@@ -56,8 +56,6 @@ MonoBehaviour:
   <HitParticle>k__BackingField: {fileID: 0}
   <MaxGP>k__BackingField: 20
   <GP>k__BackingField: 0
-  <StateMachine>k__BackingField: {fileID: 11400000, guid: 47609f3cd80fb7a4baf9d1efb58ff385, type: 2}
   <SkinData>k__BackingField: {fileID: 11400000, guid: e45c1540f2d605b4694419c56070e7a9, type: 2}
+  <StateMachine>k__BackingField: {fileID: 11400000, guid: 47609f3cd80fb7a4baf9d1efb58ff385, type: 2}
   <AnimationData>k__BackingField: {fileID: 11400000, guid: 64c26bbc28dc143448b8f534be845bc2, type: 2}
-  <EffectAnimationData>k__BackingField: {fileID: 11400000, guid: 39cdca667317c3545bcbd967cc2388aa, type: 2}
-  <EffectSpriteLibrary>k__BackingField: {fileID: 11400000, guid: fb96ea1ca6335b34b8db59c58643ec59, type: 2}

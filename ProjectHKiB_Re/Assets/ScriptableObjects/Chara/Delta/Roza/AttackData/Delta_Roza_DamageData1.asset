@@ -31,9 +31,6 @@ MonoBehaviour:
       Value: {fileID: -3625257904410580586, guid: 8c35a0dacb5835544993207b242448aa, type: 3}
     - Key: 3
       Value: {fileID: -4778618110262917078, guid: abc4ed63c34eda44e982341f59d3db8e, type: 3}
-  effectAnimationClipName: NormalAttack1
-  attatchParticleToBody: 0
   downwardDamageArea:
     offset: {x: 0, y: -1}
     size: {x: 3, y: 3}
-    pivot: {x: 0, y: 0, z: 0}

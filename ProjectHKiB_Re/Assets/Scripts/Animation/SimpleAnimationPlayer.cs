@@ -44,7 +44,7 @@ public class SimpleAnimationPlayer : MonoBehaviour
         {
             if(!string.IsNullOrEmpty(overrideClipName))
                 Play(overrideClipName);
-            else if(animationData && !string.IsNullOrEmpty(animationData.defaultClipName))
+            else if(!string.IsNullOrEmpty(animationData.defaultClipName))
                 Play(animationData.defaultClipName);
         }
     }

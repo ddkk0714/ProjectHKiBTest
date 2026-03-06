@@ -17,11 +17,8 @@ public class Damager : MonoBehaviour
     public void Initialize(SimpleAnimationDataSO effectAnimationData, SpriteLibraryAsset effectSpriteLibrary)
     {
         _effectAnimationPlayer.gameObject.SetActive(false);
-        if (effectAnimationData && effectSpriteLibrary)
-        {
-            _effectAnimationPlayer.animationData = effectAnimationData;
-            _effectSpritelibrary.spriteLibraryAsset = effectSpriteLibrary;
-        }
+        _effectAnimationPlayer.animationData = effectAnimationData;
+        _effectSpritelibrary.spriteLibraryAsset = effectSpriteLibrary;
     }
 
     public void SetAttackable(IAttackable attackable)

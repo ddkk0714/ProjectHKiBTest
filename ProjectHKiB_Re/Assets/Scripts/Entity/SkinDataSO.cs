@@ -9,4 +9,14 @@ public class SkinDataSO : ScriptableObject
     public Texture2D skinTexture;
     public Texture2D emissionSkinTexture;
     public Texture2D effectSkinTexture;
+
+    public void SetSKin(SpriteLibrary spriteLibrary, SimpleAnimationDataSO animationData, SpriteRenderer spriteRenderer)
+    {
+        spriteLibrary.spriteLibraryAsset = bodyType.Bodytypes[animationData];
+        MaterialPropertyBlock materialPropertyBlock = new();
+        materialPropertyBlock.SetTexture("_MainTex", bodyType.MainTex[animationData]);
+        materialPropertyBlock.SetTexture("_SkinTex", skinTexture);
+        materialPropertyBlock.SetTexture("_EmissionSkinTex", emissionSkinTexture);
+        spriteRenderer.SetPropertyBlock(materialPropertyBlock);
+    }
 }

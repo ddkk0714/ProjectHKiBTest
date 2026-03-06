@@ -33,8 +33,7 @@ public class AttackableModule : InterfaceModule, IAttackable
         SetAttacker();
         attackCooltime = new();
         IsAttackCooltime = false;
-        if (damager != null)
-            damager.Initialize(EffectAnimationData, EffectSpriteLibrary);
+        damager.Initialize(EffectAnimationData, EffectSpriteLibrary);
     }
 
     public void SetAttacker()
