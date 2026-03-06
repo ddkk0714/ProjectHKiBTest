@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.U2D.Animation;
 
 public class AttackableModule : InterfaceModule, IAttackable
 {
@@ -17,9 +16,6 @@ public class AttackableModule : InterfaceModule, IAttackable
     public bool IsAttackCooltime { get; set; }
     public int AttackNumber { get; set; }
     public Transform CurrentTarget { get; set; }
-    public SimpleAnimationDataSO EffectAnimationData { get; set; }
-    public SpriteLibraryAsset EffectSpriteLibrary { get; set; }
-
     public Cooltime attackCooltime;
 
     public override void Register(IInterfaceRegistable interfaceRegistable)
@@ -33,7 +29,6 @@ public class AttackableModule : InterfaceModule, IAttackable
         SetAttacker();
         attackCooltime = new();
         IsAttackCooltime = false;
-        damager.Initialize(EffectAnimationData, EffectSpriteLibrary);
     }
 
     public void SetAttacker()

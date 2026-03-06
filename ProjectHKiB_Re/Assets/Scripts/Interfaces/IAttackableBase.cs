@@ -1,4 +1,5 @@
-using UnityEngine.U2D.Animation;
+using System;
+using UnityEngine;
 
 public interface IAttackableBase
 {
@@ -8,6 +9,4 @@ public interface IAttackableBase
     public float CriticalDamageRate { get; set; }
     public AttackDataSO[] AttackDatas { get; set; }
     public DamageParticleDataSO DamageParticle { get; set; }
-    public SimpleAnimationDataSO EffectAnimationData { get; set; }
-    public SpriteLibraryAsset EffectSpriteLibrary { get; set; }
 }

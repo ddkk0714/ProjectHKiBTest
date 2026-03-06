@@ -16,9 +16,6 @@ public class SimpleAnimationPlayer : MonoBehaviour
     public bool playOnAwake = true;
     public string overrideClipName;
     public bool disableWhenStop = false;
-    public bool syncDirection = false;
-    [NaughtyAttributes.ShowIf("syncDirection")] 
-    public SimpleAnimationPlayer[] playersToSync;
 
     [Header("Event Handlers")]
     public Dictionary<string, Action> animationEvents = new();
@@ -31,7 +28,7 @@ public class SimpleAnimationPlayer : MonoBehaviour
     protected Sequence _currentSequence;
     private SimpleAnimationClip _currentClip;
     protected int _loop = 0;
-    [field:SerializeField] [field: NaughtyAttributes.ReadOnly] public EnumManager.AnimDir CurrentAnimDir {get; private set;} = EnumManager.AnimDir.D;
+    [SerializeField] [NaughtyAttributes.ReadOnly] private EnumManager.AnimDir _currentAnimDir = EnumManager.AnimDir.D;
 
     protected void Start()
     {
@@ -123,17 +120,9 @@ public class SimpleAnimationPlayer : MonoBehaviour
 
     public void SetDirection(EnumManager.AnimDir animDir) 
     {
-        CurrentAnimDir = animDir;
-
-        if (_currentClip.resetWhenDirectionChange)
-        {
-            Stop();
-            Play(_currentClip.clipName);
-        }
-
-        if (syncDirection)
-            for (int i = 0; i < playersToSync.Length; i++)
-                playersToSync[i].SetDirection(animDir);
+        Stop();
+        _currentAnimDir = animDir;
+        Play(_currentClip.clipName);
     }
 
     protected void ApplyFrame(SimpleAnimationClip clip, int frameIndex)
@@ -143,10 +132,10 @@ public class SimpleAnimationPlayer : MonoBehaviour
         string categoryKey;
         if (clip.categoryKeys.Count < 1) 
             categoryKey = clip.clipName;
-        else if (!clip.categoryKeys.ContainsKey(CurrentAnimDir)) 
+        else if (!clip.categoryKeys.ContainsKey(_currentAnimDir)) 
             categoryKey = clip.categoryKeys.Values.ToList()[0];
         else 
-            categoryKey = clip.categoryKeys[CurrentAnimDir];
+            categoryKey = clip.categoryKeys[_currentAnimDir];
         
         _spriteResolver.SetCategoryAndLabel(categoryKey, frame.labelKey);
 

@@ -1,6 +1,5 @@
 using UnityEditor.Animations;
 using UnityEngine;
-using UnityEngine.U2D.Animation;
 
 [CreateAssetMenu(fileName = "PlayerBaseData", menuName = "Scriptable Objects/Data/PlayerBaseData", order = 1)]
 public class PlayerBaseDataSO : ScriptableObject, IMovableBase, IAttackableBase, ITargetableBase,
@@ -38,9 +37,8 @@ IDodgeableBase, IDamagableBase, ISkinableBase, IAnimatableBase, IFootstepBase
     [field: NaughtyAttributes.Foldout("Graffiti")][field: SerializeField] public int MaxGP { get; set; }
     [field: NaughtyAttributes.Foldout("Graffiti")][field: SerializeField] public int GP { get; set; }
 
+    [field: NaughtyAttributes.Foldout("Skin")][field: SerializeField] public SkinDataSO SkinData { get; set; }
+
     [field: NaughtyAttributes.Foldout("Control")][field: SerializeField] public StateMachineSO StateMachine { get; set; }
-    [field: NaughtyAttributes.Foldout("Visual")][field: SerializeField] public SkinDataSO SkinData { get; set; }
-    [field: NaughtyAttributes.Foldout("Visual")][field: SerializeField] public SimpleAnimationDataSO AnimationData { get; set; }
-    [field: NaughtyAttributes.Foldout("Visual")][field: SerializeField] public SimpleAnimationDataSO EffectAnimationData { get; set; }
-    [field: NaughtyAttributes.Foldout("Visual")][field: SerializeField] public SpriteLibraryAsset EffectSpriteLibrary { get; set; }
+    [field: NaughtyAttributes.Foldout("Control")][field: SerializeField] public SimpleAnimationDataSO AnimationData { get; set; }
 }

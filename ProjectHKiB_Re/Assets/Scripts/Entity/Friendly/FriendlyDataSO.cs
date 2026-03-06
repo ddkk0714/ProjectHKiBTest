@@ -39,9 +39,7 @@ IAnimatableBase, ITargetableBase, IPathFindableBase, IFootstepBase
     public AnimatorController animationController;
     public UnityEvent<int, int> OnGameObjectDisabled { get; set; }
     [field: NaughtyAttributes.Foldout("Control")][field: SerializeField] public StateMachineSO StateMachine { get; set; }
-    [field: NaughtyAttributes.Foldout("Visual")][field: SerializeField] public SimpleAnimationDataSO AnimationData { get; set; }
-    [field: NaughtyAttributes.Foldout("Visual")][field: SerializeField] public SimpleAnimationDataSO EffectAnimationData { get; set; }
-    [field: NaughtyAttributes.Foldout("Visual")][field: SerializeField] public SpriteLibraryAsset EffectSpriteLibrary { get; set; }
+    [field: NaughtyAttributes.Foldout("Control")][field: SerializeField] public SimpleAnimationDataSO AnimationData { get; set; }
     public float PathFindCooltime { get; set; }
 
     public void OnDisable()

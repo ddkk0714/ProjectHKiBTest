@@ -1,7 +1,6 @@
 using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.U2D.Animation;
 
 [CreateAssetMenu(fileName = "Enemy Data", menuName = "Scriptable Objects/Data/Enemy Data", order = 1)]
 public class EnemyDataSO : ScriptableObject, IMovableBase, IAttackableBase, ITargetableBase,
@@ -31,9 +30,7 @@ IPathFindableBase, IDamagableBase, IPoolable, IAnimatableBase, IFootstepBase
 
 
     [field: NaughtyAttributes.Foldout("Control")][field: SerializeField] public StateMachineSO StateMachine { get; set; }
-    [field: NaughtyAttributes.Foldout("Visual")][field: SerializeField] public SimpleAnimationDataSO AnimationData { get; set; }
-    [field: NaughtyAttributes.Foldout("Visual")][field: SerializeField] public SimpleAnimationDataSO EffectAnimationData { get; set; }
-    [field: NaughtyAttributes.Foldout("Visual")][field: SerializeField] public SpriteLibraryAsset EffectSpriteLibrary { get; set; }
+    [field: NaughtyAttributes.Foldout("Control")][field: SerializeField] public SimpleAnimationDataSO AnimationData { get; set; }
 
     public UnityEvent<int, int> OnGameObjectDisabled { get; set; }
     public float PathFindCooltime { get; set; }

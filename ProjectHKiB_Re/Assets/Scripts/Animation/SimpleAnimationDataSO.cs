@@ -66,7 +66,6 @@ public class SimpleAnimationClip
     public bool isLoop = true;
     public float tickSeconds = 0.1f;
     public float maxPlaySeconds = -1;
-    public bool resetWhenDirectionChange = true;
 
     public List<AnimationFrame> frames = new();
 }

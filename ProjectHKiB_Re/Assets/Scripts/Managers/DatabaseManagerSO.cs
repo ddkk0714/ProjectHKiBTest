@@ -27,8 +27,6 @@ public class DatabaseManagerSO : ScriptableObject
         attackable.CriticalChanceRate = data.CriticalChanceRate;
         attackable.CriticalDamageRate = data.CriticalDamageRate;
         attackable.DamageParticle = data.DamageParticle;
-        attackable.EffectAnimationData = data.EffectAnimationData;
-        attackable.EffectSpriteLibrary = data.EffectSpriteLibrary;
     }
 
     public void SetITargetable(IInterfaceRegistable entity, ITargetableBase data)

@@ -8,7 +8,6 @@ public class SkinDataSO : ScriptableObject
     public BodytypeDataSO bodyType;
     public Texture2D skinTexture;
     public Texture2D emissionSkinTexture;
-    public Texture2D effectSkinTexture;
 
     public void SetSKin(SpriteLibrary spriteLibrary, SimpleAnimationDataSO animationData, SpriteRenderer spriteRenderer)
     {
