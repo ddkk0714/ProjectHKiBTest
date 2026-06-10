@@ -7,6 +7,7 @@ public class WalkByLastSetAnimationDirAction : StateActionSO
 {
     [SerializeField] private bool _negate;
     [SerializeField] private MovementManagerSO movementManager;
+    [SerializeField, Range(0.01f, 2f)] private float _speedMultiplier = 1f;
 
     public override void Act(StateController stateController)
     {
@@ -21,7 +22,7 @@ public class WalkByLastSetAnimationDirAction : StateActionSO
             movementManager.WalkMove(
                 stateController.transform,
                 movable,
-                movable.Speed,
+                movable.Speed * _speedMultiplier,
                 dir,
                 movable.WallLayer
             );

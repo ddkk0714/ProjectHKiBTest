@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _negate: 1
   movementManager: {fileID: 11400000, guid: 642ea6baceb016d4c8e15940b757d7cf, type: 2}
+  _speedMultiplier: 0.15

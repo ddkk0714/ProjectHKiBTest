@@ -58,5 +58,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7263eacb51896564e8bf3466a98c6b58, type: 2}
   exitActions:
   - {fileID: 11400000, guid: 797efcf4b4a2d0449b5517e4e60eed74, type: 2}
-  frameDecisions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
   animationName: DodgeEnd

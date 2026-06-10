@@ -24,3 +24,16 @@ public enum EmotionColor
 
     // 새 값은 반드시 여기 아래에 추가할 것 (기존 번호 절대 변경 금지)
 }
+
+// 상성 계산에서 "같은 감정"을 판단하는 그룹 단위.
+// SadnessBlue/SadnessSky처럼 색상 변형이 달라도 같은 감정이면 동일 그룹.
+public enum EmotionGroup
+{
+    Sadness,
+    Excitement,
+    Happiness,
+    Anger,
+    Void,
+    Fear,
+    Reaction,
+}

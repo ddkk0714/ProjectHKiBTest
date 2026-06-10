@@ -1044,17 +1044,5 @@
             ]
         }
     ],
-    "controlSchemes": [
-        {
-            "name": "PC",
-            "bindingGroup": "PC",
-            "devices": [
-                {
-                    "devicePath": "<Keyboard>",
-                    "isOptional": false,
-                    "isOR": false
-                }
-            ]
-        }
-    ]
+    "controlSchemes": []
 }

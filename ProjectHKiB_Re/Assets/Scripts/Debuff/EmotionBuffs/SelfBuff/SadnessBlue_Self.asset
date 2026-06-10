@@ -19,7 +19,7 @@ MonoBehaviour:
   isEmotionBuff: 1
   emotionColor: 0
   maxStack: 200
-  <TimeStackType>k__BackingField: 1
+  <TimeStackType>k__BackingField: 2
   <BuffStackType>k__BackingField: 1
   <BuffRemoveType>k__BackingField: 0
   <Effects>k__BackingField:

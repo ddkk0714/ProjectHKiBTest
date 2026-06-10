@@ -1,0 +1,434 @@
+{
+    "maps": [
+        {
+            "guid": "map-001",
+            "nodeName": "집",
+            "description": "시작점. 일기장이 있는 곳. 지도 열람과 세이브가 가능하다.",
+            "graphPosition": { "x": 0.0, "y": 0.0 },
+            "isStartNode": true,
+            "startsWithClue": true,
+            "sceneName": "Home",
+            "events": [
+                { "key": "hasDiary",   "value": true  },
+                { "key": "hasBed",     "value": false },
+                { "key": "hasInternet","value": true  }
+            ],
+            "clueIds": ["clue-destination-1", "clue-destination-2"]
+        },
+        {
+            "guid": "map-002",
+            "nodeName": "숲 입구",
+            "description": "어두운 나무들이 늘어선 길의 시작. 소형 슬픔 감정체들이 배회한다.",
+            "graphPosition": { "x": 200.0, "y": 0.0 },
+            "isStartNode": false,
+            "startsWithClue": false,
+            "sceneName": "ForestEntrance",
+            "events": [
+                { "key": "hasDiary",   "value": false },
+                { "key": "hasBed",     "value": false },
+                { "key": "hasInternet","value": false },
+                { "key": "metStranger","value": false }
+            ],
+            "clueIds": ["clue-forest-entrance"]
+        },
+        {
+            "guid": "map-003",
+            "nodeName": "숲 속 오두막",
+            "description": "낡은 침대가 있는 오두막. 벽에 고원으로 향하는 지도 메모가 붙어 있다.",
+            "graphPosition": { "x": 350.0, "y": 80.0 },
+            "isStartNode": false,
+            "startsWithClue": false,
+            "sceneName": "ForestCabin",
+            "events": [
+                { "key": "hasDiary",   "value": false },
+                { "key": "hasBed",     "value": true  },
+                { "key": "hasInternet","value": false }
+            ],
+            "clueIds": ["clue-forest-cabin", "clue-plateau"]
+        },
+        {
+            "guid": "map-004",
+            "nodeName": "호수가",
+            "description": "잔잔한 호수 옆에 자리한 공간. 먼 곳에서 노래 소리가 들린다.",
+            "graphPosition": { "x": 350.0, "y": -80.0 },
+            "isStartNode": false,
+            "startsWithClue": true,
+            "sceneName": "Lakeside",
+            "events": [
+                { "key": "hasDiary",   "value": false },
+                { "key": "hasBed",     "value": false },
+                { "key": "hasInternet","value": false }
+            ],
+            "clueIds": ["clue-lakeside", "clue-fog-valley"]
+        },
+        {
+            "guid": "map-005",
+            "nodeName": "첫 번째 목적지",
+            "description": "여러 경로가 합쳐지는 장소. 이 꿈의 중심부처럼 느껴진다.",
+            "graphPosition": { "x": 550.0, "y": 40.0 },
+            "isStartNode": false,
+            "startsWithClue": false,
+            "sceneName": "Destination1",
+            "events": [
+                { "key": "hasDiary",   "value": false },
+                { "key": "hasBed",     "value": false },
+                { "key": "hasInternet","value": false }
+            ],
+            "clueIds": ["clue-destination-1"]
+        },
+        {
+            "guid": "map-006",
+            "nodeName": "황무지",
+            "description": "메마른 땅에 거대한 감정체들이 배회한다. 지름길이지만 매우 위험하다.",
+            "graphPosition": { "x": 100.0, "y": -180.0 },
+            "isStartNode": false,
+            "startsWithClue": false,
+            "sceneName": "Wasteland",
+            "events": [
+                { "key": "hasDiary",   "value": false },
+                { "key": "hasBed",     "value": false },
+                { "key": "hasInternet","value": false }
+            ],
+            "clueIds": []
+        },
+        {
+            "guid": "map-007",
+            "nodeName": "폐기된 역",
+            "description": "오래전 멈춰버린 열차가 서 있다. 녹슨 침대에서 잠들 수 있다.",
+            "graphPosition": { "x": 200.0, "y": -260.0 },
+            "isStartNode": false,
+            "startsWithClue": false,
+            "sceneName": "AbandonedStation",
+            "events": [
+                { "key": "hasDiary",   "value": false },
+                { "key": "hasBed",     "value": true  },
+                { "key": "hasInternet","value": false }
+            ],
+            "clueIds": ["clue-abandoned-station", "clue-underground-passage"]
+        },
+        {
+            "guid": "map-008",
+            "nodeName": "안개 계곡",
+            "description": "짙은 안개가 시야를 가린다. 소형 감정체들이 안개 속을 떠다닌다.",
+            "graphPosition": { "x": 480.0, "y": -40.0 },
+            "isStartNode": false,
+            "startsWithClue": false,
+            "sceneName": "FogValley",
+            "events": [
+                { "key": "hasDiary",   "value": false },
+                { "key": "hasBed",     "value": false },
+                { "key": "hasInternet","value": false }
+            ],
+            "clueIds": ["clue-fog-valley"]
+        },
+        {
+            "guid": "map-009",
+            "nodeName": "고원",
+            "description": "높은 곳에서 꿈 전체가 내려다보인다. 유리 온실이 저 아래 보인다.",
+            "graphPosition": { "x": 480.0, "y": -160.0 },
+            "isStartNode": false,
+            "startsWithClue": false,
+            "sceneName": "Plateau",
+            "events": [
+                { "key": "hasDiary",   "value": false },
+                { "key": "hasBed",     "value": false },
+                { "key": "hasInternet","value": false }
+            ],
+            "clueIds": ["clue-plateau", "clue-greenhouse"]
+        },
+        {
+            "guid": "map-010",
+            "nodeName": "두 번째 목적지",
+            "description": "안개와 절벽 사이에 숨어 있는 고립된 공간.",
+            "graphPosition": { "x": 650.0, "y": -160.0 },
+            "isStartNode": false,
+            "startsWithClue": false,
+            "sceneName": "Destination2",
+            "events": [
+                { "key": "hasDiary",   "value": false },
+                { "key": "hasBed",     "value": false },
+                { "key": "hasInternet","value": false }
+            ],
+            "clueIds": ["clue-destination-2"]
+        },
+        {
+            "guid": "map-011",
+            "nodeName": "지하 통로",
+            "description": "땅 아래로 이어지는 좁은 터널. 공허한 형체들이 웅크리고 있다.",
+            "graphPosition": { "x": 350.0, "y": -300.0 },
+            "isStartNode": false,
+            "startsWithClue": false,
+            "sceneName": "UndergroundPassage",
+            "events": [
+                { "key": "hasDiary",   "value": false },
+                { "key": "hasBed",     "value": false },
+                { "key": "hasInternet","value": false }
+            ],
+            "clueIds": []
+        },
+        {
+            "guid": "map-012",
+            "nodeName": "유리 온실",
+            "description": "빛이 투과하는 유리벽 너머로 이상한 식물들이 자란다. 세 번째 목적지의 단서가 있다.",
+            "graphPosition": { "x": 480.0, "y": -280.0 },
+            "isStartNode": false,
+            "startsWithClue": false,
+            "sceneName": "GlassGreenhouse",
+            "events": [
+                { "key": "hasDiary",   "value": false },
+                { "key": "hasBed",     "value": false },
+                { "key": "hasInternet","value": false }
+            ],
+            "clueIds": ["clue-greenhouse", "clue-destination-3"]
+        },
+        {
+            "guid": "map-013",
+            "nodeName": "세 번째 목적지",
+            "description": "지하 깊은 곳에 있는 최종 공간. 모든 것이 고요하다.",
+            "graphPosition": { "x": 650.0, "y": -280.0 },
+            "isStartNode": false,
+            "startsWithClue": false,
+            "sceneName": "Destination3",
+            "events": [
+                { "key": "hasDiary",   "value": false },
+                { "key": "hasBed",     "value": false },
+                { "key": "hasInternet","value": false }
+            ],
+            "clueIds": ["clue-destination-3"]
+        }
+    ],
+    "connections": [
+        {
+            "guid": "conn-001",
+            "fromGuid": "map-001",
+            "toGuid": "map-002",
+            "startsWithClue": true,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 0, "scale": 0, "count": 3 }
+            ]
+        },
+        {
+            "guid": "conn-002",
+            "fromGuid": "map-002",
+            "toGuid": "map-003",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 2, "scale": 1, "count": 2 }
+            ]
+        },
+        {
+            "guid": "conn-003",
+            "fromGuid": "map-002",
+            "toGuid": "map-004",
+            "startsWithClue": true,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 3, "scale": 0, "count": 2 },
+                { "emotionType": 0, "scale": 1, "count": 1 }
+            ]
+        },
+        {
+            "guid": "conn-004",
+            "fromGuid": "map-003",
+            "toGuid": "map-005",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 7, "scale": 1, "count": 2 },
+                { "emotionType": 4, "scale": 0, "count": 3 }
+            ]
+        },
+        {
+            "guid": "conn-005",
+            "fromGuid": "map-004",
+            "toGuid": "map-005",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 1, "scale": 2, "count": 1 }
+            ]
+        },
+        {
+            "guid": "conn-006",
+            "fromGuid": "map-004",
+            "toGuid": "map-008",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 3, "scale": 1, "count": 1 },
+                { "emotionType": 0, "scale": 0, "count": 2 }
+            ]
+        },
+        {
+            "guid": "conn-007",
+            "fromGuid": "map-008",
+            "toGuid": "map-005",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 0, "scale": 0, "count": 1 }
+            ]
+        },
+        {
+            "guid": "conn-008",
+            "fromGuid": "map-001",
+            "toGuid": "map-006",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 5, "scale": 2, "count": 2 },
+                { "emotionType": 6, "scale": 2, "count": 1 }
+            ],
+            "requiredGears": [6]
+        },
+        {
+            "guid": "conn-009",
+            "fromGuid": "map-006",
+            "toGuid": "map-005",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 6, "scale": 2, "count": 2 }
+            ]
+        },
+        {
+            "guid": "conn-010",
+            "fromGuid": "map-003",
+            "toGuid": "map-008",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 3, "scale": 0, "count": 3 }
+            ]
+        },
+        {
+            "guid": "conn-011",
+            "fromGuid": "map-008",
+            "toGuid": "map-009",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 3, "scale": 1, "count": 2 }
+            ]
+        },
+        {
+            "guid": "conn-012",
+            "fromGuid": "map-009",
+            "toGuid": "map-010",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 4, "scale": 1, "count": 1 },
+                { "emotionType": 7, "scale": 0, "count": 2 }
+            ]
+        },
+        {
+            "guid": "conn-013",
+            "fromGuid": "map-004",
+            "toGuid": "map-009",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 1, "scale": 2, "count": 1 },
+                { "emotionType": 3, "scale": 0, "count": 1 }
+            ]
+        },
+        {
+            "guid": "conn-014",
+            "fromGuid": "map-006",
+            "toGuid": "map-009",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 7, "scale": 2, "count": 1 },
+                { "emotionType": 6, "scale": 0, "count": 1 }
+            ]
+        },
+        {
+            "guid": "conn-015",
+            "fromGuid": "map-006",
+            "toGuid": "map-010",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 4, "scale": 2, "count": 1 },
+                { "emotionType": 7, "scale": 2, "count": 1 }
+            ]
+        },
+        {
+            "guid": "conn-016",
+            "fromGuid": "map-006",
+            "toGuid": "map-007",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 5, "scale": 2, "count": 1 }
+            ]
+        },
+        {
+            "guid": "conn-017",
+            "fromGuid": "map-007",
+            "toGuid": "map-011",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 6, "scale": 1, "count": 2 }
+            ]
+        },
+        {
+            "guid": "conn-018",
+            "fromGuid": "map-011",
+            "toGuid": "map-012",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 7, "scale": 1, "count": 1 },
+                { "emotionType": 6, "scale": 0, "count": 3 }
+            ]
+        },
+        {
+            "guid": "conn-019",
+            "fromGuid": "map-012",
+            "toGuid": "map-013",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 2, "scale": 1, "count": 2 }
+            ]
+        },
+        {
+            "guid": "conn-020",
+            "fromGuid": "map-009",
+            "toGuid": "map-012",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 4, "scale": 1, "count": 1 },
+                { "emotionType": 3, "scale": 0, "count": 2 }
+            ]
+        },
+        {
+            "guid": "conn-021",
+            "fromGuid": "map-002",
+            "toGuid": "map-007",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 7, "scale": 1, "count": 2 }
+            ]
+        },
+        {
+            "guid": "conn-022",
+            "fromGuid": "map-003",
+            "toGuid": "map-009",
+            "startsWithClue": false,
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 0, "scale": 2, "count": 1 },
+                { "emotionType": 2, "scale": 0, "count": 2 }
+            ]
+        }
+    ]
+}

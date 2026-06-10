@@ -1,0 +1,92 @@
+{
+    "clues": [
+        {
+            "id": "clue-forest-entrance",
+            "name": "숲 입구에 대한 소문",
+            "description": "인터넷에 올라온 게시글. 숲 입구의 분위기와 등장하는 존재들에 대한 내용이 담겨 있다.",
+            "targetMapGuid": "map-002",
+            "targetConnectionGuid": "",
+            "requiredEventKey": "metStranger"
+        },
+        {
+            "id": "clue-lakeside",
+            "name": "호수가의 전설",
+            "description": "오래된 문서에서 발견된 기록. 호수 근처에서 목격된 이상한 현상들을 묘사하고 있다.",
+            "targetMapGuid": "map-004",
+            "targetConnectionGuid": "",
+            "requiredEventKey": ""
+        },
+        {
+            "id": "clue-forest-cabin",
+            "name": "숲 속 오두막 목격담",
+            "description": "숲 입구 부근에서 수집한 이야기. 나무 사이에 낡은 오두막이 있고 침대가 있다고 한다.",
+            "targetMapGuid": "map-003",
+            "targetConnectionGuid": "",
+            "requiredEventKey": ""
+        },
+        {
+            "id": "clue-fog-valley",
+            "name": "안개 계곡 기록",
+            "description": "호수 근처에서 발견한 낡은 일지. 안개가 짙게 깔린 계곡과 그 너머 목적지에 대한 기록이 있다.",
+            "targetMapGuid": "map-008",
+            "targetConnectionGuid": "",
+            "requiredEventKey": ""
+        },
+        {
+            "id": "clue-plateau",
+            "name": "고원으로 가는 지도 메모",
+            "description": "오두막 벽에 붙어 있던 손으로 그린 지도. 안개 계곡을 지나면 높은 고원이 있다고 적혀 있다.",
+            "targetMapGuid": "map-009",
+            "targetConnectionGuid": "",
+            "requiredEventKey": ""
+        },
+        {
+            "id": "clue-abandoned-station",
+            "name": "폐기된 역 소문",
+            "description": "황무지 방향으로 가면 멈춰버린 열차가 있는 역이 있다는 이야기. 침대가 있어 쉬어갈 수 있다고 한다.",
+            "targetMapGuid": "map-007",
+            "targetConnectionGuid": "",
+            "requiredEventKey": ""
+        },
+        {
+            "id": "clue-underground-passage",
+            "name": "지하 통로의 존재",
+            "description": "폐역 역사 바닥에 적힌 낙서. 지하로 이어지는 터널이 있고 그 끝에 밝은 빛이 있다고 한다.",
+            "targetMapGuid": "map-011",
+            "targetConnectionGuid": "",
+            "requiredEventKey": ""
+        },
+        {
+            "id": "clue-greenhouse",
+            "name": "유리 온실 목격담",
+            "description": "고원에서 내려다보이는 빛나는 구조물에 대한 기록. 안에 이상한 식물들이 자라고 있다.",
+            "targetMapGuid": "map-012",
+            "targetConnectionGuid": "",
+            "requiredEventKey": ""
+        },
+        {
+            "id": "clue-destination-1",
+            "name": "첫 번째 목적지 정보",
+            "description": "인터넷 게시판의 오래된 글. 여러 경로가 교차하는 장소가 있다는 내용이다.",
+            "targetMapGuid": "map-005",
+            "targetConnectionGuid": "",
+            "requiredEventKey": ""
+        },
+        {
+            "id": "clue-destination-2",
+            "name": "두 번째 목적지 소문",
+            "description": "인터넷에서 발견한 단편적인 정보. 절벽과 안개 사이의 고립된 공간에 대한 이야기다.",
+            "targetMapGuid": "map-010",
+            "targetConnectionGuid": "",
+            "requiredEventKey": ""
+        },
+        {
+            "id": "clue-destination-3",
+            "name": "세 번째 목적지의 단서",
+            "description": "유리 온실 안에서 찾은 쪽지. 지하 깊은 곳에 최후의 공간이 있다고 적혀 있다.",
+            "targetMapGuid": "map-013",
+            "targetConnectionGuid": "",
+            "requiredEventKey": ""
+        }
+    ]
+}
