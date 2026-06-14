@@ -18,6 +18,10 @@ public class PathResult
     public bool IsSelectable => IsValid && !IsBlocked;
 }
 
+// 경로 탐색 알고리즘 모음 — 무상태 정적 클래스.
+// 그래프 데이터(graph), 진행 상태(progress, 단서 공개 여부 판단용),
+// 장착 장비(equippedGears, 난이도 가중치·통과 가능 판정용)를 모두 파라미터로 받는다.
+// 일반적으로는 RouteModule.FindPath / FindPathFromStart 래퍼를 통해 호출된다.
 public static class MapPathFinder
 {
     public static PathResult FindPath(
@@ -25,6 +29,7 @@ public static class MapPathFinder
         MapNodeData destination,
         PathType pathType,
         MapGraph graph,
+        RouteProgressState progress,
         EmotionColor[] equippedGears = null)
     {
         if (start == null || destination == null || graph == null)
@@ -32,9 +37,9 @@ public static class MapPathFinder
 
         var result = pathType switch
         {
-            PathType.Shortest => BFS(start, destination, graph, equippedGears),
-            PathType.Balanced => Dijkstra(start, destination, graph, equippedGears, useHopPenalty: true),
-            _                 => Dijkstra(start, destination, graph, equippedGears, useHopPenalty: false),
+            PathType.Shortest => BFS(start, destination, graph, progress, equippedGears),
+            PathType.Balanced => Dijkstra(start, destination, graph, progress, equippedGears, useHopPenalty: true),
+            _                 => Dijkstra(start, destination, graph, progress, equippedGears, useHopPenalty: false),
         };
 
         if (!result.IsValid) return result;
@@ -46,9 +51,9 @@ public static class MapPathFinder
             var excluded = GetBlockedConnectionGuids(graph, equippedGears);
             var alt = pathType switch
             {
-                PathType.Shortest => BFS(start, destination, graph, equippedGears, excluded),
-                PathType.Balanced => Dijkstra(start, destination, graph, equippedGears, useHopPenalty: true, excluded),
-                _                 => Dijkstra(start, destination, graph, equippedGears, useHopPenalty: false, excluded),
+                PathType.Shortest => BFS(start, destination, graph, progress, equippedGears, excluded),
+                PathType.Balanced => Dijkstra(start, destination, graph, progress, equippedGears, useHopPenalty: true, excluded),
+                _                 => Dijkstra(start, destination, graph, progress, equippedGears, useHopPenalty: false, excluded),
             };
             if (alt.IsValid) result.AlternativePath = alt;
         }
@@ -74,7 +79,7 @@ public static class MapPathFinder
     }
 
     // ─── BFS (최단 경로) ──────────────────────────────────────────
-    private static PathResult BFS(MapNodeData start, MapNodeData destination, MapGraph graph, EmotionColor[] gears, HashSet<string> excluded = null)
+    private static PathResult BFS(MapNodeData start, MapNodeData destination, MapGraph graph, RouteProgressState progress, EmotionColor[] gears, HashSet<string> excluded = null)
     {
         var queue   = new Queue<MapNodeData>();
         var visited = new HashSet<string>();
@@ -88,7 +93,7 @@ public static class MapPathFinder
         {
             var current = queue.Dequeue();
             if (current.guid == destination.guid)
-                return BuildResult(start, destination, prev, graph, gears);
+                return BuildResult(start, destination, prev, progress, gears);
 
             foreach (var conn in graph.GetConnectionsFrom(current))
             {
@@ -114,6 +119,7 @@ public static class MapPathFinder
         MapNodeData start,
         MapNodeData destination,
         MapGraph graph,
+        RouteProgressState progress,
         EmotionColor[] gears,
         bool useHopPenalty,
         HashSet<string> excluded = null)
@@ -144,7 +150,7 @@ public static class MapPathFinder
             pq.Remove(pq.Min);
 
             if (current.guid == destination.guid)
-                return BuildResult(start, destination, prev, graph, gears);
+                return BuildResult(start, destination, prev, progress, gears);
 
             if (cost > dist[current.guid]) continue;
 
@@ -182,12 +188,12 @@ public static class MapPathFinder
 
     // ─── 경로 복원 ────────────────────────────────────────────────
     // TotalDifficulty: 클루 여부 무관하게 실제 난이도 합산 (표시용)
-    // ContainsNoClueNode: 경로 중 단서 없는 노드 포함 여부 (start 제외)
+    // ContainsNoClueNode: 경로 중 단서 없는 노드 포함 여부 (start 제외, progress가 null이면 검사 생략)
     private static PathResult BuildResult(
         MapNodeData start,
         MapNodeData destination,
         Dictionary<string, (MapNodeData node, MapConnectionData conn)> prev,
-        MapGraph graph,
+        RouteProgressState progress,
         EmotionColor[] gears)
     {
         var nodes = new List<MapNodeData>();
@@ -199,7 +205,7 @@ public static class MapPathFinder
         while (cur != null)
         {
             nodes.Insert(0, cur);
-            if (!graph.HasNodeClue(cur) && cur.guid != start.guid)
+            if (progress != null && !progress.HasNodeClue(cur) && cur.guid != start.guid)
                 noClue = true;
 
             var (prevNode, conn) = prev[cur.guid];

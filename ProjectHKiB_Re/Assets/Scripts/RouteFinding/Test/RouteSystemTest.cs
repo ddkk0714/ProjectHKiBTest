@@ -3,8 +3,9 @@ using UnityEngine;
 using NaughtyAttributes;
 
 // 에디터 인스펙터에서 [Button]으로 루트파인딩 시스템을 검증하는 테스트 컴포넌트.
-// MapGraph / RouteManager / RouteSpawnManager 가 씬에 있어야 동작한다.
+// MapGraph / RouteSpawnManager 는 씬에 있어야 하고, RouteModule은 없으면 자동 생성된다.
 // 노드는 map_database.json에 정의된 GUID 문자열로 참조한다.
+// 진행 상태(방문/단서/클리어)는 RouteModule.Instance.Progress를 통해 조작한다.
 public class RouteSystemTest : MonoBehaviour
 {
     [Header("경로 탐색 테스트")]
@@ -48,7 +49,8 @@ public class RouteSystemTest : MonoBehaviour
         var (start, dest) = GetNodes();
         if (start == null || dest == null) return;
 
-        var result = MapPathFinder.FindPath(start, dest, type, MapGraph.Instance, _testEquippedGears);
+        // 테스트 전용 장비(_testEquippedGears)를 쓰므로 모듈 래퍼 대신 MapPathFinder를 직접 호출한다.
+        var result = MapPathFinder.FindPath(start, dest, type, MapGraph.Instance, RouteModule.Instance.Progress, _testEquippedGears);
         ApplyResult(result, ref display, ref diff, label);
         if (trackNoClue) _pathContainsNoClue = result.ContainsNoClueNode;
     }
@@ -63,7 +65,7 @@ public class RouteSystemTest : MonoBehaviour
         foreach (var conn in MapGraph.Instance.AllConnections)
         {
             float diff = DifficultyCalculator.Calculate(conn, _testEquippedGears);
-            bool hasClue = MapGraph.Instance.HasConnectionClue(conn);
+            bool hasClue = RouteModule.Instance.Progress.HasConnectionClue(conn);
             bool passable = conn.IsPassableWith(_testEquippedGears);
             var from = MapGraph.Instance.GetNode(conn.fromGuid);
             var to   = MapGraph.Instance.GetNode(conn.toGuid);
@@ -87,7 +89,7 @@ public class RouteSystemTest : MonoBehaviour
     {
         var spawnNode = RouteSpawnManager.Instance.ConsumeRespawnNode();
         Debug.Log($"[RouteSystemTest] 사망 처리 완료 — 복귀: {spawnNode?.nodeName ?? "없음"}");
-        Debug.Log("[RouteSystemTest] ※ 실게임에서는 MapGraph.RevertToLastSave(lastSaved) 호출 필요");
+        Debug.Log("[RouteSystemTest] ※ 실게임에서는 RouteModule.Instance.RevertToLastSave(lastSaved) 호출 필요");
     }
 
     // ─── 단서 획득 ───────────────────────────────────────────────
@@ -98,7 +100,7 @@ public class RouteSystemTest : MonoBehaviour
         if (!ValidateGraph()) return;
         var node = MapGraph.Instance.GetNode(_testClueMapGuid);
         if (node == null) { Debug.LogError($"[RouteSystemTest] GUID에 해당하는 노드가 없습니다: {_testClueMapGuid}"); return; }
-        MapGraph.Instance.MarkNodeVisited(node);
+        RouteModule.Instance.Progress.MarkNodeVisited(node);
         Debug.Log($"[RouteSystemTest] 방문 처리: {node.nodeName}");
     }
 
@@ -108,7 +110,7 @@ public class RouteSystemTest : MonoBehaviour
         if (!ValidateGraph()) return;
         var node = MapGraph.Instance.GetNode(_testClueMapGuid);
         if (node == null) { Debug.LogError($"[RouteSystemTest] GUID에 해당하는 노드가 없습니다: {_testClueMapGuid}"); return; }
-        MapGraph.Instance.SetEventFlag(node.guid, _testEventKey);
+        RouteModule.Instance.Progress.SetEventFlag(node.guid, _testEventKey);
         Debug.Log($"[RouteSystemTest] 이벤트 발생: {node.nodeName} / {_testEventKey}");
     }
 
@@ -116,7 +118,7 @@ public class RouteSystemTest : MonoBehaviour
     private void TestPrintAcquiredClues()
     {
         if (!ValidateGraph()) return;
-        foreach (var clueId in MapGraph.Instance.AcquiredClueIds)
+        foreach (var clueId in RouteModule.Instance.Progress.AcquiredClueIds)
         {
             var clue = MapGraph.Instance.GetClue(clueId);
             if (clue == null) continue;
@@ -134,30 +136,30 @@ public class RouteSystemTest : MonoBehaviour
         var (start, dest) = GetNodes();
         if (start == null || dest == null) return;
 
-        var result = MapPathFinder.FindPath(start, dest, PathType.Shortest, MapGraph.Instance);
+        var result = RouteModule.Instance.FindPath(start, dest, PathType.Shortest);
         if (!result.IsValid) { Debug.LogWarning("[RouteSystemTest] 유효한 경로가 없습니다."); return; }
 
-        RouteManager.Instance.SelectRoute(result);
-        RouteManager.Instance.StartTravel();
+        RouteModule.Instance.SelectRoute(result);
+        RouteModule.Instance.StartTravel();
     }
 
     [Button("다음 노드로 진행 (전투 완료 시뮬레이션)")]
     private void TestAdvance()
     {
-        if (!RouteManager.Instance.IsTraveling)
+        if (!RouteModule.Instance.IsTraveling)
         {
             Debug.LogWarning("[RouteSystemTest] 이동 중이 아닙니다. 먼저 출발하세요.");
             return;
         }
-        var conn = RouteManager.Instance.GetCurrentConnection();
+        var conn = RouteModule.Instance.GetCurrentConnection();
         if (conn != null)
         {
-            MapGraph.Instance.MarkConnectionCleared(conn);
+            RouteModule.Instance.Progress.MarkConnectionCleared(conn);
             var from = MapGraph.Instance.GetNode(conn.fromGuid);
             var to   = MapGraph.Instance.GetNode(conn.toGuid);
             Debug.Log($"[RouteSystemTest] 연결 클리어: {from?.nodeName}→{to?.nodeName}");
         }
-        RouteManager.Instance.AdvanceToNextNode();
+        RouteModule.Instance.AdvanceToNextNode();
     }
 
     // ─── 내부 헬퍼 ───────────────────────────────────────────────

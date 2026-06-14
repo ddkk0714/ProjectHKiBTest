@@ -7,12 +7,17 @@ using TMPro;
 
 namespace RouteFinding.MapView
 {
-    // 씬 내 맵 뷰어 창.
+    // 씬 내 맵 뷰어 창 — 루트파인딩 시스템의 "그리기" 담당.
     // Canvas 직속 자식 GO에 이 컴포넌트를 붙인다. (BaseWindow와 동일한 계층 구조)
     // 이 GO 자체는 항상 활성 — M키 감지를 위해 Update가 계속 동작.
     // 내부 패널(_panelGO)만 Open/Close 시 토글된다.
     //
-    // 의존: MapGraph, RouteManager, DifficultyCalculator, MapPathFinder (씬에 존재해야 함)
+    // 상태를 직접 소유하지 않는다:
+    //   - 장착 장비, 진행 상태(방문/단서/클리어), 경로 규칙 → RouteModule이 소유
+    //   - 이 클래스는 모듈의 상태를 읽어 노드·엣지 색상과 패널 텍스트만 갱신한다
+    //   - 장비 버튼 클릭 등 입력은 모듈에 위임하고 결과를 다시 그린다
+    //
+    // 의존: MapGraph(씬 배치 필요), RouteModule(없으면 자동 생성)
     public class MapViewer : MonoBehaviour
     {
         [Header("조작")]
@@ -60,10 +65,11 @@ namespace RouteFinding.MapView
         private TextMeshProUGUI _tooltipTMP;
         private RectTransform   _clueListContent;
 
+        // 뷰가 가지는 것은 "화면 표시" 상태뿐 — 목적지 선택, 경로 방식, 탐색 결과 캐시.
+        // 장비·진행 상태 같은 공용 상태는 RouteModule이 소유한다.
         private MapNodeView            _selectedDest;
         private PathType               _pathType    = PathType.Shortest;
         private PathResult             _currentPath;
-        private readonly List<EmotionColor> _gears  = new();
 
         private TextMeshProUGUI _pathInfoTMP;
         private TextMeshProUGUI _gearListTMP;
@@ -104,7 +110,8 @@ namespace RouteFinding.MapView
 
         public void Open()
         {
-            if (RouteManager.Instance != null && RouteManager.Instance.IsTraveling)
+            // 기획 규칙(이동 중 지도 열람 불가)의 판단은 모듈의 몫 — 뷰는 묻기만 한다.
+            if (!RouteModule.Instance.CanOpenMap)
             {
                 Debug.LogWarning("[MapViewer] 이동 중에는 지도를 열 수 없습니다.");
                 return;
@@ -260,8 +267,8 @@ namespace RouteFinding.MapView
         private void Refresh()
         {
             if (MapGraph.Instance == null) return;
-            var graph = MapGraph.Instance;
-            var gears = _gears.Count > 0 ? _gears.ToArray() : null;
+            var progress = RouteModule.Instance.Progress; // 방문/단서/클리어 상태
+            var gears    = RouteModule.Instance.EquippedGearArray;
 
             // 통과 불가 구간을 포함한 경로(IsBlocked)는 선택 불가 — 빨강으로 표시만 하고,
             // 실제 선택 가능한 경로는 AlternativePath.
@@ -272,8 +279,8 @@ namespace RouteFinding.MapView
             foreach (var kv in _nodeViews)
             {
                 var d       = kv.Value.Data;
-                bool vis    = graph.IsNodeVisited(d);
-                bool clue   = graph.HasNodeClue(d);
+                bool vis    = progress.IsNodeVisited(d);
+                bool clue   = progress.HasNodeClue(d);
                 bool start  = d.isStartNode;
                 bool sel    = _selectedDest?.Data.guid == d.guid;
                 bool onPath = IsNodeOnPath(selectablePath, d.guid);
@@ -285,8 +292,8 @@ namespace RouteFinding.MapView
             {
                 var d        = ev.Data;
                 float df     = DifficultyCalculator.Calculate(d, gears);
-                bool cleared = graph.IsConnectionCleared(d);
-                bool hasClue = graph.HasConnectionClue(d);
+                bool cleared = progress.IsConnectionCleared(d);
+                bool hasClue = progress.HasConnectionClue(d);
                 bool onPath  = IsEdgeOnPath(selectablePath, d.guid);
                 bool onBlockedPath = IsEdgeOnPath(blockedPath, d.guid);
                 bool passable = d.IsPassableWith(gears);
@@ -296,6 +303,7 @@ namespace RouteFinding.MapView
 
             RefreshPathLabel();
             RefreshPathTypeButtons();
+            RefreshGearPanel();
             RefreshClueMarkers();
             RefreshClueList();
         }
@@ -326,7 +334,7 @@ namespace RouteFinding.MapView
         {
             if (MapGraph.Instance == null) return;
 
-            foreach (var clueId in MapGraph.Instance.AcquiredClueIds)
+            foreach (var clueId in RouteModule.Instance.Progress.AcquiredClueIds)
             {
                 if (_clueMarkerViews.ContainsKey(clueId)) continue;
                 var clue = MapGraph.Instance.GetClue(clueId);
@@ -393,14 +401,13 @@ namespace RouteFinding.MapView
             var sb = new StringBuilder();
             sb.Append($"<b>{clue.name}</b>\n{clue.description}\n");
 
-            var startNode  = GetStartNode();
+            var startNode  = MapGraph.Instance.StartNode;
             var targetNode = MapGraph.Instance.GetNode(clue.targetMapGuid);
             if (startNode != null && targetNode != null && startNode.guid != targetNode.guid)
             {
-                var gears = _gears.Count > 0 ? _gears.ToArray() : null;
-                AppendRouteInfo(sb, "최단",      PathType.Shortest,      startNode, targetNode, gears);
-                AppendRouteInfo(sb, "균형",      PathType.Balanced,      startNode, targetNode, gears);
-                AppendRouteInfo(sb, "최소난이도", PathType.MinDifficulty, startNode, targetNode, gears);
+                AppendRouteInfo(sb, "최단",      PathType.Shortest,      targetNode);
+                AppendRouteInfo(sb, "균형",      PathType.Balanced,      targetNode);
+                AppendRouteInfo(sb, "최소난이도", PathType.MinDifficulty, targetNode);
             }
 
             _tooltipTMP.text = sb.ToString();
@@ -417,10 +424,10 @@ namespace RouteFinding.MapView
             if (_tooltipRT != null) _tooltipRT.gameObject.SetActive(false);
         }
 
-        private static void AppendRouteInfo(StringBuilder sb, string label, PathType type,
-            MapNodeData start, MapNodeData dest, EmotionColor[] gears)
+        // 단서 툴팁에 표시할 추천 경로 한 줄 요약. 탐색 자체는 모듈(현재 장비·진행 상태 기준)에 위임.
+        private static void AppendRouteInfo(StringBuilder sb, string label, PathType type, MapNodeData dest)
         {
-            var result = MapPathFinder.FindPath(start, dest, type, MapGraph.Instance, gears);
+            var result = RouteModule.Instance.FindPathFromStart(dest, type);
             if (!result.IsValid) { sb.Append($"{label}: 경로 없음\n"); return; }
 
             if (result.IsBlocked)
@@ -437,13 +444,6 @@ namespace RouteFinding.MapView
             }
         }
 
-        private static MapNodeData GetStartNode()
-        {
-            foreach (var n in MapGraph.Instance.AllNodes)
-                if (n.isStartNode) return n;
-            return null;
-        }
-
         // 사이드패널의 단서 목록(텍스트)을 갱신한다. 클릭하면 그래프가 해당 맵으로 포커스 이동.
         private void RefreshClueList()
         {
@@ -452,7 +452,7 @@ namespace RouteFinding.MapView
             for (int i = _clueListContent.childCount - 1; i >= 0; i--)
                 Destroy(_clueListContent.GetChild(i).gameObject);
 
-            var acquired = MapGraph.Instance.AcquiredClueIds;
+            var acquired = RouteModule.Instance.Progress.AcquiredClueIds;
             if (acquired.Count == 0)
             {
                 MakeTMP(_clueListContent, "없음", 8f, FontStyles.Normal, 12f).color = Gray;
@@ -507,16 +507,17 @@ namespace RouteFinding.MapView
             Refresh();
         }
 
+        // 선택된 목적지 기준으로 추천 경로 재계산.
+        // 장비·진행 상태 반영은 모듈이 담당하므로 뷰는 목적지와 경로 방식만 전달한다.
         private void RecalcPath()
         {
             _currentPath = null;
             if (_selectedDest == null || MapGraph.Instance == null) return;
 
-            var startNode = GetStartNode();
+            var startNode = MapGraph.Instance.StartNode;
             if (startNode == null || startNode.guid == _selectedDest.Data.guid) return;
 
-            var gears = _gears.Count > 0 ? _gears.ToArray() : null;
-            _currentPath = MapPathFinder.FindPath(startNode, _selectedDest.Data, _pathType, MapGraph.Instance, gears);
+            _currentPath = RouteModule.Instance.FindPathFromStart(_selectedDest.Data, _pathType);
         }
 
         private void SetPathType(PathType pt)
@@ -526,37 +527,42 @@ namespace RouteFinding.MapView
             Refresh();
         }
 
+        // 장비 버튼 클릭 — 실제 착탈은 모듈에 위임하고(이동 중이면 거부됨),
+        // 변경됐을 때만 경로 재계산 + 화면 갱신. 버튼 색상 등은 Refresh→RefreshGearPanel이 처리.
         private void ToggleGear(EmotionColor ec)
         {
-            if (_gears.Contains(ec)) _gears.Remove(ec);
-            else _gears.Add(ec);
-
-            if (_gearBtnImages.TryGetValue(ec, out var img))
-            {
-                var baseColor = EmotionColorConfig.GetColor(ec);
-                img.color = _gears.Contains(ec) ? baseColor : baseColor * 0.45f;
-            }
-
-            if (_gearListTMP != null)
-            {
-                if (_gears.Count == 0)
-                {
-                    _gearListTMP.text = "없음";
-                }
-                else
-                {
-                    var sb = new StringBuilder();
-                    foreach (var g in _gears)
-                    {
-                        if (sb.Length > 0) sb.Append(", ");
-                        sb.Append(EmotionColorConfig.GetName(g));
-                    }
-                    _gearListTMP.text = sb.ToString();
-                }
-            }
-
+            if (!RouteModule.Instance.ToggleGear(ec)) return;
             RecalcPath();
             Refresh();
+        }
+
+        // 장비 패널을 모듈의 장비 상태와 동기화한다.
+        // 상태의 원본이 모듈에 있으므로, 어떤 경로로 장비가 바뀌어도 화면이 항상 일치한다.
+        private void RefreshGearPanel()
+        {
+            var module = RouteModule.Instance;
+
+            foreach (var kv in _gearBtnImages)
+            {
+                var baseColor = EmotionColorConfig.GetColor(kv.Key);
+                kv.Value.color = module.IsGearEquipped(kv.Key) ? baseColor : baseColor * 0.45f;
+            }
+
+            if (_gearListTMP == null) return;
+
+            if (module.EquippedGears.Count == 0)
+            {
+                _gearListTMP.text = "없음";
+                return;
+            }
+
+            var sb = new StringBuilder();
+            foreach (var g in module.EquippedGears)
+            {
+                if (sb.Length > 0) sb.Append(", ");
+                sb.Append(EmotionColorConfig.GetName(g));
+            }
+            _gearListTMP.text = sb.ToString();
         }
 
         private void RefreshPathLabel()

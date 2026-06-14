@@ -466,7 +466,7 @@ namespace RouteFinding.Editor
             EditorGUILayout.HelpBox(
                 "출발 맵(이 단서가 '획득 가능 단서 ID'에 등록된 맵)을 방문해야 획득 가능.\n" +
                 "비어있으면 방문만으로 획득. 값이 있으면 해당 맵에서 " +
-                "MapGraph.SetEventFlag(맵GUID, 이 키)가 호출된 후에만 획득.",
+                "RouteModule.Instance.Progress.SetEventFlag(맵GUID, 이 키)가 호출된 후에만 획득.",
                 MessageType.None);
 
             if (EditorGUI.EndChangeCheck()) _dirty = true;
