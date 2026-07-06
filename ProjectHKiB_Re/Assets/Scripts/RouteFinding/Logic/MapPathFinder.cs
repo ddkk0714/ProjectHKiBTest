@@ -14,6 +14,10 @@ public class PathResult
     public bool IsBlocked { get; set; }
     public PathResult AlternativePath { get; set; }
 
+    // "단서 있는 경로 우선" 옵션(avoidNoClueNodes)으로 탐색했으나, 단서 없는 맵을
+    // 전혀 경유하지 않는 경로가 존재하지 않아 어쩔 수 없이 일반 경로로 대체됐음을 표시.
+    public bool NoClueAvoidanceFailed { get; set; }
+
     public bool IsValid => Nodes != null && Nodes.Count >= 2;
     public bool IsSelectable => IsValid && !IsBlocked;
 }
@@ -30,17 +34,20 @@ public static class MapPathFinder
         PathType pathType,
         MapGraph graph,
         RouteProgressState progress,
-        EmotionColor[] equippedGears = null)
+        EmotionColor[] equippedGears = null,
+        bool avoidNoClueNodes = false)
     {
         if (start == null || destination == null || graph == null)
             return new PathResult();
 
-        var result = pathType switch
+        var result = Search(start, destination, pathType, graph, progress, equippedGears, avoidNoClueNodes, excluded: null);
+
+        // "단서 있는 경로 우선" 옵션인데 그런 경로가 아예 없으면, 일반 탐색으로 대체하고 실패했음을 표시.
+        if (avoidNoClueNodes && !result.IsValid)
         {
-            PathType.Shortest => BFS(start, destination, graph, progress, equippedGears),
-            PathType.Balanced => Dijkstra(start, destination, graph, progress, equippedGears, useHopPenalty: true),
-            _                 => Dijkstra(start, destination, graph, progress, equippedGears, useHopPenalty: false),
-        };
+            result = Search(start, destination, pathType, graph, progress, equippedGears, avoidNoClueNodes: false, excluded: null);
+            if (result.IsValid) result.NoClueAvoidanceFailed = true;
+        }
 
         if (!result.IsValid) return result;
 
@@ -49,17 +56,32 @@ public static class MapPathFinder
         {
             // 차선 경로: 통과 불가 연결을 그래프에서 모두 제외하고 같은 기준으로 재탐색
             var excluded = GetBlockedConnectionGuids(graph, equippedGears);
-            var alt = pathType switch
+            var alt = Search(start, destination, pathType, graph, progress, equippedGears, avoidNoClueNodes, excluded);
+            if (avoidNoClueNodes && !alt.IsValid)
             {
-                PathType.Shortest => BFS(start, destination, graph, progress, equippedGears, excluded),
-                PathType.Balanced => Dijkstra(start, destination, graph, progress, equippedGears, useHopPenalty: true, excluded),
-                _                 => Dijkstra(start, destination, graph, progress, equippedGears, useHopPenalty: false, excluded),
-            };
+                alt = Search(start, destination, pathType, graph, progress, equippedGears, avoidNoClueNodes: false, excluded);
+                if (alt.IsValid) alt.NoClueAvoidanceFailed = true;
+            }
             if (alt.IsValid) result.AlternativePath = alt;
         }
 
         return result;
     }
+
+    private static PathResult Search(
+        MapNodeData start,
+        MapNodeData destination,
+        PathType pathType,
+        MapGraph graph,
+        RouteProgressState progress,
+        EmotionColor[] gears,
+        bool avoidNoClueNodes,
+        HashSet<string> excluded) => pathType switch
+    {
+        PathType.Shortest => BFS(start, destination, graph, progress, gears, avoidNoClueNodes, excluded),
+        PathType.Balanced => Dijkstra(start, destination, graph, progress, gears, useHopPenalty: true, avoidNoClueNodes: avoidNoClueNodes, excluded: excluded),
+        _                 => Dijkstra(start, destination, graph, progress, gears, useHopPenalty: false, avoidNoClueNodes: avoidNoClueNodes, excluded: excluded),
+    };
 
     // 장비로 통과 불가능한 연결을 하나라도 포함하는지
     private static bool ContainsBlockedConnection(List<MapConnectionData> connections, EmotionColor[] gears)
@@ -68,6 +90,25 @@ public static class MapPathFinder
             if (!conn.IsPassableWith(gears)) return true;
         return false;
     }
+
+    // 노드가 단서를 보유한(또는 시작) 상태 = 지도 UI에서 "밝혀진 노드"와 동일한 기준.
+    private static bool IsNodeRevealed(MapNodeData node, RouteProgressState progress) =>
+        progress == null || node.isStartNode || progress.HasNodeClue(node);
+
+    // 간선(current-neighbor)을 경로 계산에 쓸 수 있는지 판단 — 지도 UI의 "간선 표시" 규칙(둘 중 하나라도
+    // 밝혀졌으면 표시)과 완전히 동일한 기준이다. 노드 단위로만 걸러내면, neighbor가 *다른* 밝혀진 노드를
+    // 통해 독립적으로 "안다" 판정을 받았을 때 지금 건너는 이 간선 자체는 화면에 보이지도 않는데
+    // 몰래 경로에 쓰이는 틈이 생긴다 — 그래서 반드시 "지금 이 간선"의 두 끝점 중 하나가 밝혀졌는지로 검사한다.
+    // (current가 밝혀졌으면 어느 이웃으로든 한 칸까지 허용되고, current가 안 밝혀진 이웃(프론티어)이면
+    //  neighbor 쪽이 밝혀진 경우만 통과 — 그 이상은 연쇄되지 않는다.)
+    private static bool IsConnectionKnown(MapNodeData current, MapNodeData neighbor, RouteProgressState progress) =>
+        IsNodeRevealed(current, progress) || IsNodeRevealed(neighbor, progress);
+
+    // "단서 있는 경로 우선(avoidNoClueNodes)" 옵션 적용 시, neighbor를 경유지로 통과할 수 있는지 판단.
+    // 목적지 자체는 단서가 없어도(=아직 밝혀지지 않은 프론티어 맵이어도) 항상 허용한다 —
+    // 이 옵션은 "중간에 거치는" 단서 없는 맵을 최대한 피하자는 것이지, 목적지 선택 자체를 막는 게 아니다.
+    private static bool CanPassThrough(MapNodeData neighbor, MapNodeData destination, RouteProgressState progress) =>
+        neighbor.guid == destination.guid || IsNodeRevealed(neighbor, progress);
 
     // 현재 장비로 통과 불가능한 모든 연결의 GUID (차선 경로 탐색 시 제외 대상)
     private static HashSet<string> GetBlockedConnectionGuids(MapGraph graph, EmotionColor[] gears)
@@ -79,7 +120,7 @@ public static class MapPathFinder
     }
 
     // ─── BFS (최단 경로) ──────────────────────────────────────────
-    private static PathResult BFS(MapNodeData start, MapNodeData destination, MapGraph graph, RouteProgressState progress, EmotionColor[] gears, HashSet<string> excluded = null)
+    private static PathResult BFS(MapNodeData start, MapNodeData destination, MapGraph graph, RouteProgressState progress, EmotionColor[] gears, bool avoidNoClueNodes = false, HashSet<string> excluded = null)
     {
         var queue   = new Queue<MapNodeData>();
         var visited = new HashSet<string>();
@@ -100,6 +141,8 @@ public static class MapPathFinder
                 if (excluded != null && excluded.Contains(conn.guid)) continue;
                 var neighbor = graph.GetNeighbor(conn, current);
                 if (neighbor == null || visited.Contains(neighbor.guid)) continue;
+                if (!IsConnectionKnown(current, neighbor, progress)) continue;
+                if (avoidNoClueNodes && !CanPassThrough(neighbor, destination, progress)) continue;
                 visited.Add(neighbor.guid);
                 prev[neighbor.guid] = (current, conn);
                 queue.Enqueue(neighbor);
@@ -122,6 +165,7 @@ public static class MapPathFinder
         RouteProgressState progress,
         EmotionColor[] gears,
         bool useHopPenalty,
+        bool avoidNoClueNodes = false,
         HashSet<string> excluded = null)
     {
         float hopPenalty = useHopPenalty ? CalcAvgDifficulty(graph, gears) : 0f;
@@ -159,6 +203,8 @@ public static class MapPathFinder
                 if (excluded != null && excluded.Contains(conn.guid)) continue;
                 var neighbor = graph.GetNeighbor(conn, current);
                 if (neighbor == null) continue;
+                if (!IsConnectionKnown(current, neighbor, progress)) continue;
+                if (avoidNoClueNodes && !CanPassThrough(neighbor, destination, progress)) continue;
 
                 float edgeCost = DifficultyCalculator.Calculate(conn, gears) + hopPenalty;
                 float newCost = dist[current.guid] + edgeCost;

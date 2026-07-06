@@ -19,6 +19,7 @@ using UnityEngine;
 //   1) Progress      : 방문한 맵, 클리어한 연결, 단서, 이벤트 플래그
 //   2) 장착 장비      : 난이도 계산·통과 가능 판정의 기준 (기획서: "출발 전 입력한 장비만 참조")
 //   3) 선택 경로·이동 : 선택된 경로, 현재 노드 인덱스, 이동 중 여부
+//   4) 경로 탐색 옵션 : 단서 없는 맵 회피 여부(avoidNoClueNodes) — 장비와 마찬가지로 출발 전에만 변경 가능
 //
 // 강제하는 기획 규칙:
 //   - 출발(StartTravel) 후에는 장비·경로 변경 불가, 지도 열람 불가(CanOpenMap)
@@ -91,6 +92,26 @@ public class RouteModule : MonoBehaviour
         if (!_equippedGears.Remove(gear))
             _equippedGears.Add(gear);
         _gearArrayCache = null;
+        return true;
+    }
+
+    // ─── 경로 탐색 옵션 ───────────────────────────────────────────
+    // 단서 없는 맵을 경유하는 것을 최대한 피할지 여부 (기본값: 허용).
+    // 장비와 마찬가지로 출발 전에만 바꿀 수 있다 — 이동 중 탐색 조건이 바뀌면 안 되므로.
+    private bool _avoidNoClueNodes;
+
+    public bool AvoidNoClueNodes => _avoidNoClueNodes;
+
+    // 반환값: 실제로 변경되었는지 여부 (UI가 갱신 필요 여부를 판단하는 데 사용)
+    public bool SetAvoidNoClueNodes(bool value)
+    {
+        if (_isTraveling)
+        {
+            Debug.LogWarning("[RouteModule] 이동 중에는 경로 탐색 옵션을 변경할 수 없습니다.");
+            return false;
+        }
+        if (_avoidNoClueNodes == value) return false;
+        _avoidNoClueNodes = value;
         return true;
     }
 
@@ -193,7 +214,7 @@ public class RouteModule : MonoBehaviour
     // 현재 장착 장비와 진행 상태(단서 공개 여부)가 자동으로 반영된다.
 
     public PathResult FindPath(MapNodeData start, MapNodeData destination, PathType pathType) =>
-        MapPathFinder.FindPath(start, destination, pathType, MapGraph.Instance, Progress, EquippedGearArray);
+        MapPathFinder.FindPath(start, destination, pathType, MapGraph.Instance, Progress, EquippedGearArray, _avoidNoClueNodes);
 
     // 시작 지점(집)에서 destination까지의 경로 탐색.
     public PathResult FindPathFromStart(MapNodeData destination, PathType pathType)
@@ -201,7 +222,7 @@ public class RouteModule : MonoBehaviour
         var graph = MapGraph.Instance;
         if (graph == null || graph.StartNode == null || destination == null)
             return new PathResult();
-        return MapPathFinder.FindPath(graph.StartNode, destination, pathType, graph, Progress, EquippedGearArray);
+        return MapPathFinder.FindPath(graph.StartNode, destination, pathType, graph, Progress, EquippedGearArray, _avoidNoClueNodes);
     }
 
     // ─── 세이브 / 사망 처리 ──────────────────────────────────────

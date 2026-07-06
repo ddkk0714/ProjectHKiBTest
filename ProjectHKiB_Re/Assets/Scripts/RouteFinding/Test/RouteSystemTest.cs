@@ -12,6 +12,7 @@ public class RouteSystemTest : MonoBehaviour
     [SerializeField] private string _startNodeGuid;
     [SerializeField] private string _destinationNodeGuid;
     [SerializeField] private EmotionColor[] _testEquippedGears;
+    [SerializeField] private bool _testAvoidNoClueNodes;
 
     [Header("침대 스폰 테스트")]
     [SerializeField] private string _testBedNodeGuid;
@@ -50,7 +51,7 @@ public class RouteSystemTest : MonoBehaviour
         if (start == null || dest == null) return;
 
         // 테스트 전용 장비(_testEquippedGears)를 쓰므로 모듈 래퍼 대신 MapPathFinder를 직접 호출한다.
-        var result = MapPathFinder.FindPath(start, dest, type, MapGraph.Instance, RouteModule.Instance.Progress, _testEquippedGears);
+        var result = MapPathFinder.FindPath(start, dest, type, MapGraph.Instance, RouteModule.Instance.Progress, _testEquippedGears, _testAvoidNoClueNodes);
         ApplyResult(result, ref display, ref diff, label);
         if (trackNoClue) _pathContainsNoClue = result.ContainsNoClueNode;
     }
@@ -194,7 +195,8 @@ public class RouteSystemTest : MonoBehaviour
         display = string.Join(" → ", names);
         diffOut = result.TotalDifficulty;
 
-        Debug.Log($"[RouteSystemTest][{label}] {display}  총난이도={result.TotalDifficulty:F1}  단서없는맵={result.ContainsNoClueNode}");
+        Debug.Log($"[RouteSystemTest][{label}] {display}  총난이도={result.TotalDifficulty:F1}  단서없는맵={result.ContainsNoClueNode}" +
+            (result.NoClueAvoidanceFailed ? "  (단서만 있는 경로 없음 → 일반 경로로 대체됨)" : ""));
 
         if (result.IsBlocked)
         {

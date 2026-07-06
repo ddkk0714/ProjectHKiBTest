@@ -77,6 +77,8 @@ namespace RouteFinding.MapView
         private Image        _btnShortestImg;
         private Image        _btnMinDiffImg;
         private Image        _btnBalancedImg;
+        private Image        _btnAllowNoClueImg;
+        private Image        _btnAvoidNoClueImg;
         private GraphPanZoom _graphPanZoom;
         private InputManager _inputManager;
 
@@ -276,6 +278,24 @@ namespace RouteFinding.MapView
             var selectablePath = blocked ? _currentPath.AlternativePath : _currentPath;
             var blockedPath    = blocked ? _currentPath : null;
 
+            // 밝혀진(단서 보유) 노드 → 그 노드에 닿은 간선 → 간선 반대편 노드 순으로 "표시 대상"을 계산한다.
+            // 밝혀지지 않았고 밝혀진 노드와 맞닿은 간선도 없는 노드/간선은 화면에서 완전히 숨긴다.
+            var revealedNodeGuids = new HashSet<string>();
+            foreach (var kv in _nodeViews)
+                if (kv.Value.Data.isStartNode || progress.HasNodeClue(kv.Value.Data))
+                    revealedNodeGuids.Add(kv.Key);
+
+            var shownEdgeGuids = new HashSet<string>();
+            var shownNodeGuids = new HashSet<string>(revealedNodeGuids);
+            foreach (var ev in _edgeViews)
+            {
+                var d = ev.Data;
+                if (!revealedNodeGuids.Contains(d.fromGuid) && !revealedNodeGuids.Contains(d.toGuid)) continue;
+                shownEdgeGuids.Add(d.guid);
+                shownNodeGuids.Add(d.fromGuid);
+                shownNodeGuids.Add(d.toGuid);
+            }
+
             foreach (var kv in _nodeViews)
             {
                 var d       = kv.Value.Data;
@@ -285,7 +305,9 @@ namespace RouteFinding.MapView
                 bool sel    = _selectedDest?.Data.guid == d.guid;
                 bool onPath = IsNodeOnPath(selectablePath, d.guid);
                 bool onBlockedPath = IsNodeOnPath(blockedPath, d.guid);
-                kv.Value.SetState(visited: vis, hasClue: clue, isStart: start, isSelected: sel, isOnPath: onPath, isOnBlockedPath: onBlockedPath);
+                bool known = shownNodeGuids.Contains(d.guid);
+                kv.Value.SetShown(known);
+                kv.Value.SetState(visited: vis, hasClue: clue, isStart: start, isSelected: sel, isOnPath: onPath, isOnBlockedPath: onBlockedPath, known: known);
             }
 
             foreach (var ev in _edgeViews)
@@ -297,12 +319,14 @@ namespace RouteFinding.MapView
                 bool onPath  = IsEdgeOnPath(selectablePath, d.guid);
                 bool onBlockedPath = IsEdgeOnPath(blockedPath, d.guid);
                 bool passable = d.IsPassableWith(gears);
+                ev.SetShown(shownEdgeGuids.Contains(d.guid));
                 ev.SetState(cleared: cleared, hasClue: hasClue, isOnPath: onPath, isOnBlockedPath: onBlockedPath,
                     isPassable: passable, requiredGears: d.requiredGears, difficulty: df);
             }
 
             RefreshPathLabel();
             RefreshPathTypeButtons();
+            RefreshNoClueOptionButtons();
             RefreshGearPanel();
             RefreshClueMarkers();
             RefreshClueList();
@@ -527,6 +551,14 @@ namespace RouteFinding.MapView
             Refresh();
         }
 
+        // "단서 없어도 이동" / "단서 우선 경로" 옵션 전환. 실제 판단·잠금(이동 중 변경 불가)은 모듈이 담당.
+        private void SetAvoidNoClueNodes(bool avoid)
+        {
+            if (!RouteModule.Instance.SetAvoidNoClueNodes(avoid)) return;
+            RecalcPath();
+            Refresh();
+        }
+
         // 장비 버튼 클릭 — 실제 착탈은 모듈에 위임하고(이동 중이면 거부됨),
         // 변경됐을 때만 경로 재계산 + 화면 갱신. 버튼 색상 등은 Refresh→RefreshGearPanel이 처리.
         private void ToggleGear(EmotionColor ec)
@@ -591,7 +623,9 @@ namespace RouteFinding.MapView
                 {
                     sb.Append($"차선: 구간 {alt.Nodes.Count - 1}  난이도 {alt.TotalDifficulty:F0}\n");
                     if (alt.ContainsNoClueNode)
-                        sb.Append("[!] 차선 경로에 단서 없는 맵 포함");
+                        sb.Append("[!] 차선 경로에 단서 없는 맵 포함\n");
+                    if (alt.NoClueAvoidanceFailed)
+                        sb.Append("[!] 단서만 있는 경로 없음\n");
                 }
                 else
                 {
@@ -602,7 +636,9 @@ namespace RouteFinding.MapView
             {
                 sb.Append($"구간: {_currentPath.Nodes.Count - 1}  난이도: {_currentPath.TotalDifficulty:F0}\n");
                 if (_currentPath.ContainsNoClueNode)
-                    sb.Append("[!] 단서 없는 맵 포함");
+                    sb.Append("[!] 단서 없는 맵 포함\n");
+                if (_currentPath.NoClueAvoidanceFailed)
+                    sb.Append("[!] 단서만 있는 경로 없음\n");
             }
 
             _pathInfoTMP.text = sb.ToString();
@@ -615,16 +651,23 @@ namespace RouteFinding.MapView
             if (_btnMinDiffImg  != null) _btnMinDiffImg.color  = _pathType == PathType.MinDifficulty ? BtnActive : BtnInactive;
         }
 
+        private void RefreshNoClueOptionButtons()
+        {
+            bool avoid = RouteModule.Instance.AvoidNoClueNodes;
+            if (_btnAllowNoClueImg != null) _btnAllowNoClueImg.color = !avoid ? BtnActive : BtnInactive;
+            if (_btnAvoidNoClueImg != null) _btnAvoidNoClueImg.color = avoid  ? BtnActive : BtnInactive;
+        }
+
         // ─── UI 구축 ─────────────────────────────────────────────
 
         private void BuildUI()
         {
             // 씬 계층에 MapPanel이 이미 자식으로 배치돼 있으면 재사용
-            // BtnBalanced가 없으면 구버전 — 파괴 후 재생성
+            // BtnAvoidNoClue가 없으면 구버전 — 파괴 후 재생성
             var existing = transform.Find("MapPanel");
             if (existing != null)
             {
-                bool existingCurrent = FindDeepTransform(existing, "BtnBalanced") != null;
+                bool existingCurrent = FindDeepTransform(existing, "BtnAvoidNoClue") != null;
 
                 if (existingCurrent)
                 {
@@ -636,10 +679,10 @@ namespace RouteFinding.MapView
             }
 
             // 프리팹이 지정되어 있으면 인스턴스화 후 참조를 바인딩하고 콜백만 재연결
-            // BtnBalanced 없으면 구버전 취급. GraphArea는 프리팹에서 지워둔 경우(겹침 방지) 자동 생성으로 보강한다.
+            // BtnAvoidNoClue 없으면 구버전 취급. GraphArea는 프리팹에서 지워둔 경우(겹침 방지) 자동 생성으로 보강한다.
             if (_panelPrefab != null)
             {
-                bool prefabCurrent = FindDeepTransform(_panelPrefab.transform, "BtnBalanced") != null;
+                bool prefabCurrent = FindDeepTransform(_panelPrefab.transform, "BtnAvoidNoClue") != null;
 
                 if (prefabCurrent)
                 {
@@ -759,24 +802,34 @@ namespace RouteFinding.MapView
             vlg.childForceExpandHeight = false;
             vlg.childForceExpandWidth  = true;
 
-            MakeTMP(content, "지  도", 14f, FontStyles.Bold, 18f, TextAlignmentOptions.Center);
+            MakeTMP(content, "지  도", 14f, FontStyles.Bold, 15f, TextAlignmentOptions.Center);
 
             MakeSep(content);
 
-            MakeTMP(content, "경로 방식", 8f, FontStyles.Normal, 10f).color = Gray;
-            var pathRow = NewRow(content, 14f);
+            MakeTMP(content, "경로 방식", 8f, FontStyles.Normal, 12f).color = Gray;
+            var pathRow = NewRow(content, 20f);
             pathRow.name = "PathTypeRow";
-            var btnSh = MakeBtn(pathRow, "최단",      () => SetPathType(PathType.Shortest),      id: "BtnShortest");
-            var btnBl = MakeBtn(pathRow, "균형",      () => SetPathType(PathType.Balanced),      id: "BtnBalanced");
-            var btnMd = MakeBtn(pathRow, "최소난이도", () => SetPathType(PathType.MinDifficulty), id: "BtnMinDiff");
+            var btnSh = MakeBtn(pathRow, "최단",      () => SetPathType(PathType.Shortest),      id: "BtnShortest", fontSize: 8f);
+            var btnBl = MakeBtn(pathRow, "균형",      () => SetPathType(PathType.Balanced),      id: "BtnBalanced", fontSize: 8f);
+            var btnMd = MakeBtn(pathRow, "최소난이도", () => SetPathType(PathType.MinDifficulty), id: "BtnMinDiff", fontSize: 8f);
             _btnShortestImg = btnSh.GetComponent<Image>();
             _btnBalancedImg = btnBl.GetComponent<Image>();
             _btnMinDiffImg  = btnMd.GetComponent<Image>();
 
             MakeSep(content);
 
-            MakeTMP(content, "장착 장비 (클릭)", 8f, FontStyles.Normal, 10f).color = Gray;
-            _gearListTMP = MakeTMP(content, "없음", 8f, FontStyles.Normal, 10f, id: "GearListLabel");
+            MakeTMP(content, "단서 없는 맵 경유", 8f, FontStyles.Normal, 12f).color = Gray;
+            var clueRow = NewRow(content, 20f);
+            clueRow.name = "NoClueOptionRow";
+            var btnAllow = MakeBtn(clueRow, "단서 없어도 이동", () => SetAvoidNoClueNodes(false), id: "BtnAllowNoClue", fontSize: 8f);
+            var btnAvoid = MakeBtn(clueRow, "단서 우선 경로",   () => SetAvoidNoClueNodes(true),  id: "BtnAvoidNoClue", fontSize: 8f);
+            _btnAllowNoClueImg = btnAllow.GetComponent<Image>();
+            _btnAvoidNoClueImg = btnAvoid.GetComponent<Image>();
+
+            MakeSep(content);
+
+            MakeTMP(content, "장착 장비 (클릭)", 8f, FontStyles.Normal, 12f).color = Gray;
+            _gearListTMP = MakeTMP(content, "없음", 8f, FontStyles.Normal, 12f, id: "GearListLabel");
             _gearListTMP.color = Gray;
 
             var emotionDefs = new (EmotionColor ec, string nm)[]
@@ -791,7 +844,7 @@ namespace RouteFinding.MapView
 
             for (int i = 0; i < emotionDefs.Length; i += 2)
             {
-                var row = NewRow(content, 12f);
+                var row = NewRow(content, 10f);
                 AddGearBtn(row, emotionDefs[i].ec, emotionDefs[i].nm);
                 if (i + 1 < emotionDefs.Length)
                     AddGearBtn(row, emotionDefs[i + 1].ec, emotionDefs[i + 1].nm);
@@ -799,16 +852,16 @@ namespace RouteFinding.MapView
 
             MakeSep(content);
 
-            MakeTMP(content, "경로 정보", 8f, FontStyles.Normal, 10f).color = Gray;
-            _pathInfoTMP = MakeTMP(content, "노드 클릭 →\n목적지 선택", 8f, FontStyles.Normal, 44f, id: "PathInfoLabel");
+            MakeTMP(content, "경로 정보", 8f, FontStyles.Normal, 12f).color = Gray;
+            _pathInfoTMP = MakeTMP(content, "노드 클릭 →\n목적지 선택", 8f, FontStyles.Normal, 28f, id: "PathInfoLabel");
             _pathInfoTMP.color = Color.white;
-            _pathInfoTMP.enableWordWrapping = true;
+            _pathInfoTMP.enableWordWrapping = false;
 
             BuildClueListSection(content);
 
             MakeSep(content);
 
-            MakeTMP(content, "범례", 8f, FontStyles.Normal, 10f).color = Gray;
+            MakeTMP(content, "범례", 8f, FontStyles.Normal, 12f).color = Gray;
             MakeLegendRow(content, "단서 없는 맵",  new Color(0.10f, 0.10f, 0.12f));
             MakeLegendRow(content, "단서 있는 맵",  new Color(0.25f, 0.38f, 0.65f));
             MakeLegendRow(content, "방문한 맵",     new Color(0.50f, 0.72f, 1.00f));
@@ -820,7 +873,7 @@ namespace RouteFinding.MapView
 
             MakeSep(content);
 
-            var closeBtn = MakeBtn(content, $"닫기 [{_toggleKey}]", Close, h: 16f, id: "BtnClose");
+            var closeBtn = MakeBtn(content, $"닫기 [{_toggleKey}]", Close, h: 20f, id: "BtnClose");
             closeBtn.GetComponent<Image>().color = new Color(0.42f, 0.10f, 0.10f);
         }
 
@@ -828,7 +881,7 @@ namespace RouteFinding.MapView
         private void BuildClueListSection(RectTransform content)
         {
             MakeSep(content);
-            MakeTMP(content, "단서", 8f, FontStyles.Normal, 10f).color = Gray;
+            MakeTMP(content, "단서", 8f, FontStyles.Normal, 12f).color = Gray;
 
             _clueListContent = NewRect(content, "ClueList");
             var vlg = _clueListContent.gameObject.AddComponent<VerticalLayoutGroup>();
@@ -842,7 +895,7 @@ namespace RouteFinding.MapView
         private void AddGearBtn(RectTransform row, EmotionColor ec, string nm)
         {
             var captured = ec;
-            var rt = MakeBtn(row, nm, () => ToggleGear(captured), id: "GearBtn_" + ec.ToString());
+            var rt = MakeBtn(row, nm, () => ToggleGear(captured), id: "GearBtn_" + ec.ToString(), fontSize: 8f);
             var img = rt.GetComponent<Image>();
             img.color = EmotionColorConfig.GetColor(ec) * 0.45f;
             _gearBtnImages[ec] = img;
@@ -896,6 +949,12 @@ namespace RouteFinding.MapView
             var md = FindDeepTransform(_panelGO.transform, "BtnMinDiff");
             if (md != null) _btnMinDiffImg = md.GetComponent<Image>();
 
+            var allowNc = FindDeepTransform(_panelGO.transform, "BtnAllowNoClue");
+            if (allowNc != null) _btnAllowNoClueImg = allowNc.GetComponent<Image>();
+
+            var avoidNc = FindDeepTransform(_panelGO.transform, "BtnAvoidNoClue");
+            if (avoidNc != null) _btnAvoidNoClueImg = avoidNc.GetComponent<Image>();
+
             _gearBtnImages.Clear();
             foreach (EmotionColor ec in Enum.GetValues(typeof(EmotionColor)))
             {
@@ -915,6 +974,12 @@ namespace RouteFinding.MapView
 
             FindDeepTransform(_panelGO.transform, "BtnMinDiff")
                 ?.GetComponent<Button>()?.onClick.AddListener(() => SetPathType(PathType.MinDifficulty));
+
+            FindDeepTransform(_panelGO.transform, "BtnAllowNoClue")
+                ?.GetComponent<Button>()?.onClick.AddListener(() => SetAvoidNoClueNodes(false));
+
+            FindDeepTransform(_panelGO.transform, "BtnAvoidNoClue")
+                ?.GetComponent<Button>()?.onClick.AddListener(() => SetAvoidNoClueNodes(true));
 
             FindDeepTransform(_panelGO.transform, "BtnClose")
                 ?.GetComponent<Button>()?.onClick.AddListener(Close);
@@ -1016,7 +1081,7 @@ namespace RouteFinding.MapView
         }
 
         private RectTransform MakeBtn(RectTransform parent, string label, Action onClick,
-            float h = 0f, string id = null)
+            float h = 0f, string id = null, float fontSize = 10f)
         {
             var goName = id ?? ("Btn_" + label);
             var rt = NewRect(parent, goName);
@@ -1034,7 +1099,7 @@ namespace RouteFinding.MapView
             var tmp = lblRT.gameObject.AddComponent<TextMeshProUGUI>();
             if (_font != null) tmp.font = _font;
             tmp.text              = label;
-            tmp.fontSize          = 10f;
+            tmp.fontSize          = fontSize;
             tmp.alignment         = TextAlignmentOptions.Center;
             tmp.verticalAlignment = VerticalAlignmentOptions.Middle;
             tmp.color             = Color.white;

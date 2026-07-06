@@ -14,6 +14,7 @@ namespace RouteFinding.MapView
 
         private Image             _bg;
         private TextMeshProUGUI   _label;
+        private Button            _btn;
 
         // 노드 상태별 색상
         private static readonly Color ColNoClue   = new(0.10f, 0.10f, 0.12f);
@@ -29,18 +30,22 @@ namespace RouteFinding.MapView
             Data   = data;
             _bg    = GetComponent<Image>();
             _label = GetComponentInChildren<TextMeshProUGUI>();
+            _btn   = GetComponent<Button>();
 
-            if (_label != null)
-                _label.text = data.nodeName;
-
-            var btn = GetComponent<Button>();
-            if (btn == null) return;
-
-            btn.onClick.AddListener(() => OnClicked?.Invoke(this));
+            if (_btn != null)
+                _btn.onClick.AddListener(() => OnClicked?.Invoke(this));
         }
 
+        // 지도에 그려질지 여부(= 밝혀진 노드이거나, 밝혀진 노드와 맞닿은 간선의 반대편인 경우).
+        // 어느 쪽에도 해당하지 않으면 완전히 숨긴다.
+        public void SetShown(bool shown) => gameObject.SetActive(shown);
+
         // visited / hasClue / isStart / isSelected / isOnPath / isOnBlockedPath 중 우선순위가 높은 상태를 시각화.
-        public void SetState(bool visited, bool hasClue, bool isStart, bool isSelected, bool isOnPath, bool isOnBlockedPath)
+        // known: 단서 보유 노드이거나 그런 노드와 한 칸 맞닿은 이웃이면 true (MapViewer가 계산해 넘김).
+        // known이 아니면 애초에 화면에 그려지지 않으므로(SetShown) 실질적으로는 항상 true로 들어오지만,
+        // "이름 표시·클릭 가능" 여부의 기준을 이 값 하나로 통일해 둔다 — 그래야 다음 목적지로 선택해
+        // 실제로 가볼 수 있다 (단서 없이도 한 칸 이웃까지는 목적지로 삼을 수 있어야 탐사가 진행됨).
+        public void SetState(bool visited, bool hasClue, bool isStart, bool isSelected, bool isOnPath, bool isOnBlockedPath, bool known)
         {
             if (_bg == null)
             {
@@ -59,6 +64,9 @@ namespace RouteFinding.MapView
                 _                     => ColNoClue,
             };
             _bg.color = col;
+
+            if (_label != null) _label.text = known ? Data.nodeName : string.Empty;
+            if (_btn != null) _btn.interactable = known;
         }
     }
 }

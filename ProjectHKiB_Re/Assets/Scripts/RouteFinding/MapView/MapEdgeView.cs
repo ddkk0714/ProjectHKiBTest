@@ -62,6 +62,13 @@ namespace RouteFinding.MapView
                 ((RectTransform)_diffLabel.transform).anchoredPosition = mid + Vector2.up * 3f;
         }
 
+        // 지도에 그려질지 여부(= 두 노드 중 하나라도 밝혀진 경우). 선(Line)과 난이도 레이블(별도 GO) 둘 다 토글한다.
+        public void SetShown(bool shown)
+        {
+            gameObject.SetActive(shown);
+            if (_diffLabel != null) _diffLabel.gameObject.SetActive(shown);
+        }
+
         // isOnBlockedPath: 추천되었으나 통과 불가한 경로에 포함됨 (선택 불가, 빨강 강조)
         // isPassable/requiredGears: 필수 장비 충족 여부 — 미충족이면 보라색 + "X" 표시
         public void SetState(bool cleared, bool hasClue, bool isOnPath, bool isOnBlockedPath, bool isPassable, EmotionColor[] requiredGears, float difficulty)

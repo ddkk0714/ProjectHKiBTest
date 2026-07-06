@@ -8678,6 +8678,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5835413904539291333, guid: b4d487ab9c569b8498bab4db65e3f0d7, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5858399575180951867, guid: b4d487ab9c569b8498bab4db65e3f0d7, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -68261,12 +68265,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1586495356}
   - component: {fileID: 1586495360}
-  - component: {fileID: 1586495359}
   - component: {fileID: 1586495358}
   - component: {fileID: 1586495357}
   - component: {fileID: 1586495363}
   - component: {fileID: 1586495362}
   - component: {fileID: 1586495361}
+  - component: {fileID: 1586495364}
   m_Layer: 5
   m_Name: RouteTest
   m_TagString: Untagged
@@ -68320,18 +68324,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _homeNodeGuid: map-001
---- !u!114 &1586495359
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1586495355}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8e4983630a3bc0140a0eafa96ba29d8e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1586495360
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -68400,6 +68392,18 @@ MonoBehaviour:
   _edgeThicknessNormal: 3
   _edgeThicknessHighlight: 3
   _panelPrefab: {fileID: 638010319}
+--- !u!114 &1586495364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1586495355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d93cee7233fe10b41a7eaaf6774fddc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1586717154
 GameObject:
   m_ObjectHideFlags: 0
@@ -74030,10 +74034,10 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.18781494
+    x: 0.24278516
     y: 0
-    width: 0.6229959
-    height: 0.9990205
+    width: 0.51305544
+    height: 1.0011919
   near clip plane: 0.1
   far clip plane: 5000
   field of view: 40
