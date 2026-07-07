@@ -90,5 +90,14 @@ namespace RouteFinding.MapView
             if (_target == null || _viewport == null) return;
             _target.anchoredPosition = _viewport.rect.size * 0.5f - localPos * _scale;
         }
+
+        // 지도 원점 복귀 — 팬/줌을 BuildScrollGraph 직후의 초기 상태(스케일 1, 앵커 위치 0,0)로 되돌린다.
+        public void ResetView()
+        {
+            if (_target == null) return;
+            _scale = 1f;
+            _target.localScale = Vector3.one;
+            _target.anchoredPosition = Vector2.zero;
+        }
     }
 }

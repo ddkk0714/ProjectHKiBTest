@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
 
@@ -7,10 +8,19 @@ namespace RouteFinding.MapView
 {
     // 지도 그래프 위의 맵 노드 하나를 표시하는 UI 컴포넌트.
     // MapViewer가 런타임에 생성하며, 직접 씬에 추가하지 않는다.
-    public class MapNodeView : MonoBehaviour
+    public class MapNodeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         public MapNodeData Data { get; private set; }
         public event Action<MapNodeView> OnClicked;
+
+        // 호버 시 MapViewer가 맵 정보+획득 단서 툴팁을 띄우는 데 사용 (known 노드에서만 발행됨 — SetState 참조)
+        public event Action<MapNodeView> OnHoverEnter;
+        public event Action<MapNodeView> OnHoverExit;
+
+        private bool _known;
+
+        public void OnPointerEnter(PointerEventData e) { if (_known) OnHoverEnter?.Invoke(this); }
+        public void OnPointerExit(PointerEventData e)  { if (_known) OnHoverExit?.Invoke(this); }
 
         private Image             _bg;
         private TextMeshProUGUI   _label;
@@ -67,6 +77,7 @@ namespace RouteFinding.MapView
 
             if (_label != null) _label.text = known ? Data.nodeName : string.Empty;
             if (_btn != null) _btn.interactable = known;
+            _known = known;
         }
     }
 }

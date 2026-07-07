@@ -34,6 +34,8 @@ namespace RouteFinding.MapView
 
         [Header("Graph Panel UI 레이아웃 (런타임 자동 생성 시)")]
         [SerializeField] private float _sidePanelWidth = 100f;
+        [SerializeField] private float _sidePanelCollapsedWidth = 12f; // 접었을 때 남는 재오픈용 탭 폭
+        [SerializeField] private float _toolbarHeight = 18f;
         [SerializeField] private float _graphAreaMarginLeft;
         [SerializeField] private float _graphAreaMarginRight;
         [SerializeField] private float _graphAreaMarginTop;
@@ -68,6 +70,7 @@ namespace RouteFinding.MapView
         // 뷰가 가지는 것은 "화면 표시" 상태뿐 — 목적지 선택, 경로 방식, 탐색 결과 캐시.
         // 장비·진행 상태 같은 공용 상태는 RouteModule이 소유한다.
         private MapNodeView            _selectedDest;
+        private MapNodeData            _originNode; // 출발지 — 기본값 MapGraph.StartNode, 상단 툴바 드롭다운으로 변경 가능
         private PathType               _pathType    = PathType.Shortest;
         private PathResult             _currentPath;
 
@@ -83,6 +86,36 @@ namespace RouteFinding.MapView
         private InputManager _inputManager;
 
         private readonly Dictionary<EmotionColor, Image> _gearBtnImages = new();
+
+        // ─── 사이드패널 열기/닫기 ───────────────────────────────────
+        private RectTransform   _sidePanelRT;
+        private RectTransform   _graphAreaRT;
+        private RectTransform   _sidePanelScrollGO; // Viewport — 접혔을 때 비활성화 대상
+        private TextMeshProUGUI _sidePanelToggleArrowTMP;
+        private Image           _toolbarPanelToggleImg;
+        private bool            _sidePanelOpen = true;
+
+        // ─── 상단 툴바 (출발/도착 드롭다운) ─────────────────────────
+        // TMP_Dropdown이 동적으로 만드는 중첩 캔버스가 이 프로젝트의 카메라(Cinemachine)/렌더 설정과
+        // 맞물려 화면에 안 뜨는 문제가 있어(2026-07-07), 별도 캔버스·Instantiate 없이 기존 UI 계층에
+        // 그대로 얹는 자체 드롭다운(SimpleDropdown)으로 교체했다.
+        private RectTransform _toolbarRT;
+        private SimpleDropdown _originDropdown;
+        private SimpleDropdown _destDropdown;
+        private readonly List<MapNodeData> _knownNodesForDropdown = new();
+
+        // 캔버스/Instantiate 없이 같은 계층에 얹는 최소 드롭다운. 옵션 목록(OptionsList)은 평소엔
+        // 비활성화돼 있다가 클릭 시 SetActive(true)로 펼쳐진다 — TMP_Dropdown처럼 새 GameObject를
+        // 복제해서 별도 캔버스에 띄우는 방식이 아니라, 항상 같은 부모 밑에 존재하는 형제 오브젝트다.
+        private class SimpleDropdown
+        {
+            public RectTransform    Root;
+            public TextMeshProUGUI  Caption;
+            public RectTransform    OptionsList;
+            public RectTransform    OptionsContent;
+            public int              SelectedIndex = -1;
+            public Action<int>      OnSelected;
+        }
 
         // ─── Lifecycle ───────────────────────────────────────────
 
@@ -259,7 +292,9 @@ namespace RouteFinding.MapView
 
                 var nv = nodeGO.AddComponent<MapNodeView>();
                 nv.Init(node);
-                nv.OnClicked += OnNodeClicked;
+                nv.OnClicked    += OnNodeClicked;
+                nv.OnHoverEnter += ShowNodeTooltip;
+                nv.OnHoverExit  += _ => HideClueTooltip();
                 _nodeViews[node.guid] = nv;
             }
         }
@@ -269,6 +304,7 @@ namespace RouteFinding.MapView
         private void Refresh()
         {
             if (MapGraph.Instance == null) return;
+            _originNode ??= MapGraph.Instance.StartNode; // 출발지 드롭다운 기본값 — 최초 1회만
             var progress = RouteModule.Instance.Progress; // 방문/단서/클리어 상태
             var gears    = RouteModule.Instance.EquippedGearArray;
 
@@ -295,6 +331,11 @@ namespace RouteFinding.MapView
                 shownNodeGuids.Add(d.fromGuid);
                 shownNodeGuids.Add(d.toGuid);
             }
+
+            // 툴바 출발/도착 드롭다운에 올릴 후보 — 화면에 보이는(known) 노드만.
+            _knownNodesForDropdown.Clear();
+            foreach (var kv in _nodeViews)
+                if (shownNodeGuids.Contains(kv.Key)) _knownNodesForDropdown.Add(kv.Value.Data);
 
             foreach (var kv in _nodeViews)
             {
@@ -330,6 +371,7 @@ namespace RouteFinding.MapView
             RefreshGearPanel();
             RefreshClueMarkers();
             RefreshClueList();
+            RefreshDropdowns();
         }
 
         private static bool IsNodeOnPath(PathResult path, string guid)
@@ -448,6 +490,37 @@ namespace RouteFinding.MapView
             if (_tooltipRT != null) _tooltipRT.gameObject.SetActive(false);
         }
 
+        // 화면에 보이는(known) 노드에 호버 시 맵 정보 + 이 맵에서 획득한 단서를 보여준다.
+        private void ShowNodeTooltip(MapNodeView view)
+        {
+            Debug.Log($"[MapViewer] 노드 호버 진입: {view.Data.nodeName}"); // TODO(임시 진단용): 콘솔에 안 찍히면 EventSystem/InputModule 쪽 문제, 찍히는데 화면에 안 뜨면 아래 표시 로직 문제
+            EnsureTooltip();
+            var node     = view.Data;
+            var progress = RouteModule.Instance.Progress;
+
+            var sb = new StringBuilder();
+            sb.Append($"<b>{node.nodeName}</b>\n");
+            if (!string.IsNullOrEmpty(node.description)) sb.Append($"{node.description}\n");
+
+            if (node.clueIds != null)
+            {
+                foreach (var clueId in node.clueIds)
+                {
+                    if (!progress.IsClueAcquired(clueId)) continue;
+                    var clue = MapGraph.Instance.GetClue(clueId);
+                    if (clue != null) sb.Append($"[단서] {clue.name}\n");
+                }
+            }
+
+            _tooltipTMP.text = sb.ToString();
+
+            var nodeRT = (RectTransform)view.transform;
+            _tooltipRT.anchoredPosition = nodeRT.anchoredPosition + new Vector2(_nodeSize, 0f);
+            _tooltipRT.localScale = Vector3.one / Mathf.Max(_graphPanZoom != null ? _graphPanZoom.Scale : 1f, 0.0001f);
+            _tooltipRT.gameObject.SetActive(true);
+            _tooltipRT.SetAsLastSibling();
+        }
+
         // 단서 툴팁에 표시할 추천 경로 한 줄 요약. 탐색 자체는 모듈(현재 장비·진행 상태 기준)에 위임.
         private static void AppendRouteInfo(StringBuilder sb, string label, PathType type, MapNodeData dest)
         {
@@ -473,8 +546,16 @@ namespace RouteFinding.MapView
         {
             if (_clueListContent == null || MapGraph.Instance == null) return;
 
+            // 먼저 비활성화한 뒤 Destroy — TMP 오브젝트를 활성 상태로 그냥 Destroy하면, 같은 프레임에
+            // ScrollRect.LateUpdate가 강제하는 CanvasUpdateRegistry 리빌드가 이미 파괴 중인 TMP의
+            // 서브메시(폴백 폰트) 머티리얼에 접근하려다 MissingReferenceException을 던지는 경우가 있다.
+            // SetActive(false)는 OnDisable을 즉시 호출해 리빌드 대상에서 그 프레임에 바로 빠지게 한다.
             for (int i = _clueListContent.childCount - 1; i >= 0; i--)
-                Destroy(_clueListContent.GetChild(i).gameObject);
+            {
+                var child = _clueListContent.GetChild(i).gameObject;
+                child.SetActive(false);
+                Destroy(child);
+            }
 
             var acquired = RouteModule.Instance.Progress.AcquiredClueIds;
             if (acquired.Count == 0)
@@ -531,17 +612,34 @@ namespace RouteFinding.MapView
             Refresh();
         }
 
+        // 툴바 "원점" 버튼 — 지도 팬/줌을 초기 상태로 되돌리는 것에 더해,
+        // 출발/도착 드롭다운도 둘 다 집(StartNode)으로 초기화한다.
+        private void ResetToOrigin()
+        {
+            _graphPanZoom?.ResetView();
+
+            if (MapGraph.Instance == null) return;
+            var home = MapGraph.Instance.StartNode;
+            if (home == null) return;
+
+            _originNode   = home;
+            _selectedDest = _nodeViews.TryGetValue(home.guid, out var view) ? view : null;
+            RecalcPath();
+            Refresh();
+        }
+
         // 선택된 목적지 기준으로 추천 경로 재계산.
-        // 장비·진행 상태 반영은 모듈이 담당하므로 뷰는 목적지와 경로 방식만 전달한다.
+        // 출발지는 툴바 드롭다운으로 바뀔 수 있어 기본(StartNode)이 아닐 수 있다 — RouteModule.FindPath에 직접 전달.
+        // 장비·진행 상태 반영은 모듈이 담당하므로 뷰는 출발지·목적지·경로 방식만 전달한다.
         private void RecalcPath()
         {
             _currentPath = null;
             if (_selectedDest == null || MapGraph.Instance == null) return;
 
-            var startNode = MapGraph.Instance.StartNode;
+            var startNode = _originNode ?? MapGraph.Instance.StartNode;
             if (startNode == null || startNode.guid == _selectedDest.Data.guid) return;
 
-            _currentPath = RouteModule.Instance.FindPathFromStart(_selectedDest.Data, _pathType);
+            _currentPath = RouteModule.Instance.FindPath(startNode, _selectedDest.Data, _pathType);
         }
 
         private void SetPathType(PathType pt)
@@ -658,16 +756,112 @@ namespace RouteFinding.MapView
             if (_btnAvoidNoClueImg != null) _btnAvoidNoClueImg.color = avoid  ? BtnActive : BtnInactive;
         }
 
+        // ─── 사이드패널 열기/닫기 ───────────────────────────────────
+        // 우측 사이드패널 자체를 접어서 그래프 영역을 넓게 볼 수 있게 한다.
+        // 접혀도 재오픈용 작은 탭(SidePanelToggleTab)은 항상 보이도록 스크롤 뷰와 별개로 둔다.
+
+        private void SetSidePanelOpen(bool open)
+        {
+            _sidePanelOpen = open;
+            UpdateSidePanelLayout();
+            if (_sidePanelToggleArrowTMP != null) _sidePanelToggleArrowTMP.text = open ? "◀" : "▶";
+            if (_toolbarPanelToggleImg   != null) _toolbarPanelToggleImg.color  = open ? BtnActive : BtnInactive;
+        }
+
+        private void UpdateSidePanelLayout()
+        {
+            float w = _sidePanelOpen ? _sidePanelWidth : _sidePanelCollapsedWidth;
+            if (_sidePanelRT != null) _sidePanelRT.offsetMin = new Vector2(-w, 0f);
+            if (_graphAreaRT != null) _graphAreaRT.offsetMax = new Vector2(-w - _graphAreaMarginRight, -_graphAreaMarginTop - _toolbarHeight);
+            _sidePanelScrollGO?.gameObject.SetActive(_sidePanelOpen);
+        }
+
+        // ─── 출발/도착 드롭다운 (SimpleDropdown) ──────────────────────
+
+        private void RefreshDropdowns()
+        {
+            if (_originDropdown == null || _destDropdown == null) return;
+            FillSimpleDropdown(_originDropdown, _originNode);
+            FillSimpleDropdown(_destDropdown, _selectedDest?.Data);
+        }
+
+        // 옵션 버튼들을 다시 만들고, 캡션 텍스트를 현재 선택값으로 갱신한다.
+        // 여기서는 OnSelected를 호출하지 않으므로(사용자가 실제로 옵션을 클릭했을 때만 호출됨)
+        // TMP_Dropdown 때 필요했던 "이벤트 억제 플래그" 자체가 필요 없다.
+        private void FillSimpleDropdown(SimpleDropdown dd, MapNodeData current)
+        {
+            for (int i = dd.OptionsContent.childCount - 1; i >= 0; i--)
+            {
+                var child = dd.OptionsContent.GetChild(i).gameObject;
+                child.SetActive(false);
+                Destroy(child);
+            }
+
+            int selectedIdx = 0;
+            for (int i = 0; i < _knownNodesForDropdown.Count; i++)
+            {
+                var node = _knownNodesForDropdown[i];
+                int captured = i;
+                var optBtn = MakeBtn(dd.OptionsContent, node.nodeName, () => SelectSimpleDropdownOption(dd, captured), fontSize: 7f);
+                var le = optBtn.GetComponent<LayoutElement>();
+                le.preferredHeight = 14f;
+                if (current != null && node.guid == current.guid) selectedIdx = i;
+            }
+
+            dd.SelectedIndex = _knownNodesForDropdown.Count > 0 ? selectedIdx : -1;
+            dd.Caption.text  = _knownNodesForDropdown.Count > 0 ? _knownNodesForDropdown[selectedIdx].nodeName : "";
+        }
+
+        // 드롭다운 본체 클릭 — 열림/닫힘 토글. 다른 쪽 드롭다운이 열려있으면 같이 닫는다(둘 다 열리면 헷갈림).
+        private void ToggleSimpleDropdown(SimpleDropdown dd)
+        {
+            bool opening = !dd.OptionsList.gameObject.activeSelf;
+            _originDropdown.OptionsList.gameObject.SetActive(opening && dd == _originDropdown);
+            _destDropdown.OptionsList.gameObject.SetActive(opening && dd == _destDropdown);
+        }
+
+        // 옵션 클릭 — 선택 확정 + 목록 닫기 + 실제 동작(OnSelected)은 호출부(출발/도착)에 위임.
+        private void SelectSimpleDropdownOption(SimpleDropdown dd, int index)
+        {
+            dd.OptionsList.gameObject.SetActive(false);
+            if (index < 0 || index >= _knownNodesForDropdown.Count) return;
+            dd.SelectedIndex = index;
+            dd.Caption.text  = _knownNodesForDropdown[index].nodeName;
+            dd.OnSelected?.Invoke(index);
+        }
+
+        // 출발지 드롭다운 변경 — 그래프 클릭으로는 바꿀 수 없는 유일한 수단.
+        private void OnOriginDropdownChanged(int index)
+        {
+            if (index < 0 || index >= _knownNodesForDropdown.Count) return;
+            _originNode = _knownNodesForDropdown[index];
+            RecalcPath();
+            Refresh();
+        }
+
+        // 도착지 드롭다운 변경 — 그래프 노드 클릭(OnNodeClicked)과 동일한 목적지 선택 수단이며 서로 값이 동기화된다.
+        private void OnDestDropdownChanged(int index)
+        {
+            if (index < 0 || index >= _knownNodesForDropdown.Count) return;
+            var node = _knownNodesForDropdown[index];
+            if (_nodeViews.TryGetValue(node.guid, out var view))
+            {
+                _selectedDest = view;
+                RecalcPath();
+                Refresh();
+            }
+        }
+
         // ─── UI 구축 ─────────────────────────────────────────────
 
         private void BuildUI()
         {
             // 씬 계층에 MapPanel이 이미 자식으로 배치돼 있으면 재사용
-            // BtnAvoidNoClue가 없으면 구버전 — 파괴 후 재생성
+            // Toolbar가 없으면 구버전(툴바 도입 이전) — 파괴 후 재생성
             var existing = transform.Find("MapPanel");
             if (existing != null)
             {
-                bool existingCurrent = FindDeepTransform(existing, "BtnAvoidNoClue") != null;
+                bool existingCurrent = FindDeepTransform(existing, "Toolbar") != null;
 
                 if (existingCurrent)
                 {
@@ -679,10 +873,10 @@ namespace RouteFinding.MapView
             }
 
             // 프리팹이 지정되어 있으면 인스턴스화 후 참조를 바인딩하고 콜백만 재연결
-            // BtnAvoidNoClue 없으면 구버전 취급. GraphArea는 프리팹에서 지워둔 경우(겹침 방지) 자동 생성으로 보강한다.
+            // Toolbar 없으면 구버전 취급. GraphArea는 프리팹에서 지워둔 경우(겹침 방지) 자동 생성으로 보강한다.
             if (_panelPrefab != null)
             {
-                bool prefabCurrent = FindDeepTransform(_panelPrefab.transform, "BtnAvoidNoClue") != null;
+                bool prefabCurrent = FindDeepTransform(_panelPrefab.transform, "Toolbar") != null;
 
                 if (prefabCurrent)
                 {
@@ -706,11 +900,18 @@ namespace RouteFinding.MapView
             side.anchorMin = new Vector2(1f, 0f);
             side.anchorMax = Vector2.one;
             side.offsetMin = new Vector2(-panelW, 0f);
-            side.offsetMax = Vector2.zero;
+            side.offsetMax = new Vector2(0f, -_toolbarHeight);
             AddImg(side, _sidePanelBgColor);
+            _sidePanelRT = side;
             BuildSidePanel(side, panelW);
+            BuildSidePanelToggleTab(side);
 
             BuildGraphArea(root);
+
+            // Toolbar를 마지막 자식으로 만들어야 한다 — GraphArea/SidePanel 자체는 툴바 아래 영역에만
+            // 앵커돼 있어 겹치지 않지만, 드롭다운 옵션 목록은 툴바 바깥(아래쪽, GraphArea 영역)까지
+            // 펼쳐지므로 그보다 늦게 그려지는 형제(=나중에 생성된 GraphArea)에게 가려진다.
+            BuildToolbar(root);
         }
 
         // 기존/프리팹 패널을 재사용할 때의 공통 마무리: 전체 스트레치, 참조 바인딩, 버튼 콜백 연결.
@@ -721,19 +922,22 @@ namespace RouteFinding.MapView
             BindRefsFromHierarchy();
             WireButtonCallbacks();
             if (_graphContainer == null) BuildGraphArea(rt);
+            _toolbarRT?.SetAsLastSibling(); // 드롭다운 목록이 GraphArea에 가리지 않도록 툴바를 항상 맨 위로
+            UpdateSidePanelLayout();
         }
 
         // GraphArea(스크롤·줌 가능한 그래프 영역)를 root 아래에 생성한다.
         // 프리팹에 SidePanel만 있고 GraphArea가 없는 경우(겹침 방지를 위해 지워둔 경우) 보강용으로 호출된다.
         private void BuildGraphArea(RectTransform root)
         {
-            float panelW = _sidePanelWidth;
+            float panelW = _sidePanelOpen ? _sidePanelWidth : _sidePanelCollapsedWidth;
 
             var graphArea = NewRect(root, "GraphArea");
             graphArea.anchorMin = Vector2.zero;
             graphArea.anchorMax = new Vector2(1f, 1f);
             graphArea.offsetMin = new Vector2(_graphAreaMarginLeft, _graphAreaMarginBottom);
-            graphArea.offsetMax = new Vector2(-panelW - _graphAreaMarginRight, -_graphAreaMarginTop);
+            graphArea.offsetMax = new Vector2(-panelW - _graphAreaMarginRight, -_graphAreaMarginTop - _toolbarHeight);
+            _graphAreaRT = graphArea;
             BuildScrollGraph(graphArea);
         }
 
@@ -771,6 +975,157 @@ namespace RouteFinding.MapView
             tmp.color             = new Color(0.9f, 0.45f, 0.25f);
         }
 
+        // 상단 툴바 — 출발·도착 드롭다운, 지도 원점 복귀, 사이드패널 열기/닫기 토글, 닫기 버튼을 한 줄에 담는다.
+        // (2026-07-07 요구사항) 사이드패널과 별개로 그래프 위쪽 전체 폭을 차지한다.
+        private void BuildToolbar(RectTransform root)
+        {
+            var toolbar = NewRect(root, "Toolbar");
+            toolbar.anchorMin = new Vector2(0f, 1f);
+            toolbar.anchorMax = Vector2.one;
+            toolbar.pivot     = new Vector2(0.5f, 1f);
+            toolbar.sizeDelta = new Vector2(0f, _toolbarHeight);
+            toolbar.anchoredPosition = Vector2.zero;
+            AddImg(toolbar, _sidePanelBgColor);
+            _toolbarRT = toolbar;
+
+            var hlg = toolbar.gameObject.AddComponent<HorizontalLayoutGroup>();
+            hlg.padding               = new RectOffset(3, 3, 2, 2);
+            hlg.spacing               = 3f;
+            // childControlWidth=false였을 때 버그: LayoutElement.preferredWidth가 자식 실제 크기에 전혀
+            // 반영되지 않고(부모의 총 크기 계산에만 쓰임) 새로 생성된 RectTransform 기본 크기(100)를 그대로
+            // 써버려서 요소들이 화면 밖으로 밀려나므로, true로 둬야 preferredWidth가 실제로 적용된다.
+            hlg.childControlWidth     = true;
+            hlg.childControlHeight    = true;
+            hlg.childForceExpandWidth  = false;
+            hlg.childForceExpandHeight = true;
+            hlg.childAlignment        = TextAnchor.MiddleLeft;
+
+            ToolbarFixedLabel(toolbar, "출발", 18f);
+            _originDropdown = MakeSimpleDropdown(toolbar, "OriginDropdown", 48f);
+            _originDropdown.OnSelected = OnOriginDropdownChanged;
+
+            ToolbarFixedLabel(toolbar, "도착", 18f);
+            _destDropdown = MakeSimpleDropdown(toolbar, "DestDropdown", 48f);
+            _destDropdown.OnSelected = OnDestDropdownChanged;
+
+            ToolbarFixedBtn(toolbar, "원점", ResetToOrigin, "BtnResetView", 24f);
+
+            var panelToggleBtn = ToolbarFixedBtn(toolbar, "패널", () => SetSidePanelOpen(!_sidePanelOpen), "BtnTogglePanel", 24f);
+            _toolbarPanelToggleImg = panelToggleBtn.GetComponent<Image>();
+
+            // 닫기 버튼 — 툴바 최우측 (사이드패널에서는 제거됨)
+            var closeBtn = ToolbarFixedBtn(toolbar, $"닫기 [{_toggleKey}]", Close, "BtnClose", 40f);
+            closeBtn.GetComponent<Image>().color = new Color(0.42f, 0.10f, 0.10f);
+        }
+
+        // 툴바 전용 — LayoutElement.preferredWidth로 고정폭을 명시한다 (HLG.childControlWidth=true 필요).
+        private RectTransform ToolbarFixedBtn(RectTransform toolbar, string label, Action onClick, string id, float width)
+        {
+            var rt = MakeBtn(toolbar, label, onClick, id: id, fontSize: 8f);
+            var le = rt.GetComponent<LayoutElement>();
+            le.flexibleWidth  = 0f;
+            le.preferredWidth = width;
+            return rt;
+        }
+
+        private void ToolbarFixedLabel(RectTransform toolbar, string text, float width)
+        {
+            var tmp = MakeTMP(toolbar, text, 8f, FontStyles.Normal, _toolbarHeight, TextAlignmentOptions.Right);
+            tmp.color = Gray;
+            var le = tmp.GetComponent<LayoutElement>();
+            le.flexibleWidth  = 0f;
+            le.preferredWidth = width;
+        }
+
+        // 캔버스/Instantiate 없이 같은 UI 계층에 그대로 얹는 자체 드롭다운.
+        // 본체(캡션 박스) + 그 밑에 펼쳐지는 옵션 목록(OptionsList, 평소엔 비활성화)으로 구성된다.
+        private SimpleDropdown MakeSimpleDropdown(RectTransform parent, string id, float width)
+        {
+            var dd = new SimpleDropdown();
+
+            var ddRT = NewRect(parent, id);
+            var ddLe = ddRT.gameObject.AddComponent<LayoutElement>();
+            ddLe.flexibleWidth  = 0f;
+            ddLe.preferredWidth = width;
+            var ddImg = AddImg(ddRT, BtnInactive);
+            var ddBtn = ddRT.gameObject.AddComponent<Button>();
+            ddBtn.targetGraphic = ddImg;
+            ddBtn.transition    = Selectable.Transition.None;
+            ddBtn.onClick.AddListener(() => ToggleSimpleDropdown(dd));
+            dd.Root = ddRT;
+
+            var captionRT = NewRect(ddRT, "Caption");
+            StretchFull(captionRT);
+            captionRT.offsetMin = new Vector2(4f, 1f);
+            captionRT.offsetMax = new Vector2(-4f, -1f);
+            var captionTMP = captionRT.gameObject.AddComponent<TextMeshProUGUI>();
+            if (_font != null) captionTMP.font = _font;
+            captionTMP.fontSize      = 7f;
+            captionTMP.color        = Color.white;
+            captionTMP.alignment    = TextAlignmentOptions.MidlineLeft;
+            captionTMP.overflowMode = TextOverflowModes.Ellipsis;
+            captionTMP.raycastTarget = false; // 캡션이 드롭다운 전체를 덮으므로, 클릭을 가로챌 필요 없음
+            dd.Caption = captionTMP;
+
+            // 옵션 목록 — 드롭다운 본체(ddRT)의 자식으로, 아래로 펼쳐진다. 평소엔 비활성화.
+            var list = NewRect(ddRT, "OptionsList");
+            list.anchorMin        = new Vector2(0f, 0f);
+            list.anchorMax        = new Vector2(1f, 0f);
+            list.pivot            = new Vector2(0.5f, 1f);
+            list.anchoredPosition = Vector2.zero;
+            list.sizeDelta        = new Vector2(0f, 90f);
+            AddImg(list, new Color(0.90f, 0.90f, 0.20f, 1f)); // 배경과 확실히 구분되는 밝은 색
+            dd.OptionsList = list;
+
+            var scroll = list.gameObject.AddComponent<ScrollRect>();
+            scroll.horizontal   = false;
+            scroll.movementType = ScrollRect.MovementType.Clamped;
+
+            var vp = NewRect(list, "Viewport");
+            StretchFull(vp);
+            vp.gameObject.AddComponent<RectMask2D>();
+            scroll.viewport = vp;
+
+            var content = NewRect(vp, "Content");
+            content.anchorMin = new Vector2(0f, 1f);
+            content.anchorMax = new Vector2(1f, 1f);
+            content.pivot     = new Vector2(0.5f, 1f);
+            content.sizeDelta = Vector2.zero;
+            scroll.content = content;
+
+            var csf = content.gameObject.AddComponent<ContentSizeFitter>();
+            csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            var vlg = content.gameObject.AddComponent<VerticalLayoutGroup>();
+            vlg.spacing               = 1f;
+            vlg.childControlWidth     = true;
+            vlg.childControlHeight    = false;
+            vlg.childForceExpandWidth  = true;
+            vlg.childForceExpandHeight = false;
+            dd.OptionsContent = content;
+
+            list.gameObject.SetActive(false);
+
+            return dd;
+        }
+
+        // 프리팹 재사용 경로에서 이름 기반으로 SimpleDropdown 참조를 재구성한다.
+        private SimpleDropdown BindSimpleDropdown(string rootName)
+        {
+            var rootTF = FindDeepTransform(_panelGO.transform, rootName);
+            if (rootTF == null) return null;
+
+            var dd = new SimpleDropdown { Root = (RectTransform)rootTF };
+            dd.Caption        = FindDeepTransform(rootTF, "Caption")?.GetComponent<TextMeshProUGUI>();
+            var listTF        = FindDeepTransform(rootTF, "OptionsList");
+            dd.OptionsList    = listTF as RectTransform;
+            dd.OptionsContent = listTF != null ? FindDeepTransform(listTF, "Content") as RectTransform : null;
+
+            var btn = rootTF.GetComponent<Button>();
+            btn?.onClick.AddListener(() => ToggleSimpleDropdown(dd));
+            return dd;
+        }
+
         private void BuildSidePanel(RectTransform parent, float panelW)
         {
             var scroll = parent.gameObject.AddComponent<ScrollRect>();
@@ -783,6 +1138,7 @@ namespace RouteFinding.MapView
             StretchFull(vp);
             vp.gameObject.AddComponent<RectMask2D>();
             scroll.viewport = vp;
+            _sidePanelScrollGO = vp; // 패널 접었을 때 이 뷰포트만 비활성화 (재오픈 탭은 parent 직속이라 별개)
 
             var content = NewRect(vp, "Content");
             content.anchorMin = new Vector2(0f, 1f);
@@ -858,23 +1214,35 @@ namespace RouteFinding.MapView
             _pathInfoTMP.enableWordWrapping = false;
 
             BuildClueListSection(content);
+        }
 
-            MakeSep(content);
+        // 사이드패널 좌측 가장자리에 항상 떠 있는 재오픈/접기 탭. 스크롤뷰(Content)와 별개 오브젝트라
+        // 패널이 접혀 Viewport가 비활성화돼도 계속 보이고 클릭할 수 있다.
+        private void BuildSidePanelToggleTab(RectTransform parent)
+        {
+            var tab = NewRect(parent, "SidePanelToggleTab");
+            tab.anchorMin = new Vector2(0f, 0.5f);
+            tab.anchorMax = new Vector2(0f, 0.5f);
+            tab.pivot     = new Vector2(1f, 0.5f);
+            tab.sizeDelta = new Vector2(12f, 28f);
+            tab.anchoredPosition = Vector2.zero;
 
-            MakeTMP(content, "범례", 8f, FontStyles.Normal, 12f).color = Gray;
-            MakeLegendRow(content, "단서 없는 맵",  new Color(0.10f, 0.10f, 0.12f));
-            MakeLegendRow(content, "단서 있는 맵",  new Color(0.25f, 0.38f, 0.65f));
-            MakeLegendRow(content, "방문한 맵",     new Color(0.50f, 0.72f, 1.00f));
-            MakeLegendRow(content, "시작 지점",     new Color(0.28f, 0.78f, 0.38f));
-            MakeLegendRow(content, "선택/경로",     new Color(1.00f, 0.82f, 0.08f));
-            MakeLegendRow(content, "클리어 연결",   new Color(0.32f, 0.80f, 0.45f));
-            MakeLegendRow(content, "필수 장비 부족 (통과불가)", new Color(0.55f, 0.18f, 0.55f));
-            MakeLegendRow(content, "최선 경로 (장비 부족)",   new Color(0.75f, 0.20f, 0.20f));
+            var img = AddImg(tab, _sidePanelBgColor);
+            var btn = tab.gameObject.AddComponent<Button>();
+            btn.targetGraphic = img;
+            btn.transition    = Selectable.Transition.None;
+            btn.onClick.AddListener(() => SetSidePanelOpen(!_sidePanelOpen));
 
-            MakeSep(content);
-
-            var closeBtn = MakeBtn(content, $"닫기 [{_toggleKey}]", Close, h: 20f, id: "BtnClose");
-            closeBtn.GetComponent<Image>().color = new Color(0.42f, 0.10f, 0.10f);
+            var lblRT = NewRect(tab, "Arrow");
+            StretchFull(lblRT);
+            var tmp = lblRT.gameObject.AddComponent<TextMeshProUGUI>();
+            if (_font != null) tmp.font = _font;
+            tmp.fontSize          = 8f;
+            tmp.alignment         = TextAlignmentOptions.Center;
+            tmp.verticalAlignment = VerticalAlignmentOptions.Middle;
+            tmp.color             = Color.white;
+            tmp.text              = "◀";
+            _sidePanelToggleArrowTMP = tmp;
         }
 
         // 획득한 단서 목록 섹션. content(SidePanel의 ScrollRect Content) 끝에 추가된다.
@@ -901,25 +1269,6 @@ namespace RouteFinding.MapView
             _gearBtnImages[ec] = img;
         }
 
-        private void MakeLegendRow(RectTransform parent, string text, Color dotColor)
-        {
-            var row = NewRow(parent, 10f);
-
-            var dot = NewRect(row, "Dot");
-            dot.gameObject.AddComponent<LayoutElement>().preferredWidth = 8f;
-            AddImg(dot, dotColor);
-
-            var lbl = NewRect(row, "Lbl");
-            lbl.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1f;
-            var tmp = lbl.gameObject.AddComponent<TextMeshProUGUI>();
-            if (_font != null) tmp.font = _font;
-            tmp.text              = text;
-            tmp.fontSize          = 8f;
-            tmp.color             = new Color(0.85f, 0.85f, 0.85f);
-            tmp.alignment         = TextAlignmentOptions.Left;
-            tmp.verticalAlignment = VerticalAlignmentOptions.Middle;
-        }
-
         // ─── 프리팹 지원 ─────────────────────────────────────────
 
         // 프리팹 인스턴스에서 이름 기반으로 핵심 참조를 찾아 연결한다.
@@ -930,7 +1279,20 @@ namespace RouteFinding.MapView
             _labelContainer = FindDeepChild<RectTransform>("LabelContainer");
 
             var graphAreaTF = FindDeepTransform(_panelGO.transform, "GraphArea");
-            if (graphAreaTF != null) _graphPanZoom = graphAreaTF.GetComponent<GraphPanZoom>();
+            if (graphAreaTF != null) { _graphPanZoom = graphAreaTF.GetComponent<GraphPanZoom>(); _graphAreaRT = (RectTransform)graphAreaTF; }
+            _sidePanelRT     = FindDeepChild<RectTransform>("SidePanel");
+            _toolbarRT       = FindDeepChild<RectTransform>("Toolbar");
+            _sidePanelScrollGO = FindDeepChild<RectTransform>("Viewport");
+
+            var toggleTabTF = FindDeepTransform(_panelGO.transform, "SidePanelToggleTab");
+            if (toggleTabTF != null) _sidePanelToggleArrowTMP = FindDeepTransform(toggleTabTF, "Arrow")?.GetComponent<TextMeshProUGUI>();
+
+            var panelToggleTF = FindDeepTransform(_panelGO.transform, "BtnTogglePanel");
+            if (panelToggleTF != null) _toolbarPanelToggleImg = panelToggleTF.GetComponent<Image>();
+
+            _originDropdown = BindSimpleDropdown("OriginDropdown");
+            _destDropdown   = BindSimpleDropdown("DestDropdown");
+
             _pathInfoTMP    = FindDeepChild<TextMeshProUGUI>("PathInfoLabel");
             _gearListTMP    = FindDeepChild<TextMeshProUGUI>("GearListLabel");
             _clueListContent = FindDeepChild<RectTransform>("ClueList");
@@ -983,6 +1345,18 @@ namespace RouteFinding.MapView
 
             FindDeepTransform(_panelGO.transform, "BtnClose")
                 ?.GetComponent<Button>()?.onClick.AddListener(Close);
+
+            FindDeepTransform(_panelGO.transform, "BtnResetView")
+                ?.GetComponent<Button>()?.onClick.AddListener(ResetToOrigin);
+
+            FindDeepTransform(_panelGO.transform, "BtnTogglePanel")
+                ?.GetComponent<Button>()?.onClick.AddListener(() => SetSidePanelOpen(!_sidePanelOpen));
+
+            FindDeepTransform(_panelGO.transform, "SidePanelToggleTab")
+                ?.GetComponent<Button>()?.onClick.AddListener(() => SetSidePanelOpen(!_sidePanelOpen));
+
+            if (_originDropdown != null) _originDropdown.OnSelected = OnOriginDropdownChanged;
+            if (_destDropdown   != null) _destDropdown.OnSelected   = OnDestDropdownChanged;
 
             foreach (EmotionColor ec in Enum.GetValues(typeof(EmotionColor)))
             {
