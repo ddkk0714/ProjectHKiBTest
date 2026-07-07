@@ -28,13 +28,14 @@ using UnityEngine;
 public class RouteModule : MonoBehaviour
 {
     private static RouteModule _instance;
+    private static bool _isQuitting; // 종료 중에는 다른 오브젝트의 OnDestroy가 Instance를 건드려도 재생성하지 않는다.
 
     // 씬에 미리 배치해도 되고, 배치하지 않았다면 첫 접근 시 자동 생성된다.
     public static RouteModule Instance
     {
         get
         {
-            if (_instance == null && Application.isPlaying)
+            if (_instance == null && Application.isPlaying && !_isQuitting)
             {
                 _instance = FindObjectOfType<RouteModule>();
                 if (_instance == null)
@@ -43,6 +44,12 @@ public class RouteModule : MonoBehaviour
             return _instance;
         }
     }
+
+    // 플레이 모드 종료(에디터) / 앱 종료 시 호출된다 — OnDestroy들보다 먼저 실행되는 것이 보장되므로,
+    // 이후 다른 오브젝트의 OnDestroy에서 Instance에 접근해도 새 GameObject를 만들지 않도록 막는다
+    // (안 막으면 CodexModule.OnDestroy 같은 곳에서 이미 파괴된 RouteModule을 새로 스폰해버려
+    // "Some objects were not cleaned up when closing the scene" 경고가 뜬다).
+    private void OnApplicationQuit() => _isQuitting = true;
 
     // ─── 진행 상태 (방문 / 클리어 / 단서 / 이벤트) ────────────────
     private RouteProgressState _progress;

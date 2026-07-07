@@ -444,14 +444,14 @@ namespace RouteFinding.MapView
             go.transform.SetParent(_graphContainer, false);
             _tooltipRT = go.AddComponent<RectTransform>();
             _tooltipRT.pivot     = new Vector2(0f, 0f);
-            _tooltipRT.sizeDelta = new Vector2(120f, 60f);
+            _tooltipRT.sizeDelta = new Vector2(80f, 50f);
             AddImg(_tooltipRT, new Color(0.05f, 0.05f, 0.08f, 0.95f));
 
             var txtRT = NewRect(_tooltipRT, "Text");
             StretchFull(txtRT);
             _tooltipTMP = txtRT.gameObject.AddComponent<TextMeshProUGUI>();
             if (_font != null) _tooltipTMP.font = _font;
-            _tooltipTMP.fontSize  = 7f;
+            _tooltipTMP.fontSize  = 6f;
             _tooltipTMP.color     = Color.white;
             _tooltipTMP.alignment = TextAlignmentOptions.TopLeft;
             _tooltipTMP.enableWordWrapping = true;
@@ -491,9 +491,9 @@ namespace RouteFinding.MapView
         }
 
         // 화면에 보이는(known) 노드에 호버 시 맵 정보 + 이 맵에서 획득한 단서를 보여준다.
+        // 툴팁은 노드 위치가 아니라 마우스 커서 바로 오른쪽 위에 뜬다(ShowClueTooltip은 기존대로 마커 기준 유지).
         private void ShowNodeTooltip(MapNodeView view)
         {
-            Debug.Log($"[MapViewer] 노드 호버 진입: {view.Data.nodeName}"); // TODO(임시 진단용): 콘솔에 안 찍히면 EventSystem/InputModule 쪽 문제, 찍히는데 화면에 안 뜨면 아래 표시 로직 문제
             EnsureTooltip();
             var node     = view.Data;
             var progress = RouteModule.Instance.Progress;
@@ -514,11 +514,31 @@ namespace RouteFinding.MapView
 
             _tooltipTMP.text = sb.ToString();
 
-            var nodeRT = (RectTransform)view.transform;
-            _tooltipRT.anchoredPosition = nodeRT.anchoredPosition + new Vector2(_nodeSize, 0f);
-            _tooltipRT.localScale = Vector3.one / Mathf.Max(_graphPanZoom != null ? _graphPanZoom.Scale : 1f, 0.0001f);
+            PositionTooltipAtMouse();
             _tooltipRT.gameObject.SetActive(true);
             _tooltipRT.SetAsLastSibling();
+        }
+
+        // 현재 마우스 스크린 좌표를 그래프 컨테이너 로컬 좌표로 변환해 툴팁을 그 자리에 놓는다.
+        // _tooltipRT의 pivot이 (0,0)이라 anchoredPosition이 곧 툴팁의 좌하단 모서리 — 그 지점을
+        // 마우스보다 살짝 오른쪽·위로 두면 툴팁 박스 전체가 커서의 오른쪽 위로 펼쳐진다.
+        // 오프셋은 화면 픽셀 기준으로 고정되도록 현재 줌 배율로 나눠서 그래프 컨테이너 로컬 단위로 변환한다.
+        private void PositionTooltipAtMouse()
+        {
+            if (_graphContainer == null) return;
+
+            var canvas = GetComponentInParent<Canvas>();
+            var cam = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
+
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(_graphContainer, Input.mousePosition, cam, out var local))
+                return;
+
+            float scale = Mathf.Max(_graphPanZoom != null ? _graphPanZoom.Scale : 1f, 0.0001f);
+            // 기존 (+10,+10)에서 좌측 100px·아래 50px만큼 이동 요청 반영.
+            const float offsetX = 10f - 120f; // -90f
+            const float offsetY = 10f - 120f;  // -40f
+            _tooltipRT.anchoredPosition = local + new Vector2(offsetX, offsetY) / scale;
+            _tooltipRT.localScale = Vector3.one / scale;
         }
 
         // 단서 툴팁에 표시할 추천 경로 한 줄 요약. 탐색 자체는 모듈(현재 장비·진행 상태 기준)에 위임.
@@ -810,6 +830,12 @@ namespace RouteFinding.MapView
 
             dd.SelectedIndex = _knownNodesForDropdown.Count > 0 ? selectedIdx : -1;
             dd.Caption.text  = _knownNodesForDropdown.Count > 0 ? _knownNodesForDropdown[selectedIdx].nodeName : "";
+
+            // TODO(임시 진단용 — 드롭다운 캡션 텍스트 안 보임 리포트 확인용, 원인 특정되면 제거):
+            // count=0이면 _knownNodesForDropdown(데이터) 쪽 문제, count>0인데 화면에 안 보이면
+            // captionSize가 (0,0)에 가까운지 확인 — 0이면 레이아웃 타이밍 문제로 범위가 좁혀짐.
+            Debug.Log($"[MapViewer] FillSimpleDropdown({dd.Root.name}): count={_knownNodesForDropdown.Count}, " +
+                      $"text=\"{dd.Caption.text}\", rootSize={dd.Root.rect.size}, captionSize={dd.Caption.rectTransform.rect.size}");
         }
 
         // 드롭다운 본체 클릭 — 열림/닫힘 토글. 다른 쪽 드롭다운이 열려있으면 같이 닫는다(둘 다 열리면 헷갈림).

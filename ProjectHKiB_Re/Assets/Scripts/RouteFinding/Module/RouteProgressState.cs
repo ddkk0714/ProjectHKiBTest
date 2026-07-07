@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -27,6 +28,11 @@ public class RouteProgressState
     private readonly HashSet<string> _eventFlags = new();             // "mapGuid:eventKey"
 
     public IReadOnlyCollection<string> AcquiredClueIds => _acquiredClueIds;
+
+    // 단서를 새로 획득할 때마다 발행 — CodexModule 등 확장 시스템이 폴링 없이 구독한다.
+    // 세이브 로드(ImportFromSaveData)는 이 이벤트를 발행하지 않으므로(컬렉션 직접 갱신),
+    // 로드 직후에는 구독자가 직접 전체 재계산(AcquiredClueIds 순회)을 한 번 해줘야 한다.
+    public event Action<ClueData> OnClueAcquired;
 
     public RouteProgressState(MapGraph graph)
     {
@@ -122,6 +128,7 @@ public class RouteProgressState
         }
 
         Debug.Log($"[RouteProgressState] 단서 획득: {clue.name}");
+        OnClueAcquired?.Invoke(clue);
     }
 
     // ─── SaveSlotData 연동 (일기장 세이브) ────────────────────────

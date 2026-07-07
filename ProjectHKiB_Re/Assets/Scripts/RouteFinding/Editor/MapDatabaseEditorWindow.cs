@@ -33,6 +33,7 @@ namespace RouteFinding.Editor
         private bool _foldWavePaths    = true;
         private bool _foldEnemies      = true;
         private bool _foldRequiredGears = true;
+        private bool _foldKeywords = true;
 
         // ─── 색상 ────────────────────────────────────────────────
         private static readonly Color ColDirty    = new(1.00f, 0.85f, 0.35f);
@@ -84,7 +85,14 @@ namespace RouteFinding.Editor
                 _clueDb = JsonUtility.FromJson<ClueDatabase>(File.ReadAllText(_cluePath));
                 _clueDb.clues = _clueDb.clues ?? Array.Empty<ClueData>();
                 foreach (var cl in _clueDb.clues)
+                {
                     cl.requiredEventKey = cl.requiredEventKey ?? "";
+                    cl.timestamp     = cl.timestamp     ?? "";
+                    cl.content       = cl.content       ?? "";
+                    cl.source        = cl.source        ?? "";
+                    cl.codexMapGuid  = cl.codexMapGuid  ?? "";
+                    cl.keywords      = cl.keywords      ?? Array.Empty<string>();
+                }
             }
 
             _dirty = false;
@@ -469,6 +477,37 @@ namespace RouteFinding.Editor
                 "RouteModule.Instance.Progress.SetEventFlag(맵GUID, 이 키)가 호출된 후에만 획득.",
                 MessageType.None);
 
+            // ─── 도감(Codex) 전용 필드 ──────────────────────────
+            EditorGUILayout.Space(8f);
+            SectionHeader("도감 카드 정보");
+
+            cl.type      = (ClueType)EditorGUILayout.EnumPopup("타입", cl.type);
+            cl.timestamp = TF("시간 (표시용, 비우면 숨김)", cl.timestamp);
+            cl.content   = TA("도감 본문", cl.content);
+            cl.source    = TF("출처", cl.source);
+            cl.codexMapGuid = NodeGuidPopup("도감 분류 맵 (없으면 '기타')", cl.codexMapGuid, allowEmpty: true);
+
+            EditorGUILayout.Space(4f);
+            _foldKeywords = EditorGUILayout.Foldout(_foldKeywords,
+                $"키워드  ({cl.keywords.Length}개)", true, EditorStyles.foldoutHeader);
+            if (_foldKeywords)
+            {
+                EditorGUI.indentLevel++;
+                int removeKw = -1;
+                for (int i = 0; i < cl.keywords.Length; i++)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayout.Label($"[{i}]", GUILayout.Width(28f));
+                    cl.keywords[i] = EditorGUILayout.TextField(cl.keywords[i]);
+                    if (GUILayout.Button("−", GUILayout.Width(22f))) removeKw = i;
+                    EditorGUILayout.EndHorizontal();
+                }
+                if (removeKw >= 0) ArrayUtility.RemoveAt(ref cl.keywords, removeKw);
+                if (GUILayout.Button("+ 키워드 추가", GUILayout.ExpandWidth(false)))
+                    ArrayUtility.Add(ref cl.keywords, "");
+                EditorGUI.indentLevel--;
+            }
+
             if (EditorGUI.EndChangeCheck()) _dirty = true;
         }
 
@@ -514,6 +553,12 @@ namespace RouteFinding.Editor
                         targetMapGuid        = "",
                         targetConnectionGuid = "",
                         requiredEventKey     = "",
+                        type                 = ClueType.EventHint,
+                        timestamp            = "",
+                        content              = "",
+                        source               = "",
+                        codexMapGuid         = "",
+                        keywords             = Array.Empty<string>(),
                     });
                     _selClue = _clueDb.clues.Length - 1;
                     break;
