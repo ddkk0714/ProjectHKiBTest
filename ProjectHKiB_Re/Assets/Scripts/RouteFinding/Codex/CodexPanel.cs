@@ -171,6 +171,10 @@ namespace RouteFinding.Codex
                     FinalizePanel(_panelGO.GetComponent<RectTransform>());
                     return;
                 }
+                // 먼저 비활성화한 뒤 Destroy — 구버전 패널 안의 TMP 텍스트를 활성 상태로 그냥 Destroy하면,
+                // 같은 프레임에 ScrollRect.LateUpdate가 강제하는 CanvasUpdateRegistry 리빌드가 이미 파괴 중인
+                // TMP의 서브메시(폴백 폰트) 머티리얼에 접근하려다 MissingReferenceException을 던질 수 있다.
+                existing.gameObject.SetActive(false);
                 Destroy(existing.gameObject);
             }
 

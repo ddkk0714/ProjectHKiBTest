@@ -11,7 +11,7 @@ using UnityEngine;
 //   DifficultyCalculator(Logic): 기획서 난이도 공식 — 무상태 정적 클래스
 //   RouteModule       (Module) : ★ 공용 상태·기획 규칙의 단일 소유자  ← 이 클래스
 //   RouteProgressState(Module) : 맵 진행 상태(방문/클리어/단서) — RouteModule이 소유
-//   WaveCombatBridge  (Manager): 연결 전투 실행 창구 — 시작/종료 이벤트만 발행
+//   WaveCombatBridge  (Manager): 맵 전투 실행 창구 (2026-07-14 이전 — 원래는 연결 전투) — 시작/종료 이벤트만 발행
 //   RouteSpawnManager (Manager): 침대 임시 스폰 포인트
 //   MapViewer         (MapView): 지도 UI — 모듈의 상태를 읽어 그리기만 한다
 //
@@ -140,11 +140,11 @@ public class RouteModule : MonoBehaviour
 
     // 이동 진행 알림 — 확장 시스템(RouteNote, UI 등)이 구독한다.
     public event Action OnTravelStarted;
-    public event Action<MapNodeData> OnNodeArrived; // 연결 전투 통과 후 새 노드 도달
+    public event Action<MapNodeData> OnNodeArrived; // 맵 전투 통과 후 새 노드 도달
     public event Action OnTravelEnded;              // 목적지 도달 또는 이동 중단
 
     // 출발 전 경로 선택 (지도 화면에서 호출).
-    // 통과 불가 연결을 포함한 경로(IsBlocked)는 선택할 수 없다 — AlternativePath를 대신 선택해야 한다.
+    // 통과 불가 맵을 포함한 경로(IsBlocked)는 선택할 수 없다 — AlternativePath를 대신 선택해야 한다.
     public bool SelectRoute(PathResult route)
     {
         if (_isTraveling)
@@ -178,15 +178,15 @@ public class RouteModule : MonoBehaviour
         return true;
     }
 
-    // 현재 통과해야 할 연결 (= 다음 전투 대상). 경로의 i번째 노드와 i+1번째 노드 사이 연결.
-    public MapConnectionData GetCurrentConnection()
+    // 다음 전투 대상 맵 (= 지금부터 도달해야 할 다음 노드). 2026-07-14 완료 — 원래는 "다음 연결"(GetCurrentConnection).
+    public MapNodeData GetCurrentTargetNode()
     {
-        if (!_isTraveling || _selectedRoute == null || _currentNodeIndex >= _selectedRoute.Connections.Count)
+        if (!_isTraveling || _selectedRoute == null || _currentNodeIndex + 1 >= _selectedRoute.Nodes.Count)
             return null;
-        return _selectedRoute.Connections[_currentNodeIndex];
+        return _selectedRoute.Nodes[_currentNodeIndex + 1];
     }
 
-    // 연결 전투 완료 후 다음 노드로 진행. 도달한 노드는 방문 처리(단서 자동 획득 포함)된다.
+    // 맵 전투 완료 후 다음 노드로 진행. 도달한 노드는 방문 처리(단서 자동 획득 포함)된다.
     public void AdvanceToNextNode()
     {
         if (!_isTraveling || _selectedRoute == null) return;
@@ -279,13 +279,13 @@ public class RouteModule : MonoBehaviour
         _bridgeSubscribed = true;
     }
 
-    private void HandleCombatCompleted(MapConnectionData connection)
+    private void HandleCombatCompleted(MapNodeData node)
     {
-        // 전투 승리 → 연결 영구 개방(기획서: 한 번 통과하면 이후 전투 없이 이동 가능) 후 다음 노드로.
-        // 단, 일기장 세이브 전에 사망하면 RevertToLastSave로 개방이 취소된다.
-        Progress.MarkConnectionCleared(connection);
+        // 전투 승리 → 맵 영구 클리어(기획서: 한 번 클리어하면 이후 전투 없이 재방문 가능) 후 다음 노드로.
+        // 단, 일기장 세이브 전에 사망하면 RevertToLastSave로 클리어가 취소된다.
+        Progress.MarkNodeCleared(node);
         AdvanceToNextNode();
     }
 
-    private void HandleCombatFailed(MapConnectionData connection) => AbortTravel();
+    private void HandleCombatFailed(MapNodeData node) => AbortTravel();
 }

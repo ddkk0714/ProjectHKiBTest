@@ -7,8 +7,17 @@ namespace RouteFinding.MapView
     // Init()으로 target(GraphContainer)과 viewport(GraphViewport)를 주입받는다.
     // 줌: 마우스 휠 — 커서 위치 기준으로 스케일 변경
     // 패닝: 좌클릭 드래그 — GraphContainer 위치 이동
+    //
+    // 2026-07-14 — 줌을 Input.GetAxis 폴링이 아니라 IScrollHandler.OnScroll(EventSystem 경유)로 변경.
+    // 폴링 방식은 "지금 마우스가 이 사각형 범위 안에 있는가"만 boolean으로 확인하기 때문에, 그 위에
+    // 다른 UI(드롭다운 옵션 목록의 ScrollRect 등)가 덮여 있어도 구분하지 못하고 배경 줌이 같이 동작해버렸다
+    // (드롭다운을 열고 목록을 휠로 스크롤하면 뒤 지도까지 같이 줌되던 문제). EventSystem 기반 IScrollHandler는
+    // 레이캐스트로 "현재 커서 아래 가장 위에 있는 대상"에게만 이벤트를 전달하므로, 드롭다운 목록처럼 위에 뜬
+    // 다른 스크롤 가능 UI가 있으면 그쪽이 이벤트를 가로가고 이 핸들러는 아예 호출되지 않아 자연히 해결된다.
+    // 드래그·클릭(IPointerDownHandler/IBeginDragHandler/IDragHandler)은 원래부터 EventSystem 기반이라
+    // 이 문제가 없었다 — 줌만 폴링 방식이라 예외였던 것.
     [RequireComponent(typeof(RectTransform))]
-    public class GraphPanZoom : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler
+    public class GraphPanZoom : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IScrollHandler
     {
         private RectTransform _target;    // GraphContainer (스케일/이동 대상)
         private RectTransform _viewport;  // GraphViewport (클리핑·좌표 기준)
@@ -16,6 +25,11 @@ namespace RouteFinding.MapView
 
         private const float ZoomMin = 0.25f;
         private const float ZoomMax = 4.0f;
+
+        // PointerEventData.scrollDelta는 휠 한 칸에 대략 ±1(환경에 따라 다름). 값이 클수록 휠 한 칸당
+        // 스케일 변화가 커진다 — 2026-07-14: 기존 0.2f(휠 한 칸당 ~20% 변화)가 너무 민감하다는 피드백으로
+        // 0.08f(칸당 ~8% 변화)로 완화. 인스펙터에서 추가 조정 가능.
+        [SerializeField] private float _zoomSensitivity = 0.08f;
 
         private float   _scale = 1f;
         private Vector2 _dragStartLocal;
@@ -34,23 +48,21 @@ namespace RouteFinding.MapView
             _canvas != null && _canvas.renderMode != RenderMode.ScreenSpaceOverlay
                 ? _canvas.worldCamera : null;
 
-        private void Update()
+        // EventSystem이 "지금 커서 아래 가장 위에 있는 대상"에게만 호출한다 — 드롭다운 옵션 목록처럼
+        // 위에 뜬 다른 스크롤 UI가 있으면 그쪽이 이벤트를 가로채 이 메서드 자체가 호출되지 않는다.
+        public void OnScroll(PointerEventData eventData)
         {
             if (_target == null) return;
 
-            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            float scroll = eventData.scrollDelta.y;
             if (Mathf.Abs(scroll) < 0.001f) return;
 
-            if (!RectTransformUtility.RectangleContainsScreenPoint(
-                    (RectTransform)transform, Input.mousePosition, WorldCam))
-                return;
-
             if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                    _viewport, Input.mousePosition, WorldCam, out Vector2 mouseLocal))
+                    _viewport, eventData.position, WorldCam, out Vector2 mouseLocal))
                 return;
 
             float oldScale = _scale;
-            _scale = Mathf.Clamp(_scale * (1f + scroll * 2f), ZoomMin, ZoomMax);
+            _scale = Mathf.Clamp(_scale * (1f + scroll * _zoomSensitivity), ZoomMin, ZoomMax);
             if (Mathf.Approximately(oldScale, _scale)) return;
 
             // 커서 위치 기준 줌.

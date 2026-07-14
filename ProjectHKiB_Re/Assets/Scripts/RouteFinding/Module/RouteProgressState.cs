@@ -21,7 +21,7 @@ public class RouteProgressState
     private readonly MapGraph _graph;
 
     private readonly HashSet<string> _visitedNodeGuids = new();      // 방문한 맵
-    private readonly HashSet<string> _clearedConnectionGuids = new(); // 클리어(영구 개방)된 연결
+    private readonly HashSet<string> _clearedNodeGuids = new();       // 클리어(영구 안전)된 맵 — 2026-07-14 이전, 원래는 연결
     private readonly HashSet<string> _cluedNodeGuids = new();         // 단서가 공개된 맵
     private readonly HashSet<string> _cluedConnectionGuids = new();   // 단서가 공개된 연결
     private readonly HashSet<string> _acquiredClueIds = new();        // 획득한 단서
@@ -45,7 +45,7 @@ public class RouteProgressState
     public void ResetToInitial()
     {
         _visitedNodeGuids.Clear();
-        _clearedConnectionGuids.Clear();
+        _clearedNodeGuids.Clear();
         _cluedNodeGuids.Clear();
         _cluedConnectionGuids.Clear();
         _acquiredClueIds.Clear();
@@ -62,7 +62,7 @@ public class RouteProgressState
 
     // ─── 상태 조회 ───────────────────────────────────────────────
     public bool IsNodeVisited(MapNodeData node) => _visitedNodeGuids.Contains(node.guid);
-    public bool IsConnectionCleared(MapConnectionData conn) => _clearedConnectionGuids.Contains(conn.guid);
+    public bool IsNodeCleared(MapNodeData node) => _clearedNodeGuids.Contains(node.guid);
     public bool HasNodeClue(MapNodeData node) => _cluedNodeGuids.Contains(node.guid);
     public bool HasConnectionClue(MapConnectionData conn) => _cluedConnectionGuids.Contains(conn.guid);
     public bool IsClueAcquired(string clueId) => _acquiredClueIds.Contains(clueId);
@@ -79,8 +79,8 @@ public class RouteProgressState
         TryAcquireCluesForMap(node.guid);
     }
 
-    // 연결 전투 클리어 → 영구 개방. (단, 일기장 세이브 전에 사망하면 손실 — RouteModule.RevertToLastSave 참조)
-    public void MarkConnectionCleared(MapConnectionData conn) => _clearedConnectionGuids.Add(conn.guid);
+    // 맵 전투 클리어 → 영구 안전. (단, 일기장 세이브 전에 사망하면 손실 — RouteModule.RevertToLastSave 참조)
+    public void MarkNodeCleared(MapNodeData node) => _clearedNodeGuids.Add(node.guid);
 
     // 단서 공개 — 지도에서 해당 맵/연결의 정보(이름·난이도 등)가 보이게 된다.
     public void GrantNodeClue(MapNodeData node) => _cluedNodeGuids.Add(node.guid);
@@ -133,7 +133,7 @@ public class RouteProgressState
 
     // ─── SaveSlotData 연동 (일기장 세이브) ────────────────────────
     // 진행 상태는 SaveSlotData에 아래 키 규칙으로 직렬화된다:
-    //   passages              : 클리어된 연결 GUID
+    //   passages              : 클리어된 맵 GUID (2026-07-14 이전 — 원래는 연결 GUID)
     //   eventFlags(접두사별)  : "mapnode_<guid>"   방문한 맵
     //                           "mapclue_<guid>"   단서 공개된 맵
     //                           "connclue_<guid>"  단서 공개된 연결
@@ -142,8 +142,8 @@ public class RouteProgressState
 
     public void ExportToSaveData(SaveSlotData data)
     {
-        foreach (var conn in _graph.AllConnections)
-            SetOrUpdatePassage(data, conn.guid, _clearedConnectionGuids.Contains(conn.guid));
+        foreach (var node in _graph.AllNodes)
+            SetOrUpdatePassage(data, node.guid, _clearedNodeGuids.Contains(node.guid));
 
         foreach (var node in _graph.AllNodes)
         {
@@ -166,7 +166,7 @@ public class RouteProgressState
         if (data == null) return;
 
         foreach (var p in data.passages)
-            if (p.opened) _clearedConnectionGuids.Add(p.id);
+            if (p.opened) _clearedNodeGuids.Add(p.id);
 
         foreach (var f in data.eventFlags)
         {

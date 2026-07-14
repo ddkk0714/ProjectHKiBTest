@@ -28,6 +28,7 @@ namespace RouteFinding.MapView
 
         [Header("그래프 레이아웃")]
         [SerializeField] private float _nodeSize     =  8f;
+        [SerializeField] private float _nodeHitSizeMultiplier = 2.5f; // 클릭 판정 영역 = 노드 시각 크기 × 이 값 (최소 1배 보장)
         [SerializeField] private float _graphPadding =  8f;
         [SerializeField] private float _graphWidth   = 230f;
         [SerializeField] private float _graphHeight  = 230f;
@@ -49,6 +50,15 @@ namespace RouteFinding.MapView
         [SerializeField] private float _edgeThicknessNormal    = 3f;
         [SerializeField] private float _edgeThicknessHighlight = 7f;
 
+        [Header("드롭다운 스타일 (출발/도착 SimpleDropdown)")]
+        [SerializeField] private Color _dropdownBgColor            = new Color(0.17f, 0.21f, 0.30f, 1f); // 드롭다운 본체(캡션 박스) 배경
+        [SerializeField] private Color _dropdownOptionsListBgColor = new Color(0.12f, 0.14f, 0.20f, 0.97f); // 펼쳐지는 옵션 목록 배경 — 2026-07-07 진단용으로 넣었던 밝은 노란색을 정상 색으로 교체
+        [SerializeField] private Color _dropdownCaptionColor       = Color.white;
+        [SerializeField] private float _dropdownCaptionFontSize    = 7f;
+        [SerializeField] private float _dropdownOptionFontSize     = 7f;
+        [SerializeField] private float _dropdownOptionHeight       = 14f;
+        [SerializeField] private float _dropdownOptionsListMaxHeight = 90f;
+
         [Header("프리팹 (선택 — 비워두면 런타임 자동 생성)")]
         [SerializeField] private GameObject _panelPrefab;
 
@@ -66,6 +76,7 @@ namespace RouteFinding.MapView
         private RectTransform   _tooltipRT;
         private TextMeshProUGUI _tooltipTMP;
         private RectTransform   _clueListContent;
+        private readonly HashSet<string> _expandedClueIds = new(); // 사이드패널 단서 목록에서 펼쳐둔 단서 id (Refresh()로 목록이 재생성돼도 유지)
 
         // 뷰가 가지는 것은 "화면 표시" 상태뿐 — 목적지 선택, 경로 방식, 탐색 결과 캐시.
         // 장비·진행 상태 같은 공용 상태는 RouteModule이 소유한다.
@@ -230,20 +241,9 @@ namespace RouteFinding.MapView
                 edgeRT.pivot     = new Vector2(0.5f, 0.5f);
                 edgeGO.AddComponent<Image>();
 
-                var lblGO = new GameObject($"Lbl_{conn.guid}");
-                lblGO.transform.SetParent(_labelContainer, false);
-                var lblRT = lblGO.AddComponent<RectTransform>();
-                lblRT.anchorMin = lblRT.anchorMax = Vector2.zero;
-                lblRT.pivot     = new Vector2(0.5f, 0.5f);
-                lblRT.sizeDelta = new Vector2(24f, 10f);
-                var lblTMP = lblGO.AddComponent<TextMeshProUGUI>();
-                if (_font != null) lblTMP.font = _font;
-                lblTMP.fontSize  = 8f;
-                lblTMP.alignment = TextAlignmentOptions.Center;
-                lblTMP.color     = new Color(1f, 1f, 1f, 0.88f);
-
+                // 2026-07-14 — 난이도 숫자 표시가 노드로 이동하면서 간선 전용 라벨은 더 이상 만들지 않는다.
                 var ev = edgeGO.AddComponent<MapEdgeView>();
-                ev.Init(conn, lblTMP);
+                ev.Init(conn);
                 ev.SetHighlightStyle(_pathHighlightColor, _edgeThicknessNormal, _edgeThicknessHighlight);
                 ev.SetLayout(fp, tp);
                 _edgeViews.Add(ev);
@@ -255,19 +255,37 @@ namespace RouteFinding.MapView
             {
                 if (!_nodePositions.TryGetValue(node.guid, out var pos)) continue;
 
+                // 노드 GO 자체는 "클릭 판정 영역"이다 — 실제 눈에 보이는 크기(_nodeSize)보다
+                // 넉넉하게 키워서(_nodeHitSizeMultiplier) 마우스로 누르기 쉽게 한다.
+                // 눈에 보이는 그래픽은 자식 "Visual"에 원래 크기 그대로 둔다.
+                float hitSize = Mathf.Max(_nodeSize, _nodeSize * _nodeHitSizeMultiplier);
+
                 var nodeGO = new GameObject($"Node_{node.guid}");
                 nodeGO.transform.SetParent(_graphContainer, false);
                 var nodeRT = nodeGO.AddComponent<RectTransform>();
                 nodeRT.anchorMin        = nodeRT.anchorMax = Vector2.zero;
                 nodeRT.pivot            = Vector2.one * 0.5f;
                 nodeRT.anchoredPosition = pos;
-                nodeRT.sizeDelta        = Vector2.one * _nodeSize;
+                nodeRT.sizeDelta        = Vector2.one * hitSize;
 
-                var img = nodeGO.AddComponent<Image>();
-                if (circleSprite != null) img.sprite = circleSprite;
+                // 클릭 판정용 배경 — 완전 투명이지만 raycastTarget은 그대로 true라 클릭은 정상 등록된다.
+                var hitImg = nodeGO.AddComponent<Image>();
+                hitImg.color = new Color(0f, 0f, 0f, 0f);
                 var btn = nodeGO.AddComponent<Button>();
-                btn.targetGraphic = img;
+                btn.targetGraphic = hitImg;
                 btn.transition    = Selectable.Transition.None;
+
+                // 실제 눈에 보이는 노드 그래픽 — 클릭 판정 영역(hitSize)과 무관하게 원래 크기(_nodeSize) 유지.
+                var visualGO = new GameObject("Visual");
+                visualGO.transform.SetParent(nodeGO.transform, false);
+                var visualRT = visualGO.AddComponent<RectTransform>();
+                visualRT.anchorMin = visualRT.anchorMax = new Vector2(0.5f, 0.5f);
+                visualRT.pivot            = new Vector2(0.5f, 0.5f);
+                visualRT.anchoredPosition = Vector2.zero;
+                visualRT.sizeDelta        = Vector2.one * _nodeSize;
+                var img = visualGO.AddComponent<Image>();
+                if (circleSprite != null) img.sprite = circleSprite;
+                img.raycastTarget = false; // 클릭 판정은 부모(hitImg)가 담당 — 시각 그래픽은 판정에서 제외
 
                 // 레이블: 노드 아래에 위치 (노드가 작아도 텍스트가 충분히 표시됨)
                 var lblGO = new GameObject("Name");
@@ -290,8 +308,25 @@ namespace RouteFinding.MapView
                 var cg = lblGO.AddComponent<CanvasGroup>();
                 cg.blocksRaycasts = false;
 
+                // 2026-07-14 추가 — 난이도/통과 불가 표시가 간선에서 노드로 이동해온 라벨.
+                // 노드 좌상단(고정 오프셋)에 배치 — 노드 자체는 팬/줌 시 부모(_graphContainer)와 함께
+                // 움직이므로, 엣지 라벨과 달리 매 프레임 위치를 다시 계산할 필요가 없다.
+                var diffGO = new GameObject($"Diff_{node.guid}");
+                diffGO.transform.SetParent(_graphContainer, false);
+                var diffRT = diffGO.AddComponent<RectTransform>();
+                diffRT.anchorMin = diffRT.anchorMax = Vector2.zero;
+                diffRT.pivot     = new Vector2(0.5f, 0.5f);
+                diffRT.sizeDelta = new Vector2(24f, 10f);
+                diffRT.anchoredPosition = pos + new Vector2(_nodeSize * 0.6f, _nodeSize * 0.6f);
+                var diffTMP = diffGO.AddComponent<TextMeshProUGUI>();
+                if (_font != null) diffTMP.font = _font;
+                diffTMP.fontSize  = 8f;
+                diffTMP.alignment = TextAlignmentOptions.Center;
+                diffTMP.color     = new Color(1f, 1f, 1f, 0.88f);
+                diffTMP.raycastTarget = false; // 노드 위에 겹쳐 그려지므로 클릭 판정을 가로채면 안 됨
+
                 var nv = nodeGO.AddComponent<MapNodeView>();
-                nv.Init(node);
+                nv.Init(node, img, diffTMP);
                 nv.OnClicked    += OnNodeClicked;
                 nv.OnHoverEnter += ShowNodeTooltip;
                 nv.OnHoverExit  += _ => HideClueTooltip();
@@ -339,30 +374,31 @@ namespace RouteFinding.MapView
 
             foreach (var kv in _nodeViews)
             {
-                var d       = kv.Value.Data;
-                bool vis    = progress.IsNodeVisited(d);
-                bool clue   = progress.HasNodeClue(d);
-                bool start  = d.isStartNode;
-                bool sel    = _selectedDest?.Data.guid == d.guid;
-                bool onPath = IsNodeOnPath(selectablePath, d.guid);
+                var d        = kv.Value.Data;
+                bool vis     = progress.IsNodeVisited(d);
+                bool clue    = progress.HasNodeClue(d);
+                bool start   = d.isStartNode;
+                bool sel     = _selectedDest?.Data.guid == d.guid;
+                bool onPath  = IsNodeOnPath(selectablePath, d.guid);
                 bool onBlockedPath = IsNodeOnPath(blockedPath, d.guid);
-                bool known = shownNodeGuids.Contains(d.guid);
+                bool known   = shownNodeGuids.Contains(d.guid);
+                // 2026-07-14 — 난이도/통과 불가 판정이 연결에서 맵으로 이동.
+                float df       = DifficultyCalculator.Calculate(d, gears);
+                bool cleared   = progress.IsNodeCleared(d);
+                bool passable  = d.IsPassableWith(gears);
                 kv.Value.SetShown(known);
-                kv.Value.SetState(visited: vis, hasClue: clue, isStart: start, isSelected: sel, isOnPath: onPath, isOnBlockedPath: onBlockedPath, known: known);
+                kv.Value.SetState(visited: vis, hasClue: clue, isStart: start, isSelected: sel, isOnPath: onPath, isOnBlockedPath: onBlockedPath, known: known,
+                    isPassable: passable, requiredGears: d.requiredGears, difficulty: df, cleared: cleared);
             }
 
             foreach (var ev in _edgeViews)
             {
                 var d        = ev.Data;
-                float df     = DifficultyCalculator.Calculate(d, gears);
-                bool cleared = progress.IsConnectionCleared(d);
                 bool hasClue = progress.HasConnectionClue(d);
                 bool onPath  = IsEdgeOnPath(selectablePath, d.guid);
                 bool onBlockedPath = IsEdgeOnPath(blockedPath, d.guid);
-                bool passable = d.IsPassableWith(gears);
                 ev.SetShown(shownEdgeGuids.Contains(d.guid));
-                ev.SetState(cleared: cleared, hasClue: hasClue, isOnPath: onPath, isOnBlockedPath: onBlockedPath,
-                    isPassable: passable, requiredGears: d.requiredGears, difficulty: df);
+                ev.SetState(hasClue: hasClue, isOnPath: onPath, isOnBlockedPath: onBlockedPath);
             }
 
             RefreshPathLabel();
@@ -561,7 +597,10 @@ namespace RouteFinding.MapView
             }
         }
 
-        // 사이드패널의 단서 목록(텍스트)을 갱신한다. 클릭하면 그래프가 해당 맵으로 포커스 이동.
+        // 사이드패널의 단서 목록을 갱신한다 — 2026-07-14: 전체 획득 단서가 아니라 **가장 최근에 선택된
+        // 맵 노드(_selectedDest, 그래프 클릭 또는 도착 드롭다운으로 갱신됨)와 연관된 단서만** 보여주도록
+        // 범위를 좁혔다. "연관"의 기준은 ShowNodeTooltip이 이미 쓰던 것과 동일 — 그 맵의 clueIds 중
+        // 획득된 것만. 항목이 여러 개면 이름만 접어두고 클릭해야 본문(세부 항목)이 펼쳐진다(아코디언).
         private void RefreshClueList()
         {
             if (_clueListContent == null || MapGraph.Instance == null) return;
@@ -577,43 +616,77 @@ namespace RouteFinding.MapView
                 Destroy(child);
             }
 
-            var acquired = RouteModule.Instance.Progress.AcquiredClueIds;
-            if (acquired.Count == 0)
+            var selected = _selectedDest?.Data;
+            if (selected == null)
             {
-                MakeTMP(_clueListContent, "없음", 8f, FontStyles.Normal, 12f).color = Gray;
+                MakeTMP(_clueListContent, "맵 노드를 선택하세요", 8f, FontStyles.Normal, 12f).color = Gray;
                 return;
             }
 
-            foreach (var clueId in acquired)
+            var progress = RouteModule.Instance.Progress;
+            var related = new List<ClueData>();
+            if (selected.clueIds != null)
             {
-                var clue = MapGraph.Instance.GetClue(clueId);
-                if (clue != null) MakeClueItem(_clueListContent, clue);
+                foreach (var clueId in selected.clueIds)
+                {
+                    if (!progress.IsClueAcquired(clueId)) continue;
+                    var clue = MapGraph.Instance.GetClue(clueId);
+                    if (clue != null) related.Add(clue);
+                }
             }
+
+            if (related.Count == 0)
+            {
+                MakeTMP(_clueListContent, "이 맵에서 획득한 단서 없음", 8f, FontStyles.Normal, 12f).color = Gray;
+                return;
+            }
+
+            // 1개면 클릭 없이 바로 본문까지 보여주고, 여러 개면 이름만 접어둔다(눌러서 펼침).
+            // 펼침 여부는 _expandedClueIds에 저장해둬서, 다른 조작(장비 토글 등)으로 Refresh()가 다시
+            // 불려 목록이 통째로 재생성되더라도 사용자가 펼쳐 둔 상태가 갑자기 접히지 않게 한다.
+            bool singleItem = related.Count == 1;
+            foreach (var clue in related)
+                MakeClueListItem(_clueListContent, clue, startExpanded: singleItem || _expandedClueIds.Contains(clue.id));
         }
 
-        private void MakeClueItem(RectTransform parent, ClueData clue)
+        // startExpanded=true면 처음부터 이름+본문을 모두 보여주고, false면 이름만 보이다가
+        // 클릭할 때마다 펼침/접힘을 토글한다. 클릭 시 기존처럼 그래프도 해당 맵으로 포커스 이동.
+        private void MakeClueListItem(RectTransform parent, ClueData clue, bool startExpanded)
         {
             var rt = NewRect(parent, "Clue_" + clue.id);
             var le = rt.gameObject.AddComponent<LayoutElement>();
-            le.preferredHeight = 28f;
-            le.flexibleWidth   = 1f;
+            le.flexibleWidth = 1f;
 
             var bgImg = AddImg(rt, new Color(0.12f, 0.15f, 0.22f));
             var btn = rt.gameObject.AddComponent<Button>();
             btn.targetGraphic = bgImg;
             btn.transition    = Selectable.Transition.None;
-            btn.onClick.AddListener(() => FocusOnClue(clue));
 
             var txtRT = NewRect(rt, "Text");
             StretchFull(txtRT);
             var tmp = txtRT.gameObject.AddComponent<TextMeshProUGUI>();
             if (_font != null) tmp.font = _font;
-            tmp.text  = $"<b>{clue.name}</b>\n{clue.description}";
             tmp.fontSize = 7f;
             tmp.color = Color.white;
             tmp.alignment = TextAlignmentOptions.TopLeft;
             tmp.enableWordWrapping = true;
             tmp.margin = new Vector4(2f, 1f, 2f, 1f);
+
+            bool expanded = startExpanded;
+            void ApplyState()
+            {
+                tmp.text = expanded ? $"<b>{clue.name}</b>\n{clue.description}" : $"▸ <b>{clue.name}</b>";
+                le.preferredHeight = expanded ? 28f : 14f;
+            }
+            ApplyState();
+
+            btn.onClick.AddListener(() =>
+            {
+                expanded = !expanded;
+                if (expanded) _expandedClueIds.Add(clue.id); else _expandedClueIds.Remove(clue.id);
+                ApplyState();
+                FocusOnClue(clue);
+            });
         }
 
         private void FocusOnClue(ClueData clue)
@@ -822,20 +895,22 @@ namespace RouteFinding.MapView
             {
                 var node = _knownNodesForDropdown[i];
                 int captured = i;
-                var optBtn = MakeBtn(dd.OptionsContent, node.nodeName, () => SelectSimpleDropdownOption(dd, captured), fontSize: 7f);
+                var optBtn = MakeBtn(dd.OptionsContent, node.nodeName, () => SelectSimpleDropdownOption(dd, captured), fontSize: _dropdownOptionFontSize);
                 var le = optBtn.GetComponent<LayoutElement>();
-                le.preferredHeight = 14f;
+                le.preferredHeight = _dropdownOptionHeight;
                 if (current != null && node.guid == current.guid) selectedIdx = i;
             }
 
             dd.SelectedIndex = _knownNodesForDropdown.Count > 0 ? selectedIdx : -1;
             dd.Caption.text  = _knownNodesForDropdown.Count > 0 ? _knownNodesForDropdown[selectedIdx].nodeName : "";
 
-            // TODO(임시 진단용 — 드롭다운 캡션 텍스트 안 보임 리포트 확인용, 원인 특정되면 제거):
-            // count=0이면 _knownNodesForDropdown(데이터) 쪽 문제, count>0인데 화면에 안 보이면
-            // captionSize가 (0,0)에 가까운지 확인 — 0이면 레이아웃 타이밍 문제로 범위가 좁혀짐.
-            Debug.Log($"[MapViewer] FillSimpleDropdown({dd.Root.name}): count={_knownNodesForDropdown.Count}, " +
-                      $"text=\"{dd.Caption.text}\", rootSize={dd.Root.rect.size}, captionSize={dd.Caption.rectTransform.rect.size}");
+            // [원인 파악, 2026-07-14] Caption은 ddRT(드롭다운 본체)에 앵커-스트레치된 자식이라, ddRT
+            // 자체의 크기가 아직 유효하지 않으면(0,0) Caption도 크기 0인 채로 텍스트만 대입되어 화면에
+            // 안 보이게 된다. ddRT의 크기는 툴바의 HorizontalLayoutGroup이 계산하는데, 이 리빌드는 다음
+            // 레이아웃 패스까지 지연되는 게 기본 동작 — BuildUI()/FinalizePanel()에서 빌드 직후 1회
+            // 강제 리빌드를 추가했지만, 옵션 버튼을 매번 파괴·재생성하는 이 함수도 같은 툴바 하위에서
+            // 호출되므로 안전하게 한 번 더 강제 리빌드해 Caption이 항상 유효한 크기를 갖도록 보장한다.
+            if (_toolbarRT != null) LayoutRebuilder.ForceRebuildLayoutImmediate(_toolbarRT);
         }
 
         // 드롭다운 본체 클릭 — 열림/닫힘 토글. 다른 쪽 드롭다운이 열려있으면 같이 닫는다(둘 다 열리면 헷갈림).
@@ -895,6 +970,9 @@ namespace RouteFinding.MapView
                     FinalizePanel(_panelGO.GetComponent<RectTransform>());
                     return;
                 }
+                // 먼저 비활성화한 뒤 Destroy — 구버전 패널 안의 TMP 텍스트를 활성 상태로 그냥 Destroy하면
+                // MissingReferenceException이 발생할 수 있다 (RefreshClueList 등과 동일 패턴).
+                existing.gameObject.SetActive(false);
                 Destroy(existing.gameObject);
             }
 
@@ -922,6 +1000,13 @@ namespace RouteFinding.MapView
 
             float panelW = _sidePanelWidth;
 
+            // GraphArea를 SidePanel보다 먼저 만든다 — SidePanelToggleTab(재오픈용 탭)이 SidePanel의
+            // 왼쪽 경계 바깥(GraphArea 쪽)으로 튀어나오게 배치되는데, 나중에 생성된 형제가 화면에서 위에
+            // 그려지는 일반 UI 계층 규칙상 GraphArea가 SidePanel보다 늦게 만들어지면 그 튀어나온 탭 부분을
+            // 덮어버려 안 보이게 된다(2026-07-14 리포트). GraphArea를 먼저 만들어 SidePanel(과 탭)이 항상
+            // 그 위에 그려지도록 순서를 바꿨다.
+            BuildGraphArea(root);
+
             var side = NewRect(root, "SidePanel");
             side.anchorMin = new Vector2(1f, 0f);
             side.anchorMax = Vector2.one;
@@ -932,12 +1017,17 @@ namespace RouteFinding.MapView
             BuildSidePanel(side, panelW);
             BuildSidePanelToggleTab(side);
 
-            BuildGraphArea(root);
-
             // Toolbar를 마지막 자식으로 만들어야 한다 — GraphArea/SidePanel 자체는 툴바 아래 영역에만
             // 앵커돼 있어 겹치지 않지만, 드롭다운 옵션 목록은 툴바 바깥(아래쪽, GraphArea 영역)까지
             // 펼쳐지므로 그보다 늦게 그려지는 형제(=나중에 생성된 GraphArea)에게 가려진다.
             BuildToolbar(root);
+
+            // 툴바는 HorizontalLayoutGroup(childControlWidth/Height=true)으로 자식(드롭다운 등) 크기를
+            // 계산하는데, 이 리빌드는 기본적으로 다음 레이아웃 패스까지 지연된다(Canvas.willRenderCanvases).
+            // Awake 안에서 만들어진 직후 곧바로 Refresh()가 호출되면(Open() 참고) 드롭다운의 Caption(ddRT에
+            // 앵커-스트레치된 자식)이 아직 크기 0인 부모를 참조한 상태로 텍스트가 대입돼버려 화면에 반영되지
+            // 않는 문제가 있었다 — 여기서 즉시 강제로 레이아웃을 확정해 이 시점부터 rect가 유효하게 한다.
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_toolbarRT);
         }
 
         // 기존/프리팹 패널을 재사용할 때의 공통 마무리: 전체 스트레치, 참조 바인딩, 버튼 콜백 연결.
@@ -948,7 +1038,25 @@ namespace RouteFinding.MapView
             BindRefsFromHierarchy();
             WireButtonCallbacks();
             if (_graphContainer == null) BuildGraphArea(rt);
-            _toolbarRT?.SetAsLastSibling(); // 드롭다운 목록이 GraphArea에 가리지 않도록 툴바를 항상 맨 위로
+
+            // [2026-07-14] Toolbar 자체(배경·버튼·라벨 위치 등 정적 디자인)는 프리팹 재사용을 허용해
+            // 비주얼 커스터마이징이 가능하게 유지한다. 다만 드롭다운(OriginDropdown/DestDropdown)은 저장
+            // 시점 상태가 굳어 캡션이 영구히 깨질 수 있었던 실제 사례가 있어(원인: 프리팹에 저장된 옛
+            // 인스턴스가 "Toolbar 있음"만으로 최신 판정돼 재사용되며 MakeSimpleDropdown이 아예 호출 안 됨),
+            // 이 둘만큼은 재사용 여부와 무관하게 항상 파괴 후 새로 만든다 — 같은 위치(형제 인덱스)에
+            // 다시 끼워 넣으므로 Toolbar 안에서의 배치(라벨 옆)는 프리팹에 있던 그대로 유지된다.
+            if (_toolbarRT != null)
+            {
+                _originDropdown = RebuildSimpleDropdownInPlace(_toolbarRT, "OriginDropdown", 48f, OnOriginDropdownChanged);
+                _destDropdown   = RebuildSimpleDropdownInPlace(_toolbarRT, "DestDropdown", 48f, OnDestDropdownChanged);
+            }
+
+            // 형제 순서를 GraphArea < SidePanel < Toolbar로 강제한다 — 프리팹/씬에 저장된 순서가 무엇이든
+            // SidePanelToggleTab(SidePanel 왼쪽 바깥으로 튀어나오는 탭)과 드롭다운 옵션 목록(Toolbar 아래로
+            // 펼쳐짐)이 GraphArea에 가리지 않게 하려면 이 순서가 필요하다(2026-07-14).
+            _sidePanelRT?.SetAsLastSibling();
+            _toolbarRT?.SetAsLastSibling(); // 드롭다운 목록이 GraphArea/SidePanel에 가리지 않도록 툴바를 항상 맨 위로
+            if (_toolbarRT != null) LayoutRebuilder.ForceRebuildLayoutImmediate(_toolbarRT); // 아래 BuildUI() 주석 참고
             UpdateSidePanelLayout();
         }
 
@@ -1073,7 +1181,7 @@ namespace RouteFinding.MapView
             var ddLe = ddRT.gameObject.AddComponent<LayoutElement>();
             ddLe.flexibleWidth  = 0f;
             ddLe.preferredWidth = width;
-            var ddImg = AddImg(ddRT, BtnInactive);
+            var ddImg = AddImg(ddRT, _dropdownBgColor);
             var ddBtn = ddRT.gameObject.AddComponent<Button>();
             ddBtn.targetGraphic = ddImg;
             ddBtn.transition    = Selectable.Transition.None;
@@ -1086,8 +1194,8 @@ namespace RouteFinding.MapView
             captionRT.offsetMax = new Vector2(-4f, -1f);
             var captionTMP = captionRT.gameObject.AddComponent<TextMeshProUGUI>();
             if (_font != null) captionTMP.font = _font;
-            captionTMP.fontSize      = 7f;
-            captionTMP.color        = Color.white;
+            captionTMP.fontSize      = _dropdownCaptionFontSize;
+            captionTMP.color        = _dropdownCaptionColor;
             captionTMP.alignment    = TextAlignmentOptions.MidlineLeft;
             captionTMP.overflowMode = TextOverflowModes.Ellipsis;
             captionTMP.raycastTarget = false; // 캡션이 드롭다운 전체를 덮으므로, 클릭을 가로챌 필요 없음
@@ -1099,8 +1207,8 @@ namespace RouteFinding.MapView
             list.anchorMax        = new Vector2(1f, 0f);
             list.pivot            = new Vector2(0.5f, 1f);
             list.anchoredPosition = Vector2.zero;
-            list.sizeDelta        = new Vector2(0f, 90f);
-            AddImg(list, new Color(0.90f, 0.90f, 0.20f, 1f)); // 배경과 확실히 구분되는 밝은 색
+            list.sizeDelta        = new Vector2(0f, _dropdownOptionsListMaxHeight);
+            AddImg(list, _dropdownOptionsListBgColor);
             dd.OptionsList = list;
 
             var scroll = list.gameObject.AddComponent<ScrollRect>();
@@ -1125,7 +1233,7 @@ namespace RouteFinding.MapView
             var vlg = content.gameObject.AddComponent<VerticalLayoutGroup>();
             vlg.spacing               = 1f;
             vlg.childControlWidth     = true;
-            vlg.childControlHeight    = false;
+            vlg.childControlHeight    = true; // 옵션 버튼의 LayoutElement.preferredHeight(14f)가 실제로 반영되도록
             vlg.childForceExpandWidth  = true;
             vlg.childForceExpandHeight = false;
             dd.OptionsContent = content;
@@ -1135,20 +1243,25 @@ namespace RouteFinding.MapView
             return dd;
         }
 
-        // 프리팹 재사용 경로에서 이름 기반으로 SimpleDropdown 참조를 재구성한다.
-        private SimpleDropdown BindSimpleDropdown(string rootName)
+        // 프리팹/씬에 재사용된 Toolbar 안에서 기존 드롭다운(있다면)을 파괴하고 같은 자리(형제 인덱스)에
+        // 새로 만든다 — Toolbar 자체의 비주얼 커스터마이징(프리팹 편집)은 허용하면서, 드롭다운은 저장
+        // 시점 상태가 굳어버리는 문제(2026-07-14 사례, 위 FinalizePanel 주석 참고)를 원천 차단한다.
+        private SimpleDropdown RebuildSimpleDropdownInPlace(RectTransform toolbar, string id, float width, Action<int> onSelected)
         {
-            var rootTF = FindDeepTransform(_panelGO.transform, rootName);
-            if (rootTF == null) return null;
+            var existingTF = toolbar != null ? FindDeepTransform(toolbar, id) : null;
+            int siblingIndex = existingTF != null ? existingTF.GetSiblingIndex() : -1;
+            if (existingTF != null)
+            {
+                // 먼저 비활성화한 뒤 Destroy — 활성 상태로 그냥 Destroy하면 같은 프레임에 ScrollRect.LateUpdate가
+                // 강제하는 CanvasUpdateRegistry 리빌드가 이미 파괴 중인 TMP(Caption 등)의 서브메시(폴백 폰트)
+                // 머티리얼에 접근하려다 MissingReferenceException을 던질 수 있다 (RefreshClueList/FillSimpleDropdown과 동일 패턴).
+                existingTF.gameObject.SetActive(false);
+                Destroy(existingTF.gameObject);
+            }
 
-            var dd = new SimpleDropdown { Root = (RectTransform)rootTF };
-            dd.Caption        = FindDeepTransform(rootTF, "Caption")?.GetComponent<TextMeshProUGUI>();
-            var listTF        = FindDeepTransform(rootTF, "OptionsList");
-            dd.OptionsList    = listTF as RectTransform;
-            dd.OptionsContent = listTF != null ? FindDeepTransform(listTF, "Content") as RectTransform : null;
-
-            var btn = rootTF.GetComponent<Button>();
-            btn?.onClick.AddListener(() => ToggleSimpleDropdown(dd));
+            var dd = MakeSimpleDropdown(toolbar, id, width);
+            if (siblingIndex >= 0) dd.Root.SetSiblingIndex(siblingIndex);
+            dd.OnSelected = onSelected;
             return dd;
         }
 
@@ -1271,17 +1384,19 @@ namespace RouteFinding.MapView
             _sidePanelToggleArrowTMP = tmp;
         }
 
-        // 획득한 단서 목록 섹션. content(SidePanel의 ScrollRect Content) 끝에 추가된다.
+        // 선택된 맵 노드의 단서 목록 섹션. content(SidePanel의 ScrollRect Content) 끝에 추가된다.
         private void BuildClueListSection(RectTransform content)
         {
             MakeSep(content);
-            MakeTMP(content, "단서", 8f, FontStyles.Normal, 12f).color = Gray;
+            MakeTMP(content, "선택한 맵의 단서", 8f, FontStyles.Normal, 12f).color = Gray;
 
             _clueListContent = NewRect(content, "ClueList");
+            var csf = _clueListContent.gameObject.AddComponent<ContentSizeFitter>();
+            csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             var vlg = _clueListContent.gameObject.AddComponent<VerticalLayoutGroup>();
             vlg.spacing               = 1f;
             vlg.childControlWidth     = true;
-            vlg.childControlHeight    = false;
+            vlg.childControlHeight    = true; // 단서 항목의 펼침/접힘 높이(LayoutElement.preferredHeight)가 실제로 반영되도록
             vlg.childForceExpandWidth  = true;
             vlg.childForceExpandHeight = false;
         }
@@ -1316,8 +1431,8 @@ namespace RouteFinding.MapView
             var panelToggleTF = FindDeepTransform(_panelGO.transform, "BtnTogglePanel");
             if (panelToggleTF != null) _toolbarPanelToggleImg = panelToggleTF.GetComponent<Image>();
 
-            _originDropdown = BindSimpleDropdown("OriginDropdown");
-            _destDropdown   = BindSimpleDropdown("DestDropdown");
+            // 드롭다운(_originDropdown/_destDropdown)은 여기서 바인딩하지 않는다 — FinalizePanel()이
+            // RebuildSimpleDropdownInPlace()로 항상 새로 만들어 대입하므로 이중 작업이라 생략.
 
             _pathInfoTMP    = FindDeepChild<TextMeshProUGUI>("PathInfoLabel");
             _gearListTMP    = FindDeepChild<TextMeshProUGUI>("GearListLabel");

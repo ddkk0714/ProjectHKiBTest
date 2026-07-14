@@ -13,7 +13,9 @@
                 { "key": "hasBed",     "value": false },
                 { "key": "hasInternet","value": true  }
             ],
-            "clueIds": ["clue-destination-1", "clue-destination-2"]
+            "clueIds": ["clue-destination-1", "clue-destination-2"],
+            "wavePaths": [],
+            "enemyGroups": []
         },
         {
             "guid": "map-002",
@@ -29,7 +31,11 @@
                 { "key": "hasInternet","value": false },
                 { "key": "metStranger","value": false }
             ],
-            "clueIds": ["clue-forest-entrance"]
+            "clueIds": ["clue-forest-entrance"],
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 0, "scale": 0, "count": 3 }
+            ]
         },
         {
             "guid": "map-003",
@@ -44,7 +50,11 @@
                 { "key": "hasBed",     "value": true  },
                 { "key": "hasInternet","value": false }
             ],
-            "clueIds": ["clue-forest-cabin", "clue-plateau"]
+            "clueIds": ["clue-forest-cabin", "clue-plateau"],
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 2, "scale": 1, "count": 2 }
+            ]
         },
         {
             "guid": "map-004",
@@ -59,7 +69,12 @@
                 { "key": "hasBed",     "value": false },
                 { "key": "hasInternet","value": false }
             ],
-            "clueIds": ["clue-lakeside", "clue-fog-valley"]
+            "clueIds": ["clue-lakeside", "clue-fog-valley"],
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 3, "scale": 0, "count": 2 },
+                { "emotionType": 0, "scale": 1, "count": 1 }
+            ]
         },
         {
             "guid": "map-005",
@@ -74,7 +89,15 @@
                 { "key": "hasBed",     "value": false },
                 { "key": "hasInternet","value": false }
             ],
-            "clueIds": ["clue-destination-1"]
+            "clueIds": ["clue-destination-1"],
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 7, "scale": 1, "count": 2 },
+                { "emotionType": 4, "scale": 0, "count": 3 },
+                { "emotionType": 1, "scale": 2, "count": 1 },
+                { "emotionType": 0, "scale": 0, "count": 1 },
+                { "emotionType": 6, "scale": 2, "count": 2 }
+            ]
         },
         {
             "guid": "map-006",
@@ -89,7 +112,13 @@
                 { "key": "hasBed",     "value": false },
                 { "key": "hasInternet","value": false }
             ],
-            "clueIds": []
+            "clueIds": [],
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 5, "scale": 2, "count": 2 },
+                { "emotionType": 6, "scale": 2, "count": 1 }
+            ],
+            "requiredGears": [6]
         },
         {
             "guid": "map-007",
@@ -104,7 +133,12 @@
                 { "key": "hasBed",     "value": true  },
                 { "key": "hasInternet","value": false }
             ],
-            "clueIds": ["clue-abandoned-station", "clue-underground-passage"]
+            "clueIds": ["clue-abandoned-station", "clue-underground-passage"],
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 5, "scale": 2, "count": 1 },
+                { "emotionType": 7, "scale": 1, "count": 2 }
+            ]
         },
         {
             "guid": "map-008",
@@ -119,7 +153,13 @@
                 { "key": "hasBed",     "value": false },
                 { "key": "hasInternet","value": false }
             ],
-            "clueIds": ["clue-fog-valley"]
+            "clueIds": ["clue-fog-valley"],
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 3, "scale": 1, "count": 1 },
+                { "emotionType": 0, "scale": 0, "count": 2 },
+                { "emotionType": 3, "scale": 0, "count": 3 }
+            ]
         },
         {
             "guid": "map-009",
@@ -134,7 +174,17 @@
                 { "key": "hasBed",     "value": false },
                 { "key": "hasInternet","value": false }
             ],
-            "clueIds": ["clue-plateau", "clue-greenhouse"]
+            "clueIds": ["clue-plateau", "clue-greenhouse"],
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 3, "scale": 1, "count": 2 },
+                { "emotionType": 1, "scale": 2, "count": 1 },
+                { "emotionType": 3, "scale": 0, "count": 1 },
+                { "emotionType": 7, "scale": 2, "count": 1 },
+                { "emotionType": 6, "scale": 0, "count": 1 },
+                { "emotionType": 0, "scale": 2, "count": 1 },
+                { "emotionType": 2, "scale": 0, "count": 2 }
+            ]
         },
         {
             "guid": "map-010",
@@ -149,7 +199,14 @@
                 { "key": "hasBed",     "value": false },
                 { "key": "hasInternet","value": false }
             ],
-            "clueIds": ["clue-destination-2"]
+            "clueIds": ["clue-destination-2"],
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 4, "scale": 1, "count": 1 },
+                { "emotionType": 7, "scale": 0, "count": 2 },
+                { "emotionType": 4, "scale": 2, "count": 1 },
+                { "emotionType": 7, "scale": 2, "count": 1 }
+            ]
         },
         {
             "guid": "map-011",
@@ -164,7 +221,11 @@
                 { "key": "hasBed",     "value": false },
                 { "key": "hasInternet","value": false }
             ],
-            "clueIds": []
+            "clueIds": [],
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 6, "scale": 1, "count": 2 }
+            ]
         },
         {
             "guid": "map-012",
@@ -179,7 +240,14 @@
                 { "key": "hasBed",     "value": false },
                 { "key": "hasInternet","value": false }
             ],
-            "clueIds": ["clue-greenhouse", "clue-destination-3"]
+            "clueIds": ["clue-greenhouse", "clue-destination-3"],
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 7, "scale": 1, "count": 1 },
+                { "emotionType": 6, "scale": 0, "count": 3 },
+                { "emotionType": 4, "scale": 1, "count": 1 },
+                { "emotionType": 3, "scale": 0, "count": 2 }
+            ]
         },
         {
             "guid": "map-013",
@@ -194,7 +262,11 @@
                 { "key": "hasBed",     "value": false },
                 { "key": "hasInternet","value": false }
             ],
-            "clueIds": ["clue-destination-3"]
+            "clueIds": ["clue-destination-3"],
+            "wavePaths": [],
+            "enemyGroups": [
+                { "emotionType": 2, "scale": 1, "count": 2 }
+            ]
         }
     ],
     "connections": [
@@ -202,233 +274,133 @@
             "guid": "conn-001",
             "fromGuid": "map-001",
             "toGuid": "map-002",
-            "startsWithClue": true,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 0, "scale": 0, "count": 3 }
-            ]
+            "startsWithClue": true
         },
         {
             "guid": "conn-002",
             "fromGuid": "map-002",
             "toGuid": "map-003",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 2, "scale": 1, "count": 2 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-003",
             "fromGuid": "map-002",
             "toGuid": "map-004",
-            "startsWithClue": true,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 3, "scale": 0, "count": 2 },
-                { "emotionType": 0, "scale": 1, "count": 1 }
-            ]
+            "startsWithClue": true
         },
         {
             "guid": "conn-004",
             "fromGuid": "map-003",
             "toGuid": "map-005",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 7, "scale": 1, "count": 2 },
-                { "emotionType": 4, "scale": 0, "count": 3 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-005",
             "fromGuid": "map-004",
             "toGuid": "map-005",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 1, "scale": 2, "count": 1 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-006",
             "fromGuid": "map-004",
             "toGuid": "map-008",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 3, "scale": 1, "count": 1 },
-                { "emotionType": 0, "scale": 0, "count": 2 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-007",
             "fromGuid": "map-008",
             "toGuid": "map-005",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 0, "scale": 0, "count": 1 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-008",
             "fromGuid": "map-001",
             "toGuid": "map-006",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 5, "scale": 2, "count": 2 },
-                { "emotionType": 6, "scale": 2, "count": 1 }
-            ],
-            "requiredGears": [6]
+            "startsWithClue": false
         },
         {
             "guid": "conn-009",
             "fromGuid": "map-006",
             "toGuid": "map-005",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 6, "scale": 2, "count": 2 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-010",
             "fromGuid": "map-003",
             "toGuid": "map-008",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 3, "scale": 0, "count": 3 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-011",
             "fromGuid": "map-008",
             "toGuid": "map-009",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 3, "scale": 1, "count": 2 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-012",
             "fromGuid": "map-009",
             "toGuid": "map-010",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 4, "scale": 1, "count": 1 },
-                { "emotionType": 7, "scale": 0, "count": 2 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-013",
             "fromGuid": "map-004",
             "toGuid": "map-009",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 1, "scale": 2, "count": 1 },
-                { "emotionType": 3, "scale": 0, "count": 1 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-014",
             "fromGuid": "map-006",
             "toGuid": "map-009",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 7, "scale": 2, "count": 1 },
-                { "emotionType": 6, "scale": 0, "count": 1 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-015",
             "fromGuid": "map-006",
             "toGuid": "map-010",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 4, "scale": 2, "count": 1 },
-                { "emotionType": 7, "scale": 2, "count": 1 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-016",
             "fromGuid": "map-006",
             "toGuid": "map-007",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 5, "scale": 2, "count": 1 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-017",
             "fromGuid": "map-007",
             "toGuid": "map-011",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 6, "scale": 1, "count": 2 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-018",
             "fromGuid": "map-011",
             "toGuid": "map-012",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 7, "scale": 1, "count": 1 },
-                { "emotionType": 6, "scale": 0, "count": 3 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-019",
             "fromGuid": "map-012",
             "toGuid": "map-013",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 2, "scale": 1, "count": 2 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-020",
             "fromGuid": "map-009",
             "toGuid": "map-012",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 4, "scale": 1, "count": 1 },
-                { "emotionType": 3, "scale": 0, "count": 2 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-021",
             "fromGuid": "map-002",
             "toGuid": "map-007",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 7, "scale": 1, "count": 2 }
-            ]
+            "startsWithClue": false
         },
         {
             "guid": "conn-022",
             "fromGuid": "map-003",
             "toGuid": "map-009",
-            "startsWithClue": false,
-            "wavePaths": [],
-            "enemyGroups": [
-                { "emotionType": 0, "scale": 2, "count": 1 },
-                { "emotionType": 2, "scale": 0, "count": 2 }
-            ]
+            "startsWithClue": false
         }
     ]
 }

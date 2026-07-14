@@ -72,12 +72,9 @@ namespace RouteFinding.Editor
                 {
                     m.events  = m.events  ?? Array.Empty<MapEventFlag>();
                     m.clueIds = m.clueIds ?? Array.Empty<string>();
-                }
-                foreach (var c in _db.connections)
-                {
-                    c.wavePaths    = c.wavePaths    ?? Array.Empty<string>();
-                    c.enemyGroups  = c.enemyGroups  ?? Array.Empty<EnemyGroupEntry>();
-                    c.requiredGears = c.requiredGears ?? Array.Empty<EmotionColor>();
+                    m.wavePaths     = m.wavePaths     ?? Array.Empty<string>();
+                    m.enemyGroups   = m.enemyGroups   ?? Array.Empty<EnemyGroupEntry>();
+                    m.requiredGears = m.requiredGears ?? Array.Empty<EmotionColor>();
                 }
             }
             if (File.Exists(_cluePath))
@@ -359,6 +356,84 @@ namespace RouteFinding.Editor
                 EditorGUI.indentLevel--;
             }
 
+            // 2026-07-14 — 전투 데이터(웨이브 경로/적 구성/필수 장비)가 연결에서 맵으로 이동.
+            // 웨이브 경로 배열
+            EditorGUILayout.Space(6f);
+            _foldWavePaths = EditorGUILayout.Foldout(_foldWavePaths,
+                $"웨이브 경로  ({n.wavePaths.Length}개)", true, EditorStyles.foldoutHeader);
+            if (_foldWavePaths)
+            {
+                EditorGUI.indentLevel++;
+                EditorGUILayout.HelpBox("Resources/ 이후 상대 경로  예) RouteFinding/Waves/wave_01", MessageType.None);
+                int removeWave = -1;
+                for (int i = 0; i < n.wavePaths.Length; i++)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayout.Label($"[{i}]", GUILayout.Width(28f));
+                    n.wavePaths[i] = EditorGUILayout.TextField(n.wavePaths[i]);
+                    if (GUILayout.Button("−", GUILayout.Width(22f))) removeWave = i;
+                    EditorGUILayout.EndHorizontal();
+                }
+                if (removeWave >= 0) ArrayUtility.RemoveAt(ref n.wavePaths, removeWave);
+                if (GUILayout.Button("+ 웨이브 경로 추가", GUILayout.ExpandWidth(false)))
+                    ArrayUtility.Add(ref n.wavePaths, "");
+                EditorGUI.indentLevel--;
+            }
+
+            // 적 구성 배열
+            EditorGUILayout.Space(4f);
+            _foldEnemies = EditorGUILayout.Foldout(_foldEnemies,
+                $"적 구성  ({n.enemyGroups.Length}그룹)", true, EditorStyles.foldoutHeader);
+            if (_foldEnemies)
+            {
+                EditorGUI.indentLevel++;
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("감정 색상",    GUILayout.Width(140f));
+                EditorGUILayout.LabelField("규모",          GUILayout.Width(80f));
+                EditorGUILayout.LabelField("수량",          GUILayout.Width(50f));
+                EditorGUILayout.EndHorizontal();
+                int removeEnemy = -1;
+                for (int i = 0; i < n.enemyGroups.Length; i++)
+                {
+                    var eg = n.enemyGroups[i];
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayout.Label($"[{i}]", GUILayout.Width(28f));
+                    eg.emotionType = (EmotionColor)EditorGUILayout.EnumPopup(eg.emotionType, GUILayout.Width(140f));
+                    eg.scale       = (EnemyScale)EditorGUILayout.EnumPopup(eg.scale,         GUILayout.Width(80f));
+                    eg.count       = EditorGUILayout.IntField(eg.count,                        GUILayout.Width(50f));
+                    if (GUILayout.Button("−", GUILayout.Width(22f))) removeEnemy = i;
+                    EditorGUILayout.EndHorizontal();
+                }
+                if (removeEnemy >= 0) ArrayUtility.RemoveAt(ref n.enemyGroups, removeEnemy);
+                if (GUILayout.Button("+ 적 그룹 추가", GUILayout.ExpandWidth(false)))
+                    ArrayUtility.Add(ref n.enemyGroups,
+                        new EnemyGroupEntry { emotionType = EmotionColor.SadnessBlue, scale = EnemyScale.Small, count = 1 });
+                EditorGUI.indentLevel--;
+            }
+
+            // 필수 장비 배열 (비어있으면 진입 제한 없음)
+            EditorGUILayout.Space(4f);
+            _foldRequiredGears = EditorGUILayout.Foldout(_foldRequiredGears,
+                $"필수 장비  ({n.requiredGears.Length}개)", true, EditorStyles.foldoutHeader);
+            if (_foldRequiredGears)
+            {
+                EditorGUI.indentLevel++;
+                EditorGUILayout.HelpBox("비어있으면 제한 없음. 모두 충족해야 이 맵에 진입 가능 (그룹 단위 비교).", MessageType.None);
+                int removeGear = -1;
+                for (int i = 0; i < n.requiredGears.Length; i++)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayout.Label($"[{i}]", GUILayout.Width(28f));
+                    n.requiredGears[i] = (EmotionColor)EditorGUILayout.EnumPopup(n.requiredGears[i], GUILayout.Width(140f));
+                    if (GUILayout.Button("−", GUILayout.Width(22f))) removeGear = i;
+                    EditorGUILayout.EndHorizontal();
+                }
+                if (removeGear >= 0) ArrayUtility.RemoveAt(ref n.requiredGears, removeGear);
+                if (GUILayout.Button("+ 필수 장비 추가", GUILayout.ExpandWidth(false)))
+                    ArrayUtility.Add(ref n.requiredGears, EmotionColor.SadnessBlue);
+                EditorGUI.indentLevel--;
+            }
+
             if (EditorGUI.EndChangeCheck()) _dirty = true;
         }
 
@@ -373,83 +448,9 @@ namespace RouteFinding.Editor
             c.fromGuid       = NodeGuidPopup("출발 맵", c.fromGuid);
             c.toGuid         = NodeGuidPopup("도착 맵",  c.toGuid);
             c.startsWithClue = EditorGUILayout.Toggle("초기 단서 보유", c.startsWithClue);
-
-            // 웨이브 경로 배열
-            EditorGUILayout.Space(6f);
-            _foldWavePaths = EditorGUILayout.Foldout(_foldWavePaths,
-                $"웨이브 경로  ({c.wavePaths.Length}개)", true, EditorStyles.foldoutHeader);
-            if (_foldWavePaths)
-            {
-                EditorGUI.indentLevel++;
-                EditorGUILayout.HelpBox("Resources/ 이후 상대 경로  예) RouteFinding/Waves/wave_01", MessageType.None);
-                int removeWave = -1;
-                for (int i = 0; i < c.wavePaths.Length; i++)
-                {
-                    EditorGUILayout.BeginHorizontal();
-                    GUILayout.Label($"[{i}]", GUILayout.Width(28f));
-                    c.wavePaths[i] = EditorGUILayout.TextField(c.wavePaths[i]);
-                    if (GUILayout.Button("−", GUILayout.Width(22f))) removeWave = i;
-                    EditorGUILayout.EndHorizontal();
-                }
-                if (removeWave >= 0) ArrayUtility.RemoveAt(ref c.wavePaths, removeWave);
-                if (GUILayout.Button("+ 웨이브 경로 추가", GUILayout.ExpandWidth(false)))
-                    ArrayUtility.Add(ref c.wavePaths, "");
-                EditorGUI.indentLevel--;
-            }
-
-            // 적 구성 배열
-            EditorGUILayout.Space(4f);
-            _foldEnemies = EditorGUILayout.Foldout(_foldEnemies,
-                $"적 구성  ({c.enemyGroups.Length}그룹)", true, EditorStyles.foldoutHeader);
-            if (_foldEnemies)
-            {
-                EditorGUI.indentLevel++;
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("감정 색상",    GUILayout.Width(140f));
-                EditorGUILayout.LabelField("규모",          GUILayout.Width(80f));
-                EditorGUILayout.LabelField("수량",          GUILayout.Width(50f));
-                EditorGUILayout.EndHorizontal();
-                int removeEnemy = -1;
-                for (int i = 0; i < c.enemyGroups.Length; i++)
-                {
-                    var eg = c.enemyGroups[i];
-                    EditorGUILayout.BeginHorizontal();
-                    GUILayout.Label($"[{i}]", GUILayout.Width(28f));
-                    eg.emotionType = (EmotionColor)EditorGUILayout.EnumPopup(eg.emotionType, GUILayout.Width(140f));
-                    eg.scale       = (EnemyScale)EditorGUILayout.EnumPopup(eg.scale,         GUILayout.Width(80f));
-                    eg.count       = EditorGUILayout.IntField(eg.count,                        GUILayout.Width(50f));
-                    if (GUILayout.Button("−", GUILayout.Width(22f))) removeEnemy = i;
-                    EditorGUILayout.EndHorizontal();
-                }
-                if (removeEnemy >= 0) ArrayUtility.RemoveAt(ref c.enemyGroups, removeEnemy);
-                if (GUILayout.Button("+ 적 그룹 추가", GUILayout.ExpandWidth(false)))
-                    ArrayUtility.Add(ref c.enemyGroups,
-                        new EnemyGroupEntry { emotionType = EmotionColor.SadnessBlue, scale = EnemyScale.Small, count = 1 });
-                EditorGUI.indentLevel--;
-            }
-
-            // 필수 장비 배열 (비어있으면 통과 제한 없음)
-            EditorGUILayout.Space(4f);
-            _foldRequiredGears = EditorGUILayout.Foldout(_foldRequiredGears,
-                $"필수 장비  ({c.requiredGears.Length}개)", true, EditorStyles.foldoutHeader);
-            if (_foldRequiredGears)
-            {
-                EditorGUI.indentLevel++;
-                EditorGUILayout.HelpBox("비어있으면 제한 없음. 모두 충족해야 통과 가능 (그룹 단위 비교).", MessageType.None);
-                int removeGear = -1;
-                for (int i = 0; i < c.requiredGears.Length; i++)
-                {
-                    EditorGUILayout.BeginHorizontal();
-                    GUILayout.Label($"[{i}]", GUILayout.Width(28f));
-                    c.requiredGears[i] = (EmotionColor)EditorGUILayout.EnumPopup(c.requiredGears[i], GUILayout.Width(140f));
-                    if (GUILayout.Button("−", GUILayout.Width(22f))) removeGear = i;
-                    EditorGUILayout.EndHorizontal();
-                }
-                if (removeGear >= 0) ArrayUtility.RemoveAt(ref c.requiredGears, removeGear);
-                if (GUILayout.Button("+ 필수 장비 추가", GUILayout.ExpandWidth(false)))
-                    ArrayUtility.Add(ref c.requiredGears, EmotionColor.SadnessBlue);
-                EditorGUI.indentLevel--;
-            }
+            EditorGUILayout.HelpBox(
+                "전투 관련 데이터(웨이브 경로/적 구성/필수 장비)는 2026-07-14부로 맵 쪽으로 이동했습니다 — " +
+                "도착 맵(위 드롭다운) 편집 화면에서 설정하세요.", MessageType.Info);
 
             if (EditorGUI.EndChangeCheck()) _dirty = true;
         }
@@ -527,6 +528,9 @@ namespace RouteFinding.Editor
                         graphPosition = Vector2.zero,
                         events        = Array.Empty<MapEventFlag>(),
                         clueIds       = Array.Empty<string>(),
+                        wavePaths     = Array.Empty<string>(),
+                        enemyGroups   = Array.Empty<EnemyGroupEntry>(),
+                        requiredGears = Array.Empty<EmotionColor>(),
                     });
                     _selMap = _db.maps.Length - 1;
                     break;
@@ -534,12 +538,9 @@ namespace RouteFinding.Editor
                 case Tab.Connections:
                     ArrayUtility.Add(ref _db.connections, new MapConnectionData
                     {
-                        guid          = NewGuid(),
-                        fromGuid      = _db.maps.Length > 0 ? _db.maps[0].guid : "",
-                        toGuid        = _db.maps.Length > 1 ? _db.maps[1].guid : "",
-                        wavePaths     = Array.Empty<string>(),
-                        enemyGroups   = Array.Empty<EnemyGroupEntry>(),
-                        requiredGears = Array.Empty<EmotionColor>(),
+                        guid     = NewGuid(),
+                        fromGuid = _db.maps.Length > 0 ? _db.maps[0].guid : "",
+                        toGuid   = _db.maps.Length > 1 ? _db.maps[1].guid : "",
                     });
                     _selConn = _db.connections.Length - 1;
                     break;

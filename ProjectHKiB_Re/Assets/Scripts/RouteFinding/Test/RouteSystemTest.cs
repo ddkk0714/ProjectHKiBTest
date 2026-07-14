@@ -58,19 +58,18 @@ public class RouteSystemTest : MonoBehaviour
 
     // ─── 난이도 계산 ─────────────────────────────────────────────
 
-    [Button("연결 목록 난이도 출력 (장비 적용)")]
+    [Button("맵 목록 난이도 출력 (장비 적용)")]
     private void TestDifficultyAll()
     {
         if (!ValidateGraph()) return;
 
-        foreach (var conn in MapGraph.Instance.AllConnections)
+        // 2026-07-14 — 전투(난이도/통과 조건)가 연결에서 맵으로 이동해 맵 기준으로 순회한다.
+        foreach (var node in MapGraph.Instance.AllNodes)
         {
-            float diff = DifficultyCalculator.Calculate(conn, _testEquippedGears);
-            bool hasClue = RouteModule.Instance.Progress.HasConnectionClue(conn);
-            bool passable = conn.IsPassableWith(_testEquippedGears);
-            var from = MapGraph.Instance.GetNode(conn.fromGuid);
-            var to   = MapGraph.Instance.GetNode(conn.toGuid);
-            Debug.Log($"[난이도] {from?.nodeName}→{to?.nodeName}  diff={diff:F1}  단서={hasClue}  통과가능={passable}");
+            float diff = DifficultyCalculator.Calculate(node, _testEquippedGears);
+            bool hasClue = RouteModule.Instance.Progress.HasNodeClue(node);
+            bool passable = node.IsPassableWith(_testEquippedGears);
+            Debug.Log($"[난이도] {node.nodeName}  diff={diff:F1}  단서={hasClue}  통과가능={passable}");
         }
     }
 
@@ -152,13 +151,11 @@ public class RouteSystemTest : MonoBehaviour
             Debug.LogWarning("[RouteSystemTest] 이동 중이 아닙니다. 먼저 출발하세요.");
             return;
         }
-        var conn = RouteModule.Instance.GetCurrentConnection();
-        if (conn != null)
+        var target = RouteModule.Instance.GetCurrentTargetNode();
+        if (target != null)
         {
-            RouteModule.Instance.Progress.MarkConnectionCleared(conn);
-            var from = MapGraph.Instance.GetNode(conn.fromGuid);
-            var to   = MapGraph.Instance.GetNode(conn.toGuid);
-            Debug.Log($"[RouteSystemTest] 연결 클리어: {from?.nodeName}→{to?.nodeName}");
+            RouteModule.Instance.Progress.MarkNodeCleared(target);
+            Debug.Log($"[RouteSystemTest] 맵 클리어: {target.nodeName}");
         }
         RouteModule.Instance.AdvanceToNextNode();
     }

@@ -9,8 +9,9 @@ public class PathResult
     public float TotalDifficulty { get; set; }
     public bool ContainsNoClueNode { get; set; }
 
-    // 현재 장비로 통과 불가능한 연결을 포함하는지 여부.
+    // 현재 장비로 통과 불가능한 맵을 포함하는지 여부 (2026-07-14 이전 — 원래는 연결 기준).
     // true면 이 경로는 표시만 되고 선택할 수 없으며, AlternativePath가 대신 추천된다.
+    // 목적지 맵 자체가 통과 불가면 AlternativePath가 아예 없을 수 있다(우회 불가능한 도달 불가 상태).
     public bool IsBlocked { get; set; }
     public PathResult AlternativePath { get; set; }
 
@@ -26,6 +27,9 @@ public class PathResult
 // 그래프 데이터(graph), 진행 상태(progress, 단서 공개 여부 판단용),
 // 장착 장비(equippedGears, 난이도 가중치·통과 가능 판정용)를 모두 파라미터로 받는다.
 // 일반적으로는 RouteModule.FindPath / FindPathFromStart 래퍼를 통해 호출된다.
+//
+// 2026-07-14 — 전투(난이도·통과 조건)가 연결(Connection)에서 맵(Node)으로 이동함에 따라
+// 엣지 비용/통과 판정 기준을 "건너는 연결"에서 "도착하는 맵"으로 변경했다.
 public static class MapPathFinder
 {
     public static PathResult FindPath(
@@ -51,11 +55,13 @@ public static class MapPathFinder
 
         if (!result.IsValid) return result;
 
-        result.IsBlocked = ContainsBlockedConnection(result.Connections, equippedGears);
+        result.IsBlocked = ContainsBlockedNode(result.Nodes, equippedGears);
         if (result.IsBlocked)
         {
-            // 차선 경로: 통과 불가 연결을 그래프에서 모두 제외하고 같은 기준으로 재탐색
-            var excluded = GetBlockedConnectionGuids(graph, equippedGears);
+            // 차선 경로: 통과 불가 맵을 그래프에서 모두 제외하고 같은 기준으로 재탐색.
+            // 목적지 맵 자체가 통과 불가라면 이 재탐색도 실패하고(AlternativePath == null),
+            // 그 경우 "우회 불가능한 도달 불가" 상태를 의미한다.
+            var excluded = GetBlockedNodeGuids(graph, equippedGears);
             var alt = Search(start, destination, pathType, graph, progress, equippedGears, avoidNoClueNodes, excluded);
             if (avoidNoClueNodes && !alt.IsValid)
             {
@@ -83,11 +89,11 @@ public static class MapPathFinder
         _                 => Dijkstra(start, destination, graph, progress, gears, useHopPenalty: false, avoidNoClueNodes: avoidNoClueNodes, excluded: excluded),
     };
 
-    // 장비로 통과 불가능한 연결을 하나라도 포함하는지
-    private static bool ContainsBlockedConnection(List<MapConnectionData> connections, EmotionColor[] gears)
+    // 경로가 통과 불가능한 맵을 하나라도 포함하는지 (출발 노드는 이미 그 자리에 있는 것이므로 제외).
+    private static bool ContainsBlockedNode(List<MapNodeData> nodes, EmotionColor[] gears)
     {
-        foreach (var conn in connections)
-            if (!conn.IsPassableWith(gears)) return true;
+        for (int i = 1; i < nodes.Count; i++)
+            if (!nodes[i].IsPassableWith(gears)) return true;
         return false;
     }
 
@@ -110,12 +116,12 @@ public static class MapPathFinder
     private static bool CanPassThrough(MapNodeData neighbor, MapNodeData destination, RouteProgressState progress) =>
         neighbor.guid == destination.guid || IsNodeRevealed(neighbor, progress);
 
-    // 현재 장비로 통과 불가능한 모든 연결의 GUID (차선 경로 탐색 시 제외 대상)
-    private static HashSet<string> GetBlockedConnectionGuids(MapGraph graph, EmotionColor[] gears)
+    // 현재 장비로 통과 불가능한 모든 맵의 GUID (차선 경로 탐색 시 제외 대상)
+    private static HashSet<string> GetBlockedNodeGuids(MapGraph graph, EmotionColor[] gears)
     {
         var blocked = new HashSet<string>();
-        foreach (var conn in graph.AllConnections)
-            if (!conn.IsPassableWith(gears)) blocked.Add(conn.guid);
+        foreach (var node in graph.AllNodes)
+            if (!node.IsPassableWith(gears)) blocked.Add(node.guid);
         return blocked;
     }
 
@@ -138,9 +144,9 @@ public static class MapPathFinder
 
             foreach (var conn in graph.GetConnectionsFrom(current))
             {
-                if (excluded != null && excluded.Contains(conn.guid)) continue;
                 var neighbor = graph.GetNeighbor(conn, current);
                 if (neighbor == null || visited.Contains(neighbor.guid)) continue;
+                if (excluded != null && excluded.Contains(neighbor.guid)) continue;
                 if (!IsConnectionKnown(current, neighbor, progress)) continue;
                 if (avoidNoClueNodes && !CanPassThrough(neighbor, destination, progress)) continue;
                 visited.Add(neighbor.guid);
@@ -153,10 +159,10 @@ public static class MapPathFinder
     }
 
     // ─── Dijkstra (최소 난이도 / 균형 경로) ──────────────────────
-    // 엣지 비용 = difficulty (+ useHopPenalty면 hopPenalty 추가)
-    // hopPenalty = 전체 연결의 평균 난이도 → 홉 1개 추가 비용이 평균 연결 1개와 동일해져
+    // 엣지 비용 = 도착하는 맵의 난이도(difficulty) (+ useHopPenalty면 hopPenalty 추가)
+    // hopPenalty = 전체 맵의 평균 난이도 → 홉 1개 추가 비용이 평균 맵 1개와 동일해져
     // 최단보다 조금 길지만 쉽고, 최소난이도보다 조금 어렵지만 짧은 "균형" 경로가 나온다.
-    // 비용은 항상 실제 난이도 사용. "단서 없는 연결 = 최하 판정"은 UI 표시 규칙이며
+    // 비용은 항상 실제 난이도 사용. "단서 없는 맵 = 최하 판정"은 UI 표시 규칙이며
     // 탐색 비용에 적용하면 모든 엣지가 0이 되어 BFS와 동일해지는 문제가 생긴다.
     private static PathResult Dijkstra(
         MapNodeData start,
@@ -200,13 +206,13 @@ public static class MapPathFinder
 
             foreach (var conn in graph.GetConnectionsFrom(current))
             {
-                if (excluded != null && excluded.Contains(conn.guid)) continue;
                 var neighbor = graph.GetNeighbor(conn, current);
                 if (neighbor == null) continue;
+                if (excluded != null && excluded.Contains(neighbor.guid)) continue;
                 if (!IsConnectionKnown(current, neighbor, progress)) continue;
                 if (avoidNoClueNodes && !CanPassThrough(neighbor, destination, progress)) continue;
 
-                float edgeCost = DifficultyCalculator.Calculate(conn, gears) + hopPenalty;
+                float edgeCost = DifficultyCalculator.Calculate(neighbor, gears) + hopPenalty;
                 float newCost = dist[current.guid] + edgeCost;
 
                 if (!dist.ContainsKey(neighbor.guid)) dist[neighbor.guid] = float.MaxValue;
@@ -224,16 +230,17 @@ public static class MapPathFinder
 
     private static float CalcAvgDifficulty(MapGraph graph, EmotionColor[] gears)
     {
-        var conns = graph.AllConnections;
-        if (conns.Count == 0) return 1f;
+        var nodes = graph.AllNodes;
+        if (nodes.Count == 0) return 1f;
         float total = 0f;
-        foreach (var c in conns)
-            total += DifficultyCalculator.Calculate(c, gears);
-        return total / conns.Count;
+        foreach (var n in nodes)
+            total += DifficultyCalculator.Calculate(n, gears);
+        return total / nodes.Count;
     }
 
     // ─── 경로 복원 ────────────────────────────────────────────────
-    // TotalDifficulty: 클루 여부 무관하게 실제 난이도 합산 (표시용)
+    // TotalDifficulty: 클루 여부 무관하게 실제 난이도 합산 (표시용). 출발 노드는 합산 제외
+    // (도착할 때 치르는 전투 비용이므로, 이미 그 자리에 있는 출발 노드에는 해당 없음).
     // ContainsNoClueNode: 경로 중 단서 없는 노드 포함 여부 (start 제외, progress가 null이면 검사 생략)
     private static PathResult BuildResult(
         MapNodeData start,
@@ -258,7 +265,7 @@ public static class MapPathFinder
             if (conn != null)
             {
                 conns.Insert(0, conn);
-                totalDiff += DifficultyCalculator.Calculate(conn, gears);
+                totalDiff += DifficultyCalculator.Calculate(cur, gears); // cur = 이 연결을 통해 도착한 맵
             }
             cur = prevNode;
         }

@@ -4,14 +4,19 @@
 // Σ 대형 × (동일감정? 10 : 100) × (다른감정? 1 : 2)
 // 동일/다른 감정 판단은 EmotionGroup 기준 — SadnessBlue·SadnessSky는 모두 Sadness로 동일 취급
 // 장비 미입력 → 상성 미적용, 적 기본 수치(소1·중5·대10)만 합산
+//
+// 2026-07-14 — 전투(및 그에 딸린 enemyGroups)가 연결(Connection)에서 맵(Node)으로 이동함에 따라
+// 입력 타입을 MapConnectionData → MapNodeData로 변경. 공식 자체는 그대로다.
 public static class DifficultyCalculator
 {
-    public static float Calculate(MapConnectionData connection, EmotionColor[] equippedGears)
+    public static float Calculate(MapNodeData node, EmotionColor[] equippedGears)
     {
         bool hasGear = equippedGears != null && equippedGears.Length > 0;
         float total = 0f;
 
-        foreach (var group in connection.enemyGroups)
+        if (node.enemyGroups == null) return total;
+
+        foreach (var group in node.enemyGroups)
         {
             // 장비 미입력 시 hasSame=false 결과(소1·중5·대10)가 그대로 기본 수치가 된다.
             bool hasSame  = hasGear && HasSameEmotion(equippedGears, group.emotionType);
