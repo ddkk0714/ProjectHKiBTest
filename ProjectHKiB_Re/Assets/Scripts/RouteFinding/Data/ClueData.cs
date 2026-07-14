@@ -36,6 +36,10 @@ public class ClueData
     public string source;       // 출처(사람/물건/위치)
     public string codexMapGuid; // 이 단서가 "소속"되는 맵(도감 분류 기준). 없으면 "기타" 카테고리
     public string[] keywords;   // 검색/자동분류용 태그
+
+    // 4단계(2026-07-14) — NPC/시스템 코멘트. 플레이어가 입력하는 게 아니라 콘텐츠 작업자가
+    // Editor/MapDatabaseEditorWindow.cs에서 직접 채워 넣는다(1-4장 확정 사항).
+    public CodexComment[] comments = Array.Empty<CodexComment>();
 }
 
 [Serializable]

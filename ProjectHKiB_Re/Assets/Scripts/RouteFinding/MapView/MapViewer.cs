@@ -4,6 +4,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using RouteFinding.Note;
 
 namespace RouteFinding.MapView
 {
@@ -93,6 +94,7 @@ namespace RouteFinding.MapView
         private Image        _btnBalancedImg;
         private Image        _btnAllowNoClueImg;
         private Image        _btnAvoidNoClueImg;
+        private Image        _btnSelectRouteImg;
         private GraphPanZoom _graphPanZoom;
         private InputManager _inputManager;
 
@@ -179,6 +181,24 @@ namespace RouteFinding.MapView
         public void Toggle()
         {
             if (_panelGO.activeSelf) Close(); else Open();
+        }
+
+        // "노트로 이동" 툴바 버튼 — 맵을 닫고 씬에 배치된 노트 패널을 연다.
+        // (2026-07-14 신설) 노트 패널을 직접 참조하지 않고 씬에서 찾는다 — MapViewer는 노트의 존재를 몰라도 되게 유지.
+        // (2026-07-14 추가) "경로 선택"을 누르는 걸 잊어도 노트에 반영되도록, 지금 미리보기 중인 경로를
+        // 먼저 자동으로 커밋한다 — SelectCurrentPath()는 커밋할 게 없거나(막힘+대안없음) 이미 같은 경로가
+        // 커밋돼 있으면 경고만 남기고 조용히 넘어가므로 여기서 특별히 결과를 검사할 필요는 없다.
+        private void GoToNote()
+        {
+            var notePanel = FindObjectOfType<NotePanel>();
+            if (notePanel == null)
+            {
+                Debug.LogWarning("[MapViewer] 씬에서 NotePanel을 찾을 수 없습니다.");
+                return;
+            }
+            SelectCurrentPath();
+            Close();
+            notePanel.Open();
         }
 
         // Editor 스크립트에서 프리팹 저장 시 접근
@@ -404,10 +424,32 @@ namespace RouteFinding.MapView
             RefreshPathLabel();
             RefreshPathTypeButtons();
             RefreshNoClueOptionButtons();
+            RefreshSelectRouteButton();
             RefreshGearPanel();
             RefreshClueMarkers();
             RefreshClueList();
             RefreshDropdowns();
+        }
+
+        // "경로 선택" 버튼 색상 — 지금 미리보기 중인 경로(_currentPath, 막혀 있으면 AlternativePath)가
+        // 이미 RouteModule에 커밋된 경로와 같으면 초록(BtnActive), 아니면 회색(BtnInactive).
+        private void RefreshSelectRouteButton()
+        {
+            if (_btnSelectRouteImg == null) return;
+            _btnSelectRouteImg.color = IsCurrentPathSelected() ? BtnActive : BtnInactive;
+        }
+
+        private bool IsCurrentPathSelected()
+        {
+            var selected = RouteModule.Instance?.SelectedRoute;
+            if (selected == null || _currentPath == null) return false;
+
+            var toCompare = _currentPath.IsBlocked ? _currentPath.AlternativePath : _currentPath;
+            if (toCompare == null || selected.Nodes.Count != toCompare.Nodes.Count) return false;
+
+            for (int i = 0; i < selected.Nodes.Count; i++)
+                if (selected.Nodes[i].guid != toCompare.Nodes[i].guid) return false;
+            return true;
         }
 
         private static bool IsNodeOnPath(PathResult path, string guid)
@@ -750,6 +792,34 @@ namespace RouteFinding.MapView
             Refresh();
         }
 
+        // "경로 선택" 버튼 (2026-07-14 신설) — 지도는 지금까지 _currentPath를 미리보기만 했을 뿐
+        // RouteModule.SelectRoute를 호출한 적이 없어서, 노트의 "경로 연동 자동 편입"(OnRouteSelected 구독)이
+        // 지도에서 목적지를 고르는 것만으로는 절대 발동하지 않았다 — 이 버튼이 미리보기를 실제로 커밋한다.
+        private void SelectCurrentPath()
+        {
+            Debug.Log($"[MapViewer] SelectCurrentPath() 호출 — _currentPath={(_currentPath == null ? "null" : $"valid={_currentPath.IsValid},blocked={_currentPath.IsBlocked},nodes={_currentPath.Nodes?.Count}")}");
+
+            if (_currentPath == null || !_currentPath.IsValid)
+            {
+                Debug.LogWarning("[MapViewer] 선택할 경로가 없습니다.");
+                return;
+            }
+
+            var toSelect = _currentPath;
+            if (toSelect.IsBlocked)
+            {
+                if (toSelect.AlternativePath == null || !toSelect.AlternativePath.IsValid)
+                {
+                    Debug.LogWarning("[MapViewer] 통과 불가 구간이 있고 차선 경로도 없어 선택할 수 없습니다.");
+                    return;
+                }
+                toSelect = toSelect.AlternativePath;
+            }
+
+            bool ok = RouteModule.Instance.SelectRoute(toSelect);
+            Debug.Log($"[MapViewer] RouteModule.SelectRoute 결과 — {ok}, NoteModule.Instance={(NoteModule.Instance != null)}");
+        }
+
         // 장비 버튼 클릭 — 실제 착탈은 모듈에 위임하고(이동 중이면 거부됨),
         // 변경됐을 때만 경로 재계산 + 화면 갱신. 버튼 색상 등은 Refresh→RefreshGearPanel이 처리.
         private void ToggleGear(EmotionColor ec)
@@ -958,11 +1028,14 @@ namespace RouteFinding.MapView
         private void BuildUI()
         {
             // 씬 계층에 MapPanel이 이미 자식으로 배치돼 있으면 재사용
-            // Toolbar가 없으면 구버전(툴바 도입 이전) — 파괴 후 재생성
+            // BtnSelectRoute가 없으면 구버전(2026-07-14 "경로 선택"/"노트로 이동" 버튼 도입 이전) — 파괴 후 재생성
+            // (마커를 "Toolbar"로 두면, Toolbar 자체는 이미 있던 구버전 저장 프리팹도 "최신"으로 오판정돼
+            //  새로 추가된 버튼이 코드에서 생성될 기회 자체가 없어짐 — Codex의 마커 갱신과 동일한 이유로 항상
+            //  가장 최근에 추가된 구조 요소로 갱신해야 한다.)
             var existing = transform.Find("MapPanel");
             if (existing != null)
             {
-                bool existingCurrent = FindDeepTransform(existing, "Toolbar") != null;
+                bool existingCurrent = FindDeepTransform(existing, "BtnSelectRoute") != null;
 
                 if (existingCurrent)
                 {
@@ -977,10 +1050,11 @@ namespace RouteFinding.MapView
             }
 
             // 프리팹이 지정되어 있으면 인스턴스화 후 참조를 바인딩하고 콜백만 재연결
-            // Toolbar 없으면 구버전 취급. GraphArea는 프리팹에서 지워둔 경우(겹침 방지) 자동 생성으로 보강한다.
+            // BtnSelectRoute 없으면 구버전 취급(위 existing 분기와 동일한 이유). GraphArea는 프리팹에서
+            // 지워둔 경우(겹침 방지) 자동 생성으로 보강한다.
             if (_panelPrefab != null)
             {
-                bool prefabCurrent = FindDeepTransform(_panelPrefab.transform, "Toolbar") != null;
+                bool prefabCurrent = FindDeepTransform(_panelPrefab.transform, "BtnSelectRoute") != null;
 
                 if (prefabCurrent)
                 {
@@ -1146,6 +1220,16 @@ namespace RouteFinding.MapView
 
             var panelToggleBtn = ToolbarFixedBtn(toolbar, "패널", () => SetSidePanelOpen(!_sidePanelOpen), "BtnTogglePanel", 24f);
             _toolbarPanelToggleImg = panelToggleBtn.GetComponent<Image>();
+
+            // (2026-07-14) 사이드패널 안에 있던 "경로 선택" 버튼을 여기로 이동 — 사이드패널을 접으면
+            // 안 보이던 접근성 문제 해결. 지금 미리보기 중인 경로가 이미 커밋된 상태면 초록(BtnActive류),
+            // 아니면 회색(BtnInactive)으로 표시해 "커밋됐는지"를 한눈에 구분한다 (RefreshSelectRouteButton).
+            var selectRouteBtn = ToolbarFixedBtn(toolbar, "경로 선택", SelectCurrentPath, "BtnSelectRoute", 32f);
+            _btnSelectRouteImg = selectRouteBtn.GetComponent<Image>();
+
+            // "노트로 이동"은 클릭 시 지금 미리보기 중인 경로를 자동으로 먼저 커밋한 뒤 노트를 연다 —
+            // "경로 선택"을 누르는 걸 잊어도 노트에 반영되도록 하기 위함(사용자 요청).
+            ToolbarFixedBtn(toolbar, "노트로 이동", GoToNote, "BtnGoToNote", 40f);
 
             // 닫기 버튼 — 툴바 최우측 (사이드패널에서는 제거됨)
             var closeBtn = ToolbarFixedBtn(toolbar, $"닫기 [{_toggleKey}]", Close, "BtnClose", 40f);
@@ -1458,6 +1542,9 @@ namespace RouteFinding.MapView
             var avoidNc = FindDeepTransform(_panelGO.transform, "BtnAvoidNoClue");
             if (avoidNc != null) _btnAvoidNoClueImg = avoidNc.GetComponent<Image>();
 
+            var selectRoute = FindDeepTransform(_panelGO.transform, "BtnSelectRoute");
+            if (selectRoute != null) _btnSelectRouteImg = selectRoute.GetComponent<Image>();
+
             _gearBtnImages.Clear();
             foreach (EmotionColor ec in Enum.GetValues(typeof(EmotionColor)))
             {
@@ -1492,6 +1579,12 @@ namespace RouteFinding.MapView
 
             FindDeepTransform(_panelGO.transform, "BtnTogglePanel")
                 ?.GetComponent<Button>()?.onClick.AddListener(() => SetSidePanelOpen(!_sidePanelOpen));
+
+            FindDeepTransform(_panelGO.transform, "BtnGoToNote")
+                ?.GetComponent<Button>()?.onClick.AddListener(GoToNote);
+
+            FindDeepTransform(_panelGO.transform, "BtnSelectRoute")
+                ?.GetComponent<Button>()?.onClick.AddListener(SelectCurrentPath);
 
             FindDeepTransform(_panelGO.transform, "SidePanelToggleTab")
                 ?.GetComponent<Button>()?.onClick.AddListener(() => SetSidePanelOpen(!_sidePanelOpen));

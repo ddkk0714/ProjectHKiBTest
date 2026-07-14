@@ -20,8 +20,11 @@ namespace RouteFinding.Codex
         private Image _btnKeywordImg;
         private CodexFilterMode _mode = CodexFilterMode.ByMap;
 
-        private static readonly Color BtnActive   = new(0.25f, 0.42f, 0.72f);
-        private static readonly Color BtnInactive = new(0.17f, 0.21f, 0.30f);
+        // RefreshButtons()가 모드 전환마다(Init/Bind/SetMode) 색을 다시 칠하므로, 프리팹에서 버튼의
+        // Image 색을 직접 바꿔도 다음 갱신에 곧바로 덮어써진다 — [SerializeField]로 빼야 편집이 유지된다.
+        [Header("스타일 (프리팹에서 조정 가능 — RefreshButtons가 매번 다시 칠하므로 여기서만 바꿀 수 있음)")]
+        [SerializeField] private Color _btnActive   = new(0.25f, 0.42f, 0.72f);
+        [SerializeField] private Color _btnInactive = new(0.17f, 0.21f, 0.30f);
 
         public void Init(RectTransform parent, TMP_FontAsset font)
         {
@@ -63,7 +66,7 @@ namespace RouteFinding.Codex
         {
             var rt = NewRect(parent, "SearchInput");
             var le = rt.gameObject.AddComponent<LayoutElement>();
-            le.preferredHeight = 18f;
+            le.preferredHeight = 12f;
             le.flexibleWidth = 1f;
             AddImg(rt, new Color(0.03f, 0.04f, 0.06f));
 
@@ -77,7 +80,7 @@ namespace RouteFinding.Codex
             StretchFull(textRT);
             var textTmp = textRT.gameObject.AddComponent<TextMeshProUGUI>();
             if (font != null) textTmp.font = font;
-            textTmp.fontSize = 8f;
+            textTmp.fontSize = 7f;
             textTmp.color = Color.white;
             textTmp.alignment = TextAlignmentOptions.MidlineLeft;
 
@@ -86,7 +89,7 @@ namespace RouteFinding.Codex
             var placeholderTmp = placeholderRT.gameObject.AddComponent<TextMeshProUGUI>();
             if (font != null) placeholderTmp.font = font;
             placeholderTmp.text = "검색...";
-            placeholderTmp.fontSize = 8f;
+            placeholderTmp.fontSize = 7f;
             placeholderTmp.fontStyle = FontStyles.Italic;
             placeholderTmp.color = new Color(1f, 1f, 1f, 0.35f);
             placeholderTmp.alignment = TextAlignmentOptions.MidlineLeft;
@@ -102,7 +105,7 @@ namespace RouteFinding.Codex
         {
             var row = NewRect(parent, "FilterRow");
             var rowLe = row.gameObject.AddComponent<LayoutElement>();
-            rowLe.preferredHeight = 16f;
+            rowLe.preferredHeight = 12f;
             rowLe.flexibleWidth = 1f;
             var hlg = row.gameObject.AddComponent<HorizontalLayoutGroup>();
             hlg.spacing = 2f;
@@ -128,17 +131,17 @@ namespace RouteFinding.Codex
 
         private void RefreshButtons()
         {
-            _btnMapImg.color     = _mode == CodexFilterMode.ByMap     ? BtnActive : BtnInactive;
-            _btnSourceImg.color  = _mode == CodexFilterMode.BySource  ? BtnActive : BtnInactive;
-            _btnKeywordImg.color = _mode == CodexFilterMode.ByKeyword ? BtnActive : BtnInactive;
+            _btnMapImg.color     = _mode == CodexFilterMode.ByMap     ? _btnActive : _btnInactive;
+            _btnSourceImg.color  = _mode == CodexFilterMode.BySource  ? _btnActive : _btnInactive;
+            _btnKeywordImg.color = _mode == CodexFilterMode.ByKeyword ? _btnActive : _btnInactive;
         }
 
-        private static Image MakeFilterBtn(RectTransform parent, string label, Action onClick, TMP_FontAsset font)
+        private Image MakeFilterBtn(RectTransform parent, string label, Action onClick, TMP_FontAsset font)
         {
             var rt = NewRect(parent, "Btn_" + label);
             var le = rt.gameObject.AddComponent<LayoutElement>();
             le.flexibleWidth = 1f;
-            var img = AddImg(rt, BtnInactive);
+            var img = AddImg(rt, _btnInactive);
             var btn = rt.gameObject.AddComponent<Button>();
             btn.targetGraphic = img;
             btn.transition = Selectable.Transition.None;

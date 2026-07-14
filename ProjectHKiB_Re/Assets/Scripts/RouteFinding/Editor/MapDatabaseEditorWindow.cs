@@ -34,6 +34,7 @@ namespace RouteFinding.Editor
         private bool _foldEnemies      = true;
         private bool _foldRequiredGears = true;
         private bool _foldKeywords = true;
+        private bool _foldComments = true;
 
         // ─── 색상 ────────────────────────────────────────────────
         private static readonly Color ColDirty    = new(1.00f, 0.85f, 0.35f);
@@ -89,6 +90,7 @@ namespace RouteFinding.Editor
                     cl.source        = cl.source        ?? "";
                     cl.codexMapGuid  = cl.codexMapGuid  ?? "";
                     cl.keywords      = cl.keywords      ?? Array.Empty<string>();
+                    cl.comments      = cl.comments      ?? Array.Empty<CodexComment>();
                 }
             }
 
@@ -509,6 +511,36 @@ namespace RouteFinding.Editor
                 EditorGUI.indentLevel--;
             }
 
+            // 4단계(2026-07-14) — NPC/시스템 코멘트. 플레이어가 입력하는 게 아니라 콘텐츠 작업자가
+            // 여기서 직접 채워 넣는 대사 데이터다(Clue_System.md 1-4장 확정 사항).
+            EditorGUILayout.Space(4f);
+            _foldComments = EditorGUILayout.Foldout(_foldComments,
+                $"코멘트 (NPC/시스템)  ({cl.comments.Length}개)", true, EditorStyles.foldoutHeader);
+            if (_foldComments)
+            {
+                EditorGUI.indentLevel++;
+                EditorGUILayout.HelpBox("플레이어 입력이 아니라 NPC/시스템이 다는 코멘트 — 카드에서 타이프라이터 연출로 출력됨.", MessageType.None);
+                int removeComment = -1;
+                for (int i = 0; i < cl.comments.Length; i++)
+                {
+                    var cm = cl.comments[i];
+                    EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayout.Label($"[{i}]", GUILayout.Width(28f));
+                    cm.author = EditorGUILayout.TextField("작성자", cm.author ?? "");
+                    if (GUILayout.Button("−", GUILayout.Width(22f))) removeComment = i;
+                    EditorGUILayout.EndHorizontal();
+                    cm.createdAt = EditorGUILayout.TextField("시간 (선택, 비우면 숨김)", cm.createdAt ?? "");
+                    EditorGUILayout.LabelField("내용");
+                    cm.text = EditorGUILayout.TextArea(cm.text ?? "", GUILayout.MinHeight(36f));
+                    EditorGUILayout.EndVertical();
+                }
+                if (removeComment >= 0) ArrayUtility.RemoveAt(ref cl.comments, removeComment);
+                if (GUILayout.Button("+ 코멘트 추가", GUILayout.ExpandWidth(false)))
+                    ArrayUtility.Add(ref cl.comments, new CodexComment { author = "", text = "", createdAt = "" });
+                EditorGUI.indentLevel--;
+            }
+
             if (EditorGUI.EndChangeCheck()) _dirty = true;
         }
 
@@ -560,6 +592,7 @@ namespace RouteFinding.Editor
                         source               = "",
                         codexMapGuid         = "",
                         keywords             = Array.Empty<string>(),
+                        comments             = Array.Empty<CodexComment>(),
                     });
                     _selClue = _clueDb.clues.Length - 1;
                     break;

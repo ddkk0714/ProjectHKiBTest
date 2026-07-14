@@ -131,6 +131,18 @@ public class RouteProgressState
         OnClueAcquired?.Invoke(clue);
     }
 
+    // 테스트/디버그 전용 — 방문·이벤트 조건을 전부 무시하고 그래프의 모든 단서를 즉시 획득 처리한다.
+    // 도감(Codex)/노트(Note) UI를 실제 플레이 없이 빠르게 검증할 때 쓴다(RouteSystemTest 참고).
+    public void ForceAcquireAllClues()
+    {
+        if (_graph == null) return;
+        foreach (var clue in _graph.AllClues)
+        {
+            if (_acquiredClueIds.Contains(clue.id)) continue;
+            AcquireClue(clue);
+        }
+    }
+
     // ─── SaveSlotData 연동 (일기장 세이브) ────────────────────────
     // 진행 상태는 SaveSlotData에 아래 키 규칙으로 직렬화된다:
     //   passages              : 클리어된 맵 GUID (2026-07-14 이전 — 원래는 연결 GUID)

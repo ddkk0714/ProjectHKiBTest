@@ -9,6 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9bbeb80d4380bd4b99a30410b7189b9, type: 3}
+  m_Script: {fileID: 11500000, guid: 900b5f5c6a88fc64fb5af9348d3d85b8, type: 3}
   m_Name: DialogueEndDecision
   m_EditorClassIdentifier: 

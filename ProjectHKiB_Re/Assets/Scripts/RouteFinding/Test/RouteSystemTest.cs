@@ -127,6 +127,81 @@ public class RouteSystemTest : MonoBehaviour
         }
     }
 
+    // 방문·이벤트 조건을 전부 무시하고 모든 단서를 즉시 획득 처리 — 도감/노트 UI를 실제 플레이 없이
+    // 빠르게 검증할 때 쓴다(RouteProgressState.ForceAcquireAllClues 참고).
+    [Button("단서 - 전체 획득 처리 (테스트)")]
+    private void TestForceAcquireAllClues()
+    {
+        if (!ValidateGraph()) return;
+        int before = RouteModule.Instance.Progress.AcquiredClueIds.Count;
+        RouteModule.Instance.Progress.ForceAcquireAllClues();
+        int after = RouteModule.Instance.Progress.AcquiredClueIds.Count;
+        Debug.Log($"[RouteSystemTest] 단서 전체 획득 처리 완료 — {before} → {after} (전체 {MapGraph.Instance.AllClues.Count}개)");
+    }
+
+    // ─── 노트(Note) 0단계 — 경로 연동 자동 편입 ─────────────────
+
+    [Button("노트 - 최단 경로 선택 후 연동 항목 출력")]
+    private void TestNoteRouteLinked()
+    {
+        if (!ValidateGraph()) return;
+        var (start, dest) = GetNodes();
+        if (start == null || dest == null) return;
+
+        var result = RouteModule.Instance.FindPath(start, dest, PathType.Shortest);
+        if (!result.IsValid) { Debug.LogWarning("[RouteSystemTest] 유효한 경로가 없습니다."); return; }
+
+        RouteModule.Instance.SelectRoute(result); // NoteModule.OnRouteSelected 구독 → 자동 재계산
+
+        if (NoteModule.Instance.Entries.Count == 0)
+        {
+            Debug.Log("[RouteSystemTest][Note] 노트가 비어 있습니다 (경로에 포함된 맵과 연관된 획득 단서가 없음).");
+            return;
+        }
+        foreach (var entry in NoteModule.Instance.Entries)
+        {
+            var clue = MapGraph.Instance.GetClue(entry.clueId);
+            Debug.Log($"[RouteSystemTest][Note] {clue?.name ?? entry.clueId} — {entry.reason}");
+        }
+    }
+
+    // ─── 노트(Note) 4단계 — 다중 목적지 이동 계획 ─────────────────
+
+    [Button("노트 - 계획 생성 후 목적지 노드로 실행")]
+    private void TestNotePlanExecute()
+    {
+        if (!ValidateGraph()) return;
+        var dest = MapGraph.Instance.GetNode(_destinationNodeGuid);
+        if (dest == null) { Debug.LogError($"[RouteSystemTest] GUID에 해당하는 노드가 없습니다: {_destinationNodeGuid}"); return; }
+
+        var plan = NoteModule.Instance.CreatePlan("테스트 계획");
+        NoteModule.Instance.AddWaypoint(plan.planId, dest.guid);
+
+        var preview = NoteModule.Instance.ComputePreview(plan.planId);
+        Debug.Log($"[RouteSystemTest][Plan] 미리보기 — 구간 {preview.Legs.Count}개, 유효={preview.IsValid}, 통과불가포함={preview.IsBlocked}, 총난이도={preview.TotalDifficulty:F1}");
+
+        bool started = NoteModule.Instance.ExecutePlan(plan.planId);
+        Debug.Log($"[RouteSystemTest][Plan] 실행 {(started ? "시작됨" : "실패")} — RouteModule.IsTraveling={RouteModule.Instance.IsTraveling}");
+    }
+
+    [Button("노트 - 계획 다음 구간 진행 (전투 완료 시뮬레이션)")]
+    private void TestNotePlanAdvance()
+    {
+        if (!RouteModule.Instance.IsTraveling)
+        {
+            Debug.LogWarning("[RouteSystemTest] 이동 중이 아닙니다. 먼저 계획을 실행하세요.");
+            return;
+        }
+        var target = RouteModule.Instance.GetCurrentTargetNode();
+        if (target != null) RouteModule.Instance.Progress.MarkNodeCleared(target);
+        RouteModule.Instance.AdvanceToNextNode(); // 목적지 도달 시 OnTravelEnded(true) → NoteModule이 다음 구간 자동 시작
+
+        var execution = NoteModule.Instance.CurrentExecution;
+        Debug.Log(execution == null
+            ? "[RouteSystemTest][Plan] 계획 완료 (더 이상 실행 중인 계획 없음)"
+            : $"[RouteSystemTest][Plan] 다음 구간 진행 중 — legIndex={execution.currentLegIndex}, halted={execution.isHalted}");
+    }
+
     // ─── 경로 선택 → 출발 시뮬레이션 ────────────────────────────
 
     [Button("최단 경로로 출발 시뮬레이션")]

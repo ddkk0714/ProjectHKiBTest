@@ -138,10 +138,23 @@ public class RouteModule : MonoBehaviour
             ? _selectedRoute.Nodes[_currentNodeIndex]
             : null;
 
-    // 이동 진행 알림 — 확장 시스템(RouteNote, UI 등)이 구독한다.
+    // 이동 중이 아닐 때도 유지되는 "현재 위치" — Note의 다중 목적지 계획(4단계)이 다음 구간의
+    // 시작점을 잡는 데 사용한다(NoteSystem_기획서.md "현재 위치 → 다음 목적지" 참고). 이동 중엔
+    // 매 노드 도달마다 갱신되고, 이동 종료(도달/중단) 후에는 마지막으로 도달한 노드에 고정된다.
+    private MapNodeData _currentLocation;
+    public MapNodeData CurrentLocation => _currentLocation ??= MapGraph.Instance?.StartNode;
+
+    // 이동 진행 알림 — 확장 시스템(Note, UI 등)이 구독한다.
     public event Action OnTravelStarted;
     public event Action<MapNodeData> OnNodeArrived; // 맵 전투 통과 후 새 노드 도달
-    public event Action OnTravelEnded;              // 목적지 도달 또는 이동 중단
+
+    // 이동 종료 알림 — completed=true면 목적지 정상 도달, false면 AbortTravel()로 인한 중단.
+    // (2026-07-14 — Note의 자동 순차 실행이 성공/중단을 구분해야 해서 bool 인자를 추가했다.
+    //  이전엔 Action(무인자)이었고 구독자가 없었으므로 시그니처 변경에 따른 별도 마이그레이션은 불필요.)
+    public event Action<bool> OnTravelEnded;
+
+    // 경로 선택 변경 알림 (2026-07-14 신설) — NoteModule의 "경로 연동 자동 편입"(규칙 1)이 구독한다.
+    public event Action<PathResult> OnRouteSelected;
 
     // 출발 전 경로 선택 (지도 화면에서 호출).
     // 통과 불가 맵을 포함한 경로(IsBlocked)는 선택할 수 없다 — AlternativePath를 대신 선택해야 한다.
@@ -159,6 +172,7 @@ public class RouteModule : MonoBehaviour
         }
         _selectedRoute = route;
         Debug.Log($"[RouteModule] 경로 선택 완료 — {route?.Nodes?.Count ?? 0}개 노드");
+        OnRouteSelected?.Invoke(route);
         return true;
     }
 
@@ -172,6 +186,7 @@ public class RouteModule : MonoBehaviour
         }
         _isTraveling = true;
         _currentNodeIndex = 0;
+        _currentLocation = _selectedRoute.Nodes[0];
         TrySubscribeCombatBridge(); // 전투 결과를 받아 진행해야 하므로 출발 시점에 반드시 연결
         Debug.Log($"[RouteModule] 출발 → {_selectedRoute.Nodes[0].nodeName}");
         OnTravelStarted?.Invoke();
@@ -195,6 +210,7 @@ public class RouteModule : MonoBehaviour
         _currentNodeIndex++;
 
         var arrived = _selectedRoute.Nodes[_currentNodeIndex];
+        _currentLocation = arrived;
         Progress.MarkNodeVisited(arrived);
         Debug.Log($"[RouteModule] 도달 → {arrived.nodeName}");
         OnNodeArrived?.Invoke(arrived);
@@ -203,17 +219,17 @@ public class RouteModule : MonoBehaviour
         {
             _isTraveling = false;
             Debug.Log("[RouteModule] 목적지 도달!");
-            OnTravelEnded?.Invoke();
+            OnTravelEnded?.Invoke(true);
         }
     }
 
-    // 이동 중단 (전투 실패·사망 등)
+    // 이동 중단 (전투 실패·사망 등). _currentLocation은 마지막으로 정상 도달한 노드에 그대로 남는다.
     public void AbortTravel()
     {
         if (!_isTraveling) return;
         _isTraveling = false;
         Debug.Log("[RouteModule] 이동 중단");
-        OnTravelEnded?.Invoke();
+        OnTravelEnded?.Invoke(false);
     }
 
     // ─── 경로 탐색 (모듈 상태 기준 래퍼) ─────────────────────────

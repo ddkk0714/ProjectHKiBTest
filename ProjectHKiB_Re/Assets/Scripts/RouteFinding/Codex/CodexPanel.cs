@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -24,9 +25,9 @@ namespace RouteFinding.Codex
 
         [Header("레이아웃")]
         [SerializeField] private float _drawerWidth = 220f;
-        [SerializeField] private float _topBarHeight = 24f;
-        [SerializeField] private float _searchBarHeight = 44f;
-        [SerializeField] private float _newMemoBtnHeight = 20f;
+        [SerializeField] private float _topBarHeight = 12f;
+        [SerializeField] private float _searchBarHeight = 34f;
+        [SerializeField] private float _newMemoBtnHeight = 12f;
         [SerializeField] private Color _rootBgColor = new(0.04f, 0.04f, 0.08f, 0.96f);
         [SerializeField] private Color _drawerBgColor = new(0.07f, 0.09f, 0.14f, 0.97f);
         [SerializeField] private Color _cardBgColor = new(0.06f, 0.07f, 0.11f, 0.90f);
@@ -42,6 +43,7 @@ namespace RouteFinding.Codex
         private InputManager _inputManager;
 
         private readonly List<CodexEntry> _allEntries = new();
+        private List<CodexEntry> _placeholderEntries = new(); // 6-2단계 "???" 슬롯 — 맵별 그룹핑에서만 섞임
         private CodexFilterMode _filterMode = CodexFilterMode.ByMap;
         private string _searchQuery = "";
 
@@ -109,13 +111,22 @@ namespace RouteFinding.Codex
                 _allEntries.Add(ToEntry(clue));
             foreach (var userEntry in CodexModule.Instance.UserEntries)
                 _allEntries.Add(ToEntryFromUser(userEntry));
+
+            _placeholderEntries = BuildUnacquiredPlaceholders();
+
             ApplyFilter();
         }
 
         // 검색어 필터링 후, 현재 분류 기준(맵/출처/키워드)으로 그룹핑해서 트리에 반영한다.
+        // "???" 빈칸 슬롯(_placeholderEntries)은 맵별 그룹핑에서만 섞어 넣는다 — 슬롯 개수 자체가
+        // MapNodeData.clueIds 기준이라 출처/키워드 분류에는 맞지 않는다(Clue_System.md 6-2).
         private void ApplyFilter()
         {
-            var searched = CodexFilterService.Search(_allEntries, _searchQuery);
+            var source = _filterMode == CodexFilterMode.ByMap
+                ? _allEntries.Concat(_placeholderEntries).ToList()
+                : _allEntries;
+
+            var searched = CodexFilterService.Search(source, _searchQuery);
             var groups = _filterMode switch
             {
                 CodexFilterMode.BySource  => CodexFilterService.GroupBySource(searched),
@@ -123,6 +134,43 @@ namespace RouteFinding.Codex
                 _                         => CodexFilterService.GroupByMap(searched),
             };
             _drawerView.SetGroups(groups);
+        }
+
+        // 6-2단계(Clue_System.md) — 알려진(프론티어 포함) 맵 중 아직 다 못 찾은 단서가 있는 맵마다,
+        // 그 맵의 MapNodeData.clueIds 중 미획득분 개수만큼 "??? (미발견)" 슬롯을 만든다. "알려진 맵" 판정은
+        // 노트의 미획득 후보 노출(NoteSystem_기획서.md 규칙 3)과 완전히 동일한 기준(KnownMapService)을 쓴다.
+        private List<CodexEntry> BuildUnacquiredPlaceholders()
+        {
+            var result = new List<CodexEntry>();
+            var graph = MapGraph.Instance;
+            var progress = RouteModule.Instance?.Progress;
+            if (graph == null || progress == null) return result;
+
+            var known = KnownMapService.ComputeKnownNodeGuids(graph, progress);
+            foreach (var node in graph.AllNodes)
+            {
+                if (!known.Contains(node.guid) || node.clueIds == null) continue;
+
+                int missing = node.clueIds.Count(id => !progress.IsClueAcquired(id));
+                for (int i = 0; i < missing; i++)
+                {
+                    result.Add(new CodexEntry
+                    {
+                        title         = "??? (미발견)",
+                        typeLabel     = "",
+                        timestamp     = "",
+                        content       = "아직 발견하지 못한 단서입니다.",
+                        source        = "",
+                        mapCategory   = node.nodeName,
+                        keywords      = Array.Empty<string>(),
+                        userEntryGuid = "",
+                        clueId        = "",
+                        comments      = Array.Empty<CodexComment>(),
+                        isPlaceholder = true,
+                    });
+                }
+            }
+            return result;
         }
 
         private static CodexEntry ToEntry(ClueData clue)
@@ -138,6 +186,8 @@ namespace RouteFinding.Codex
                 mapCategory = mapNode != null ? mapNode.nodeName : "기타",
                 keywords    = clue.keywords,
                 userEntryGuid = "",
+                clueId      = clue.id,
+                comments    = clue.comments ?? Array.Empty<CodexComment>(),
             };
         }
 
@@ -153,6 +203,7 @@ namespace RouteFinding.Codex
             mapCategory   = string.IsNullOrEmpty(entry.mapCategory) ? "기타" : entry.mapCategory,
             keywords      = entry.keywords,
             userEntryGuid = entry.guid,
+            comments      = entry.comments ?? Array.Empty<CodexComment>(),
         };
 
         // ─── UI 구축 ─────────────────────────────────────────────
@@ -164,13 +215,17 @@ namespace RouteFinding.Codex
             var existing = transform.Find("CodexPanelRoot");
             if (existing != null)
             {
-                bool existingCurrent = FindDeepTransform(existing, "MemoFormOverlay") != null;
+                // CommentsSection(4단계, 가장 최근에 추가된 요소)까지 있어야 "최신" — 판정 기준은
+                // 항상 최근 추가 요소여야 그 이전 요소(PinRow 등)까지 전부 갖췄다는 게 보장된다.
+                bool existingCurrent = FindDeepTransform(existing, "CommentsSection") != null;
                 if (existingCurrent)
                 {
+                    Debug.Log("[CodexPanel] BuildUI: 씬에 있던 기존 CodexPanelRoot를 재사용합니다.");
                     _panelGO = existing.gameObject;
                     FinalizePanel(_panelGO.GetComponent<RectTransform>());
                     return;
                 }
+                Debug.Log("[CodexPanel] BuildUI: 기존 CodexPanelRoot에 CommentsSection이 없어 구버전으로 판단, 파괴 후 재생성합니다.");
                 // 먼저 비활성화한 뒤 Destroy — 구버전 패널 안의 TMP 텍스트를 활성 상태로 그냥 Destroy하면,
                 // 같은 프레임에 ScrollRect.LateUpdate가 강제하는 CanvasUpdateRegistry 리빌드가 이미 파괴 중인
                 // TMP의 서브메시(폴백 폰트) 머티리얼에 접근하려다 MissingReferenceException을 던질 수 있다.
@@ -181,17 +236,22 @@ namespace RouteFinding.Codex
             // 프리팹이 지정되어 있으면 인스턴스화 후 참조를 바인딩하고 콜백만 재연결.
             if (_panelPrefab != null)
             {
-                bool prefabCurrent = FindDeepTransform(_panelPrefab.transform, "MemoFormOverlay") != null;
+                bool prefabCurrent = FindDeepTransform(_panelPrefab.transform, "CommentsSection") != null;
                 if (prefabCurrent)
                 {
+                    Debug.Log($"[CodexPanel] BuildUI: 지정된 프리팹({_panelPrefab.name})을 인스턴스화합니다.");
                     _panelGO = Instantiate(_panelPrefab, transform, false);
                     _panelGO.name = "CodexPanelRoot";
                     FinalizePanel(_panelGO.GetComponent<RectTransform>());
                     return;
                 }
+                Debug.LogWarning($"[CodexPanel] BuildUI: 지정된 프리팹({_panelPrefab.name})에 CommentsSection이 없어 구버전으로 판단, 런타임 생성으로 대체합니다. 프리팹을 다시 생성해주세요.");
             }
 
             // ── 프리팹 없음 → 런타임 자동 생성 ──
+            Debug.Log(_panelPrefab == null
+                ? "[CodexPanel] BuildUI: _panelPrefab이 비어 있어 런타임으로 새로 생성합니다."
+                : "[CodexPanel] BuildUI: (위 경고 참고) 런타임으로 새로 생성합니다.");
             _panelGO = new GameObject("CodexPanelRoot");
             _panelGO.transform.SetParent(transform, false);
             var root = _panelGO.AddComponent<RectTransform>();
@@ -241,6 +301,8 @@ namespace RouteFinding.Codex
                 _cardView.Bind((RectTransform)cardTF);
                 _cardView.OnEditRequested += HandleEditRequested;
                 _cardView.OnDeleteRequested += HandleDeleteRequested;
+                _cardView.OnPinRequested += HandlePinRequested;
+                _cardView.OnSuggestionAddRequested += HandleSuggestionAddRequested;
             }
 
             _memoForm = root.GetComponent<CodexMemoFormView>();
@@ -279,14 +341,14 @@ namespace RouteFinding.Codex
             var titleTmp = titleRT.gameObject.AddComponent<TextMeshProUGUI>();
             if (_font != null) titleTmp.font = _font;
             titleTmp.text = "단서 도감";
-            titleTmp.fontSize = 12f;
+            titleTmp.fontSize = 8f;
             titleTmp.fontStyle = FontStyles.Bold;
             titleTmp.color = Color.white;
             titleTmp.alignment = TextAlignmentOptions.MidlineLeft;
 
             var closeBtnRT = NewRect(topBar, "BtnClose");
             var closeLe = closeBtnRT.gameObject.AddComponent<LayoutElement>();
-            closeLe.preferredWidth = 60f;
+            closeLe.preferredWidth = 34f;
             closeLe.flexibleWidth = 0f;
             var closeImg = AddImg(closeBtnRT, new Color(0.42f, 0.10f, 0.10f));
             var closeBtn = closeBtnRT.gameObject.AddComponent<Button>();
@@ -299,7 +361,7 @@ namespace RouteFinding.Codex
             var closeTmp = closeTxtRT.gameObject.AddComponent<TextMeshProUGUI>();
             if (_font != null) closeTmp.font = _font;
             closeTmp.text = $"닫기 [{_toggleKey}]";
-            closeTmp.fontSize = 8f;
+            closeTmp.fontSize = 7f;
             closeTmp.alignment = TextAlignmentOptions.Center;
             closeTmp.verticalAlignment = VerticalAlignmentOptions.Middle;
             closeTmp.color = Color.white;
@@ -347,7 +409,7 @@ namespace RouteFinding.Codex
             var newMemoTmp = newMemoTxtRT.gameObject.AddComponent<TextMeshProUGUI>();
             if (_font != null) newMemoTmp.font = _font;
             newMemoTmp.text = "+ 새 메모";
-            newMemoTmp.fontSize = 8f;
+            newMemoTmp.fontSize = 7f;
             newMemoTmp.alignment = TextAlignmentOptions.Center;
             newMemoTmp.verticalAlignment = VerticalAlignmentOptions.Middle;
             newMemoTmp.color = Color.white;
@@ -405,6 +467,8 @@ namespace RouteFinding.Codex
             _cardView.Init(card, _font);
             _cardView.OnEditRequested += HandleEditRequested;
             _cardView.OnDeleteRequested += HandleDeleteRequested;
+            _cardView.OnPinRequested += HandlePinRequested;
+            _cardView.OnSuggestionAddRequested += HandleSuggestionAddRequested;
         }
 
         private void BuildMemoForm(RectTransform root)
@@ -443,6 +507,62 @@ namespace RouteFinding.Codex
         {
             CodexModule.Instance.RemoveUserEntry(guid);
             _cardView.ShowEmpty();
+        }
+
+        // ─── 노트 연동 (2단계, 노트 편입 규칙 2 — 도감 → 노트 수동 핀) ─────
+
+        private void HandlePinRequested(CodexEntry entry)
+        {
+            if (entry == null || string.IsNullOrEmpty(entry.clueId)) return;
+            if (!NoteModule.Instance.AddManualPin(entry.clueId)) return;
+
+            // ShowEntry가 끝에서 추천 목록을 접으므로(카드 전환 시 이전 추천을 지우기 위함),
+            // 반드시 ShowSuggestions보다 먼저 호출해야 한다 — 순서를 바꾸면 추천이 그려지자마자 숨겨진다.
+            _cardView.ShowEntry(entry); // 핀 버튼 상태("노트에 핀됨")를 다시 그린다
+            var suggestions = FindRelatedByKeyword(entry).FindAll(s => !NoteModule.Instance.IsPinned(s.clueId));
+            _cardView.ShowSuggestions(suggestions);
+        }
+
+        private void HandleSuggestionAddRequested(CodexEntry suggestion)
+        {
+            if (suggestion == null || string.IsNullOrEmpty(suggestion.clueId)) return;
+            NoteModule.Instance.AddManualPin(suggestion.clueId);
+
+            // 방금 추가된 항목만 추천 목록에서 제외하고 다시 그린다 — 나머지 후보는 그대로 유지.
+            var remaining = FindRelatedByKeyword(_currentPinnedEntry).FindAll(s => !NoteModule.Instance.IsPinned(s.clueId));
+            _cardView.ShowSuggestions(remaining);
+        }
+
+        // 마지막으로 핀된(그래서 지금 추천 목록의 기준이 되는) 항목 — HandleSuggestionAddRequested가
+        // "추가" 클릭 후 추천 목록을 다시 계산할 때 기준 항목을 다시 알아야 해서 보관해둔다.
+        private CodexEntry _currentPinnedEntry;
+
+        // 같은 키워드(ClueData.keywords ∪ 타입 표시 이름)를 공유하는 다른 정식 단서를 찾는다.
+        // CodexFilterService.GroupByKeyword를 그대로 재사용 — NoteSystem_기획서.md 규칙 2에 명시된 그대로.
+        private List<CodexEntry> FindRelatedByKeyword(CodexEntry entry)
+        {
+            if (entry == null) return new List<CodexEntry>();
+            _currentPinnedEntry = entry;
+
+            var entryKeywords = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (entry.keywords != null)
+                foreach (var kw in entry.keywords)
+                    if (!string.IsNullOrWhiteSpace(kw)) entryKeywords.Add(kw.Trim());
+            if (!string.IsNullOrEmpty(entry.typeLabel)) entryKeywords.Add(entry.typeLabel);
+
+            var related = new List<CodexEntry>();
+            var seenClueIds = new HashSet<string>();
+            foreach (var group in CodexFilterService.GroupByKeyword(_allEntries))
+            {
+                if (!entryKeywords.Contains(group.category)) continue;
+                foreach (var other in group.entries)
+                {
+                    if (other == entry || string.IsNullOrEmpty(other.clueId)) continue; // 유저 메모는 핀 대상 아님
+                    if (!seenClueIds.Add(other.clueId)) continue;
+                    related.Add(other);
+                }
+            }
+            return related;
         }
 
         // ─── UI 헬퍼 ─────────────────────────────────────────────

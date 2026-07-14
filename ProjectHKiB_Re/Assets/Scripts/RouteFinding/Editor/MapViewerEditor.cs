@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 using RouteFinding.MapView;
+using RouteFinding.Editor;
 
 [CustomEditor(typeof(MapViewer))]
 public class MapViewerEditor : Editor
@@ -43,17 +44,17 @@ public class MapViewerEditor : Editor
             EditorUtility.DisplayDialog("오류", "프리팹 저장에 실패했습니다.", "확인");
             return;
         }
-
-        // 저장한 프리팹을 _panelPrefab 필드에 자동 할당
-        var so = new SerializedObject(viewer);
-        so.FindProperty("_panelPrefab").objectReferenceValue = prefab;
-        so.ApplyModifiedProperties();
-
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
-        EditorUtility.DisplayDialog("완료",
-            $"MapPanel 프리팹이 저장되었습니다.\n{savePath}\n\n이제 플레이 모드를 종료해도 프리팹이 유지됩니다.",
+        // 플레이 모드 중엔 지금 필드를 바꿔도 Stop 시 Unity가 되돌리므로(씬 오브젝트의 플레이 중 변경은
+        // 전부 롤백됨), 즉시 할당하지 않고 예약해둔다 — 플레이 모드를 종료하면 자동으로 반영된다.
+        PanelPrefabAssignHelper.RequestAssign(viewer, "_panelPrefab", savePath);
+
+        EditorUtility.DisplayDialog("완료 (플레이 모드 종료 후 자동 반영)",
+            $"MapPanel 프리팹이 저장되었습니다.\n{savePath}\n\n" +
+            "플레이 모드 중에는 필드 변경이 Stop 시 되돌려지기 때문에, 지금 당장은 반영되지 않습니다.\n" +
+            "플레이 모드를 종료하면 '_panelPrefab' 필드가 자동으로 할당되고 씬이 수정됨으로 표시됩니다 — Ctrl+S로 저장하세요.",
             "확인");
 
         Selection.activeObject = prefab;

@@ -45,12 +45,12 @@ namespace RouteFinding.Codex
             var boxRT = NewRect(backdropRT, "Box");
             boxRT.anchorMin = boxRT.anchorMax = new Vector2(0.5f, 0.5f);
             boxRT.pivot = new Vector2(0.5f, 0.5f);
-            boxRT.sizeDelta = new Vector2(300f, 300f);
+            boxRT.sizeDelta = new Vector2(220f, 220f);
             AddImg(boxRT, new Color(0.08f, 0.09f, 0.13f, 0.98f));
 
             var vlg = boxRT.gameObject.AddComponent<VerticalLayoutGroup>();
-            vlg.padding = new RectOffset(10, 10, 10, 10);
-            vlg.spacing = 4f;
+            vlg.padding = new RectOffset(8, 8, 8, 8);
+            vlg.spacing = 3f;
             vlg.childControlWidth = true;
             vlg.childControlHeight = false;
             vlg.childForceExpandWidth = true;
@@ -59,20 +59,20 @@ namespace RouteFinding.Codex
             MakeTitleLabel(boxRT, font, "메모");
 
             MakeFieldLabel(boxRT, font, "제목");
-            _titleField = MakeInputField(boxRT, font, "제목", 18f, multiline: false, id: "TitleField");
+            _titleField = MakeInputField(boxRT, font, "제목", 12f, multiline: false, id: "TitleField");
 
             MakeFieldLabel(boxRT, font, "내용");
-            _contentField = MakeInputField(boxRT, font, "내용", 70f, multiline: true, id: "ContentField");
+            _contentField = MakeInputField(boxRT, font, "내용", 45f, multiline: true, id: "ContentField");
 
             MakeFieldLabel(boxRT, font, "소속 맵 (선택, 없으면 기타)");
-            _mapField = MakeInputField(boxRT, font, "", 18f, multiline: false, id: "MapField");
+            _mapField = MakeInputField(boxRT, font, "", 12f, multiline: false, id: "MapField");
 
             MakeFieldLabel(boxRT, font, "키워드 (쉼표로 구분)");
-            _keywordsField = MakeInputField(boxRT, font, "", 18f, multiline: false, id: "KeywordsField");
+            _keywordsField = MakeInputField(boxRT, font, "", 12f, multiline: false, id: "KeywordsField");
 
             var btnRow = NewRect(boxRT, "Buttons");
             var btnRowLe = btnRow.gameObject.AddComponent<LayoutElement>();
-            btnRowLe.preferredHeight = 20f;
+            btnRowLe.preferredHeight = 12f;
             btnRowLe.flexibleWidth = 1f;
             var hlg = btnRow.gameObject.AddComponent<HorizontalLayoutGroup>();
             hlg.spacing = 4f;
@@ -180,12 +180,12 @@ namespace RouteFinding.Codex
         {
             var rt = NewRect(parent, "Title");
             var le = rt.gameObject.AddComponent<LayoutElement>();
-            le.preferredHeight = 18f;
+            le.preferredHeight = 12f;
             le.flexibleWidth = 1f;
             var tmp = rt.gameObject.AddComponent<TextMeshProUGUI>();
             if (font != null) tmp.font = font;
             tmp.text = text;
-            tmp.fontSize = 12f;
+            tmp.fontSize = 8f;
             tmp.fontStyle = FontStyles.Bold;
             tmp.color = Color.white;
             tmp.alignment = TextAlignmentOptions.MidlineLeft;
@@ -224,7 +224,7 @@ namespace RouteFinding.Codex
             StretchFull(textRT);
             var textTmp = textRT.gameObject.AddComponent<TextMeshProUGUI>();
             if (font != null) textTmp.font = font;
-            textTmp.fontSize = 8f;
+            textTmp.fontSize = 7f;
             textTmp.color = Color.white;
             textTmp.alignment = multiline ? TextAlignmentOptions.TopLeft : TextAlignmentOptions.MidlineLeft;
             textTmp.enableWordWrapping = true;
@@ -234,7 +234,7 @@ namespace RouteFinding.Codex
             var placeholderTmp = placeholderRT.gameObject.AddComponent<TextMeshProUGUI>();
             if (font != null) placeholderTmp.font = font;
             placeholderTmp.text = placeholder;
-            placeholderTmp.fontSize = 8f;
+            placeholderTmp.fontSize = 7f;
             placeholderTmp.fontStyle = FontStyles.Italic;
             placeholderTmp.color = new Color(1f, 1f, 1f, 0.35f);
             placeholderTmp.alignment = multiline ? TextAlignmentOptions.TopLeft : TextAlignmentOptions.MidlineLeft;
@@ -261,7 +261,7 @@ namespace RouteFinding.Codex
             var tmp = txtRT.gameObject.AddComponent<TextMeshProUGUI>();
             if (font != null) tmp.font = font;
             tmp.text = label;
-            tmp.fontSize = 8f;
+            tmp.fontSize = 7f;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.verticalAlignment = VerticalAlignmentOptions.Middle;
             tmp.color = Color.white;
