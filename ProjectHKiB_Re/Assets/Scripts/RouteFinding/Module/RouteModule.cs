@@ -30,6 +30,55 @@ using UnityEngine;
 // 발생 기록)와 IEventSaveProvider.SetEventFlag(id, value)(세이브용, 이름은 같지만 완전히 다른 의미)가
 // 한 클래스에 같이 있으면 오버로드는 되지만("string,string" vs "string,bool") 헷갈리기 쉬워서, 이미
 // "공용 상태의 단일 소유자"인 이 클래스가 대신 얇게 위임한다.
+// ════════════════════════════════════════════════════════════════
+// [외부 모듈 연동 API] — 전투/퀘스트/UI 등 RouteFinding 밖의 다른 시스템은 이 클래스만 참조하면
+// 루트파인딩 상태를 읽고 조작할 수 있다. 씬에 미리 배치할 필요 없이 RouteModule.Instance로 항상
+// 접근 가능(첫 접근 시 자동 생성). 아래는 실제 구현부(이 파일 본문)에 있는 멤버를 용도별로 정리한 것 —
+// 자세한 동작/제약은 각 멤버 바로 위 주석 참고.
+//
+// ▸ 장착 장비 (전투 상성/난이도 계산 기준)
+//   RouteModule.Instance.EquippedGears            : 현재 장착 장비 목록(읽기 전용)
+//   RouteModule.Instance.IsGearEquipped(gear)      : 특정 장비 장착 여부
+//   RouteModule.Instance.ToggleGear(gear)          : 장비 착탈(이동 중엔 거부, bool 반환)
+//   ※ 이동 중(IsTraveling)에는 변경 불가 — 실패 시 false 반환 + Debug.LogWarning
+//
+// ▸ 이동 상태 조회 (전투/연출 시스템이 "지금 뭘 해야 하는지" 판단할 때 사용)
+//   RouteModule.Instance.IsTraveling               : 이동 중 여부
+//   RouteModule.Instance.CanOpenMap                 : 지도 열람 가능 여부(=이동 중 아님)
+//   RouteModule.Instance.CurrentNode                : 이동 중 현재 위치한 노드(이동 중 아니면 null)
+//   RouteModule.Instance.CurrentLocation             : 이동 여부 무관하게 항상 유효한 "현재 위치"
+//   RouteModule.Instance.GetCurrentTargetNode()      : 다음 전투 대상 맵(=다음에 도달해야 할 노드)
+//   RouteModule.Instance.SelectedRoute               : 현재 선택된 경로(PathResult)
+//
+// ▸ 이동 진행 이벤트 구독 (Note/UI/연출 시스템이 이동 흐름에 맞춰 반응할 때)
+//   OnTravelStarted            : 출발 시
+//   OnNodeArrived(MapNodeData) : 전투 통과 후 새 노드 도달 시
+//   OnTravelEnded(bool)        : 이동 종료 시(true=목적지 도달, false=중단)
+//   OnRouteSelected(PathResult): 경로가 선택(커밋)될 때
+//
+// ▸ 전투 시스템 연동 (핵심 훅 — 웨이브 전투 실제 구현 시 사용)
+//   전투 시작/종료 "사실"은 WaveCombatBridge(Manager/WaveCombatBridge.cs)가 이벤트로 알리고,
+//   그 결과로 맵을 영구 클리어 처리하거나 다음 노드로 진행하는 것은 이 클래스가 내부에서 자동 처리한다
+//   (HandleCombatCompleted/HandleCombatFailed, private). 전투 시스템은 WaveCombatBridge의 API만
+//   신경 쓰면 되고, RouteModule을 직접 호출할 필요는 없다 — 상세는 WaveCombatBridge.cs 상단 참고.
+//
+// ▸ 사망 처리 연동
+//   RouteModule.Instance.RevertToLastSave(lastSaved) : 미세이브 맵 진도 손실(마지막 세이브로 복귀)
+//   직접 호출하지 말고 Manager/DeathHandler.cs의 HandleDeath()를 통해 호출할 것(스폰 복귀와 함께
+//   묶어서 처리해야 함) — 상세는 DeathHandler.cs 상단 참고.
+//
+// ▸ 스토리 이벤트 → 단서 공개 연동 (퀘스트/대화/전투 시스템이 호출)
+//   RouteModule.Instance.Progress.SetEventFlag(mapGuid, eventKey) : 특정 맵에서 이벤트 발생 기록
+//   → 해당 이벤트 키를 requiredEventKey로 참조하는 ClueData가 있으면 자동으로 단서 획득 재검사됨.
+//   상세는 RouteProgressState.cs 상단 참고.
+//
+// ▸ 사용 예시 — 전투 승리 시 특정 적을 죽였다는 이벤트를 기록해 단서를 공개하고 싶을 때:
+//     RouteModule.Instance.Progress.SetEventFlag(currentMapGuid, "kill_boss01");
+//
+// ▸ 세이브 연동은 RouteModule이 IEventSaveProvider를 구현하는 방식으로 이미 SaveModule과
+//   자동 연결되어 있다 — 이 인터페이스(EventFlags/SetEventFlag/Passages/SetPassage/ResetForLoad)는
+//   세이브 시스템 내부용이고, 다른 게임플레이 모듈이 직접 호출할 일은 없다.
+// ════════════════════════════════════════════════════════════════
 public class RouteModule : MonoBehaviour, IEventSaveProvider
 {
     private static RouteModule _instance;

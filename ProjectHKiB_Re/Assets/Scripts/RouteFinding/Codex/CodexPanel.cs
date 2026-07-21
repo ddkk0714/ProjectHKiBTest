@@ -29,9 +29,18 @@ namespace RouteFinding.Codex
         // 6-1(진행률 표시)·6-5(정렬 버튼 행)로 검색바 영역에 행이 2개 늘어난 만큼(34f → 62f) 높였다.
         [SerializeField] private float _searchBarHeight = 62f;
         [SerializeField] private float _newMemoBtnHeight = 12f;
+        [Tooltip("스프라이트를 지정 안 했을 때 쓰는 단색 배경(패널 전체 바깥 배경)")]
         [SerializeField] private Color _rootBgColor = new(0.04f, 0.04f, 0.08f, 0.96f);
+        [Tooltip("패널 전체 바깥 배경 이미지 — 지정하면 도트풍 이미지로 대체(9슬라이스 테두리 있는 스프라이트도 지원), 비워두면 위 단색 사용")]
+        [SerializeField] private Sprite _rootBgSprite;
+        [Tooltip("스프라이트를 지정 안 했을 때 쓰는 단색 배경(상단바 + 좌측 드로어/트리 영역이 같이 씀)")]
         [SerializeField] private Color _drawerBgColor = new(0.07f, 0.09f, 0.14f, 0.97f);
+        [Tooltip("상단바 + 좌측 드로어(트리) 배경 이미지 — 두 영역이 이 스프라이트를 같이 씀, 비워두면 위 단색 사용")]
+        [SerializeField] private Sprite _drawerBgSprite;
+        [Tooltip("스프라이트를 지정 안 했을 때 쓰는 단색 배경(우측 상세 카드 영역)")]
         [SerializeField] private Color _cardBgColor = new(0.06f, 0.07f, 0.11f, 0.90f);
+        [Tooltip("우측 상세 카드 배경 이미지 — 지정하면 도트풍 이미지로 대체, 비워두면 위 단색 사용")]
+        [SerializeField] private Sprite _cardBgSprite;
 
         [Header("프리팹 (선택 — 비워두면 런타임 자동 생성)")]
         [SerializeField] private GameObject _panelPrefab;
@@ -281,7 +290,7 @@ namespace RouteFinding.Codex
             _panelGO.transform.SetParent(transform, false);
             var root = _panelGO.AddComponent<RectTransform>();
             StretchFull(root);
-            AddImg(root, _rootBgColor);
+            PanelBackground.Apply(root, _rootBgColor, _rootBgSprite);
 
             BuildTopBar(root);
             BuildDrawer(root);
@@ -299,6 +308,12 @@ namespace RouteFinding.Codex
 
         private void BindRefsFromHierarchy(RectTransform root)
         {
+            // 프리팹/씬 재사용 경로 — 배경 스프라이트 인스펙터 값을 바꿔도 반영되도록 여기서도 적용.
+            PanelBackground.Apply(root, _rootBgColor, _rootBgSprite);
+            PanelBackground.Apply(FindDeepTransform(root, "TopBar") as RectTransform, _drawerBgColor, _drawerBgSprite);
+            PanelBackground.Apply(FindDeepTransform(root, "Drawer") as RectTransform, _drawerBgColor, _drawerBgSprite);
+            PanelBackground.Apply(FindDeepTransform(root, "Card") as RectTransform, _cardBgColor, _cardBgSprite);
+
             var searchAreaTF = FindDeepTransform(root, "SearchBarArea");
             _searchBar = searchAreaTF?.GetComponent<CodexSearchBar>();
             if (_searchBar != null)
@@ -351,7 +366,7 @@ namespace RouteFinding.Codex
             topBar.pivot = new Vector2(0.5f, 1f);
             topBar.sizeDelta = new Vector2(0f, _topBarHeight);
             topBar.anchoredPosition = Vector2.zero;
-            AddImg(topBar, _drawerBgColor);
+            PanelBackground.Apply(topBar, _drawerBgColor, _drawerBgSprite);
 
             var hlg = topBar.gameObject.AddComponent<HorizontalLayoutGroup>();
             hlg.padding = new RectOffset(6, 6, 3, 3);
@@ -402,7 +417,7 @@ namespace RouteFinding.Codex
             drawer.pivot = new Vector2(0f, 0.5f);
             drawer.sizeDelta = new Vector2(_drawerWidth, -_topBarHeight);
             drawer.anchoredPosition = new Vector2(0f, -_topBarHeight * 0.5f);
-            AddImg(drawer, _drawerBgColor);
+            PanelBackground.Apply(drawer, _drawerBgColor, _drawerBgSprite);
 
             // 최상단: 검색창 + 분류 기준 버튼 (고정 높이). 그 아래: 스크롤되는 트리 영역.
             var searchArea = NewRect(drawer, "SearchBarArea");
@@ -493,7 +508,7 @@ namespace RouteFinding.Codex
             card.anchorMax = new Vector2(1f, 1f);
             card.offsetMin = new Vector2(_drawerWidth, 0f);
             card.offsetMax = new Vector2(0f, -_topBarHeight);
-            AddImg(card, _cardBgColor);
+            PanelBackground.Apply(card, _cardBgColor, _cardBgSprite);
 
             _cardView = card.gameObject.AddComponent<CodexCardView>();
             _cardView.Init(card, _font);

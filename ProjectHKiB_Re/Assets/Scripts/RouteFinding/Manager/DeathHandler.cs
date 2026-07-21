@@ -18,6 +18,28 @@ using UnityEngine;
 // lastSaved를 파라미터로 받는 형태로 열어두고, 실제 호출부(전투/플레이어 시스템에서 사망을
 // 감지하는 지점)는 그쪽에서 resolve한 SaveModule.CurrentSaveData(또는 LoadedData)를 넘겨
 // 호출하면 된다 — Test/RouteSystemTest.cs의 "사망 시뮬레이션" 버튼 참고.
+// ════════════════════════════════════════════════════════════════
+// [외부 모듈 연동 API] — 플레이어 사망을 감지하는 시스템(전투/체력 시스템)이 사용한다.
+// ★ 아직 실제 호출부가 없음(TODO) — 이 클래스 자체는 완성돼 있지만, "사망을 감지해서 이걸
+// 호출해주는" 코드가 프로젝트 어디에도 없다. 사망 감지 로직을 만들 때 아래대로 연결하면 된다.
+//
+// ▸ 접근: DeathHandler.Instance
+//   ※ RouteSpawnManager와 같은 패턴 — 자동 생성 안 됨, 씬에 GameObject로 미리 배치해야 한다.
+//
+// ▸ 호출 시점: 플레이어 사망이 확정된 그 순간(IDamagable.OnDie 등에서 플레이어인지 구분한 뒤) 1회.
+//     var respawnNode = DeathHandler.Instance.HandleDeath(currentSaveSlotData);
+//   currentSaveSlotData는 호출자가 직접 구해서 넘겨야 한다(이 클래스는 SaveModule 접근 방법을
+//   모른다 — SaveModule이 싱글턴이 아니라 플레이어 컴포넌트에 DI로 등록되는 구조라서다). 보통
+//   플레이어의 SaveModule 컴포넌트에서 CurrentSaveData(또는 LoadedData)를 꺼내 넘기면 된다.
+//   한 번도 세이브 안 하고 죽었다면 null을 넘겨도 된다(맵 진도가 게임 시작 상태로 리셋됨).
+//
+// ▸ 호출 한 번으로 자동 처리되는 것: 이동 중이었다면 중단, 침대/집 중 복귀 지점 결정 + 소모,
+//   미세이브 맵 진도 손실(마지막 세이브로 되돌림), RouteModule.CurrentLocation 갱신.
+//
+// ▸ 반환값(= 복귀 지점, MapNodeData) 또는 OnRespawned(MapNodeData) 이벤트 구독으로 결과를 받는다.
+//   ★ 이 클래스는 "어디로 돌아가야 하는지"만 알려줄 뿐, 실제로 플레이어 게임오브젝트를 그 위치로
+//   옮기고 재활성화하고 HP를 회복시키는 건 호출자(또는 OnRespawned 구독자) 책임이다.
+// ════════════════════════════════════════════════════════════════
 public class DeathHandler : MonoBehaviour
 {
     public static DeathHandler Instance { get; private set; }

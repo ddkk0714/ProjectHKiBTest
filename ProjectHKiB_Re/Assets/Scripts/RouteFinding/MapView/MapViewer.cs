@@ -43,9 +43,18 @@ namespace RouteFinding.MapView
         [SerializeField] private float _graphAreaMarginRight;
         [SerializeField] private float _graphAreaMarginTop;
         [SerializeField] private float _graphAreaMarginBottom;
+        [Tooltip("스프라이트를 지정 안 했을 때 쓰는 단색 배경(패널 전체 바깥 배경)")]
         [SerializeField] private Color _rootBgColor      = new Color(0.04f, 0.04f, 0.08f, 0.94f);
+        [Tooltip("패널 전체 바깥 배경 이미지 — 지정하면 도트풍 이미지로 대체(9슬라이스 테두리 있는 스프라이트도 지원), 비워두면 위 단색 사용")]
+        [SerializeField] private Sprite _rootBgSprite;
+        [Tooltip("스프라이트를 지정 안 했을 때 쓰는 단색 배경(우측 사이드패널 + 상단 툴바 + 재오픈 탭이 같이 씀)")]
         [SerializeField] private Color _sidePanelBgColor = new Color(0.07f, 0.09f, 0.14f, 0.97f);
+        [Tooltip("사이드패널 + 상단 툴바 + 재오픈 탭 배경 이미지 — 셋이 이 스프라이트를 같이 씀, 비워두면 위 단색 사용")]
+        [SerializeField] private Sprite _sidePanelBgSprite;
+        [Tooltip("스프라이트를 지정 안 했을 때 쓰는 단색 배경(그래프/지도가 그려지는 영역)")]
         [SerializeField] private Color _graphAreaBgColor = new Color(0.06f, 0.07f, 0.11f, 0.80f);
+        [Tooltip("그래프/지도 영역 배경 이미지 — 지정하면 도트풍 이미지로 대체, 비워두면 위 단색 사용")]
+        [SerializeField] private Sprite _graphAreaBgSprite;
 
         [Header("경로 강조 스타일 (노드 선택 시)")]
         [SerializeField] private Color _pathHighlightColor     = new Color(1.00f, 0.82f, 0.08f, 1.00f);
@@ -1089,7 +1098,7 @@ namespace RouteFinding.MapView
             _panelGO.transform.SetParent(transform, false);
             var root = _panelGO.AddComponent<RectTransform>();
             StretchFull(root);
-            AddImg(root, _rootBgColor);
+            PanelBackground.Apply(root, _rootBgColor, _rootBgSprite);
 
             float panelW = _sidePanelWidth;
 
@@ -1105,7 +1114,7 @@ namespace RouteFinding.MapView
             side.anchorMax = Vector2.one;
             side.offsetMin = new Vector2(-panelW, 0f);
             side.offsetMax = new Vector2(0f, -_toolbarHeight);
-            AddImg(side, _sidePanelBgColor);
+            PanelBackground.Apply(side, _sidePanelBgColor, _sidePanelBgSprite);
             _sidePanelRT = side;
             BuildSidePanel(side, panelW);
             BuildSidePanelToggleTab(side);
@@ -1170,7 +1179,7 @@ namespace RouteFinding.MapView
 
         private void BuildScrollGraph(RectTransform parent)
         {
-            AddImg(parent, _graphAreaBgColor);
+            PanelBackground.Apply(parent, _graphAreaBgColor, _graphAreaBgSprite);
             _graphPanZoom = parent.gameObject.AddComponent<GraphPanZoom>();
 
             var vp = NewRect(parent, "GraphViewport");
@@ -1212,7 +1221,7 @@ namespace RouteFinding.MapView
             toolbar.pivot     = new Vector2(0.5f, 1f);
             toolbar.sizeDelta = new Vector2(0f, _toolbarHeight);
             toolbar.anchoredPosition = Vector2.zero;
-            AddImg(toolbar, _sidePanelBgColor);
+            PanelBackground.Apply(toolbar, _sidePanelBgColor, _sidePanelBgSprite);
             _toolbarRT = toolbar;
 
             var hlg = toolbar.gameObject.AddComponent<HorizontalLayoutGroup>();
@@ -1472,7 +1481,7 @@ namespace RouteFinding.MapView
             tab.sizeDelta = new Vector2(12f, 28f);
             tab.anchoredPosition = Vector2.zero;
 
-            var img = AddImg(tab, _sidePanelBgColor);
+            var img = PanelBackground.Apply(tab, _sidePanelBgColor, _sidePanelBgSprite);
             var btn = tab.gameObject.AddComponent<Button>();
             btn.targetGraphic = img;
             btn.transition    = Selectable.Transition.None;
@@ -1533,6 +1542,13 @@ namespace RouteFinding.MapView
 
             var toggleTabTF = FindDeepTransform(_panelGO.transform, "SidePanelToggleTab");
             if (toggleTabTF != null) _sidePanelToggleArrowTMP = FindDeepTransform(toggleTabTF, "Arrow")?.GetComponent<TextMeshProUGUI>();
+
+            // 프리팹/씬 재사용 경로 — 배경 스프라이트 인스펙터 값을 바꿔도 반영되도록 여기서도 적용.
+            PanelBackground.Apply((RectTransform)_panelGO.transform, _rootBgColor, _rootBgSprite);
+            PanelBackground.Apply(_sidePanelRT, _sidePanelBgColor, _sidePanelBgSprite);
+            PanelBackground.Apply(_toolbarRT, _sidePanelBgColor, _sidePanelBgSprite);
+            PanelBackground.Apply(_graphAreaRT, _graphAreaBgColor, _graphAreaBgSprite);
+            if (toggleTabTF != null) PanelBackground.Apply((RectTransform)toggleTabTF, _sidePanelBgColor, _sidePanelBgSprite);
 
             var panelToggleTF = FindDeepTransform(_panelGO.transform, "BtnTogglePanel");
             if (panelToggleTF != null) _toolbarPanelToggleImg = panelToggleTF.GetComponent<Image>();

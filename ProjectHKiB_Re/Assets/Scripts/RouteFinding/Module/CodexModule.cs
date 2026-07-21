@@ -9,6 +9,33 @@ using UnityEngine;
 // RouteProgressState.OnClueAcquired를 구독해 자동 갱신되는 것이 기본 경로이지만,
 // 세이브 로드 직후처럼 이벤트가 발행되지 않는 경로도 있으므로(RouteProgressState.ApplyEventFlag 참고),
 // RebuildFromProgress()로 언제든 전체 재계산할 수 있게 열어둔다 — CodexPanel이 Open()마다 호출한다.
+// ════════════════════════════════════════════════════════════════
+// [외부 모듈 연동 API] — 대화/퀘스트/NPC 시스템이 "이 정보는 도감에 자동 등록되는 메모여야 한다"
+// 같은 식으로 도감에 항목을 추가하고 싶을 때, 또는 다른 UI가 획득한 단서 목록을 읽고 싶을 때 사용.
+//
+// ▸ 접근: CodexModule.Instance (자동 생성 싱글턴)
+//
+// ▸ 조회
+//   AcquiredClues            : 지금까지 획득한 정식 단서 전체(ClueData, 읽기 전용)
+//   UserEntries               : 유저(또는 다른 시스템)가 직접 만든 자유 메모 전체(CodexUserEntry, 읽기 전용)
+//   IsClueNew(clueId)         : "획득했지만 아직 카드로 안 열어본" NEW 상태인지
+//   OnCodexChanged            : 도감 내용이 바뀔 때마다 발행(구독해서 UI 갱신 트리거로 사용)
+//
+// ▸ 유저 메모(자유 항목) 추가 — 노트의 "단서 생성" 기능이 이 API를 그대로 쓴다. 다른 시스템도
+//   똑같이 호출해 "정식 ClueData는 아니지만 도감에 기록되는 항목"을 만들 수 있다.
+//     var entry = CodexModule.Instance.AddUserEntry(title, content, mapCategory, keywords);
+//   반환된 entry.guid를 NoteModule.Instance.AddManualPin(entry.guid)에 넘기면 노트에도 바로 편입된다
+//   (NotePanel.HandleClueCreateRequested가 실제로 이렇게 조합해서 쓴다).
+//   수정/삭제: UpdateUserEntry(guid, ...) / RemoveUserEntry(guid)
+//
+// ▸ 세이브 로드 등으로 전체 재계산이 필요할 때(예: RouteProgressState.OnClueAcquired 이벤트를
+//   놓쳤을 가능성이 있는 시점)
+//     CodexModule.Instance.RebuildFromProgress();
+//   RouteProgressState.AcquiredClueIds 기준으로 AcquiredClues를 처음부터 다시 채운다.
+//
+// ▸ ImportUserEntries는 세이브 시스템 전용(SaveModule이 직접 호출) — 게임플레이 코드에서 직접
+//   호출하지 말 것. MarkClueViewed는 카드 UI가 "이 단서를 열람했다" 표시할 때 쓰는 내부용에 가깝다.
+// ════════════════════════════════════════════════════════════════
 public class CodexModule : MonoBehaviour
 {
     private static CodexModule _instance;

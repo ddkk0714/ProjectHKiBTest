@@ -51400,7 +51400,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 57542536076434356, guid: b4d487ab9c569b8498bab4db65e3f0d7, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 11.071876
+      value: 11.071869
       objectReference: {fileID: 0}
     - target: {fileID: 57542536076434356, guid: b4d487ab9c569b8498bab4db65e3f0d7, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -52048,7 +52048,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5427865734209846038, guid: b4d487ab9c569b8498bab4db65e3f0d7, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 76.26563
+      value: 76.265625
       objectReference: {fileID: 0}
     - target: {fileID: 5427865734209846038, guid: b4d487ab9c569b8498bab4db65e3f0d7, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -52232,7 +52232,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7430575562421880537, guid: b4d487ab9c569b8498bab4db65e3f0d7, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 108.86251
+      value: 108.86252
       objectReference: {fileID: 0}
     - target: {fileID: 7430575562421880537, guid: b4d487ab9c569b8498bab4db65e3f0d7, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -52340,7 +52340,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8394083599040421175, guid: b4d487ab9c569b8498bab4db65e3f0d7, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 43.668755
+      value: 43.668762
       objectReference: {fileID: 0}
     - target: {fileID: 8394083599040421175, guid: b4d487ab9c569b8498bab4db65e3f0d7, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -57480,7 +57480,9 @@ MonoBehaviour:
   _font: {fileID: 11400000, guid: 534611c51c4fe394ebef066303e1211c, type: 2}
   _topBarHeight: 24
   _rootBgColor: {r: 0.04, g: 0.04, b: 0.08, a: 0.96}
+  _rootBgSprite: {fileID: 0}
   _listBgColor: {r: 0.07, g: 0.09, b: 0.14, a: 0.97}
+  _listBgSprite: {fileID: 0}
   _drawerAreaWidth: 140
   _drawerCollapsedWidth: 12
   _panelPrefab: {fileID: 125711609445262906, guid: 2be36c9da3ebe4e40acb53fc2c0af2f8, type: 3}
@@ -68320,8 +68322,11 @@ MonoBehaviour:
   _graphAreaMarginTop: 0
   _graphAreaMarginBottom: 0
   _rootBgColor: {r: 0.039215688, g: 0.039215688, b: 0.078431375, a: 1}
+  _rootBgSprite: {fileID: 0}
   _sidePanelBgColor: {r: 0.07058824, g: 0.09019608, b: 0.14117648, a: 1}
+  _sidePanelBgSprite: {fileID: 0}
   _graphAreaBgColor: {r: 0.05882353, g: 0.07058824, b: 0.10980392, a: 1}
+  _graphAreaBgSprite: {fileID: 0}
   _pathHighlightColor: {r: 1, g: 0.8562628, b: 0, a: 1}
   _edgeThicknessNormal: 3
   _edgeThicknessHighlight: 3
@@ -68332,7 +68337,7 @@ MonoBehaviour:
   _dropdownOptionFontSize: 7
   _dropdownOptionHeight: 14
   _dropdownOptionsListMaxHeight: 90
-  _panelPrefab: {fileID: 0}
+  _panelPrefab: {fileID: 207258979076259189, guid: b4d487ab9c569b8498bab4db65e3f0d7, type: 3}
 --- !u!114 &1586495364
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -73989,10 +73994,10 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.15402299
+    x: 0
     y: 0
-    width: 0.69272035
-    height: 0.9991159
+    width: 1
+    height: 1
   near clip plane: 0.1
   far clip plane: 5000
   field of view: 40
@@ -82607,8 +82612,11 @@ MonoBehaviour:
   _searchBarHeight: 44
   _newMemoBtnHeight: 20
   _rootBgColor: {r: 0.04, g: 0.04, b: 0.08, a: 0.96}
+  _rootBgSprite: {fileID: 0}
   _drawerBgColor: {r: 0.07, g: 0.09, b: 0.14, a: 0.97}
+  _drawerBgSprite: {fileID: 0}
   _cardBgColor: {r: 0.06, g: 0.07, b: 0.11, a: 0.9}
+  _cardBgSprite: {fileID: 0}
   _panelPrefab: {fileID: 4706407155687817232, guid: f5d4feda72e13dc4196d7a397f826d3c, type: 3}
 --- !u!114 &1932806438
 MonoBehaviour:

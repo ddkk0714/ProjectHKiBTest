@@ -16,6 +16,36 @@ using UnityEngine;
 //   단서는 출발 맵(MapNodeData.clueIds에 등록된 맵)을 "방문"한 뒤,
 //   requiredEventKey가 비어있으면 즉시, 아니면 해당 이벤트가 발생했을 때 획득된다.
 //   획득된 단서는 targetMapGuid / targetConnectionGuid가 가리키는 맵·연결을 지도에 공개한다.
+// ════════════════════════════════════════════════════════════════
+// [외부 모듈 연동 API] — 전투/퀘스트/대화 시스템이 "이 사건이 일어났다"를 루트파인딩에 알리고,
+// 그 결과로 지도에 새 단서가 공개되게 하려면 아래 훅 하나만 사용하면 된다.
+//
+// ▸ 접근: RouteModule.Instance.Progress (MonoBehaviour 아님, RouteModule이 소유한 순수 C# 인스턴스)
+//
+// ▸ 핵심 훅 — 스토리/전투 이벤트 발생 기록
+//     RouteModule.Instance.Progress.SetEventFlag(mapGuid, eventKey);
+//   특정 맵(mapGuid)에서 어떤 사건(eventKey, 임의 문자열 — 네이밍 규칙은 콘텐츠 설계 시 팀 합의 필요,
+//   예: "kill_<enemyId>", "pacify_<enemyId>", "met_<npcId>")이 발생했다는 사실을 기록한다.
+//   호출 즉시, 그 맵의 clueIds 중 requiredEventKey가 이 eventKey와 일치하고 아직 미획득인 단서가
+//   있으면 자동으로 획득 처리되고(OnClueAcquired 이벤트 발행), 그 단서가 가리키는 맵/연결이 지도에
+//   공개된다 — 호출자는 단서 시스템 내부를 몰라도 된다.
+//   ※ mapGuid는 "지금 그 사건이 일어난 맵"의 MapNodeData.guid — 전투 중이면 보통
+//     RouteModule.Instance.CurrentNode.guid 또는 RouteModule.Instance.GetCurrentTargetNode().guid.
+//
+//   사용 예시 (전투 시스템에서 보스를 처치했을 때):
+//     RouteModule.Instance.Progress.SetEventFlag(bossMapGuid, "kill_boss01");
+//
+// ▸ 그 외 조회용 공개 API (주로 UI/디버그용, 필요하면 다른 시스템도 사용 가능)
+//   IsNodeVisited(node) / IsNodeCleared(node) / HasNodeClue(node) / HasConnectionClue(conn)
+//   IsClueAcquired(clueId) / HasEventFlag(mapGuid, eventKey) / AcquiredClueIds / AcquisitionOrder
+//   OnClueAcquired(ClueData) 이벤트 — 단서 획득 순간 구독하고 싶은 시스템(도감 NEW 배지 등)이 사용.
+//   ForceAcquireAllClues() — 테스트/디버그 전용, 실제 게임플레이 코드에서는 호출하지 말 것.
+//
+// ▸ MarkNodeVisited/MarkNodeCleared/GrantNodeClue/GrantConnectionClue는 RouteModule 내부
+//   (노드 도달·전투 클리어 처리)에서만 호출한다 — 외부 시스템이 직접 호출할 일은 없다.
+// ▸ ApplyEventFlag/ApplyPassage/BuildEventFlagsSnapshot/BuildPassagesSnapshot은 세이브 시스템
+//   전용(RouteModule의 IEventSaveProvider 구현이 내부적으로 위임) — 게임플레이 코드에서 직접 호출하지 말 것.
+// ════════════════════════════════════════════════════════════════
 public class RouteProgressState
 {
     private readonly MapGraph _graph;

@@ -20,6 +20,11 @@ namespace RouteFinding.Note
         public event Action<string> OnLoadRequested;    // boardId
         public event Action<string> OnDeleteRequested;  // boardId
 
+        [Tooltip("스프라이트를 지정 안 했을 때 쓰는 단색 배경(창 본체, 화면을 덮는 반투명 배경막은 별개)")]
+        [SerializeField] private Color _boxBgColor = new(0.08f, 0.09f, 0.13f, 0.98f);
+        [Tooltip("창 본체 배경 이미지 — 지정하면 도트풍 이미지로 대체(9슬라이스 테두리 있는 스프라이트도 지원), 비워두면 위 단색 사용")]
+        [SerializeField] private Sprite _boxBgSprite;
+
         private GameObject _overlayGO;
         private TMP_InputField _nameField;
         private RectTransform _listContent;
@@ -43,7 +48,7 @@ namespace RouteFinding.Note
             boxRT.anchorMin = boxRT.anchorMax = new Vector2(0.5f, 0.5f);
             boxRT.pivot = new Vector2(0.5f, 0.5f);
             boxRT.sizeDelta = new Vector2(220f, 240f);
-            AddImg(boxRT, new Color(0.08f, 0.09f, 0.13f, 0.98f));
+            PanelBackground.Apply(boxRT, _boxBgColor, _boxBgSprite);
 
             var vlg = boxRT.gameObject.AddComponent<VerticalLayoutGroup>();
             vlg.padding = new RectOffset(8, 8, 8, 8);
@@ -80,6 +85,8 @@ namespace RouteFinding.Note
             var overlayTF = FindDeepTransform(existingRoot, "BoardWindowOverlay");
             _overlayGO = overlayTF?.gameObject;
             if (overlayTF == null) return;
+
+            PanelBackground.Apply(FindDeepTransform(overlayTF, "Box") as RectTransform, _boxBgColor, _boxBgSprite);
 
             _nameField = FindDeepTransform(overlayTF, "NameField")?.GetComponent<TMP_InputField>();
             var listTF = FindDeepTransform(overlayTF, "ListContent");

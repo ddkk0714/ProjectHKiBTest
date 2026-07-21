@@ -11,6 +11,29 @@ using UnityEngine;
 // 이 클래스는 데이터를 변경하지 않는다.
 // "어디를 방문했고 어떤 단서를 얻었는지" 같은 플레이어 진행 상태는
 // RouteModule.Instance.Progress (RouteProgressState)가 관리한다.
+// ════════════════════════════════════════════════════════════════
+// [외부 모듈 연동 API] — 맵/단서 원본 데이터(기획 데이터, 플레이어 진행과 무관하게 항상 같은 값)를
+// GUID/ID로 조회해야 하는 모든 시스템(전투가 "지금 이 맵의 enemyGroups"를 읽어야 할 때, 퀘스트가
+// 특정 단서의 이름·설명을 표시해야 할 때 등)이 사용한다.
+//
+// ▸ 접근: MapGraph.Instance
+//   ★ RouteModule/CodexModule/NoteModule과 달리 자동 생성 싱글턴이 아니다 — 반드시 씬에 GameObject로
+//     배치해야 한다(JSON을 Awake에서 로드). null이면 씬 배치를 잊은 것 — RouteModule.Progress 등
+//     이 클래스에 의존하는 다른 API도 MapGraph가 없으면 정상 동작하지 않는다.
+//
+// ▸ 조회 API
+//   GetNode(guid)            : MapNodeData(맵 하나) — 이름/설명/이벤트/전투 데이터(enemyGroups 등) 포함
+//   GetConnection(guid)      : MapConnectionData(맵과 맵 사이 연결) — 순수 그래프 구조 + 단서 트리거만
+//   GetClue(clueId)          : ClueData(단서 정의) — 이름/설명/타겟/획득 조건
+//   AllNodes / AllConnections / AllClues : 전체 목록(읽기 전용) — 순회가 필요할 때
+//   StartNode                : 시작 지점(집) 노드
+//   GetConnectionsFrom(node) : 특정 노드에 닿아 있는 연결 목록(양방향)
+//   GetNeighbor(conn, from)  : 연결의 반대쪽 끝 노드
+//
+// ▸ 이 클래스는 절대 데이터를 쓰지 않는다(읽기 전용) — "이 맵을 방문했다/이 단서를 얻었다" 같은
+//   진행 상태는 여기 없다. 그건 RouteModule.Instance.Progress(RouteProgressState)를 참고할 것 —
+//   상세는 RouteProgressState.cs 상단 API 가이드 참고.
+// ════════════════════════════════════════════════════════════════
 public class MapGraph : MonoBehaviour
 {
     public static MapGraph Instance { get; private set; }

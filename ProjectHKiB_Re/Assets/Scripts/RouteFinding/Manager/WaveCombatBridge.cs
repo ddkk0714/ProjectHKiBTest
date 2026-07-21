@@ -12,6 +12,36 @@ using UnityEngine;
 // 이 클래스는 전투의 시작/종료 "사실"만 이벤트로 알린다.
 // 그 결과 처리(맵 영구 클리어, 다음 노드 진행, 이동 중단)는
 // RouteModule이 OnCombatCompleted / OnCombatFailed를 구독해 담당한다.
+// ════════════════════════════════════════════════════════════════
+// [외부 모듈 연동 API] — 실제 웨이브 전투 시스템(WaveTileManager/EnemyManager)이 루트파인딩과
+// 연결되는 유일한 접점. ★ 아직 연동 미완료(TODO) — 이 클래스가 "지금은 무엇을 해야 하고, 웨이브
+// 시스템 쪽에서는 무엇을 호출해줘야 하는지"의 계약(contract)만 정의된 상태다.
+//
+// ▸ 접근: WaveCombatBridge.Instance
+//   ※ RouteSpawnManager와 같은 패턴 — 자동 생성 안 됨, 씬에 GameObject로 미리 배치해야 한다.
+//
+// ▸ 루트파인딩 → 웨이브 시스템 (전투를 "시작해야 한다"는 신호)
+//     WaveCombatBridge.Instance.StartCombat(mapNode);
+//   RouteModule이 노드 도달 시 자동으로 호출한다(외부에서 직접 호출할 일은 거의 없음) — mapNode에는
+//   enemyGroups(적 구성)/wavePaths(웨이브 데이터 Resources 경로)/requiredGears(통과 장비 조건, 이미
+//   MapPathFinder가 걸러줬으므로 여기서는 신경 안 써도 됨)가 들어있다.
+//   ★ 지금은 Debug.Log만 찍고 실제 웨이브 실행 로직이 없다(LoadWaves()가 WaveDataSO[]를 로드하는
+//     것까지만 구현됨, private, 아직 아무도 안 씀) — 실제 연동 시 이 메서드 안에서
+//     WaveTileManager.Instance.StartWaveSequence(LoadWaves(node.wavePaths)) 같은 식으로 웨이브
+//     시스템에 실행을 넘겨야 한다.
+//
+// ▸ 웨이브 시스템 → 루트파인딩 (전투가 "끝났다"는 신호 — ★ 실제 연동 시 웨이브 시스템이 호출해야 함)
+//     WaveCombatBridge.Instance.NotifyCombatCompleted();  // 승리
+//     WaveCombatBridge.Instance.NotifyCombatFailed();     // 패배(사망 등)
+//   웨이브 시스템의 전투 종료 콜백(마지막 웨이브 클리어 / 플레이어 사망) 안에서 반드시 이 둘 중
+//   하나를 호출해줘야 한다 — 안 부르면 RouteModule이 "아직 전투 중"으로 알고 다음 노드 진행이
+//   영원히 멈춘다. 호출 후 자동으로 일어나는 일(RouteModule이 구독):
+//     완료 → Progress.MarkNodeCleared(맵 영구 안전) + AdvanceToNextNode(다음 노드로 진행)
+//     실패 → AbortTravel(이동 중단) — 실제 사망 처리(스폰 복귀 등)는 별도로
+//            Manager/DeathHandler.cs의 HandleDeath()를 호출해야 한다(자동 연결 안 됨, TODO).
+//
+// ▸ 상태 조회: InCombat(전투 중 여부), CurrentNode(전투 중인 맵) — UI가 "지금 전투 중" 표시할 때 사용.
+// ════════════════════════════════════════════════════════════════
 public class WaveCombatBridge : MonoBehaviour
 {
     public static WaveCombatBridge Instance { get; private set; }

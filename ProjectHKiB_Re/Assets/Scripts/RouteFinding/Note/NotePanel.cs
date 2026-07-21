@@ -36,8 +36,14 @@ namespace RouteFinding.Note
 
         [Header("레이아웃")]
         [SerializeField] private float _topBarHeight = 12f;
+        [Tooltip("스프라이트를 지정 안 했을 때 쓰는 단색 배경(패널 전체 바깥 배경)")]
         [SerializeField] private Color _rootBgColor = new(0.04f, 0.04f, 0.08f, 0.96f);
+        [Tooltip("패널 전체 바깥 배경 이미지 — 지정하면 도트풍 이미지로 대체(9슬라이스 테두리 있는 스프라이트도 지원), 비워두면 위 단색 사용")]
+        [SerializeField] private Sprite _rootBgSprite;
+        [Tooltip("스프라이트를 지정 안 했을 때 쓰는 단색 배경(상단바 + 좌측 그래프 영역 + 우측 단서 서랍이 같이 씀, 서랍은 살짝 어둡게 보정된 색)")]
         [SerializeField] private Color _listBgColor = new(0.07f, 0.09f, 0.14f, 0.97f);
+        [Tooltip("상단바 + 그래프 영역 + 단서 서랍(+ 서랍 여닫이 탭) 배경 이미지 — 전부 이 스프라이트를 같이 씀, 비워두면 위 단색 사용")]
+        [SerializeField] private Sprite _listBgSprite;
 
         // [2026-07-21, 요청으로 교체] 비율(anchorMax.x) 기반이던 서랍 폭을 MapViewer의 사이드패널과 같은
         // 픽셀 폭 기반으로 바꿨다 — 접었을 때 고정폭(_drawerCollapsedWidth)만 남기는 개념 자체가 비율로는
@@ -306,7 +312,7 @@ namespace RouteFinding.Note
             _panelGO.transform.SetParent(transform, false);
             var root = _panelGO.AddComponent<RectTransform>();
             StretchFull(root);
-            AddImg(root, _rootBgColor);
+            PanelBackground.Apply(root, _rootBgColor, _rootBgSprite);
 
             BuildTopBar(root);
             BuildList(root);
@@ -325,10 +331,15 @@ namespace RouteFinding.Note
 
         private void BindRefsFromHierarchy(RectTransform root)
         {
+            // 프리팹/씬 재사용 경로 — 배경 스프라이트 인스펙터 값을 바꿔도 반영되도록 여기서도 적용.
+            PanelBackground.Apply(root, _rootBgColor, _rootBgSprite);
+            PanelBackground.Apply(FindDeepTransform(root, "TopBar") as RectTransform, _listBgColor, _listBgSprite);
+
             FindDeepTransform(root, "BtnClose")?.GetComponent<Button>()?.onClick.AddListener(Close);
 
             var graphScrollTF = FindDeepTransform(root, "GraphScroll");
             _graphAreaRT = graphScrollTF as RectTransform;
+            PanelBackground.Apply(_graphAreaRT, _listBgColor, _listBgSprite);
             _graphPanZoom = graphScrollTF?.GetComponent<GraphPanZoom>();
             _graphPanZoom?.ConfigureBounds(true, 120f); // BuildGraphPanZoom과 동일 — 재사용 경로에서도 팬 범위 제한 적용
             _graphView = graphScrollTF?.GetComponent<NoteRouteGraphView>();
@@ -343,6 +354,8 @@ namespace RouteFinding.Note
 
             var drawerScrollTF = FindDeepTransform(root, "ClueDrawerScroll");
             _drawerAreaRT = drawerScrollTF as RectTransform;
+            var drawerColor = new Color(_listBgColor.r * 0.85f, _listBgColor.g * 0.85f, _listBgColor.b * 0.85f, _listBgColor.a);
+            PanelBackground.Apply(_drawerAreaRT, drawerColor, _listBgSprite);
             _clueDrawerView = drawerScrollTF?.GetComponent<ClueDrawerView>();
             if (_clueDrawerView != null)
             {
@@ -354,6 +367,7 @@ namespace RouteFinding.Note
             }
 
             var drawerTabTF = FindDeepTransform(root, "DrawerToggleTab");
+            PanelBackground.Apply(drawerTabTF as RectTransform, drawerColor, _listBgSprite);
             drawerTabTF?.GetComponent<Button>()?.onClick.AddListener(() => SetDrawerOpen(!_drawerOpen));
             _drawerToggleArrowTMP = drawerTabTF?.GetComponentInChildren<TextMeshProUGUI>();
             UpdateDrawerLayout(); // 재사용 경로에서도 현재 _drawerOpen 상태(기본 true)에 맞춰 폭/Viewport 활성 상태를 강제
@@ -400,7 +414,7 @@ namespace RouteFinding.Note
             topBar.pivot = new Vector2(0.5f, 1f);
             topBar.sizeDelta = new Vector2(0f, _topBarHeight);
             topBar.anchoredPosition = Vector2.zero;
-            AddImg(topBar, _listBgColor);
+            PanelBackground.Apply(topBar, _listBgColor, _listBgSprite);
 
             var hlg = topBar.gameObject.AddComponent<HorizontalLayoutGroup>();
             hlg.padding = new RectOffset(6, 6, 3, 3);
@@ -526,7 +540,7 @@ namespace RouteFinding.Note
             drawerArea.anchorMax = Vector2.one;
             drawerArea.offsetMin = new Vector2(-drawerW, 0f);
             drawerArea.offsetMax = new Vector2(0f, -_topBarHeight);
-            AddImg(drawerArea, drawerColor);
+            PanelBackground.Apply(drawerArea, drawerColor, _listBgSprite);
             _drawerAreaRT = drawerArea;
 
             _clueDrawerView = BuildScrollingList<ClueDrawerView>(drawerArea, out var drawerContent);
@@ -535,7 +549,7 @@ namespace RouteFinding.Note
             _clueDrawerView.OnClueDropped += HandleClueDropped;
             _clueDrawerView.OnFilterButtonClicked += HandleFilterButtonClicked;
 
-            BuildDrawerToggleTab(drawerArea, drawerColor);
+            BuildDrawerToggleTab(drawerArea, drawerColor, _listBgSprite);
             UpdateDrawerLayout();
         }
 
@@ -546,7 +560,7 @@ namespace RouteFinding.Note
         // 없다(예전엔 ScrollRect가 좌표를 옮겼다면 이제는 GraphPanZoom이 옮긴다는 차이뿐).
         private void BuildGraphPanZoom(RectTransform graphArea)
         {
-            AddImg(graphArea, _listBgColor);
+            PanelBackground.Apply(graphArea, _listBgColor, _listBgSprite);
             _graphPanZoom = graphArea.gameObject.AddComponent<GraphPanZoom>();
             // [요청, 2026-07-21] 지도(MapViewer)와 달리 노트 그래프는 콘텐츠 크기가 고정폭(900x300 시작,
             // 세로만 SetData 때마다 재계산)이라 무제한 팬을 허용하면 빈 허공으로 한없이 밀려날 수 있다 —
@@ -600,7 +614,7 @@ namespace RouteFinding.Note
         // 서랍 좌측 가장자리에 항상 떠 있는 재오픈/접기 탭 — MapViewer.BuildSidePanelToggleTab과 동일한
         // 이유로 Viewport(스크롤뷰)와 별개 오브젝트에 둬서, 서랍이 접혀 Viewport가 비활성화돼도 계속
         // 보이고 클릭할 수 있다.
-        private void BuildDrawerToggleTab(RectTransform parent, Color bgColor)
+        private void BuildDrawerToggleTab(RectTransform parent, Color bgColor, Sprite bgSprite)
         {
             var tab = NewRect(parent, "DrawerToggleTab");
             tab.anchorMin = new Vector2(0f, 0.5f);
@@ -609,7 +623,7 @@ namespace RouteFinding.Note
             tab.sizeDelta = new Vector2(12f, 28f);
             tab.anchoredPosition = Vector2.zero;
 
-            var img = AddImg(tab, bgColor);
+            var img = PanelBackground.Apply(tab, bgColor, bgSprite);
             var btn = tab.gameObject.AddComponent<Button>();
             btn.targetGraphic = img;
             btn.transition = Selectable.Transition.None;

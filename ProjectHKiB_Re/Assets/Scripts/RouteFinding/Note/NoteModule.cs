@@ -11,6 +11,42 @@ using UnityEngine;
 // (2026-07-14: 규칙 3 "미획득 후보 자동 노출"은 요청으로 제거됨 — 노트는 이제 항상 획득한 단서만 다룬다.)
 // [2026-07-21] 다중 목적지 이동 계획(4단계, RouteWaypointPlan) 기능은 요청으로 완전히 제거됨 —
 // 우측 패널은 그 대신 "단서 서랍"(ClueDrawerView)으로 교체됨. Git 히스토리에 이전 구현이 남아있다.
+// ════════════════════════════════════════════════════════════════
+// [외부 모듈 연동 API] — 퀘스트/대화 시스템이 특정 단서를 노트에 강제로 편입시키고 싶을 때,
+// 또는 다른 UI가 노트 상태를 읽고 싶을 때 사용한다. (일반적인 게임플레이에서는 대부분 유저가
+// 직접 UI로 조작하므로, 다른 모듈이 이 API를 호출할 일은 드물다 — 주로 읽기/구독 용도.)
+//
+// ▸ 접근: NoteModule.Instance (자동 생성 싱글턴)
+//
+// ▸ 조회
+//   Entries                 : 현재 노트에 놓인 항목 전체(경로연동 + 수동핀 통합, 읽기 전용)
+//   IsPinned(clueId)        : 특정 단서가 이미 노트에 있는지
+//   CanEdit                 : 지금 편집 가능한지(이동 중엔 false — 열람은 별도, NotePanel이 판단)
+//   OnNoteChanged           : 노트 내용이 바뀔 때마다 발행(구독해서 UI 갱신 트리거로 사용)
+//
+// ▸ 단서를 노트에 강제로 편입시키고 싶을 때 (예: 퀘스트 시스템이 "이 단서는 꼭 노트에 있어야 한다")
+//     if (NoteModule.Instance.CanEdit) NoteModule.Instance.AddManualPin(clueId);
+//   이미 있으면(경로연동이든 수동핀이든) 아무 일도 안 하고 false 반환. clueId는 ClueData.id 또는
+//   CodexUserEntry.guid 둘 다 가능(NoteClueResolver가 통일해서 다룸).
+//
+// ▸ 선택된 경로가 바뀌었을 때 노트를 그에 맞춰 재계산 — 보통 RouteModule.OnRouteSelected 구독으로
+//   자동 처리되므로(NoteModule 내부) 외부에서 직접 호출할 일은 거의 없다.
+//     NoteModule.Instance.RebuildRouteLinkedEntries(route);
+//
+// ▸ 단서 간 수동 연동(간선) — 노트 UI의 "단서 연동 모드"가 사용하는 API, 다른 시스템이 프로그램적으로
+//   특정 단서 두 개를 미리 이어두고 싶을 때도 사용 가능.
+//     NoteModule.Instance.ToggleClueLink(clueIdA, clueIdB);  // 있으면 끊고 없으면 잇는다
+//     NoteModule.Instance.AreCluesLinked(clueIdA, clueIdB);  // 조회
+//     ClueLinks                                              // 전체 연동 쌍 목록(읽기 전용)
+//
+// ▸ "저장한 루트"(보드) — 노트 상단 툴바가 사용하는 이름 붙은 스냅샷 저장/불러오기 API.
+//   SavedBoards / OnSavedBoardsChanged / SaveBoard(...) / DeleteBoard(boardId) / GetBoard(boardId) /
+//   ApplyManualPins(board) — 다른 시스템이 직접 쓸 일은 거의 없고, 세이브 연동(ExportSavedBoards/
+//   ImportSavedBoards)은 SaveModule 전용.
+//
+// ▸ ImportFrom/ExportSavedBoards/ImportSavedBoards/ExportClueLinks/ImportClueLinks는 세이브 시스템
+//   전용(SaveModule.SaveEvents()/LoadEvents()가 직접 호출) — 게임플레이 코드에서 직접 호출하지 말 것.
+// ════════════════════════════════════════════════════════════════
 public class NoteModule : MonoBehaviour
 {
     private static NoteModule _instance;

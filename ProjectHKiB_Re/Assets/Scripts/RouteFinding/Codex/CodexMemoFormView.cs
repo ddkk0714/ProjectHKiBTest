@@ -32,6 +32,11 @@ namespace RouteFinding.Codex
         private GameObject _deleteBtnGO;
         private string _editingGuid = "";
 
+        [Tooltip("스프라이트를 지정 안 했을 때 쓰는 단색 배경(창 본체, 화면을 덮는 반투명 배경막은 별개)")]
+        [SerializeField] private Color _boxBgColor = new(0.08f, 0.09f, 0.13f, 0.98f);
+        [Tooltip("창 본체 배경 이미지 — 지정하면 도트풍 이미지로 대체(9슬라이스 테두리 있는 스프라이트도 지원), 비워두면 위 단색 사용")]
+        [SerializeField] private Sprite _boxBgSprite;
+
         private static readonly Color Gray = new(0.55f, 0.60f, 0.65f);
 
         public void Init(RectTransform parent, TMP_FontAsset font)
@@ -46,7 +51,7 @@ namespace RouteFinding.Codex
             boxRT.anchorMin = boxRT.anchorMax = new Vector2(0.5f, 0.5f);
             boxRT.pivot = new Vector2(0.5f, 0.5f);
             boxRT.sizeDelta = new Vector2(220f, 220f);
-            AddImg(boxRT, new Color(0.08f, 0.09f, 0.13f, 0.98f));
+            PanelBackground.Apply(boxRT, _boxBgColor, _boxBgSprite);
 
             var vlg = boxRT.gameObject.AddComponent<VerticalLayoutGroup>();
             vlg.padding = new RectOffset(8, 8, 8, 8);
@@ -117,6 +122,8 @@ namespace RouteFinding.Codex
             var overlayTF = FindDeepTransform(existingRoot, "MemoFormOverlay");
             _overlayGO = overlayTF?.gameObject;
             if (overlayTF == null) return;
+
+            PanelBackground.Apply(FindDeepTransform(overlayTF, "Box") as RectTransform, _boxBgColor, _boxBgSprite);
 
             _titleField    = FindDeepTransform(overlayTF, "TitleField")?.GetComponent<TMP_InputField>();
             _contentField  = FindDeepTransform(overlayTF, "ContentField")?.GetComponent<TMP_InputField>();
