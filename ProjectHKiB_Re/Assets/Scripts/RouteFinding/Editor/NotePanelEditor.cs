@@ -25,9 +25,13 @@ public class NotePanelEditor : Editor
         else
         {
             EditorGUILayout.HelpBox(
-                "이 버튼은 NotePanelRoot 전체(하위의 GraphScroll/PlanScroll 안에 있는 NoteRouteGraphView·" +
-                "RoutePlanEditorView 컴포넌트의 행 템플릿 필드 — _nodeBoxTemplate/_edgeTemplate/" +
-                "_cardTemplate/_planRowTemplate/_waypointRowTemplate 포함)를 지금 이 순간 상태 그대로 저장합니다.\n\n" +
+                "이 버튼은 NotePanelRoot 전체(하위의 GraphScroll — GraphPanZoom(휠 줌·드래그 패닝)이 붙어있고 " +
+                "그 안의 GraphViewport/GraphContainer에 NoteRouteGraphView가 노드를 그림 — 와 " +
+                "ClueDrawerScroll(접기/펼치기용 DrawerToggleTab 포함) 안에 있는 NoteRouteGraphView·" +
+                "ClueDrawerView 컴포넌트의 행 템플릿 필드 — _nodeBoxTemplate/_edgeTemplate/" +
+                "_cardTemplate/_commentTemplate/_clueRowTemplate 포함, 그리고 NotePanelRoot 자체에 붙은 " +
+                "NoteBoardWindow의 BoardWindowOverlay·ClueKeywordFilterWindow의 ClueKeywordFilterOverlay·" +
+                "NoteClueCreateWindow의 ClueCreateOverlay)를 지금 이 순간 상태 그대로 저장합니다.\n\n" +
                 "행/카드 템플릿 프리팹을 새로 만들어서 위 필드들에 할당했다면, 그 할당 '이후'에 이 버튼을 " +
                 "다시 눌러야 프리팹 파일에 반영됩니다 — 필드만 바꾸고 이 버튼을 안 누르면, 플레이 모드를 " +
                 "종료하는 순간 그 할당은 저장된 데가 없어 그냥 사라집니다(NotePanelRoot 자체가 플레이 중에만 " +
@@ -50,6 +54,16 @@ public class NotePanelEditor : Editor
 
         const string saveDir  = "Assets/Scripts/RouteFinding/Note";
         const string savePath = saveDir + "/NotePanel.prefab";
+
+        // 방어적 정리 — CodexPanelEditor와 동일한 이유(재컴파일 타이밍 문제로 런타임에 AddComponent된
+        // 타입이 옛 어셈블리 기준으로 붙어있어 "missing script" 컴포넌트로 그대로 구워지는 사고가
+        // 실제로 있었다). 저장 직전에 계층 전체를 훑어 missing script 컴포넌트를 자동 제거한다.
+        int removedTotal = 0;
+        foreach (var t in panelGO.GetComponentsInChildren<Transform>(true))
+            removedTotal += GameObjectUtility.RemoveMonoBehavioursWithMissingScript(t.gameObject);
+        if (removedTotal > 0)
+            Debug.LogWarning($"[NotePanelEditor] 프리팹 저장 전 missing script 컴포넌트 {removedTotal}개를 자동 제거했습니다 " +
+                              "(재컴파일 타이밍 문제일 가능성 — 저장 후 플레이 모드를 재시작해 관련 기능이 다시 정상 동작하는지 확인하세요).");
 
         System.IO.Directory.CreateDirectory(saveDir);
 

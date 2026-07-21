@@ -24,6 +24,11 @@ namespace RouteFinding.Codex
         private readonly List<CodexGroup> _groups = new();
         private CodexEntry _selected;
 
+        // 6-4단계 — FocusCategory가 스크롤 위치를 계산하는 데 쓴다. Rebuild() 패스마다 다시 채워지므로
+        // (풀에서 재사용되는 GameObject라도 이번 패스에 실제로 그려진 헤더만 유효해야 함) 매번 Clear한다.
+        private readonly Dictionary<string, RectTransform> _categoryHeaderRTs = new();
+        private ScrollRect _scrollRect;
+
         [Header("행 템플릿 (선택 — 비워두면 아래 스타일 값으로 기본 템플릿 생성)")]
         [SerializeField] private GameObject _categoryTemplate;
         [SerializeField] private GameObject _rowTemplate;
@@ -45,6 +50,14 @@ namespace RouteFinding.Codex
             _font = font;
             _categoryPool = new UiRowPool(_categoryTemplate, BuildCategoryTemplate);
             _rowPool = new UiRowPool(_rowTemplate, BuildRowTemplate);
+            _scrollRect = GetComponent<ScrollRect>(); // CodexPanel이 이 컴포넌트를 ScrollRect와 같은 GameObject에 붙인다
+        }
+
+        // 도감을 열 때마다 CodexPanel.Open()이 호출 — 이전에 내려서 보고 있던 스크롤 위치가 다음에
+        // 열었을 때도 그대로 남아있지 않도록 맨 위로 되돌린다. 1이 맨 위(ScrollRect 정규화 좌표 규약).
+        public void ResetScroll()
+        {
+            if (_scrollRect != null) _scrollRect.verticalNormalizedPosition = 1f;
         }
 
         public void SetGroups(IReadOnlyList<CodexGroup> groups)
@@ -56,6 +69,7 @@ namespace RouteFinding.Codex
 
         private void Rebuild()
         {
+            _categoryHeaderRTs.Clear();
             foreach (var group in _groups)
             {
                 if (!_expanded.ContainsKey(group.category)) _expanded[group.category] = true;
@@ -65,11 +79,36 @@ namespace RouteFinding.Codex
             _rowPool.EndPass();
         }
 
+        // 6-4단계 — 지정한 카테고리를 펼치고 스크롤해서 화면 상단 근처로 가져온다. 도감이 접힌 상태로
+        // 카테고리를 감춰뒀을 수도 있으므로 펼침 상태부터 강제한 뒤 다시 그린다.
+        public void FocusCategory(string category)
+        {
+            if (string.IsNullOrEmpty(category)) return;
+            _expanded[category] = true;
+            Rebuild();
+
+            if (_scrollRect == null || !_categoryHeaderRTs.TryGetValue(category, out var headerRT)) return;
+
+            // VerticalLayoutGroup+ContentSizeFitter가 이번 프레임에 아직 크기를 확정하지 않았을 수 있어,
+            // 위치를 읽기 전에 강제로 레이아웃을 확정한다(NoteRouteGraphView.ClueNodeAnchor와 같은 이유).
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_content);
+
+            float contentHeight = _content.rect.height;
+            float viewportHeight = _scrollRect.viewport.rect.height;
+            float maxScroll = Mathf.Max(0f, contentHeight - viewportHeight);
+            if (maxScroll <= 0f) return; // 스크롤할 필요 자체가 없음
+
+            // Content의 pivot이 (0.5,1)이라 anchoredPosition.y가 곧 "맨 위에서부터의 거리(음수)"다.
+            float headerDistanceFromTop = -headerRT.anchoredPosition.y;
+            _scrollRect.verticalNormalizedPosition = 1f - Mathf.Clamp01(headerDistanceFromTop / maxScroll);
+        }
+
         private void BuildCategory(string category, List<CodexEntry> entries)
         {
             bool expanded = _expanded[category];
 
             var headerGO = _categoryPool.Get(_content);
+            _categoryHeaderRTs[category] = (RectTransform)headerGO.transform;
             var headerImg = headerGO.GetComponent<Image>();
             if (headerImg != null) headerImg.color = _colHeader;
 
@@ -117,7 +156,9 @@ namespace RouteFinding.Codex
             var tmp = FindDeepChild<TextMeshProUGUI>(rowGO.transform, "Text");
             if (tmp != null)
             {
-                tmp.text = string.IsNullOrEmpty(entry.typeLabel) ? entry.title : $"{entry.title}: {entry.typeLabel}";
+                var baseText = string.IsNullOrEmpty(entry.typeLabel) ? entry.title : $"{entry.title}: {entry.typeLabel}";
+                // 6-3단계 — 새로 획득했지만 아직 카드로 안 열어본 단서에 NEW 배지(리치 텍스트 태그, TMP 기본 지원).
+                tmp.text = entry.isNew ? $"<color=#FFD24C>[NEW]</color> {baseText}" : baseText;
                 // 6-2단계 "???" 슬롯은 실제 항목과 구분되도록 흐리게 표시 — 클릭하면 카드에 고정 문구만 뜬다.
                 tmp.color = entry.isPlaceholder ? new Color(1f, 1f, 1f, 0.45f) : Color.white;
             }

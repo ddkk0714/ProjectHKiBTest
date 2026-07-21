@@ -7,7 +7,7 @@ using UnityEngine;
 // 획득한 ClueData 목록(도감에 실제로 보여줄 것)의 단일 소유자 역할을 한다.
 //
 // RouteProgressState.OnClueAcquired를 구독해 자동 갱신되는 것이 기본 경로이지만,
-// 세이브 로드 직후처럼 이벤트가 발행되지 않는 경로도 있으므로(ImportFromSaveData 참고),
+// 세이브 로드 직후처럼 이벤트가 발행되지 않는 경로도 있으므로(RouteProgressState.ApplyEventFlag 참고),
 // RebuildFromProgress()로 언제든 전체 재계산할 수 있게 열어둔다 — CodexPanel이 Open()마다 호출한다.
 public class CodexModule : MonoBehaviour
 {
@@ -37,8 +37,26 @@ public class CodexModule : MonoBehaviour
     private readonly List<ClueData> _acquiredClues = new();
     public IReadOnlyList<ClueData> AcquiredClues => _acquiredClues;
 
+    // 6-3단계(Clue_System.md) — "새로 획득했지만 아직 카드로 한 번도 열어보지 않은 단서" 후보 집합.
+    // HandleClueAcquired(실시간 획득)에서만 채워진다 — RebuildFromProgress(세이브 로드 등 일괄 재계산)는
+    // 예전에 이미 갖고 있던 단서까지 전부 "NEW"로 만들어버리므로 여기 채우지 않는다. 카드로 한 번
+    // 열어보면(MarkClueViewed) 제거된다. 세이브 미연동(런타임 전용) — 재시작하면 사라진다, 6-3 문서에
+    // 적힌 대로 "별도 시스템 없이 도감 내부에서 닫힌 상태로" 구현하는 선에서 의도적으로 단순화했다.
+    private readonly HashSet<string> _unviewedNewClueIds = new();
+    public bool IsClueNew(string clueId) => !string.IsNullOrEmpty(clueId) && _unviewedNewClueIds.Contains(clueId);
+    // OnCodexChanged를 일부러 발행하지 않는다 — 이 메서드는 트리 행 클릭 콜백(CodexDrawerTreeView)
+    // 도중 CodexPanel.OnEntrySelected에서 호출되는데, 여기서 리프레시 이벤트를 쏘면 그 클릭 콜백이
+    // 참조하고 있던 CodexEntry 객체(RefreshTree가 매번 새로 만듦)가 곧바로 낡은 참조가 되어, 뒤이어
+    // 실행되는 트리의 선택 하이라이트 비교(참조 비교)가 깨진다. NEW 배지는 다음 자연스러운 갱신
+    // (다른 단서 획득, 패널 재오픈 등) 때 사라지는 정도로 충분하다고 판단해 단순화했다.
+    public void MarkClueViewed(string clueId)
+    {
+        if (string.IsNullOrEmpty(clueId)) return;
+        _unviewedNewClueIds.Remove(clueId);
+    }
+
     // 유저가 도감 안에서 직접 작성한 자유 메모("빈 단서") — 3단계.
-    // 세이브 미연동(6단계 예정) — 현재는 순수 런타임 상태, 재시작하면 사라진다.
+    // 세이브 연동(6단계) 완료 — ImportUserEntries 참고.
     private readonly List<CodexUserEntry> _userEntries = new();
     public IReadOnlyList<CodexUserEntry> UserEntries => _userEntries;
 
@@ -77,6 +95,7 @@ public class CodexModule : MonoBehaviour
     private void HandleClueAcquired(ClueData clue)
     {
         if (!_acquiredClues.Contains(clue)) _acquiredClues.Add(clue);
+        _unviewedNewClueIds.Add(clue.id);
         OnCodexChanged?.Invoke();
     }
 
@@ -137,5 +156,16 @@ public class CodexModule : MonoBehaviour
         _userEntries.Remove(entry);
         OnCodexChanged?.Invoke();
         return true;
+    }
+
+    // ─── 세이브 연동 (6단계) ────────────────────────────────────
+    // SaveModule.SaveEvents()/LoadEvents()가 직접 Instance로 접근해 호출한다. 획득 단서 목록
+    // (_acquiredClues)은 여기 포함되지 않는다 — RouteProgressState.AcquiredClueIds에서 파생되므로
+    // 이미 IEventSaveProvider 경로로 저장되고, 로드 후 RebuildFromProgress()가 다시 채운다.
+    public void ImportUserEntries(List<CodexUserEntry> entries)
+    {
+        _userEntries.Clear();
+        if (entries != null) _userEntries.AddRange(entries);
+        OnCodexChanged?.Invoke();
     }
 }

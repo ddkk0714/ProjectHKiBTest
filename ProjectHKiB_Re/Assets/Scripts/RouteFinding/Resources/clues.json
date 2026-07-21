@@ -12,7 +12,7 @@
             "content": "인터넷에 올라온 게시글. 숲 입구의 분위기와 등장하는 존재들에 대한 내용이 담겨 있다.",
             "source": "",
             "codexMapGuid": "map-002",
-            "keywords": [],
+            "keywords": ["숲", "입구", "소문"],
             "comments": [
                 {
                     "author": "델타",
@@ -33,7 +33,7 @@
             "content": "오래된 문서에서 발견된 기록. 호수 근처에서 목격된 이상한 현상들을 묘사하고 있다.",
             "source": "",
             "codexMapGuid": "map-004",
-            "keywords": [],
+            "keywords": ["호수", "전설", "기록"],
             "comments": [
                 {
                     "author": "델타",
@@ -59,7 +59,7 @@
             "content": "숲 입구 부근에서 수집한 이야기. 나무 사이에 낡은 오두막이 있고 침대가 있다고 한다.",
             "source": "",
             "codexMapGuid": "map-003",
-            "keywords": [],
+            "keywords": ["숲", "오두막", "침대"],
             "comments": []
         },
         {
@@ -74,7 +74,7 @@
             "content": "호수 근처에서 발견한 낡은 일지. 안개가 짙게 깔린 계곡과 그 너머 목적지에 대한 기록이 있다.",
             "source": "",
             "codexMapGuid": "map-008",
-            "keywords": [],
+            "keywords": ["안개", "계곡", "기록"],
             "comments": []
         },
         {
@@ -89,7 +89,7 @@
             "content": "오두막 벽에 붙어 있던 손으로 그린 지도. 안개 계곡을 지나면 높은 고원이 있다고 적혀 있다.",
             "source": "",
             "codexMapGuid": "map-009",
-            "keywords": [],
+            "keywords": ["고원", "지도", "안개"],
             "comments": []
         },
         {
@@ -104,7 +104,7 @@
             "content": "황무지 방향으로 가면 멈춰버린 열차가 있는 역이 있다는 이야기. 침대가 있어 쉬어갈 수 있다고 한다.",
             "source": "",
             "codexMapGuid": "map-007",
-            "keywords": [],
+            "keywords": ["폐역", "침대", "소문"],
             "comments": []
         },
         {
@@ -119,7 +119,7 @@
             "content": "폐역 역사 바닥에 적힌 낙서. 지하로 이어지는 터널이 있고 그 끝에 밝은 빛이 있다고 한다.",
             "source": "",
             "codexMapGuid": "map-011",
-            "keywords": [],
+            "keywords": ["지하", "터널", "폐역"],
             "comments": []
         },
         {
@@ -134,7 +134,7 @@
             "content": "고원에서 내려다보이는 빛나는 구조물에 대한 기록. 안에 이상한 식물들이 자라고 있다.",
             "source": "",
             "codexMapGuid": "map-012",
-            "keywords": [],
+            "keywords": ["온실", "고원", "목격담"],
             "comments": []
         },
         {
@@ -149,7 +149,7 @@
             "content": "인터넷 게시판의 오래된 글. 여러 경로가 교차하는 장소가 있다는 내용이다.",
             "source": "",
             "codexMapGuid": "map-005",
-            "keywords": [],
+            "keywords": ["목적지", "인터넷", "소문"],
             "comments": []
         },
         {
@@ -164,7 +164,7 @@
             "content": "인터넷에서 발견한 단편적인 정보. 절벽과 안개 사이의 고립된 공간에 대한 이야기다.",
             "source": "",
             "codexMapGuid": "map-010",
-            "keywords": [],
+            "keywords": ["목적지", "인터넷", "안개"],
             "comments": []
         },
         {
@@ -179,7 +179,7 @@
             "content": "유리 온실 안에서 찾은 쪽지. 지하 깊은 곳에 최후의 공간이 있다고 적혀 있다.",
             "source": "",
             "codexMapGuid": "map-013",
-            "keywords": [],
+            "keywords": ["목적지", "지하", "온실"],
             "comments": []
         }
     ]

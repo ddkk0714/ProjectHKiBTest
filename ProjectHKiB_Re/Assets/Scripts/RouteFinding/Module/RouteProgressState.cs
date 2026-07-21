@@ -27,10 +27,17 @@ public class RouteProgressState
     private readonly HashSet<string> _acquiredClueIds = new();        // 획득한 단서
     private readonly HashSet<string> _eventFlags = new();             // "mapGuid:eventKey"
 
+    // 획득 순서 — _acquiredClueIds(HashSet, 순서 보장 안 됨)와 별개로 도감의 "획득 최신순" 정렬
+    // (Clue_System.md 6-5)에만 쓰인다. 세이브 로드로 복원된 항목은 실제 획득 시각이 아니라
+    // SaveSlotData.eventFlags에 저장된 순서(맵 그래프 정의 순서)로 채워지는 best-effort 값이다 —
+    // 정확한 획득 타임스탬프까지 저장할 정도로 중요한 기능은 아니라고 판단해 단순화했다.
+    private readonly List<string> _acquisitionOrder = new();
+    public IReadOnlyList<string> AcquisitionOrder => _acquisitionOrder;
+
     public IReadOnlyCollection<string> AcquiredClueIds => _acquiredClueIds;
 
     // 단서를 새로 획득할 때마다 발행 — CodexModule 등 확장 시스템이 폴링 없이 구독한다.
-    // 세이브 로드(ImportFromSaveData)는 이 이벤트를 발행하지 않으므로(컬렉션 직접 갱신),
+    // 세이브 로드(ApplyEventFlag)는 이 이벤트를 발행하지 않으므로(컬렉션 직접 갱신),
     // 로드 직후에는 구독자가 직접 전체 재계산(AcquiredClueIds 순회)을 한 번 해줘야 한다.
     public event Action<ClueData> OnClueAcquired;
 
@@ -50,6 +57,7 @@ public class RouteProgressState
         _cluedConnectionGuids.Clear();
         _acquiredClueIds.Clear();
         _eventFlags.Clear();
+        _acquisitionOrder.Clear();
 
         if (_graph == null) return;
 
@@ -115,6 +123,7 @@ public class RouteProgressState
     private void AcquireClue(ClueData clue)
     {
         _acquiredClueIds.Add(clue.id);
+        _acquisitionOrder.Add(clue.id);
 
         if (!string.IsNullOrEmpty(clue.targetMapGuid))
         {
@@ -143,8 +152,10 @@ public class RouteProgressState
         }
     }
 
-    // ─── SaveSlotData 연동 (일기장 세이브) ────────────────────────
-    // 진행 상태는 SaveSlotData에 아래 키 규칙으로 직렬화된다:
+    // ─── 세이브 연동 (일기장 세이브) ───────────────────────────────
+    // SaveSlotData(Save/New_Save, RouteFinding 폴더 밖)를 직접 참조하지 않는다 — 대신
+    // Dictionary<string,bool> 스냅샷/적용 메서드만 제공하고, 실제 SaveSlotData와의 입출력은
+    // RouteModule(IEventSaveProvider 구현)이 담당한다. 키 규칙:
     //   passages              : 클리어된 맵 GUID (2026-07-14 이전 — 원래는 연결 GUID)
     //   eventFlags(접두사별)  : "mapnode_<guid>"   방문한 맵
     //                           "mapclue_<guid>"   단서 공개된 맵
@@ -152,65 +163,65 @@ public class RouteProgressState
     //                           "clueacq_<clueId>" 획득한 단서
     //                           "storyevent_<mapGuid>:<eventKey>" 스토리 이벤트
 
-    public void ExportToSaveData(SaveSlotData data)
+    public Dictionary<string, bool> BuildEventFlagsSnapshot()
     {
-        foreach (var node in _graph.AllNodes)
-            SetOrUpdatePassage(data, node.guid, _clearedNodeGuids.Contains(node.guid));
+        var dict = new Dictionary<string, bool>();
+        if (_graph == null) return dict;
 
         foreach (var node in _graph.AllNodes)
         {
-            SetOrUpdateFlag(data, "mapnode_" + node.guid, _visitedNodeGuids.Contains(node.guid));
-            SetOrUpdateFlag(data, "mapclue_" + node.guid, _cluedNodeGuids.Contains(node.guid));
+            dict["mapnode_" + node.guid] = _visitedNodeGuids.Contains(node.guid);
+            dict["mapclue_" + node.guid] = _cluedNodeGuids.Contains(node.guid);
         }
         foreach (var conn in _graph.AllConnections)
-            SetOrUpdateFlag(data, "connclue_" + conn.guid, _cluedConnectionGuids.Contains(conn.guid));
+            dict["connclue_" + conn.guid] = _cluedConnectionGuids.Contains(conn.guid);
 
         foreach (var clue in _graph.AllClues)
-            SetOrUpdateFlag(data, "clueacq_" + clue.id, _acquiredClueIds.Contains(clue.id));
+            dict["clueacq_" + clue.id] = _acquiredClueIds.Contains(clue.id);
 
         foreach (var key in _eventFlags)
-            SetOrUpdateFlag(data, "storyevent_" + key, true);
+            dict["storyevent_" + key] = true;
+
+        return dict;
     }
 
-    public void ImportFromSaveData(SaveSlotData data)
+    public Dictionary<string, bool> BuildPassagesSnapshot()
     {
-        ResetToInitial();
-        if (data == null) return;
+        var dict = new Dictionary<string, bool>();
+        if (_graph == null) return dict;
 
-        foreach (var p in data.passages)
-            if (p.opened) _clearedNodeGuids.Add(p.id);
+        foreach (var node in _graph.AllNodes)
+            dict[node.guid] = _clearedNodeGuids.Contains(node.guid);
 
-        foreach (var f in data.eventFlags)
-        {
-            if (!f.value) continue;
-            if (f.id.StartsWith("mapnode_"))
-                _visitedNodeGuids.Add(f.id.Substring("mapnode_".Length));
-            else if (f.id.StartsWith("mapclue_"))
-                _cluedNodeGuids.Add(f.id.Substring("mapclue_".Length));
-            else if (f.id.StartsWith("connclue_"))
-                _cluedConnectionGuids.Add(f.id.Substring("connclue_".Length));
-            else if (f.id.StartsWith("clueacq_"))
-                _acquiredClueIds.Add(f.id.Substring("clueacq_".Length));
-            else if (f.id.StartsWith("storyevent_"))
-                _eventFlags.Add(f.id.Substring("storyevent_".Length));
-        }
+        return dict;
     }
 
-    private static void SetOrUpdatePassage(SaveSlotData data, string id, bool opened)
+    // 세이브 항목 하나를 복원한다. 게임플레이 갱신 메서드(MarkNodeVisited 등)와 달리
+    // TryAcquireCluesForMap/OnClueAcquired 같은 파생 로직을 다시 태우지 않고 원본 컬렉션에
+    // 그대로 반영한다 — 세이브에 이미 "acquired" 등 파생 결과가 저장돼 있으므로 재계산이 불필요하고,
+    // 재계산하면 로드 중 이벤트가 잘못 발행될 위험도 있다.
+    // 로드 시작 전 ResetToInitial()을 먼저 호출해야 한다(항목별로 호출되므로 자체 리셋 없음).
+    public void ApplyEventFlag(string id, bool value)
     {
-        foreach (var p in data.passages)
+        if (!value) return; // false는 ResetToInitial()의 기본값과 같으므로 별도 처리 불필요
+        if (id.StartsWith("mapnode_"))
+            _visitedNodeGuids.Add(id.Substring("mapnode_".Length));
+        else if (id.StartsWith("mapclue_"))
+            _cluedNodeGuids.Add(id.Substring("mapclue_".Length));
+        else if (id.StartsWith("connclue_"))
+            _cluedConnectionGuids.Add(id.Substring("connclue_".Length));
+        else if (id.StartsWith("clueacq_"))
         {
-            if (p.id == id) { p.opened = opened; return; }
+            var clueId = id.Substring("clueacq_".Length);
+            _acquiredClueIds.Add(clueId);
+            _acquisitionOrder.Add(clueId); // best-effort 순서(세이브 파일에 저장된 순서) — 위 필드 주석 참고
         }
-        data.passages.Add(new PassageSaveInfo { id = id, opened = opened });
+        else if (id.StartsWith("storyevent_"))
+            _eventFlags.Add(id.Substring("storyevent_".Length));
     }
 
-    private static void SetOrUpdateFlag(SaveSlotData data, string id, bool value)
+    public void ApplyPassage(string id, bool opened)
     {
-        foreach (var f in data.eventFlags)
-        {
-            if (f.id == id) { f.value = value; return; }
-        }
-        data.eventFlags.Add(new EventFlagSaveInfo { id = id, value = value });
+        if (opened) _clearedNodeGuids.Add(id);
     }
 }

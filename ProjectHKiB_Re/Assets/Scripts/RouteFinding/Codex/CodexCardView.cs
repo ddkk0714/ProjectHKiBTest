@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
 namespace RouteFinding.Codex
@@ -30,6 +31,7 @@ namespace RouteFinding.Codex
         public event Action<CodexEntry> OnDeleteRequested;
         public event Action<CodexEntry> OnPinRequested;
         public event Action<CodexEntry> OnSuggestionAddRequested;
+        public event Action<string> OnKeywordClicked; // 6-4단계 — 키워드 태그 클릭
 
         private TextMeshProUGUI _titleTmp;
         private GameObject _typeBadgeGO;
@@ -39,6 +41,7 @@ namespace RouteFinding.Codex
         private TextMeshProUGUI _sourceTmp;
         private TextMeshProUGUI _mapTmp;
         private TextMeshProUGUI _keywordsTmp;
+        private CodexKeywordLinkHandler _keywordLinkHandler; // 6-4단계 — _keywordsTmp에 붙는 클릭 감지기
         private GameObject _editRowGO;
 
         private GameObject _pinRowGO;
@@ -127,6 +130,9 @@ namespace RouteFinding.Codex
             MakeLabel(content, font, "키워드");
             _keywordsTmp = MakeTMP(content, font, "", 7f, FontStyles.Normal, TextAlignmentOptions.MidlineLeft, height: 12f, id: "KeywordsValue");
             _keywordsTmp.enableWordWrapping = true;
+            _keywordLinkHandler = _keywordsTmp.gameObject.AddComponent<CodexKeywordLinkHandler>();
+            _keywordLinkHandler.Text = _keywordsTmp;
+            _keywordLinkHandler.OnLinkClicked = kw => OnKeywordClicked?.Invoke(kw);
 
             BuildEditRow(content, font);
             BuildPinRow(content, font);
@@ -152,6 +158,13 @@ namespace RouteFinding.Codex
             _sourceTmp    = FindDeepChild<TextMeshProUGUI>(existingRoot, "SourceValue");
             _mapTmp       = FindDeepChild<TextMeshProUGUI>(existingRoot, "MapValue");
             _keywordsTmp  = FindDeepChild<TextMeshProUGUI>(existingRoot, "KeywordsValue");
+            if (_keywordsTmp != null)
+            {
+                _keywordLinkHandler = _keywordsTmp.gameObject.GetComponent<CodexKeywordLinkHandler>()
+                                      ?? _keywordsTmp.gameObject.AddComponent<CodexKeywordLinkHandler>();
+                _keywordLinkHandler.Text = _keywordsTmp;
+                _keywordLinkHandler.OnLinkClicked = kw => OnKeywordClicked?.Invoke(kw);
+            }
 
             var editRowTF = FindDeepTransform(existingRoot, "EditRow");
             _editRowGO = editRowTF?.gameObject;
@@ -488,7 +501,7 @@ namespace RouteFinding.Codex
             _contentTmp.text = e.content;
             _sourceTmp.text = string.IsNullOrEmpty(e.source) ? "-" : e.source;
             _mapTmp.text = string.IsNullOrEmpty(e.mapCategory) ? "기타" : e.mapCategory;
-            _keywordsTmp.text = (e.keywords == null || e.keywords.Length == 0) ? "-" : string.Join(", ", e.keywords);
+            _keywordsTmp.text = BuildKeywordsText(e.keywords);
 
             _editRowGO.SetActive(!string.IsNullOrEmpty(e.userEntryGuid));
 
@@ -506,6 +519,41 @@ namespace RouteFinding.Codex
             _suggestionsGO?.SetActive(false);
 
             RefreshComments(e.comments);
+        }
+
+        // [버그 수정, 2026-07-21] 이 카드가 어떤 단서를 보여준 채로 남아있는 동안, 노트 쪽에서 그 단서의
+        // 핀이 풀리면(예: 노트 그래프에서 삭제) 카드의 "노트에 핀" 버튼은 그 사실을 모른 채 계속
+        // interactable=false("노트에 핀됨")로 남아있었다 — 도감을 닫았다 다시 열어도 ShowEntry가 그
+        // 항목에 대해 다시 호출되지 않는 한(예: 같은 항목이 이미 선택돼 있던 채로 재오픈) 갱신될 계기가
+        // 없어서, 한 번 삭제한 단서를 도감에서 다시 꺼낼 방법이 없어 보였다. CodexPanel.Open()이 열 때마다
+        // 이 메서드를 호출해 지금 보여주고 있는 항목의 핀 상태만 가볍게 다시 확인한다(카드 전체를
+        // 다시 그리지 않음 — ShowEntry를 통째로 재호출하면 스크롤 위치·펼침 상태 등이 불필요하게 리셋됨).
+        public void RefreshPinState()
+        {
+            if (_currentEntry == null || _pinBtn == null) return;
+            if (string.IsNullOrEmpty(_currentEntry.clueId)) return; // 핀 대상 아님(유저 메모)
+
+            bool pinned = NoteModule.Instance != null && NoteModule.Instance.IsPinned(_currentEntry.clueId);
+            _pinBtn.interactable = !pinned;
+            if (_pinBtnLabel != null) _pinBtnLabel.text = pinned ? "노트에 핀됨" : "노트에 핀";
+        }
+
+        // 6-4단계 — 키워드마다 TMP <link> 태그를 씌운다. 별도 버튼 GameObject를 여러 개 만들지 않고도
+        // (줄바꿈 자동 처리를 TMP의 기본 워드랩에 그대로 맡길 수 있어서) 한 텍스트 블록 안에서
+        // 키워드별 클릭을 구분할 수 있다 — CodexKeywordLinkHandler가 TMP_TextUtilities.FindIntersectingLink로
+        // 클릭 위치가 어느 링크(키워드) 위인지 찾아낸다.
+        private static string BuildKeywordsText(string[] keywords)
+        {
+            if (keywords == null || keywords.Length == 0) return "-";
+
+            var sb = new StringBuilder();
+            for (int i = 0; i < keywords.Length; i++)
+            {
+                if (i > 0) sb.Append(", ");
+                var kw = keywords[i];
+                sb.Append("<link=\"").Append(kw).Append("\"><u><color=#8FC1E3>").Append(kw).Append("</color></u></link>");
+            }
+            return sb.ToString();
         }
 
         private void MakeLabel(RectTransform parent, TMP_FontAsset font, string text)
@@ -593,6 +641,26 @@ namespace RouteFinding.Codex
                 if (found != null) return found;
             }
             return null;
+        }
+    }
+
+    // 키워드 태그(TMP <link>) 클릭 감지 전용 — CodexCardView._keywordsTmp가 붙은 GameObject에 얹힌다.
+    // [버그 수정, 2026-07-21] 원래 CodexCardView 안의 private 중첩 클래스였는데, 유니티가 private 중첩
+    // MonoBehaviour를 프리팹에 제대로 직렬화하지 못해("The referenced script... is missing!") 도감
+    // 프리팹 저장이 막히는 문제가 있었다 — 최상위 public 클래스로 분리해 해결. 드래그(ScrollRect)와 같은
+    // 오브젝트 계층에 있어도 uGUI가 클릭/드래그를 배타적으로 처리하므로 서로 간섭하지 않는다
+    // (NoteRouteGraphView의 ClickToToggle/NodeDragHandle 조합과 같은 이유).
+    public class CodexKeywordLinkHandler : MonoBehaviour, IPointerClickHandler
+    {
+        public TextMeshProUGUI Text;
+        public Action<string> OnLinkClicked;
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if (Text == null) return;
+            int linkIndex = TMP_TextUtilities.FindIntersectingLink(Text, eventData.position, eventData.pressEventCamera);
+            if (linkIndex == -1) return;
+            OnLinkClicked?.Invoke(Text.textInfo.linkInfo[linkIndex].GetLinkID());
         }
     }
 }

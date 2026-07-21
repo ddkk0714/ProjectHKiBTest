@@ -87,9 +87,11 @@ public class RouteSystemTest : MonoBehaviour
     [Button("사망 시뮬레이션 (맵 진도 손실 + 스폰 복귀)")]
     private void TestDeath()
     {
-        var spawnNode = RouteSpawnManager.Instance.ConsumeRespawnNode();
-        Debug.Log($"[RouteSystemTest] 사망 처리 완료 — 복귀: {spawnNode?.nodeName ?? "없음"}");
-        Debug.Log("[RouteSystemTest] ※ 실게임에서는 RouteModule.Instance.RevertToLastSave(lastSaved) 호출 필요");
+        // 테스트용 — 실제로는 사망을 감지한 쪽(전투/플레이어 시스템)이 플레이어의 SaveModule에서
+        // resolve한 CurrentSaveData(또는 LoadedData)를 넘겨야 한다. 여기서는 null(한 번도 세이브
+        // 안 한 상태와 동일하게 처리됨 — RouteModule.RevertToLastSave 참고)로 시뮬레이션한다.
+        var respawnNode = DeathHandler.Instance.HandleDeath(null);
+        Debug.Log($"[RouteSystemTest] 사망 처리 완료 — 복귀: {respawnNode?.nodeName ?? "없음"}, 현재 위치: {RouteModule.Instance.CurrentLocation?.nodeName}");
     }
 
     // ─── 단서 획득 ───────────────────────────────────────────────
@@ -165,42 +167,10 @@ public class RouteSystemTest : MonoBehaviour
         }
     }
 
-    // ─── 노트(Note) 4단계 — 다중 목적지 이동 계획 ─────────────────
-
-    [Button("노트 - 계획 생성 후 목적지 노드로 실행")]
-    private void TestNotePlanExecute()
-    {
-        if (!ValidateGraph()) return;
-        var dest = MapGraph.Instance.GetNode(_destinationNodeGuid);
-        if (dest == null) { Debug.LogError($"[RouteSystemTest] GUID에 해당하는 노드가 없습니다: {_destinationNodeGuid}"); return; }
-
-        var plan = NoteModule.Instance.CreatePlan("테스트 계획");
-        NoteModule.Instance.AddWaypoint(plan.planId, dest.guid);
-
-        var preview = NoteModule.Instance.ComputePreview(plan.planId);
-        Debug.Log($"[RouteSystemTest][Plan] 미리보기 — 구간 {preview.Legs.Count}개, 유효={preview.IsValid}, 통과불가포함={preview.IsBlocked}, 총난이도={preview.TotalDifficulty:F1}");
-
-        bool started = NoteModule.Instance.ExecutePlan(plan.planId);
-        Debug.Log($"[RouteSystemTest][Plan] 실행 {(started ? "시작됨" : "실패")} — RouteModule.IsTraveling={RouteModule.Instance.IsTraveling}");
-    }
-
-    [Button("노트 - 계획 다음 구간 진행 (전투 완료 시뮬레이션)")]
-    private void TestNotePlanAdvance()
-    {
-        if (!RouteModule.Instance.IsTraveling)
-        {
-            Debug.LogWarning("[RouteSystemTest] 이동 중이 아닙니다. 먼저 계획을 실행하세요.");
-            return;
-        }
-        var target = RouteModule.Instance.GetCurrentTargetNode();
-        if (target != null) RouteModule.Instance.Progress.MarkNodeCleared(target);
-        RouteModule.Instance.AdvanceToNextNode(); // 목적지 도달 시 OnTravelEnded(true) → NoteModule이 다음 구간 자동 시작
-
-        var execution = NoteModule.Instance.CurrentExecution;
-        Debug.Log(execution == null
-            ? "[RouteSystemTest][Plan] 계획 완료 (더 이상 실행 중인 계획 없음)"
-            : $"[RouteSystemTest][Plan] 다음 구간 진행 중 — legIndex={execution.currentLegIndex}, halted={execution.isHalted}");
-    }
+    // [2026-07-21] 노트의 다중 목적지 이동 계획(4단계) 테스트 버튼("계획 생성 후 실행"/"계획 다음 구간
+    // 진행")은 그 기능 자체(RouteWaypointPlan/NoteModule.CreatePlan 등)가 요청으로 완전히 제거되면서
+    // 함께 삭제됨 — 대체 기능(단서 서랍, ClueDrawerView)은 드래그 UI 조작이라 이런 버튼형 테스트로는
+    // 검증하기 어려워 별도 테스트 버튼을 두지 않았다. NoteSystem_기획서.md "단서 서랍으로 교체" 참고.
 
     // ─── 경로 선택 → 출발 시뮬레이션 ────────────────────────────
 

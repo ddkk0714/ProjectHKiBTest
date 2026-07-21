@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 // 노트 전용 싱글턴 — CodexModule과 같은 패턴으로, 노트에 담긴 NoteEntry 목록의 단일 소유자.
 //
-// 도감(CodexModule)은 "획득한 단서 전체"를 보여주는 반면, 노트는 그중 실제로 쓸 것만 추려
-// 다중 목적지 이동 계획에 쓴다(NoteSystem_기획서.md). 규칙 1(경로 연동 자동 편입)·규칙 2(도감 수동 핀)·
-// 4단계(다중 목적지 이동 계획, 자동 순차 실행)가 동작한다. 세이브 연동(5단계)만 남음.
+// 도감(CodexModule)은 "획득한 단서 전체"를 보여주는 반면, 노트는 그중 실제로 쓸 것만 추려 좌측
+// 단서 그래프(NoteRouteGraphView)에 배치한다(NoteSystem_기획서.md). 규칙 1(경로 연동 자동 편입)·
+// 규칙 2(도감/단서 서랍에서 수동 핀)와 세이브 연동(7단계)까지 동작한다.
 // (2026-07-14: 규칙 3 "미획득 후보 자동 노출"은 요청으로 제거됨 — 노트는 이제 항상 획득한 단서만 다룬다.)
+// [2026-07-21] 다중 목적지 이동 계획(4단계, RouteWaypointPlan) 기능은 요청으로 완전히 제거됨 —
+// 우측 패널은 그 대신 "단서 서랍"(ClueDrawerView)으로 교체됨. Git 히스토리에 이전 구현이 남아있다.
 public class NoteModule : MonoBehaviour
 {
     private static NoteModule _instance;
@@ -37,9 +40,8 @@ public class NoteModule : MonoBehaviour
     // NotePanel 등 UI가 구독 — 노트 목록이 바뀔 때마다 다시 그리라는 신호.
     public event Action OnNoteChanged;
 
-    // 이동 중에는 노트 편집(항목 삭제·핀·이동 계획 변경 등)을 잠근다 — 열람(NotePanel.Open)과는 분리된 권한
-    // (NoteSystem_기획서.md "UI 진입 / 영속성" 절의 NoteModule.CanEditPlan 규칙을 1단계 기능인
-    // 개별 삭제에도 동일하게 적용한 것 — 장비·경로가 이동 중 변경 불가한 것과 같은 이유).
+    // 이동 중에는 노트 편집(항목 삭제·핀 등)을 잠근다 — 열람(NotePanel.Open)과는 분리된 권한
+    // (NoteSystem_기획서.md "UI 진입 / 영속성" 절의 규칙 — 장비·경로가 이동 중 변경 불가한 것과 같은 이유).
     public bool CanEdit => RouteModule.Instance == null || !RouteModule.Instance.IsTraveling;
 
     private bool _subscribed;
@@ -63,15 +65,20 @@ public class NoteModule : MonoBehaviour
         if (_subscribed && RouteModule.Instance != null)
         {
             RouteModule.Instance.OnRouteSelected -= HandleRouteSelected;
-            RouteModule.Instance.OnTravelEnded -= HandleTravelEnded;
+            if (RouteModule.Instance.Progress != null)
+                RouteModule.Instance.Progress.OnClueAcquired -= HandleClueAcquired;
         }
     }
 
     private void TrySubscribe()
     {
-        if (_subscribed || RouteModule.Instance == null) return;
+        if (_subscribed || RouteModule.Instance == null || RouteModule.Instance.Progress == null) return;
         RouteModule.Instance.OnRouteSelected += HandleRouteSelected;
-        RouteModule.Instance.OnTravelEnded += HandleTravelEnded;
+        // [요청, 2026-07-21] 경로를 먼저 골라둔 뒤 나중에 단서를 획득하는 순서에서는 OnRouteSelected가
+        // 다시 발행되지 않아 RebuildRouteLinkedEntries가 호출될 계기가 없었다 — CodexModule과 같은 패턴으로
+        // RouteProgressState.OnClueAcquired(단서를 실제로 획득한 그 순간)도 구독해, 지금 선택된 경로와
+        // 연관된 단서면 획득 즉시 노트에 반영되도록 한다.
+        RouteModule.Instance.Progress.OnClueAcquired += HandleClueAcquired;
         _subscribed = true;
     }
 
@@ -80,6 +87,15 @@ public class NoteModule : MonoBehaviour
         Debug.Log($"[NoteModule] HandleRouteSelected — route={(route == null ? "null" : $"valid={route.IsValid},nodes={route.Nodes?.Count}")}");
         TrySubscribe(); // RouteModule이 이 컴포넌트보다 늦게 준비된 경우를 대비
         RebuildRouteLinkedEntries(route);
+    }
+
+    // RebuildRouteLinkedEntries는 RouteLinked 항목만 통째로 지우고 다시 채우는 멱등 연산이라(수동 핀은
+    // 안 건드림), 단서를 새로 하나 획득했을 때도 그냥 다시 호출하는 것으로 충분하다 — 그 단서가 지금
+    // 선택된 경로의 맵과 연관 있으면 자동으로 편입되고, 아니면 (route/graph 내부에서 이미 필터링돼) 무시된다.
+    private void HandleClueAcquired(ClueData clue)
+    {
+        TrySubscribe();
+        RebuildRouteLinkedEntries(RouteModule.Instance?.SelectedRoute);
     }
 
     // 규칙 1(경로 연동 자동 편입): 선택된 경로가 지나는 맵들과 연관된, 이미 획득한 단서를 노트에 채운다.
@@ -136,7 +152,11 @@ public class NoteModule : MonoBehaviour
         }
 
         int removed = _entries.RemoveAll(e => e.clueId == clueId);
-        if (removed > 0) OnNoteChanged?.Invoke();
+        if (removed > 0)
+        {
+            _clueLinks.RemoveWhere(p => p.a == clueId || p.b == clueId); // 지운 단서가 걸려있던 연동 간선도 같이 정리
+            OnNoteChanged?.Invoke();
+        }
         return removed > 0;
     }
 
@@ -165,196 +185,138 @@ public class NoteModule : MonoBehaviour
         return true;
     }
 
-    // ─── 4단계: 다중 목적지 이동 계획 ─────────────────────────────
-
-    private readonly List<RouteWaypointPlan> _plans = new();
-    public IReadOnlyList<RouteWaypointPlan> Plans => _plans;
-
-    // 한 번에 하나의 계획만 실행 중일 수 있다 — RouteModule 자체가 단일 이동 상태만 가지므로 자연스러운 제약.
-    private NotePlanExecutionState _execution;
-    public NotePlanExecutionState CurrentExecution => _execution;
-
-    public event Action<RouteWaypointPlan> OnPlanCompleted;
-    public event Action<RouteWaypointPlan> OnPlanHalted;
-
-    public RouteWaypointPlan GetPlan(string planId) => _plans.Find(p => p.planId == planId);
-
-    public RouteWaypointPlan CreatePlan(string name = null)
+    // ─── 세이브 연동 (NoteSystem_기획서.md 7단계) ─────────────────
+    // SaveModule.SaveEvents()/LoadEvents()가 직접 Instance로 접근해 호출한다(IEventSaveProvider와
+    // 별개 경로 — 핀 목록은 Dictionary<string,bool>로 표현 안 되는 구조화 데이터라서).
+    public void ImportFrom(List<NoteEntry> entries)
     {
-        var plan = new RouteWaypointPlan
-        {
-            planId = Guid.NewGuid().ToString("N"),
-            planName = string.IsNullOrWhiteSpace(name) ? "새 계획" : name,
-            pathType = PathType.Shortest,
-        };
-        _plans.Add(plan);
+        _entries.Clear();
+        if (entries != null) _entries.AddRange(entries);
         OnNoteChanged?.Invoke();
-        return plan;
     }
 
-    public bool RemovePlan(string planId)
+    // ─── 저장한 루트(보드) — 상단 툴바 창에서 이름 붙여 스냅샷 저장/불러오기 ──────
+    // 자동 게임 세이브(위 ImportFrom/ExportSavedBoards)와는 별개의 "이름 붙은 다중 슬롯" 개념 —
+    // 게임 세이브 한 슬롯 안에 여러 개의 보드가 같이 저장된다(노트 기획서 "저장한 루트" 절 참고).
+    private readonly List<NoteSavedBoard> _savedBoards = new();
+    public IReadOnlyList<NoteSavedBoard> SavedBoards => _savedBoards;
+
+    // NoteBoardWindow가 구독 — 저장/삭제/불러오기로 목록이 바뀔 때마다 다시 그리라는 신호.
+    // 노트 그래프 자체의 갱신 신호(OnNoteChanged)와 분리 — 보드 목록 창만 다시 그리면 되는 경우가 대부분이라서.
+    public event Action OnSavedBoardsChanged;
+
+    // 덮어쓰기 개념 없이 항상 새 보드로 추가한다 — 이름이 같아도 별개 스냅샷으로 취급(삭제는 boardId 기준).
+    // [2026-07-21 확장] expandedClueIds 매개변수 추가 — 경로연동 단서를 노드로 펼쳐서 옮긴 위치도
+    // 같이 저장하려면, "펼쳐진 상태" 자체도 같이 기억해둬야 불러올 때 그 위치가 적용될 노드가 생긴다.
+    public NoteSavedBoard SaveBoard(string name, List<string> routeNodeGuids, List<string> manualPinClueIds,
+        List<CluePositionEntry> cluePositions, List<string> expandedClueIds)
     {
-        if (!CanEdit) { Debug.LogWarning("[NoteModule] 이동 중에는 계획을 편집할 수 없습니다."); return false; }
-        if (_execution != null && _execution.planId == planId)
+        var board = new NoteSavedBoard
         {
-            Debug.LogWarning("[NoteModule] 실행 중인 계획은 삭제할 수 없습니다.");
-            return false;
-        }
-        int removed = _plans.RemoveAll(p => p.planId == planId);
-        if (removed > 0) OnNoteChanged?.Invoke();
+            boardId = Guid.NewGuid().ToString("N"),
+            boardName = string.IsNullOrWhiteSpace(name) ? $"보드 {_savedBoards.Count + 1}" : name,
+            routeNodeGuids = routeNodeGuids != null ? new List<string>(routeNodeGuids) : new List<string>(),
+            manualPinClueIds = manualPinClueIds != null ? new List<string>(manualPinClueIds) : new List<string>(),
+            cluePositions = cluePositions != null ? new List<CluePositionEntry>(cluePositions) : new List<CluePositionEntry>(),
+            expandedClueIds = expandedClueIds != null ? new List<string>(expandedClueIds) : new List<string>(),
+            // [요청, 2026-07-21] 저장 시점의 단서 연동 관계 전부를 같이 담는다 — 양쪽 종류(경로연동/수동핀)
+            // 구분 없이 그냥 지금 상태를 통째로 스냅샷 뜨고, 안 맞는 링크는 불러올 때 그냥 무해하게 무시된다.
+            clueLinks = ExportClueLinks(),
+        };
+        _savedBoards.Add(board);
+        OnSavedBoardsChanged?.Invoke();
+        return board;
+    }
+
+    public bool DeleteBoard(string boardId)
+    {
+        int removed = _savedBoards.RemoveAll(b => b.boardId == boardId);
+        if (removed > 0) OnSavedBoardsChanged?.Invoke();
         return removed > 0;
     }
 
-    public bool SetPlanPathType(string planId, PathType type)
+    public NoteSavedBoard GetBoard(string boardId) => _savedBoards.Find(b => b.boardId == boardId);
+
+    // 보드의 수동 핀 부분만 현재 노트에 반영한다(경로 연동 항목·그래프 배치 위치 복원은 NotePanel이
+    // RouteModule.ImportSelectedRoute + RebuildRouteLinkedEntries + NoteRouteGraphView.ApplySavedPositions와
+    // 함께 오케스트레이션한다 — 이 메서드는 그중 "핀 목록 교체"만 담당하는 단일 책임 조각).
+    public bool ApplyManualPins(NoteSavedBoard board)
     {
-        if (!CanEdit) { Debug.LogWarning("[NoteModule] 이동 중에는 계획을 편집할 수 없습니다."); return false; }
-        var plan = GetPlan(planId);
-        if (plan == null) return false;
-        plan.pathType = type;
-        OnNoteChanged?.Invoke();
-        return true;
-    }
-
-    // 노트 항목(clueId)이 가리키는 단서의 targetMapGuid를 목적지로 추가한다 — 편입 규칙에 명시된
-    // "목적지 성격을 가진 것(targetMapGuid가 있는 것)을 골라 계획에 추가"에 대응.
-    public bool AddWaypoint(string planId, string mapGuid)
-    {
-        if (!CanEdit) { Debug.LogWarning("[NoteModule] 이동 중에는 계획을 편집할 수 없습니다."); return false; }
-        var plan = GetPlan(planId);
-        if (plan == null || string.IsNullOrEmpty(mapGuid)) return false;
-        plan.orderedMapGuids.Add(mapGuid);
-        OnNoteChanged?.Invoke();
-        return true;
-    }
-
-    public bool RemoveWaypoint(string planId, int index)
-    {
-        if (!CanEdit) { Debug.LogWarning("[NoteModule] 이동 중에는 계획을 편집할 수 없습니다."); return false; }
-        var plan = GetPlan(planId);
-        if (plan == null || index < 0 || index >= plan.orderedMapGuids.Count) return false;
-        plan.orderedMapGuids.RemoveAt(index);
-        OnNoteChanged?.Invoke();
-        return true;
-    }
-
-    // direction: -1(위로) 또는 +1(아래로).
-    public bool MoveWaypoint(string planId, int index, int direction)
-    {
-        if (!CanEdit) { Debug.LogWarning("[NoteModule] 이동 중에는 계획을 편집할 수 없습니다."); return false; }
-        var plan = GetPlan(planId);
-        if (plan == null) return false;
-        int newIndex = index + direction;
-        if (index < 0 || index >= plan.orderedMapGuids.Count || newIndex < 0 || newIndex >= plan.orderedMapGuids.Count)
-            return false;
-
-        (plan.orderedMapGuids[index], plan.orderedMapGuids[newIndex]) = (plan.orderedMapGuids[newIndex], plan.orderedMapGuids[index]);
-        OnNoteChanged?.Invoke();
-        return true;
-    }
-
-    // 계획 미리보기 — RoutePlanEditorView가 "구간 N개 / 총 난이도 X / 통과불가 여부"를 보여주는 데 쓴다.
-    // 시작점은 RouteModule.CurrentLocation(이동 중이 아닐 때도 유지되는 마지막 위치) 기준.
-    public RouteWaypointPlanner.PlanPreview ComputePreview(string planId)
-    {
-        var plan = GetPlan(planId);
-        var route = RouteModule.Instance;
-        var graph = MapGraph.Instance;
-        if (plan == null || route == null || graph == null)
-            return new RouteWaypointPlanner.PlanPreview { IsValid = false };
-
-        return RouteWaypointPlanner.ComputePreview(route.CurrentLocation, plan, graph, route.Progress, route.EquippedGearArray, route.AvoidNoClueNodes);
-    }
-
-    // ─── 실행 (자동 순차 트리거, NoteSystem_기획서.md "실행 방식" 확정 사항) ──────
-
-    public bool ExecutePlan(string planId)
-    {
-        var route = RouteModule.Instance;
-        if (route == null || route.IsTraveling)
+        if (board == null) return false;
+        if (!CanEdit)
         {
-            Debug.LogWarning("[NoteModule] 이미 이동 중이라 새 계획을 실행할 수 없습니다.");
-            return false;
-        }
-        var plan = GetPlan(planId);
-        if (plan == null || plan.orderedMapGuids.Count == 0) return false;
-
-        _execution = new NotePlanExecutionState { planId = planId, currentLegIndex = 0, isHalted = false };
-        bool started = StartLeg(plan, 0);
-        OnNoteChanged?.Invoke();
-        return started;
-    }
-
-    // 전투 실패 등으로 중단(isHalted)된 계획을 같은 구간부터 다시 시작 — 자동 재개는 하지 않고
-    // 플레이어가 직접 눌러야 한다(NoteSystem_기획서.md "실행 방식" 4번 참고).
-    public bool ResumePlan(string planId)
-    {
-        if (_execution == null || _execution.planId != planId || !_execution.isHalted) return false;
-        if (RouteModule.Instance == null || RouteModule.Instance.IsTraveling) return false;
-
-        var plan = GetPlan(planId);
-        if (plan == null) return false;
-
-        _execution.isHalted = false;
-        bool started = StartLeg(plan, _execution.currentLegIndex);
-        OnNoteChanged?.Invoke();
-        return started;
-    }
-
-    // 목적지 정상 도달(completed=true)이면 다음 구간으로 자동 연쇄, 중단(false)이면 실행을 멈추고 대기.
-    // 노트 계획 실행 중이 아닐 때(일반 단일 경로 이동)는 무시한다.
-    private void HandleTravelEnded(bool completed)
-    {
-        if (_execution == null) return;
-        var plan = GetPlan(_execution.planId);
-        if (plan == null) { _execution = null; OnNoteChanged?.Invoke(); return; }
-
-        if (!completed)
-        {
-            _execution.isHalted = true;
-            OnPlanHalted?.Invoke(plan);
-            OnNoteChanged?.Invoke();
-            return;
-        }
-
-        _execution.currentLegIndex++;
-        if (_execution.currentLegIndex >= plan.orderedMapGuids.Count)
-        {
-            _execution = null;
-            OnPlanCompleted?.Invoke(plan);
-            OnNoteChanged?.Invoke();
-            return;
-        }
-
-        StartLeg(plan, _execution.currentLegIndex);
-        OnNoteChanged?.Invoke();
-    }
-
-    // 한 구간을 계산해 RouteModule에 선택·출발시킨다. 실패(도달 불가/통과 불가/거부)하면 실행을 멈춘다.
-    private bool StartLeg(RouteWaypointPlan plan, int legIndex)
-    {
-        var route = RouteModule.Instance;
-        var graph = MapGraph.Instance;
-        if (route == null || graph == null) { HaltExecution(plan); return false; }
-
-        var leg = RouteWaypointPlanner.ComputeLeg(route.CurrentLocation, plan, legIndex, graph, route.Progress, route.EquippedGearArray, route.AvoidNoClueNodes);
-        if (!leg.IsValid || leg.IsBlocked)
-        {
-            Debug.LogWarning($"[NoteModule] 계획 '{plan.planName}' 구간 {legIndex}을 진행할 수 없습니다 (도달 불가 또는 통과 불가).");
-            HaltExecution(plan);
+            Debug.LogWarning("[NoteModule] 이동 중에는 노트를 편집할 수 없습니다.");
             return false;
         }
 
-        if (!route.SelectRoute(leg) || !route.StartTravel())
+        _entries.RemoveAll(e => e.reason == NotePinReason.ManualPin);
+        foreach (var clueId in board.manualPinClueIds)
         {
-            HaltExecution(plan);
-            return false;
+            if (IsPinned(clueId)) continue;
+            _entries.Add(new NoteEntry { clueId = clueId, reason = NotePinReason.ManualPin });
         }
+        OnNoteChanged?.Invoke();
         return true;
     }
 
-    private void HaltExecution(RouteWaypointPlan plan)
+    // SaveModule이 직접 Instance로 접근해 호출 — noteEntries와 동일한 패턴.
+    public List<NoteSavedBoard> ExportSavedBoards() => new(_savedBoards);
+
+    public void ImportSavedBoards(List<NoteSavedBoard> boards)
     {
-        if (_execution != null) _execution.isHalted = true;
-        OnPlanHalted?.Invoke(plan);
+        _savedBoards.Clear();
+        if (boards != null) _savedBoards.AddRange(boards);
+        OnSavedBoardsChanged?.Invoke();
+    }
+
+    // ─── 단서 연동(수동 "연관 단서" 간선) — NoteRouteGraphView "단서 연동 모드"가 사용 ────────
+    // 자동 키워드 공유 간선(NoteRouteGraphView._colKeywordEdge)과 별개로, 사용자가 그래프에서 마우스로
+    // 직접 이어둔 관계다. 정규화된(사전순) 쌍으로 저장해 (A,B)/(B,A)를 같은 연결로 취급한다.
+    // [요청, 2026-07-21] 세이브 연동 완료 — noteEntries와 동일한 패턴으로 SaveModule이 ExportClueLinks/
+    // ImportClueLinks를 직접 호출한다(아래 참고).
+    private readonly HashSet<(string a, string b)> _clueLinks = new();
+    public IEnumerable<(string a, string b)> ClueLinks => _clueLinks;
+
+    private static (string, string) NormalizeLinkPair(string a, string b) =>
+        string.CompareOrdinal(a, b) <= 0 ? (a, b) : (b, a);
+
+    // NoteRouteGraphView.HandleLinkModeClueClicked가 두 번째 단서를 클릭한 순간 호출한다.
+    // true = 새로 연결됨, false = 있던 연결이 해제됨(같은 쌍을 다시 연동하면 토글).
+    public bool ToggleClueLink(string clueIdA, string clueIdB)
+    {
+        if (string.IsNullOrEmpty(clueIdA) || string.IsNullOrEmpty(clueIdB) || clueIdA == clueIdB) return false;
+        if (!CanEdit)
+        {
+            Debug.LogWarning("[NoteModule] 이동 중에는 단서를 연동할 수 없습니다.");
+            return false;
+        }
+
+        var pair = NormalizeLinkPair(clueIdA, clueIdB);
+        bool linked = !_clueLinks.Remove(pair);
+        if (linked) _clueLinks.Add(pair);
+        OnNoteChanged?.Invoke();
+        return linked;
+    }
+
+    public bool AreCluesLinked(string clueIdA, string clueIdB) =>
+        _clueLinks.Contains(NormalizeLinkPair(clueIdA, clueIdB));
+
+    // [요청, 2026-07-21] SaveModule이 직접 Instance로 접근해 호출 — noteEntries/noteSavedBoards와
+    // 동일한 패턴. ValueTuple은 JsonUtility가 못 다뤄서 NoteClueLink(평범한 클래스)로 변환해 오간다.
+    public List<NoteClueLink> ExportClueLinks() =>
+        _clueLinks.Select(p => new NoteClueLink { clueIdA = p.a, clueIdB = p.b }).ToList();
+
+    public void ImportClueLinks(List<NoteClueLink> links)
+    {
+        _clueLinks.Clear();
+        if (links != null)
+        {
+            foreach (var link in links)
+            {
+                if (string.IsNullOrEmpty(link.clueIdA) || string.IsNullOrEmpty(link.clueIdB)) continue;
+                _clueLinks.Add(NormalizeLinkPair(link.clueIdA, link.clueIdB));
+            }
+        }
+        OnNoteChanged?.Invoke();
     }
 }

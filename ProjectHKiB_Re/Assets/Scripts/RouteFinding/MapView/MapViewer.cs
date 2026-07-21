@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using RouteFinding.Note;
+using RouteFinding.Codex;
 
 namespace RouteFinding.MapView
 {
@@ -164,6 +165,7 @@ namespace RouteFinding.MapView
                 Debug.LogWarning("[MapViewer] 이동 중에는 지도를 열 수 없습니다.");
                 return;
             }
+            ExclusivePanelGroup.NotifyOpening(this, Close); // 노트/도감 등 다른 패널이 열려 있으면 먼저 닫는다
             Debug.Log($"[MapViewer] Open() — nodeViews={_nodeViews.Count}  edgeViews={_edgeViews.Count}  MapGraph={MapGraph.Instance != null}");
             if (_nodeViews.Count == 0 && MapGraph.Instance != null)
                 PopulateGraph();
@@ -174,6 +176,7 @@ namespace RouteFinding.MapView
 
         public void Close()
         {
+            ExclusivePanelGroup.NotifyClosing(this);
             _panelGO.SetActive(false);
             _inputManager?.PLAYMode();
         }
@@ -199,6 +202,22 @@ namespace RouteFinding.MapView
             SelectCurrentPath();
             Close();
             notePanel.Open();
+        }
+
+        // "도감" 툴바 버튼 — 맵을 닫고 씬에 배치된 도감 패널을 연다 (Clue_System.md 5단계).
+        // 노트 이동(GoToNote)과 동일한 패턴: 도감 패널을 직접 참조하지 않고 씬에서 찾는다.
+        // 경로 자동 커밋은 하지 않는다 — 도감은 노트와 달리 경로 계획과 무관한 순수 열람 기능이라
+        // "노트로 이동"의 SelectCurrentPath() 자동 호출이 여기엔 해당하지 않는다.
+        private void GoToCodex()
+        {
+            var codexPanel = FindObjectOfType<CodexPanel>();
+            if (codexPanel == null)
+            {
+                Debug.LogWarning("[MapViewer] 씬에서 CodexPanel을 찾을 수 없습니다.");
+                return;
+            }
+            Close();
+            codexPanel.Open();
         }
 
         // Editor 스크립트에서 프리팹 저장 시 접근
@@ -1028,14 +1047,14 @@ namespace RouteFinding.MapView
         private void BuildUI()
         {
             // 씬 계층에 MapPanel이 이미 자식으로 배치돼 있으면 재사용
-            // BtnSelectRoute가 없으면 구버전(2026-07-14 "경로 선택"/"노트로 이동" 버튼 도입 이전) — 파괴 후 재생성
-            // (마커를 "Toolbar"로 두면, Toolbar 자체는 이미 있던 구버전 저장 프리팹도 "최신"으로 오판정돼
-            //  새로 추가된 버튼이 코드에서 생성될 기회 자체가 없어짐 — Codex의 마커 갱신과 동일한 이유로 항상
-            //  가장 최근에 추가된 구조 요소로 갱신해야 한다.)
+            // BtnGoToCodex가 없으면 구버전(2026-07-20 "도감" 버튼 도입 이전) — 파괴 후 재생성
+            // (마커를 예전 요소로 두면, 그 요소는 이미 있던 구버전 저장 프리팹도 "최신"으로 오판정돼
+            //  새로 추가된 버튼이 코드에서 생성될 기회 자체가 없어짐 — 항상 가장 최근에 추가된
+            //  구조 요소로 갱신해야 한다.)
             var existing = transform.Find("MapPanel");
             if (existing != null)
             {
-                bool existingCurrent = FindDeepTransform(existing, "BtnSelectRoute") != null;
+                bool existingCurrent = FindDeepTransform(existing, "BtnGoToCodex") != null;
 
                 if (existingCurrent)
                 {
@@ -1050,11 +1069,11 @@ namespace RouteFinding.MapView
             }
 
             // 프리팹이 지정되어 있으면 인스턴스화 후 참조를 바인딩하고 콜백만 재연결
-            // BtnSelectRoute 없으면 구버전 취급(위 existing 분기와 동일한 이유). GraphArea는 프리팹에서
+            // BtnGoToCodex 없으면 구버전 취급(위 existing 분기와 동일한 이유). GraphArea는 프리팹에서
             // 지워둔 경우(겹침 방지) 자동 생성으로 보강한다.
             if (_panelPrefab != null)
             {
-                bool prefabCurrent = FindDeepTransform(_panelPrefab.transform, "BtnSelectRoute") != null;
+                bool prefabCurrent = FindDeepTransform(_panelPrefab.transform, "BtnGoToCodex") != null;
 
                 if (prefabCurrent)
                 {
@@ -1230,6 +1249,9 @@ namespace RouteFinding.MapView
             // "노트로 이동"은 클릭 시 지금 미리보기 중인 경로를 자동으로 먼저 커밋한 뒤 노트를 연다 —
             // "경로 선택"을 누르는 걸 잊어도 노트에 반영되도록 하기 위함(사용자 요청).
             ToolbarFixedBtn(toolbar, "노트로 이동", GoToNote, "BtnGoToNote", 40f);
+
+            // "도감 열기" — 지도 사이드패널에서 도감으로 바로 넘어가는 진입 경로 (Clue_System.md 5단계).
+            ToolbarFixedBtn(toolbar, "도감", GoToCodex, "BtnGoToCodex", 28f);
 
             // 닫기 버튼 — 툴바 최우측 (사이드패널에서는 제거됨)
             var closeBtn = ToolbarFixedBtn(toolbar, $"닫기 [{_toggleKey}]", Close, "BtnClose", 40f);
@@ -1582,6 +1604,9 @@ namespace RouteFinding.MapView
 
             FindDeepTransform(_panelGO.transform, "BtnGoToNote")
                 ?.GetComponent<Button>()?.onClick.AddListener(GoToNote);
+
+            FindDeepTransform(_panelGO.transform, "BtnGoToCodex")
+                ?.GetComponent<Button>()?.onClick.AddListener(GoToCodex);
 
             FindDeepTransform(_panelGO.transform, "BtnSelectRoute")
                 ?.GetComponent<Button>()?.onClick.AddListener(SelectCurrentPath);

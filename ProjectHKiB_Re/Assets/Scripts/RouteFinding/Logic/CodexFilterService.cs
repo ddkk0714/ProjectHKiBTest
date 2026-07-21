@@ -52,6 +52,45 @@ public static class CodexFilterService
         return result;
     }
 
+    // 6-5단계 — 그룹 내부(entries) 정렬. ToSortedGroups는 그룹 자체(카테고리)만 가나다순으로 정렬하고
+    // 그룹 안 항목 순서는 원래 삽입 순서 그대로였다 — 그 삽입 순서 자체가 세이브 로드 후에는 사실상
+    // 무작위(HashSet 기반)라 "가나다순" 조차 보장되지 않던 상태였다. acquisitionRank는 clueId → 획득
+    // 순번(작을수록 먼저 획득, RouteProgressState.AcquisitionOrder 기준) — 없는 항목(유저 메모·미발견
+    // 슬롯)은 정렬 우선순위상 맨 뒤로 보낸다.
+    public static void SortEntries(List<CodexGroup> groups, CodexSortOrder order, IReadOnlyDictionary<string, int> acquisitionRank)
+    {
+        foreach (var group in groups)
+        {
+            switch (order)
+            {
+                case CodexSortOrder.ByType:
+                    group.entries.Sort((a, b) =>
+                    {
+                        int c = string.Compare(a.typeLabel, b.typeLabel, StringComparison.CurrentCultureIgnoreCase);
+                        return c != 0 ? c : string.Compare(a.title, b.title, StringComparison.CurrentCultureIgnoreCase);
+                    });
+                    break;
+                case CodexSortOrder.RecentlyAcquired:
+                    group.entries.Sort((a, b) =>
+                    {
+                        int ra = RankOf(a.clueId, acquisitionRank);
+                        int rb = RankOf(b.clueId, acquisitionRank);
+                        return rb.CompareTo(ra); // 순번이 큰(최근) 것이 먼저
+                    });
+                    break;
+                default: // Alphabetical
+                    group.entries.Sort((a, b) => string.Compare(a.title, b.title, StringComparison.CurrentCultureIgnoreCase));
+                    break;
+            }
+        }
+    }
+
+    private static int RankOf(string clueId, IReadOnlyDictionary<string, int> acquisitionRank)
+    {
+        if (string.IsNullOrEmpty(clueId) || acquisitionRank == null) return -1;
+        return acquisitionRank.TryGetValue(clueId, out var rank) ? rank : -1;
+    }
+
     private static bool Contains(string haystack, string needle) =>
         !string.IsNullOrEmpty(haystack) && haystack.IndexOf(needle, StringComparison.OrdinalIgnoreCase) >= 0;
 

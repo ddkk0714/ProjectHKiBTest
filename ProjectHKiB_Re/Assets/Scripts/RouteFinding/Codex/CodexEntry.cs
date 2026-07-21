@@ -33,6 +33,10 @@ namespace RouteFinding.Codex
         // 새지 않는다(핀·편집 버튼도 clueId/userEntryGuid가 비어 자연히 숨겨짐). 맵별 그룹핑에서만
         // 채워진다(슬롯 개수 자체가 MapNodeData.clueIds 기준이라 맵과 무관한 출처/키워드 분류에는 안 맞음).
         public bool isPlaceholder = false;
+
+        // 6-3단계(Clue_System.md) — 새로 획득했지만 아직 카드로 한 번도 열어보지 않은 정식 단서.
+        // CodexModule.IsClueNew가 계산해서 CodexPanel.ToEntry가 채운다. 유저 메모/미발견 슬롯은 항상 false.
+        public bool isNew = false;
     }
 
     // CodexFilterService의 그룹핑 결과 한 덩어리 — 카테고리 이름 + 그 안에 속한 항목들.

@@ -1,6 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using RouteFinding.MapView;
 
 namespace RouteFinding.Note
 {
@@ -19,9 +22,10 @@ namespace RouteFinding.Note
     // 1단계 재설계(2026-07-14, 사용자 제공 UI 목업 기준): 항목을 플랫 리스트가 아니라
     // "선택된 경로가 지나는 맵 체인 + 그 맵에 연관된 단서 카드"로 그린다 — NoteRouteGraphView 참고.
     //
-    // 4단계(2026-07-14, 완료): 우측에 RoutePlanEditorView를 추가해 다중 목적지 이동 계획(핵심 산출물)을
-    // 편집·실행한다. 좌측 카드의 "계획에 추가" 버튼(targetMapGuid가 있는 항목)이 우측 계획에 목적지를 담는
-    // 다리 역할 — NotePanel.HandleAddToPlanRequested 참고.
+    // [2026-07-21, 요청으로 교체] 우측에 있던 다중 목적지 이동 계획(RoutePlanEditorView)을 완전히
+    // 제거하고 "단서 서랍"(ClueDrawerView)으로 대체했다 — 현재 획득한 모든 단서를 검색/키워드 필터로
+    // 훑어보고, 드래그해서 좌측 단서 그래프에 직접 배치할 수 있다. 드롭 처리 자체는
+    // NoteRouteGraphView.PlaceClueAt이 담당 — NotePanel.HandleClueDropped가 그 다리 역할.
     public class NotePanel : MonoBehaviour
     {
         [Header("조작")]
@@ -35,21 +39,44 @@ namespace RouteFinding.Note
         [SerializeField] private Color _rootBgColor = new(0.04f, 0.04f, 0.08f, 0.96f);
         [SerializeField] private Color _listBgColor = new(0.07f, 0.09f, 0.14f, 0.97f);
 
-        [SerializeField] private float _planAreaWidthRatio = 0.42f; // 우측 계획 편집 영역이 차지하는 비율
+        // [2026-07-21, 요청으로 교체] 비율(anchorMax.x) 기반이던 서랍 폭을 MapViewer의 사이드패널과 같은
+        // 픽셀 폭 기반으로 바꿨다 — 접었을 때 고정폭(_drawerCollapsedWidth)만 남기는 개념 자체가 비율로는
+        // 표현하기 어려워서(비율은 항상 화면 크기에 상대적이라 "접었을 때 12px" 같은 절대값을 못 담는다).
+        [SerializeField] private float _drawerAreaWidth = 140f;      // 서랍이 열렸을 때의 폭
+        [SerializeField] private float _drawerCollapsedWidth = 12f;  // 접었을 때 남는 재오픈용 탭 폭
 
         [Header("프리팹 (선택 — 비워두면 런타임 자동 생성)")]
         [SerializeField] private GameObject _panelPrefab;
 
         private GameObject _panelGO;
         private NoteRouteGraphView _graphView;
-        private RoutePlanEditorView _planEditorView;
+        private ClueDrawerView _clueDrawerView;
+        private NoteBoardWindow _boardWindow;
+        private ClueKeywordFilterWindow _keywordFilterWindow;
+        private NoteClueCreateWindow _clueCreateWindow;
         private InputManager _inputManager;
+        private Image _linkModeBtnImg; // "단서 연동" 토글 버튼 — 활성 상태를 색으로 표시
+
+        // [2026-07-21, 신설] 좌측 단서 그래프 팬·줌(MapViewer.GraphPanZoom 재사용) + 우측 서랍 접기/펼치기.
+        private RectTransform _graphAreaRT;     // GraphScroll 자체 — 서랍 폭에 맞춰 offsetMax를 조정
+        private RectTransform _graphViewportRT; // GraphPanZoom 클리핑 기준
+        private RectTransform _graphContainerRT; // GraphPanZoom 대상 — NoteRouteGraphView의 Content로도 그대로 쓰임
+        private GraphPanZoom _graphPanZoom;
+
+        private RectTransform _drawerAreaRT;      // ClueDrawerScroll 자체 — 열림/접힘 폭 조정 대상
+        private RectTransform _drawerViewportRT;  // 접었을 때 비활성화할 스크롤 뷰포트(재오픈 탭은 별개라 계속 보임)
+        private TextMeshProUGUI _drawerToggleArrowTMP;
+        private bool _drawerOpen = true;
 
         private void Awake()
         {
             var rt = GetComponent<RectTransform>();
             if (rt != null) StretchFull(rt);
             BuildUI();
+            // MapViewer.Awake와 동일한 이유·순서 — BuildUI()가 어느 경로(재사용/프리팹/런타임 생성)를
+            // 탔든 이 시점엔 _graphContainerRT/_graphViewportRT가 채워져 있으므로 여기서 한 번만 Init.
+            var canvas = GetComponentInParent<Canvas>();
+            _graphPanZoom?.Init(_graphContainerRT, _graphViewportRT, canvas);
             _inputManager = FindObjectOfType<InputManager>();
         }
 
@@ -77,6 +104,7 @@ namespace RouteFinding.Note
         // 지도/도감과 달리 이동 중에도 항상 열 수 있다 — CanOpenMap 체크를 의도적으로 하지 않는다.
         public void Open()
         {
+            ExclusivePanelGroup.NotifyOpening(this, Close); // 지도/도감 등 다른 패널이 열려 있으면 먼저 닫는다
             Refresh();
             _panelGO.SetActive(true);
             _inputManager?.MENUMode();
@@ -84,6 +112,7 @@ namespace RouteFinding.Note
 
         public void Close()
         {
+            ExclusivePanelGroup.NotifyClosing(this);
             _panelGO.SetActive(false);
             _inputManager?.PLAYMode();
         }
@@ -103,7 +132,7 @@ namespace RouteFinding.Note
             var route = RouteModule.Instance?.SelectedRoute;
             Debug.Log($"[NotePanel] Refresh() — route={(route == null ? "null" : $"valid={route.IsValid}")}, entries={NoteModule.Instance.Entries.Count}, _graphView={(_graphView != null)}");
             _graphView.SetData(route, NoteModule.Instance.Entries);
-            _planEditorView.Refresh();
+            _clueDrawerView.Refresh();
         }
 
         private void HandleRouteSelected(PathResult _) => Refresh();
@@ -111,12 +140,121 @@ namespace RouteFinding.Note
         // 이동 중 잠금은 NoteModule.RemoveEntry 내부에서 판단·경고한다 — 여기서는 그대로 위임만 한다.
         private void HandleDeleteRequested(NoteEntry entry) => NoteModule.Instance.RemoveEntry(entry.clueId);
 
-        // 4단계: 노트 카드의 "계획에 추가" 액션 — 그 단서의 targetMapGuid를 현재 편집 중인 계획에 담는다.
-        private void HandleAddToPlanRequested(NoteEntry entry)
+        // 단서 서랍(우측)에서 드래그가 끝났을 때의 다리 역할 — 실제로 그래프 영역 위에 놓였는지,
+        // 어디에 배치할지는 NoteRouteGraphView.PlaceClueAt이 전부 판단한다(NotePanel은 중계만).
+        private void HandleClueDropped(string clueId, Vector2 screenPosition) =>
+            _graphView.PlaceClueAt(clueId, screenPosition);
+
+        // ─── 저장한 루트(보드) — 상단 툴바 "저장한 루트" 창 오케스트레이션 ─────
+        // 실제 저장/삭제/목록 보관은 NoteModule.SavedBoards가 담당하고, 여기서는 "지금 화면 상태"를
+        // 모으거나(저장) "저장된 스냅샷을 화면에 반영"(불러오기)하는 조립만 한다.
+
+        private void OpenBoardWindow() => _boardWindow?.Show(NoteModule.Instance.SavedBoards);
+
+        private void HandleBoardSaveRequested(string name)
         {
-            var clue = MapGraph.Instance?.GetClue(entry.clueId);
-            if (clue == null || string.IsNullOrEmpty(clue.targetMapGuid)) return;
-            _planEditorView.AddMapToSelectedPlan(clue.targetMapGuid);
+            var routeGuids = new List<string>();
+            var route = RouteModule.Instance?.SelectedRoute;
+            if (route != null && route.IsValid)
+                foreach (var node in route.Nodes) routeGuids.Add(node.guid);
+
+            var manualClueIds = NoteModule.Instance.Entries
+                .Where(e => e.reason == NotePinReason.ManualPin)
+                .Select(e => e.clueId)
+                .ToList();
+
+            // [요청, 2026-07-21] 수동 핀뿐 아니라 지금 노드로 펼쳐져 있는 경로연동 단서까지 포함해 위치를
+            // 저장한다 — 안 그러면 사용자가 직접 옮겨둔 경로연동 단서 위치가 불러올 때 기본 위치로 리셋됐다.
+            var positions = _graphView.ExportCluePositions(_graphView.GetPlacedClueIds());
+            var expandedClueIds = _graphView.GetExpandedClueIds().ToList();
+
+            NoteModule.Instance.SaveBoard(name, routeGuids, manualClueIds, positions, expandedClueIds);
+            _boardWindow?.Refresh(NoteModule.Instance.SavedBoards);
+        }
+
+        private void HandleBoardLoadRequested(string boardId)
+        {
+            var board = NoteModule.Instance.GetBoard(boardId);
+            if (board == null) return;
+            if (!NoteModule.Instance.CanEdit)
+            {
+                Debug.LogWarning("[NotePanel] 이동 중에는 저장한 루트를 불러올 수 없습니다.");
+                return;
+            }
+
+            // 순서 중요:
+            // 1) 펼침 상태부터 복원해야 — 아래 RebuildRouteLinkedEntries가 유발하는 SetData 재생성 때
+            //    저장돼 있던 경로연동 단서가 카드가 아니라 노드로 만들어진다(안 그러면 카드로 남아
+            //    2)에서 큐잉해둔 위치가 적용될 자리가 없다).
+            // 2) 그래프 위치를 경로/핀 반영보다 먼저 큐잉해둬야, 뒤이은 호출들이 유발하는 SetData
+            //    재생성 시점에 새로 만들어지는 단서 노드가 저장된 위치를 바로 집어간다
+            //    (NoteRouteGraphView.PlaceClueAt과 동일한 큐잉 순서).
+            _graphView.ApplyExpandedClueIds(board.expandedClueIds);
+            _graphView.ApplySavedPositions(board.cluePositions);
+
+            RouteModule.Instance?.ImportSelectedRoute(board.routeNodeGuids);
+            NoteModule.Instance.RebuildRouteLinkedEntries(RouteModule.Instance?.SelectedRoute);
+            NoteModule.Instance.ApplyManualPins(board);
+            NoteModule.Instance.ImportClueLinks(board.clueLinks); // 단서 연동 관계도 같이 복원
+
+            _boardWindow?.Hide();
+        }
+
+        private void HandleBoardDeleteRequested(string boardId)
+        {
+            NoteModule.Instance.DeleteBoard(boardId);
+            _boardWindow?.Refresh(NoteModule.Instance.SavedBoards);
+        }
+
+        // ─── 단서 서랍 키워드 필터 창 오케스트레이션 ───────────────
+        // 필터 상태(_activeKeywords) 자체는 ClueDrawerView가 소유 — 여기서는 창을 열고/갱신하는
+        // 다리 역할만 한다(HandleClueDropped와 같은 성격의 중계).
+
+        private void HandleFilterButtonClicked() =>
+            _keywordFilterWindow?.Show(_clueDrawerView.ComputeAllKeywords(), _clueDrawerView.ActiveKeywords);
+
+        private void HandleFilterKeywordToggled(string keyword)
+        {
+            _clueDrawerView.ToggleKeyword(keyword);
+            _keywordFilterWindow?.Refresh(_clueDrawerView.ComputeAllKeywords(), _clueDrawerView.ActiveKeywords);
+        }
+
+        private void HandleFilterClearAllRequested()
+        {
+            _clueDrawerView.ClearActiveKeywords();
+            _keywordFilterWindow?.Refresh(_clueDrawerView.ComputeAllKeywords(), _clueDrawerView.ActiveKeywords);
+        }
+
+        // ─── 단서 생성 — 상단 툴바 "단서 생성" 창 오케스트레이션 ─────────────
+        // [신설, 2026-07-21] 노트 안에서 유저가 직접 새 단서를 만들 수 있다 — 생성하면 도감
+        // (CodexModule.AddUserEntry)에도 자동 등록되고, 노트에도 곧바로 수동 핀으로 붙는다.
+
+        private void OpenClueCreateWindow() => _clueCreateWindow?.Show();
+
+        private void HandleClueCreateRequested(string title, string content, string[] keywords)
+        {
+            if (CodexModule.Instance == null || NoteModule.Instance == null) return;
+
+            var entry = CodexModule.Instance.AddUserEntry(title, content, "", keywords);
+            NoteModule.Instance.AddManualPin(entry.guid);
+        }
+
+        // ─── 단서 연동 모드 — 상단 툴바 "단서 연동" 토글 오케스트레이션 ─────────
+        // [신설, 2026-07-21] 실제 연동 상태 관리·클릭 처리는 전부 NoteRouteGraphView(그래프 쪽 사정을
+        // 잘 아는 쪽)가 하고, 여기서는 토글 버튼 색만 그 상태에 맞춰 갱신한다.
+
+        private void ToggleLinkMode()
+        {
+            _graphView.SetLinkMode(!_graphView.LinkModeActive);
+            RefreshLinkModeButton();
+        }
+
+        private void RefreshLinkModeButton()
+        {
+            if (_linkModeBtnImg == null || _graphView == null) return;
+            _linkModeBtnImg.color = _graphView.LinkModeActive
+                ? new Color(0.25f, 0.55f, 0.30f)
+                : new Color(0.20f, 0.28f, 0.42f);
         }
 
         // ─── UI 구축 ─────────────────────────────────────────────
@@ -124,14 +262,14 @@ namespace RouteFinding.Note
         private void BuildUI()
         {
             // 씬 계층에 NotePanelRoot가 이미 자식으로 배치돼 있으면 재사용 (CodexPanel.BuildUI와 동일한 패턴).
-            // GraphArea(2026-07-14, 노드-간선 그래프 재작업으로 가장 최근에 추가된 요소)가 없으면 구버전으로
-            // 보고 파괴 후 재생성 — "판정 기준은 항상 가장 최근에 추가된 요소여야 그 이전 요소까지 전부
-            // 갖췄다는 게 보장된다"(Clue_System.md 4-5장의 MemoFormOverlay/PinRow 판정과 같은 이유,
-            // MapViewer의 BtnSelectRoute 마커 갱신과 동일한 이유로 PlanScroll에서 GraphArea로 교체).
+            // ClueCreateOverlay(2026-07-21, "단서 생성" 창 + "단서 연동" 모드 신설로 가장 최근에 추가된
+            // 요소)가 없으면 구버전으로 보고 파괴 후 재생성 — "판정 기준은 항상 가장 최근에 추가된 요소여야
+            // 그 이전 요소까지 전부 갖췄다는 게 보장된다"(MapViewer의 BtnSelectRoute 마커 갱신과 동일한
+            // 이유로, 이번에도 DrawerToggleTab에서 ClueCreateOverlay로 교체).
             var existing = transform.Find("NotePanelRoot");
             if (existing != null)
             {
-                bool existingCurrent = FindDeepTransform(existing, "GraphArea") != null;
+                bool existingCurrent = FindDeepTransform(existing, "ClueCreateOverlay") != null;
                 if (existingCurrent)
                 {
                     Debug.Log("[NotePanel] BuildUI: 씬에 있던 기존 NotePanelRoot를 재사용합니다.");
@@ -139,7 +277,7 @@ namespace RouteFinding.Note
                     FinalizePanel(_panelGO.GetComponent<RectTransform>());
                     return;
                 }
-                Debug.Log("[NotePanel] BuildUI: 기존 NotePanelRoot에 GraphArea가 없어 구버전으로 판단, 파괴 후 재생성합니다.");
+                Debug.Log("[NotePanel] BuildUI: 기존 NotePanelRoot에 ClueCreateOverlay가 없어 구버전으로 판단, 파괴 후 재생성합니다.");
                 // CodexDrawerTreeView.Clear와 동일한 이유로 먼저 비활성화한 뒤 Destroy.
                 existing.gameObject.SetActive(false);
                 Destroy(existing.gameObject);
@@ -148,7 +286,7 @@ namespace RouteFinding.Note
             // 프리팹이 지정되어 있으면 인스턴스화 후 참조를 바인딩하고 콜백만 재연결.
             if (_panelPrefab != null)
             {
-                bool prefabCurrent = FindDeepTransform(_panelPrefab.transform, "GraphArea") != null;
+                bool prefabCurrent = FindDeepTransform(_panelPrefab.transform, "ClueCreateOverlay") != null;
                 if (prefabCurrent)
                 {
                     Debug.Log($"[NotePanel] BuildUI: 지정된 프리팹({_panelPrefab.name})을 인스턴스화합니다.");
@@ -157,7 +295,7 @@ namespace RouteFinding.Note
                     FinalizePanel(_panelGO.GetComponent<RectTransform>());
                     return;
                 }
-                Debug.LogWarning($"[NotePanel] BuildUI: 지정된 프리팹({_panelPrefab.name})에 GraphArea가 없어 구버전으로 판단, 런타임 생성으로 대체합니다. 프리팹을 다시 생성해주세요.");
+                Debug.LogWarning($"[NotePanel] BuildUI: 지정된 프리팹({_panelPrefab.name})에 ClueCreateOverlay가 없어 구버전으로 판단, 런타임 생성으로 대체합니다. 프리팹을 다시 생성해주세요.");
             }
 
             // ── 프리팹 없음 → 런타임 자동 생성 ──
@@ -172,6 +310,9 @@ namespace RouteFinding.Note
 
             BuildTopBar(root);
             BuildList(root);
+            BuildBoardWindow(root);
+            BuildKeywordFilterWindow(root);
+            BuildClueCreateWindow(root);
         }
 
         // 기존/프리팹 패널을 재사용할 때의 공통 마무리: 전체 스트레치 + 참조 바인딩 + 콜백 재연결.
@@ -187,21 +328,67 @@ namespace RouteFinding.Note
             FindDeepTransform(root, "BtnClose")?.GetComponent<Button>()?.onClick.AddListener(Close);
 
             var graphScrollTF = FindDeepTransform(root, "GraphScroll");
+            _graphAreaRT = graphScrollTF as RectTransform;
+            _graphPanZoom = graphScrollTF?.GetComponent<GraphPanZoom>();
+            _graphPanZoom?.ConfigureBounds(true, 120f); // BuildGraphPanZoom과 동일 — 재사용 경로에서도 팬 범위 제한 적용
             _graphView = graphScrollTF?.GetComponent<NoteRouteGraphView>();
             if (_graphView != null)
             {
-                var contentTF = FindDeepTransform(graphScrollTF, "Content");
-                _graphView.Init((RectTransform)contentTF, _font); // 위젯을 새로 만들지 않고 참조만 저장하므로 재호출해도 안전
+                _graphViewportRT = FindDeepTransform(graphScrollTF, "GraphViewport") as RectTransform;
+                _graphContainerRT = FindDeepTransform(graphScrollTF, "GraphContainer") as RectTransform;
+                if (_graphContainerRT != null)
+                    _graphView.Init(_graphContainerRT, _font); // 위젯을 새로 만들지 않고 참조만 저장하므로 재호출해도 안전
                 _graphView.OnDeleteRequested += HandleDeleteRequested;
-                _graphView.OnAddToPlanRequested += HandleAddToPlanRequested;
             }
 
-            var planScrollTF = FindDeepTransform(root, "PlanScroll");
-            _planEditorView = planScrollTF?.GetComponent<RoutePlanEditorView>();
-            if (_planEditorView != null)
+            var drawerScrollTF = FindDeepTransform(root, "ClueDrawerScroll");
+            _drawerAreaRT = drawerScrollTF as RectTransform;
+            _clueDrawerView = drawerScrollTF?.GetComponent<ClueDrawerView>();
+            if (_clueDrawerView != null)
             {
-                var contentTF = FindDeepTransform(planScrollTF, "Content");
-                _planEditorView.Init((RectTransform)contentTF, _font);
+                _drawerViewportRT = FindDeepTransform(drawerScrollTF, "Viewport") as RectTransform;
+                var contentTF = FindDeepTransform(drawerScrollTF, "Content");
+                _clueDrawerView.Init((RectTransform)contentTF, _font);
+                _clueDrawerView.OnClueDropped += HandleClueDropped;
+                _clueDrawerView.OnFilterButtonClicked += HandleFilterButtonClicked;
+            }
+
+            var drawerTabTF = FindDeepTransform(root, "DrawerToggleTab");
+            drawerTabTF?.GetComponent<Button>()?.onClick.AddListener(() => SetDrawerOpen(!_drawerOpen));
+            _drawerToggleArrowTMP = drawerTabTF?.GetComponentInChildren<TextMeshProUGUI>();
+            UpdateDrawerLayout(); // 재사용 경로에서도 현재 _drawerOpen 상태(기본 true)에 맞춰 폭/Viewport 활성 상태를 강제
+
+            FindDeepTransform(root, "BtnBoardWindow")?.GetComponent<Button>()?.onClick.AddListener(OpenBoardWindow);
+
+            _boardWindow = root.GetComponent<NoteBoardWindow>();
+            if (_boardWindow != null)
+            {
+                _boardWindow.Bind(root, _font);
+                _boardWindow.OnSaveRequested += HandleBoardSaveRequested;
+                _boardWindow.OnLoadRequested += HandleBoardLoadRequested;
+                _boardWindow.OnDeleteRequested += HandleBoardDeleteRequested;
+            }
+
+            _keywordFilterWindow = root.GetComponent<ClueKeywordFilterWindow>();
+            if (_keywordFilterWindow != null)
+            {
+                _keywordFilterWindow.Bind(root, _font);
+                _keywordFilterWindow.OnKeywordToggled += HandleFilterKeywordToggled;
+                _keywordFilterWindow.OnClearAllRequested += HandleFilterClearAllRequested;
+            }
+
+            FindDeepTransform(root, "BtnClueCreate")?.GetComponent<Button>()?.onClick.AddListener(OpenClueCreateWindow);
+
+            var linkModeBtnTF = FindDeepTransform(root, "BtnLinkMode");
+            linkModeBtnTF?.GetComponent<Button>()?.onClick.AddListener(ToggleLinkMode);
+            _linkModeBtnImg = linkModeBtnTF?.GetComponent<Image>();
+            RefreshLinkModeButton();
+
+            _clueCreateWindow = root.GetComponent<NoteClueCreateWindow>();
+            if (_clueCreateWindow != null)
+            {
+                _clueCreateWindow.Bind(root, _font);
+                _clueCreateWindow.OnCreateRequested += HandleClueCreateRequested;
             }
         }
 
@@ -235,6 +422,66 @@ namespace RouteFinding.Note
             titleTmp.color = Color.white;
             titleTmp.alignment = TextAlignmentOptions.MidlineLeft;
 
+            var boardBtnRT = NewRect(topBar, "BtnBoardWindow");
+            var boardLe = boardBtnRT.gameObject.AddComponent<LayoutElement>();
+            boardLe.preferredWidth = 56f;
+            boardLe.flexibleWidth = 0f;
+            var boardImg = AddImg(boardBtnRT, new Color(0.20f, 0.28f, 0.42f));
+            var boardBtn = boardBtnRT.gameObject.AddComponent<Button>();
+            boardBtn.targetGraphic = boardImg;
+            boardBtn.transition = Selectable.Transition.None;
+            boardBtn.onClick.AddListener(OpenBoardWindow);
+
+            var boardTxtRT = NewRect(boardBtnRT, "Text");
+            StretchFull(boardTxtRT);
+            var boardTmp = boardTxtRT.gameObject.AddComponent<TextMeshProUGUI>();
+            if (_font != null) boardTmp.font = _font;
+            boardTmp.text = "저장한 루트";
+            boardTmp.fontSize = 7f;
+            boardTmp.alignment = TextAlignmentOptions.Center;
+            boardTmp.verticalAlignment = VerticalAlignmentOptions.Middle;
+            boardTmp.color = Color.white;
+
+            var createBtnRT = NewRect(topBar, "BtnClueCreate");
+            var createLe = createBtnRT.gameObject.AddComponent<LayoutElement>();
+            createLe.preferredWidth = 48f;
+            createLe.flexibleWidth = 0f;
+            var createImg = AddImg(createBtnRT, new Color(0.20f, 0.28f, 0.42f));
+            var createBtn = createBtnRT.gameObject.AddComponent<Button>();
+            createBtn.targetGraphic = createImg;
+            createBtn.transition = Selectable.Transition.None;
+            createBtn.onClick.AddListener(OpenClueCreateWindow);
+
+            var createTxtRT = NewRect(createBtnRT, "Text");
+            StretchFull(createTxtRT);
+            var createTmp = createTxtRT.gameObject.AddComponent<TextMeshProUGUI>();
+            if (_font != null) createTmp.font = _font;
+            createTmp.text = "단서 생성";
+            createTmp.fontSize = 7f;
+            createTmp.alignment = TextAlignmentOptions.Center;
+            createTmp.verticalAlignment = VerticalAlignmentOptions.Middle;
+            createTmp.color = Color.white;
+
+            var linkBtnRT = NewRect(topBar, "BtnLinkMode");
+            var linkLe = linkBtnRT.gameObject.AddComponent<LayoutElement>();
+            linkLe.preferredWidth = 48f;
+            linkLe.flexibleWidth = 0f;
+            _linkModeBtnImg = AddImg(linkBtnRT, new Color(0.20f, 0.28f, 0.42f));
+            var linkBtn = linkBtnRT.gameObject.AddComponent<Button>();
+            linkBtn.targetGraphic = _linkModeBtnImg;
+            linkBtn.transition = Selectable.Transition.None;
+            linkBtn.onClick.AddListener(ToggleLinkMode);
+
+            var linkTxtRT = NewRect(linkBtnRT, "Text");
+            StretchFull(linkTxtRT);
+            var linkTmp = linkTxtRT.gameObject.AddComponent<TextMeshProUGUI>();
+            if (_font != null) linkTmp.font = _font;
+            linkTmp.text = "단서 연동";
+            linkTmp.fontSize = 7f;
+            linkTmp.alignment = TextAlignmentOptions.Center;
+            linkTmp.verticalAlignment = VerticalAlignmentOptions.Middle;
+            linkTmp.color = Color.white;
+
             var closeBtnRT = NewRect(topBar, "BtnClose");
             var closeLe = closeBtnRT.gameObject.AddComponent<LayoutElement>();
             closeLe.preferredWidth = 34f;
@@ -256,34 +503,162 @@ namespace RouteFinding.Note
             closeTmp.color = Color.white;
         }
 
-        // 좌측: 노트 항목(경로 체인 + 카드, NoteRouteGraphView). 우측: 다중 목적지 이동 계획 편집·실행
-        // (RoutePlanEditorView, 4단계 — 이 시스템의 핵심 산출물).
+        // 좌측: 노트 항목(경로 체인 + 카드, NoteRouteGraphView) — [2026-07-21, 요청으로 추가] 맵(MapViewer)
+        // 처럼 휠 줌 + 좌클릭 드래그 패닝 가능. 우측: 단서 서랍(ClueDrawerView) — 현재 획득한 단서를
+        // 검색/키워드 필터로 훑어보고 드래그해서 좌측 그래프에 배치하며, [2026-07-21, 요청으로 추가]
+        // 맵 사이드패널처럼 접고 펼 수 있다.
         private void BuildList(RectTransform root)
         {
+            float drawerW = _drawerOpen ? _drawerAreaWidth : _drawerCollapsedWidth;
+
             var graphArea = NewRect(root, "GraphScroll");
             graphArea.anchorMin = Vector2.zero;
-            graphArea.anchorMax = new Vector2(1f - _planAreaWidthRatio, 1f);
+            graphArea.anchorMax = Vector2.one;
             graphArea.offsetMin = Vector2.zero;
-            graphArea.offsetMax = new Vector2(0f, -_topBarHeight);
-            AddImg(graphArea, _listBgColor);
+            graphArea.offsetMax = new Vector2(-drawerW, -_topBarHeight);
+            _graphAreaRT = graphArea;
+            BuildGraphPanZoom(graphArea);
 
-            _graphView = BuildScrollingList<NoteRouteGraphView>(graphArea, out var graphContent);
-            _graphView.Init(graphContent, _font);
-            _graphView.OnDeleteRequested += HandleDeleteRequested;
-            _graphView.OnAddToPlanRequested += HandleAddToPlanRequested;
+            var drawerColor = new Color(_listBgColor.r * 0.85f, _listBgColor.g * 0.85f, _listBgColor.b * 0.85f, _listBgColor.a);
 
-            var planArea = NewRect(root, "PlanScroll");
-            planArea.anchorMin = new Vector2(1f - _planAreaWidthRatio, 0f);
-            planArea.anchorMax = Vector2.one;
-            planArea.offsetMin = Vector2.zero;
-            planArea.offsetMax = new Vector2(0f, -_topBarHeight);
-            AddImg(planArea, new Color(_listBgColor.r * 0.85f, _listBgColor.g * 0.85f, _listBgColor.b * 0.85f, _listBgColor.a));
+            var drawerArea = NewRect(root, "ClueDrawerScroll");
+            drawerArea.anchorMin = new Vector2(1f, 0f);
+            drawerArea.anchorMax = Vector2.one;
+            drawerArea.offsetMin = new Vector2(-drawerW, 0f);
+            drawerArea.offsetMax = new Vector2(0f, -_topBarHeight);
+            AddImg(drawerArea, drawerColor);
+            _drawerAreaRT = drawerArea;
 
-            _planEditorView = BuildScrollingList<RoutePlanEditorView>(planArea, out var planContent);
-            _planEditorView.Init(planContent, _font);
+            _clueDrawerView = BuildScrollingList<ClueDrawerView>(drawerArea, out var drawerContent);
+            _drawerViewportRT = (RectTransform)drawerArea.Find("Viewport");
+            _clueDrawerView.Init(drawerContent, _font);
+            _clueDrawerView.OnClueDropped += HandleClueDropped;
+            _clueDrawerView.OnFilterButtonClicked += HandleFilterButtonClicked;
+
+            BuildDrawerToggleTab(drawerArea, drawerColor);
+            UpdateDrawerLayout();
         }
 
-        // GraphScroll/PlanScroll이 공유하는 뼈대(ScrollRect+Viewport+Content)를 만들고,
+        // GraphScroll 내부에 지도(MapViewer.BuildScrollGraph)와 동일한 구조로 팬·줌 가능한 그래프 영역을
+        // 짓는다 — GraphPanZoom(휠 줌 + 좌클릭 드래그 패닝)을 GraphArea 자체에 붙이고, 그 안에 마스킹용
+        // GraphViewport + 실제 이동/확대 대상인 GraphContainer를 둔다. NoteRouteGraphView는 이미 프리폼
+        // 배치 방식이라 이 GraphContainer를 그대로 "Content"로 받아 노드를 배치하는 것 외에 달라지는 게
+        // 없다(예전엔 ScrollRect가 좌표를 옮겼다면 이제는 GraphPanZoom이 옮긴다는 차이뿐).
+        private void BuildGraphPanZoom(RectTransform graphArea)
+        {
+            AddImg(graphArea, _listBgColor);
+            _graphPanZoom = graphArea.gameObject.AddComponent<GraphPanZoom>();
+            // [요청, 2026-07-21] 지도(MapViewer)와 달리 노트 그래프는 콘텐츠 크기가 고정폭(900x300 시작,
+            // 세로만 SetData 때마다 재계산)이라 무제한 팬을 허용하면 빈 허공으로 한없이 밀려날 수 있다 —
+            // 이 인스턴스에 한해 팬 범위를 제한한다(MapViewer의 GraphPanZoom은 건드리지 않아 그대로 무제한).
+            _graphPanZoom.ConfigureBounds(true, 120f);
+
+            var viewport = NewRect(graphArea, "GraphViewport");
+            StretchFull(viewport);
+            viewport.gameObject.AddComponent<RectMask2D>();
+            _graphViewportRT = viewport;
+
+            var container = NewRect(viewport, "GraphContainer");
+            container.anchorMin = container.anchorMax = Vector2.zero;
+            container.pivot     = Vector2.zero;
+            // NoteNodeDragHandle이 이 폭(Bounds.rect.width)을 기준으로 노드 드래그 가능 범위를 클램프하고,
+            // GraphPanZoom.ConfigureBounds(팬 범위 클램프)도 이 크기를 기준으로 동작한다 — 기본 노드
+            // 배치보다 충분히 넉넉한 고정 크기로 두고 이후 절대 건드리지 않는다. [버그 수정, 2026-07-21]
+            // 원래는 세로를 NoteRouteGraphView.UpdateContentSize가 SetData 때마다 그래프 높이에 맞춰
+            // 다시 계산해 덮어쓰게 했었는데, 이 컨테이너는 pivot=(0,0)이라 세로 크기가 커질 때마다
+            // 좌하단은 고정된 채 위쪽 모서리가 밀려 올라가고, 그 모서리에 앵커된 그래프 내용(노드 전체)이
+            // 통째로 같이 떠밀려 올라가는 버그(노드를 위/아래로 드래그하면 배경까지 같이 팬되는 것처럼
+            // 보임)로 이어졌다 — 자세한 원인은 NoteRouteGraphView.UpdateContentSize 주석 참고. 지금은
+            // 고정 크기로 두고 절대 변경하지 않는다.
+            container.sizeDelta = new Vector2(900f, 300f);
+            _graphContainerRT = container;
+
+            _graphView = graphArea.gameObject.AddComponent<NoteRouteGraphView>();
+            _graphView.Init(container, _font);
+            _graphView.OnDeleteRequested += HandleDeleteRequested;
+        }
+
+        // ─── 우측 단서 서랍 열기/닫기 ───────────────────────────────
+        // MapViewer의 사이드패널 접기/펼치기와 동일한 패턴 — 접으면 그래프 영역이 그만큼 넓어지고,
+        // 접힌 상태에서도 재오픈용 작은 탭(DrawerToggleTab)은 항상 보인다.
+
+        private void SetDrawerOpen(bool open)
+        {
+            _drawerOpen = open;
+            UpdateDrawerLayout();
+            if (_drawerToggleArrowTMP != null) _drawerToggleArrowTMP.text = open ? "◀" : "▶";
+        }
+
+        private void UpdateDrawerLayout()
+        {
+            float w = _drawerOpen ? _drawerAreaWidth : _drawerCollapsedWidth;
+            if (_drawerAreaRT != null) _drawerAreaRT.offsetMin = new Vector2(-w, 0f);
+            if (_graphAreaRT != null) _graphAreaRT.offsetMax = new Vector2(-w, -_topBarHeight);
+            _drawerViewportRT?.gameObject.SetActive(_drawerOpen);
+        }
+
+        // 서랍 좌측 가장자리에 항상 떠 있는 재오픈/접기 탭 — MapViewer.BuildSidePanelToggleTab과 동일한
+        // 이유로 Viewport(스크롤뷰)와 별개 오브젝트에 둬서, 서랍이 접혀 Viewport가 비활성화돼도 계속
+        // 보이고 클릭할 수 있다.
+        private void BuildDrawerToggleTab(RectTransform parent, Color bgColor)
+        {
+            var tab = NewRect(parent, "DrawerToggleTab");
+            tab.anchorMin = new Vector2(0f, 0.5f);
+            tab.anchorMax = new Vector2(0f, 0.5f);
+            tab.pivot     = new Vector2(1f, 0.5f);
+            tab.sizeDelta = new Vector2(12f, 28f);
+            tab.anchoredPosition = Vector2.zero;
+
+            var img = AddImg(tab, bgColor);
+            var btn = tab.gameObject.AddComponent<Button>();
+            btn.targetGraphic = img;
+            btn.transition = Selectable.Transition.None;
+            btn.onClick.AddListener(() => SetDrawerOpen(!_drawerOpen));
+
+            var lblRT = NewRect(tab, "Arrow");
+            StretchFull(lblRT);
+            var tmp = lblRT.gameObject.AddComponent<TextMeshProUGUI>();
+            if (_font != null) tmp.font = _font;
+            tmp.fontSize = 8f;
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.verticalAlignment = VerticalAlignmentOptions.Middle;
+            tmp.color = Color.white;
+            tmp.text = "◀";
+            _drawerToggleArrowTMP = tmp;
+        }
+
+        // 상단 툴바 "저장한 루트" 버튼이 여는 모달 창 — CodexPanel의 BuildMemoForm과 동일한 패턴으로
+        // 패널 루트 자체에 컴포넌트를 붙이고, 그 안에서 자기 완결적인 오버레이 자식(BoardWindowOverlay)을 짓는다.
+        private void BuildBoardWindow(RectTransform root)
+        {
+            _boardWindow = root.gameObject.AddComponent<NoteBoardWindow>();
+            _boardWindow.Init(root, _font);
+            _boardWindow.OnSaveRequested += HandleBoardSaveRequested;
+            _boardWindow.OnLoadRequested += HandleBoardLoadRequested;
+            _boardWindow.OnDeleteRequested += HandleBoardDeleteRequested;
+        }
+
+        // 단서 서랍(우측)의 "필터" 버튼이 여는 키워드 다중 선택 창 — BuildBoardWindow와 동일한 이유로
+        // 패널 루트에 직접 컴포넌트를 붙인다(ClueKeywordFilterWindow.cs 상단 주석 참고 — 서랍의
+        // ScrollRect 안에 두면 마스크에 잘리고, NotePanel을 닫아도 같이 안 꺼지는 문제가 있었다).
+        private void BuildKeywordFilterWindow(RectTransform root)
+        {
+            _keywordFilterWindow = root.gameObject.AddComponent<ClueKeywordFilterWindow>();
+            _keywordFilterWindow.Init(root, _font);
+            _keywordFilterWindow.OnKeywordToggled += HandleFilterKeywordToggled;
+            _keywordFilterWindow.OnClearAllRequested += HandleFilterClearAllRequested;
+        }
+
+        // 상단 툴바 "단서 생성" 버튼이 여는 입력 창 — BuildBoardWindow/BuildKeywordFilterWindow와 동일한
+        // 이유로 패널 루트에 직접 컴포넌트를 붙인다.
+        private void BuildClueCreateWindow(RectTransform root)
+        {
+            _clueCreateWindow = root.gameObject.AddComponent<NoteClueCreateWindow>();
+            _clueCreateWindow.Init(root, _font);
+            _clueCreateWindow.OnCreateRequested += HandleClueCreateRequested;
+        }
+
+        // GraphScroll/ClueDrawerScroll이 공유하는 뼈대(ScrollRect+Viewport+Content)를 만들고,
         // 그 Content 위에 T 컴포넌트를 붙여 반환한다.
         private static T BuildScrollingList<T>(RectTransform area, out RectTransform content) where T : Component
         {

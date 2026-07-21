@@ -25,7 +25,12 @@ using UnityEngine;
 //   - 출발(StartTravel) 후에는 장비·경로 변경 불가, 지도 열람 불가(CanOpenMap)
 //   - 통과 불가 구간(IsBlocked)이 포함된 경로는 선택 불가 — AlternativePath를 대신 선택해야 함
 // ────────────────────────────────────────────────────────────────
-public class RouteModule : MonoBehaviour
+// IEventSaveProvider(Save/New_Save, RouteFinding 폴더 밖) 구현체 — RouteProgressState가 아니라
+// 이 클래스가 구현한다. RouteProgressState.SetEventFlag(mapGuid, eventKey)(게임플레이용, 스토리 이벤트
+// 발생 기록)와 IEventSaveProvider.SetEventFlag(id, value)(세이브용, 이름은 같지만 완전히 다른 의미)가
+// 한 클래스에 같이 있으면 오버로드는 되지만("string,string" vs "string,bool") 헷갈리기 쉬워서, 이미
+// "공용 상태의 단일 소유자"인 이 클래스가 대신 얇게 위임한다.
+public class RouteModule : MonoBehaviour, IEventSaveProvider
 {
     private static RouteModule _instance;
     private static bool _isQuitting; // 종료 중에는 다른 오브젝트의 OnDestroy가 Instance를 건드려도 재생성하지 않는다.
@@ -102,6 +107,15 @@ public class RouteModule : MonoBehaviour
         return true;
     }
 
+    // 세이브 로드 전용 — ToggleGear()의 이동 중 잠금 없이 곧장 대입한다(로드는 이동 중이 아닐 때만
+    // 일어나는 것이 전제이기도 하고, 설령 그렇더라도 로드가 우선이다).
+    public void ImportEquippedGears(List<EmotionColor> gears)
+    {
+        _equippedGears.Clear();
+        if (gears != null) _equippedGears.AddRange(gears);
+        _gearArrayCache = null;
+    }
+
     // ─── 경로 탐색 옵션 ───────────────────────────────────────────
     // 단서 없는 맵을 경유하는 것을 최대한 피할지 여부 (기본값: 허용).
     // 장비와 마찬가지로 출발 전에만 바꿀 수 있다 — 이동 중 탐색 조건이 바뀌면 안 되므로.
@@ -144,6 +158,13 @@ public class RouteModule : MonoBehaviour
     private MapNodeData _currentLocation;
     public MapNodeData CurrentLocation => _currentLocation ??= MapGraph.Instance?.StartNode;
 
+    // 현재 위치를 직접 대입 전용 — 세이브 로드(SaveModule.LoadEvents) 외에 사망 복귀
+    // (DeathHandler.HandleDeath)도 이 메서드로 침대/집 노드를 반영한다. guid가 비어있거나
+    // 그래프에서 못 찾으면 null로 되돌린다 — CurrentLocation 프로퍼티가 null일 때 자동으로
+    // 시작 노드(집)로 폴백하므로 별도 기본값 처리가 불필요하다.
+    public void ImportCurrentLocation(string guid) =>
+        _currentLocation = !string.IsNullOrEmpty(guid) ? MapGraph.Instance?.GetNode(guid) : null;
+
     // 이동 진행 알림 — 확장 시스템(Note, UI 등)이 구독한다.
     public event Action OnTravelStarted;
     public event Action<MapNodeData> OnNodeArrived; // 맵 전투 통과 후 새 노드 도달
@@ -174,6 +195,31 @@ public class RouteModule : MonoBehaviour
         Debug.Log($"[RouteModule] 경로 선택 완료 — {route?.Nodes?.Count ?? 0}개 노드");
         OnRouteSelected?.Invoke(route);
         return true;
+    }
+
+    // 세이브 로드 전용 — 마지막으로 선택했던 경로(Nodes 순서, SaveSlotData.selectedRouteNodeGuids)를
+    // 복원한다. SelectRoute()와 달리 유효성 검사·이벤트 발행을 하지 않고 조용히 대입만 한다 —
+    // 로드 시점의 경로는 저장 시점에 이미 SelectRoute()를 통과했던(=유효했던) 것이 보장되고,
+    // OnRouteSelected를 또 발행하면 NoteModule의 RouteLinked 재계산이 같은 시점에 복원되는
+    // NoteModule.ImportFrom과 순서 다툼을 일으킬 수 있다. Connections/TotalDifficulty 등 파생
+    // 필드는 채우지 않는다 — 노트 좌측 그래프(NoteRouteGraphView)는 Nodes만 사용하고, 지도에서
+    // 다시 열람하면 MapPathFinder가 새로 계산하므로 여기서 채울 필요가 없다.
+    public void ImportSelectedRoute(List<string> nodeGuids)
+    {
+        if (nodeGuids == null || nodeGuids.Count < 2 || MapGraph.Instance == null)
+        {
+            _selectedRoute = null;
+            return;
+        }
+
+        var nodes = new List<MapNodeData>(nodeGuids.Count);
+        foreach (var guid in nodeGuids)
+        {
+            var node = MapGraph.Instance.GetNode(guid);
+            if (node == null) { _selectedRoute = null; return; } // 그래프 데이터가 바뀌어 guid가 더는 유효하지 않음
+            nodes.Add(node);
+        }
+        _selectedRoute = new PathResult { Nodes = nodes };
     }
 
     // 출발 — 이후 지도 열람·장비·경로 변경이 모두 잠긴다.
@@ -248,14 +294,39 @@ public class RouteModule : MonoBehaviour
         return MapPathFinder.FindPath(graph.StartNode, destination, pathType, graph, Progress, EquippedGearArray, _avoidNoClueNodes);
     }
 
-    // ─── 세이브 / 사망 처리 ──────────────────────────────────────
+    // ─── 세이브 연동 (IEventSaveProvider) ───────────────────────────
+    // SaveModule.SaveEvents()/LoadEvents()가 이 프로퍼티·메서드만으로 루트파인딩 진행 상태를
+    // 저장/복원한다 — RouteFinding 쪽은 SaveSlotData 타입을 몰라도 된다(RouteProgressState 참고).
+    // Progress가 null(MapGraph 미배치)이면 빈 상태로 취급해 세이브/로드 파이프라인이 죽지 않게 한다.
 
-    // 일기장 세이브 시 호출 — 현재 진행 상태를 SaveSlotData에 기록한다.
-    public void ExportToSaveData(SaveSlotData data) => Progress.ExportToSaveData(data);
+    public Dictionary<string, bool> EventFlags => Progress?.BuildEventFlagsSnapshot() ?? new Dictionary<string, bool>();
+    public void SetEventFlag(string id, bool value) => Progress?.ApplyEventFlag(id, value);
+
+    public Dictionary<string, bool> Passages => Progress?.BuildPassagesSnapshot() ?? new Dictionary<string, bool>();
+    public void SetPassage(string id, bool opened) => Progress?.ApplyPassage(id, opened);
+
+    // 로드 시작 시 SaveModule.LoadEvents()가 항목을 하나씩 SetEventFlag/SetPassage로 넘기기 전에
+    // 1회 호출한다 — 이걸 안 하면 이전 상태(또는 기본값)와 새로 로드되는 값이 섞인다.
+    public void ResetForLoad() => Progress?.ResetToInitial();
+
+    // ─── 사망 처리 ──────────────────────────────────────────────
 
     // 사망 시 호출 — 미세이브 맵 진도 손실 (마지막 세이브 상태로 복귀).
-    // 이벤트 진행 진도(스토리)는 별도 시스템이 관리하므로 여기서는 맵 진행만 되돌린다.
-    public void RevertToLastSave(SaveSlotData lastSaved) => Progress.ImportFromSaveData(lastSaved);
+    // SaveModule을 거치지 않고 직접 SaveSlotData를 복원한다(사망 복귀는 사용자가 명시적으로 "불러오기"를
+    // 누른 게 아니므로 SaveModule의 로드 스테이트머신을 다시 돌릴 필요가 없다 — 이미 메모리에 있는
+    // 마지막 세이브 스냅샷을 그대로 반영). 이벤트 진행 진도(스토리)는 별도 시스템이 관리하므로
+    // 여기서는 맵 진행(eventFlags/passages)만 되돌린다.
+    public void RevertToLastSave(SaveSlotData lastSaved)
+    {
+        if (Progress == null) return;
+        Progress.ResetToInitial();
+        if (lastSaved == null) return;
+
+        foreach (var f in lastSaved.eventFlags)
+            Progress.ApplyEventFlag(f.id, f.value);
+        foreach (var p in lastSaved.passages)
+            Progress.ApplyPassage(p.id, p.opened);
+    }
 
     // ─── 전투 연동 ───────────────────────────────────────────────
     // WaveCombatBridge는 전투의 시작/종료 "사실"만 이벤트로 알린다.

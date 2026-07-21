@@ -26,7 +26,8 @@ namespace RouteFinding.Codex
         [Header("레이아웃")]
         [SerializeField] private float _drawerWidth = 220f;
         [SerializeField] private float _topBarHeight = 12f;
-        [SerializeField] private float _searchBarHeight = 34f;
+        // 6-1(진행률 표시)·6-5(정렬 버튼 행)로 검색바 영역에 행이 2개 늘어난 만큼(34f → 62f) 높였다.
+        [SerializeField] private float _searchBarHeight = 62f;
         [SerializeField] private float _newMemoBtnHeight = 12f;
         [SerializeField] private Color _rootBgColor = new(0.04f, 0.04f, 0.08f, 0.96f);
         [SerializeField] private Color _drawerBgColor = new(0.07f, 0.09f, 0.14f, 0.97f);
@@ -45,6 +46,7 @@ namespace RouteFinding.Codex
         private readonly List<CodexEntry> _allEntries = new();
         private List<CodexEntry> _placeholderEntries = new(); // 6-2단계 "???" 슬롯 — 맵별 그룹핑에서만 섞임
         private CodexFilterMode _filterMode = CodexFilterMode.ByMap;
+        private CodexSortOrder _sortOrder = CodexSortOrder.Alphabetical; // 6-5단계
         private string _searchQuery = "";
 
         private void Awake()
@@ -82,14 +84,20 @@ namespace RouteFinding.Codex
                 Debug.LogWarning("[CodexPanel] 이동 중에는 도감을 열 수 없습니다.");
                 return;
             }
+            ExclusivePanelGroup.NotifyOpening(this, Close); // 지도/노트 등 다른 패널이 열려 있으면 먼저 닫는다
             // 세이브 로드 직후처럼 OnClueAcquired 이벤트를 놓쳤을 경우를 대비해, 열 때마다 전체 재계산.
             CodexModule.Instance.RebuildFromProgress();
+            // [버그 수정, 2026-07-21] 도감이 닫혀 있는 동안 노트에서 이 카드가 보여주던 단서의 핀이
+            // 풀렸을 수 있다(CodexCardView.RefreshPinState 주석 참고) — 열 때마다 다시 맞춘다.
+            _cardView?.RefreshPinState();
             _panelGO.SetActive(true);
+            _drawerView?.ResetScroll(); // 열 때마다 이전에 내려서 보던 스크롤 위치를 맨 위로 초기화
             _inputManager?.MENUMode();
         }
 
         public void Close()
         {
+            ExclusivePanelGroup.NotifyClosing(this);
             _panelGO.SetActive(false);
             _inputManager?.PLAYMode();
         }
@@ -114,6 +122,9 @@ namespace RouteFinding.Codex
 
             _placeholderEntries = BuildUnacquiredPlaceholders();
 
+            // 6-1단계 — "획득 N / 전체 M". 전체는 정식 단서 수만 센다(유저 메모 제외).
+            _searchBar.SetProgress(CodexModule.Instance.AcquiredClues.Count, MapGraph.Instance?.AllClues.Count ?? 0);
+
             ApplyFilter();
         }
 
@@ -133,6 +144,19 @@ namespace RouteFinding.Codex
                 CodexFilterMode.ByKeyword => CodexFilterService.GroupByKeyword(searched),
                 _                         => CodexFilterService.GroupByMap(searched),
             };
+
+            // 6-5단계 — 그룹 내부 항목 정렬. "획득 최신순"은 RouteProgressState.AcquisitionOrder
+            // (clueId → 순번)를 조회용 Dictionary로 한 번 만들어 넘긴다.
+            var progress = RouteModule.Instance?.Progress;
+            Dictionary<string, int> acquisitionRank = null;
+            if (progress != null)
+            {
+                acquisitionRank = new Dictionary<string, int>();
+                var order = progress.AcquisitionOrder;
+                for (int i = 0; i < order.Count; i++) acquisitionRank[order[i]] = i;
+            }
+            CodexFilterService.SortEntries(groups, _sortOrder, acquisitionRank);
+
             _drawerView.SetGroups(groups);
         }
 
@@ -188,6 +212,7 @@ namespace RouteFinding.Codex
                 userEntryGuid = "",
                 clueId      = clue.id,
                 comments    = clue.comments ?? Array.Empty<CodexComment>(),
+                isNew       = CodexModule.Instance.IsClueNew(clue.id),
             };
         }
 
@@ -215,9 +240,9 @@ namespace RouteFinding.Codex
             var existing = transform.Find("CodexPanelRoot");
             if (existing != null)
             {
-                // CommentsSection(4단계, 가장 최근에 추가된 요소)까지 있어야 "최신" — 판정 기준은
-                // 항상 최근 추가 요소여야 그 이전 요소(PinRow 등)까지 전부 갖췄다는 게 보장된다.
-                bool existingCurrent = FindDeepTransform(existing, "CommentsSection") != null;
+                // SortRow(6-5단계, 가장 최근에 추가된 요소)까지 있어야 "최신" — 판정 기준은
+                // 항상 최근 추가 요소여야 그 이전 요소(CommentsSection 등) 전부 갖췄다는 게 보장된다.
+                bool existingCurrent = FindDeepTransform(existing, "SortRow") != null;
                 if (existingCurrent)
                 {
                     Debug.Log("[CodexPanel] BuildUI: 씬에 있던 기존 CodexPanelRoot를 재사용합니다.");
@@ -225,7 +250,7 @@ namespace RouteFinding.Codex
                     FinalizePanel(_panelGO.GetComponent<RectTransform>());
                     return;
                 }
-                Debug.Log("[CodexPanel] BuildUI: 기존 CodexPanelRoot에 CommentsSection이 없어 구버전으로 판단, 파괴 후 재생성합니다.");
+                Debug.Log("[CodexPanel] BuildUI: 기존 CodexPanelRoot에 SortRow가 없어 구버전으로 판단, 파괴 후 재생성합니다.");
                 // 먼저 비활성화한 뒤 Destroy — 구버전 패널 안의 TMP 텍스트를 활성 상태로 그냥 Destroy하면,
                 // 같은 프레임에 ScrollRect.LateUpdate가 강제하는 CanvasUpdateRegistry 리빌드가 이미 파괴 중인
                 // TMP의 서브메시(폴백 폰트) 머티리얼에 접근하려다 MissingReferenceException을 던질 수 있다.
@@ -236,7 +261,7 @@ namespace RouteFinding.Codex
             // 프리팹이 지정되어 있으면 인스턴스화 후 참조를 바인딩하고 콜백만 재연결.
             if (_panelPrefab != null)
             {
-                bool prefabCurrent = FindDeepTransform(_panelPrefab.transform, "CommentsSection") != null;
+                bool prefabCurrent = FindDeepTransform(_panelPrefab.transform, "SortRow") != null;
                 if (prefabCurrent)
                 {
                     Debug.Log($"[CodexPanel] BuildUI: 지정된 프리팹({_panelPrefab.name})을 인스턴스화합니다.");
@@ -245,7 +270,7 @@ namespace RouteFinding.Codex
                     FinalizePanel(_panelGO.GetComponent<RectTransform>());
                     return;
                 }
-                Debug.LogWarning($"[CodexPanel] BuildUI: 지정된 프리팹({_panelPrefab.name})에 CommentsSection이 없어 구버전으로 판단, 런타임 생성으로 대체합니다. 프리팹을 다시 생성해주세요.");
+                Debug.LogWarning($"[CodexPanel] BuildUI: 지정된 프리팹({_panelPrefab.name})에 SortRow가 없어 구버전으로 판단, 런타임 생성으로 대체합니다. 프리팹을 다시 생성해주세요.");
             }
 
             // ── 프리팹 없음 → 런타임 자동 생성 ──
@@ -281,6 +306,7 @@ namespace RouteFinding.Codex
                 _searchBar.Bind((RectTransform)searchAreaTF);
                 _searchBar.OnSearchChanged += q => { _searchQuery = q; ApplyFilter(); };
                 _searchBar.OnFilterModeChanged += m => { _filterMode = m; ApplyFilter(); };
+                _searchBar.OnSortOrderChanged += o => { _sortOrder = o; ApplyFilter(); };
             }
 
             FindDeepTransform(root, "NewMemoArea")?.GetComponent<Button>()?.onClick.AddListener(() => _memoForm.ShowForCreate());
@@ -303,6 +329,7 @@ namespace RouteFinding.Codex
                 _cardView.OnDeleteRequested += HandleDeleteRequested;
                 _cardView.OnPinRequested += HandlePinRequested;
                 _cardView.OnSuggestionAddRequested += HandleSuggestionAddRequested;
+                _cardView.OnKeywordClicked += HandleKeywordClicked;
             }
 
             _memoForm = root.GetComponent<CodexMemoFormView>();
@@ -389,6 +416,7 @@ namespace RouteFinding.Codex
             _searchBar.Init(searchArea, _font);
             _searchBar.OnSearchChanged += q => { _searchQuery = q; ApplyFilter(); };
             _searchBar.OnFilterModeChanged += m => { _filterMode = m; ApplyFilter(); };
+            _searchBar.OnSortOrderChanged += o => { _sortOrder = o; ApplyFilter(); };
 
             // 검색창 바로 아래: "+ 새 메모" 버튼 (고정 높이).
             var newMemoArea = NewRect(drawer, "NewMemoArea");
@@ -442,7 +470,11 @@ namespace RouteFinding.Codex
             csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             var vlg = content.gameObject.AddComponent<VerticalLayoutGroup>();
-            vlg.padding = new RectOffset(2, 2, 2, 2);
+            // 아래쪽 패딩을 크게 잡아 스크롤 여유 공간을 넉넉히 확보 — 근본 원인(트리를 다 펼쳤을 때
+            // 실제 필요한 높이보다 ContentSizeFitter 계산이 짧게 나오는 문제, 위 CLAUDE.md 미해결 버그
+            // 참고)을 해결하는 대신, 그보다 훨씬 큰 여유값을 더해 항상 맨 아래까지 스크롤되도록 우회한다.
+            // 계산이 짧아도 이 여유분 안에서 흡수되면 되므로 실질적으로 체감되는 문제가 사라진다.
+            vlg.padding = new RectOffset(2, 2, 2, 400);
             vlg.spacing = 1f;
             vlg.childControlWidth = true;
             vlg.childControlHeight = false;
@@ -469,6 +501,7 @@ namespace RouteFinding.Codex
             _cardView.OnDeleteRequested += HandleDeleteRequested;
             _cardView.OnPinRequested += HandlePinRequested;
             _cardView.OnSuggestionAddRequested += HandleSuggestionAddRequested;
+            _cardView.OnKeywordClicked += HandleKeywordClicked;
         }
 
         private void BuildMemoForm(RectTransform root)
@@ -479,7 +512,14 @@ namespace RouteFinding.Codex
             _memoForm.OnDeleteRequested += HandleMemoDeleteRequested;
         }
 
-        private void OnEntrySelected(CodexEntry entry) => _cardView.ShowEntry(entry);
+        private void OnEntrySelected(CodexEntry entry)
+        {
+            // 6-3단계 — 카드로 연 시점에 "NEW" 후보에서 제거한다. MarkClueViewed는 리프레시 이벤트를
+            // 일부러 쏘지 않으므로(이유는 CodexModule 쪽 주석 참고) 트리의 NEW 배지는 다음 자연스러운
+            // 갱신 때 사라진다 — 지금 클릭한 이 카드는 그대로 정상 표시된다.
+            CodexModule.Instance.MarkClueViewed(entry.clueId);
+            _cardView.ShowEntry(entry);
+        }
 
         // ─── 유저 메모 CRUD 연동 ─────────────────────────────────
 
@@ -507,6 +547,18 @@ namespace RouteFinding.Codex
         {
             CodexModule.Instance.RemoveUserEntry(guid);
             _cardView.ShowEmpty();
+        }
+
+        // ─── 6-4단계: 키워드 태그 교차 탐색 ─────────────────────────
+
+        // 카드에서 키워드 태그를 클릭하면 분류 기준을 키워드별로 전환하고 해당 그룹으로 스크롤한다.
+        // SetFilterModeExternally는 이미 같은 모드면 아무 것도 안 하므로(SetMode의 기존 가드), 이미
+        // 키워드별 분류 중이었다면 이 호출은 그냥 스킵되고 아래 FocusCategory만 실행된다.
+        private void HandleKeywordClicked(string keyword)
+        {
+            if (string.IsNullOrEmpty(keyword)) return;
+            _searchBar.SetFilterModeExternally(CodexFilterMode.ByKeyword);
+            _drawerView.FocusCategory(keyword);
         }
 
         // ─── 노트 연동 (2단계, 노트 편입 규칙 2 — 도감 → 노트 수동 핀) ─────
