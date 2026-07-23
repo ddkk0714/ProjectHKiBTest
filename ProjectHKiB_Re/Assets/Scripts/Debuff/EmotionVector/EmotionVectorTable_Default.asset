@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db2e067c0540333478528d2bdd2bc2e8, type: 3}
+  m_Name: EmotionVectorTable_Default
+  m_EditorClassIdentifier: 
+  entries:
+  - color: 7
+    displayName: "\uACF5\uD3EC"
+    position: {x: -0.72, y: 0.75}
+    isCatalyst: 0
+  - color: 5
+    displayName: "\uC99D\uC624"
+    position: {x: -0.85, y: 0.55}
+    isCatalyst: 0
+  - color: 4
+    displayName: "\uBD84\uB178"
+    position: {x: -0.6, y: 0.38}
+    isCatalyst: 0
+  - color: 2
+    displayName: "\uD765\uBD84"
+    position: {x: 0.18, y: 0.6}
+    isCatalyst: 0
+  - color: 3
+    displayName: "\uD589\uBCF5"
+    position: {x: 0.78, y: 0.12}
+    isCatalyst: 0
+  - color: 1
+    displayName: "\uC6B0\uC6B8"
+    position: {x: -0.5, y: -0.62}
+    isCatalyst: 0
+  - color: 0
+    displayName: "\uC2AC\uD514"
+    position: {x: -0.62, y: -0.45}
+    isCatalyst: 0
