@@ -27,6 +27,7 @@ public class EmotionVectorModule : MonoBehaviour
     [SerializeField] private EmotionThresholdProfileSO profile;
     [SerializeField] private EmotionThresholdProfileSO defaultProfile;
     [SerializeField] private bool applyThresholds = true; // 플레이어는 false로 둘 것 (spec §5.5)
+    [SerializeField] private EmotionCombinationRuleSO rule; // 공허 촉매 파라미터 (Step 2.3, spec §2.4)
 
     private static readonly EmotionAxis[] AllAxes =
     {
@@ -85,12 +86,26 @@ public class EmotionVectorModule : MonoBehaviour
         return null;
     }
 
-    // T = baseThreshold * (mental/100), spec §5.3. 아직 판정(EvaluateThresholds)은 안 함 — 조회만 (Step 2.2에서 사용).
-    public float GetEffectiveThreshold(EmotionAxis axis)
+    // 촉매 적용 전, 멘탈만 반영한 값 — 디버그 뷰의 스케일 기준용.
+    // (촉매로 줄어든 값을 스케일 기준으로 쓰면 배율이 같이 커져서 화면 위치가 고정되는 자기상쇄가 생김)
+    public float GetMentalOnlyThreshold(EmotionAxis axis)
     {
         EmotionThresholdProfileSO effectiveProfile = GetEffectiveProfile();
         return effectiveProfile != null ? effectiveProfile.GetEffectiveThreshold(axis, Mental) : float.PositiveInfinity;
     }
+
+    // T = baseThreshold * (mental/100) 이후 공허 촉매 적용 (spec §2.4, §5.3)
+    public float GetEffectiveThreshold(EmotionAxis axis)
+    {
+        float mentalThreshold = GetMentalOnlyThreshold(axis);
+        if (float.IsPositiveInfinity(mentalThreshold)) return mentalThreshold;
+
+        return rule != null ? rule.ApplyCatalyst(mentalThreshold, GetRawStack(EmotionColor.VoidBlack)) : mentalThreshold;
+    }
+
+    // 0~1 게이지 바 등 표시용 (Step 2.3)
+    [ShowNativeProperty]
+    public float CatalystRatio => rule != null ? rule.GetCatalystRatio(GetRawStack(EmotionColor.VoidBlack)) : 0f;
 
     private void Update()
     {
@@ -129,7 +144,7 @@ public class EmotionVectorModule : MonoBehaviour
             if (!effectiveProfile.TryGetEntry(axis, out EmotionThresholdProfileSO.ThresholdEntry entry)) continue;
 
             float value = GetAxisValue(_current, axis);
-            float effectiveThreshold = effectiveProfile.GetEffectiveThreshold(axis, Mental);
+            float effectiveThreshold = GetEffectiveThreshold(axis); // 멘탈 스케일 + 공허 촉매 포함
             bool wasActive = _activeAxes.Contains(axis);
 
             bool nextActive = EvaluateAxisActive(wasActive, value, effectiveThreshold, entry.hysteresis, entry.locked);

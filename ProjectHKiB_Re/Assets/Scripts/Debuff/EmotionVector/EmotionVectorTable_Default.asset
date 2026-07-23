@@ -41,3 +41,7 @@ MonoBehaviour:
     displayName: "\uC2AC\uD514"
     position: {x: -0.62, y: -0.45}
     isCatalyst: 0
+  - color: 6
+    displayName: "\uACF5\uD5C8"
+    position: {x: 0, y: 0}
+    isCatalyst: 1

@@ -119,7 +119,10 @@ public class EmotionVectorDebugView : MonoBehaviour
         Vector2 center = new Vector2(plotRect.x + plotRect.width * 0.5f, plotRect.y + plotRect.height * 0.5f);
         float halfSize = plotRect.width * 0.5f;
 
-        // 자동 스케일 — 스무딩 도중 화살표가 잘리지 않도록 raw/표시값 중 큰 쪽 기준
+        // 자동 스케일 — 스무딩 도중 화살표가 잘리지 않도록 raw/표시값 중 큰 쪽 기준.
+        // ⚠️ 역치는 스케일 기준에 넣지 않는다 — 넣으면 촉매로 역치가 줄 때 배율도 같이 커져서
+        // 화면상 경계선 위치가 고정되는 자기상쇄가 생긴다(공허만 단독으로 쌓을 때 특히). 대신
+        // 벡터가 작을 때(예: 공허만 쌓는 중) 역치선이 패널 밖으로 밀려 클램프될 수 있음은 감수한다.
         float maxMagnitude = Mathf.Max(1f, _displayVector.magnitude);
         for (int i = 0; i < EmotionVectorModule.PolledColors.Length; i++)
         {
@@ -144,11 +147,20 @@ public class EmotionVectorDebugView : MonoBehaviour
         DrawTrail(ToScreen);
         DrawVectorArrow(center, ToScreen(_displayVector));
         DrawEntropyBar(plotRect, _displayEntropy);
+        DrawCatalystBar(plotRect, _vectorModule.CatalystRatio);
 
         string activeStates = GetActiveStatesText();
         GUI.Label(new Rect(plotRect.x, plotRect.yMax + 2f, panelSize, 20f),
             $"V=({_displayVector.x:F1}, {_displayVector.y:F1})  |V|={_displayVector.magnitude:F1}  Entropy={_displayEntropy:F2}  Dominant={dominant}");
-        GUI.Label(new Rect(plotRect.x, plotRect.yMax + 36f, panelSize, 20f), $"Active: {activeStates}");
+        GUI.Label(new Rect(plotRect.x, plotRect.yMax + 36f, panelSize, 20f), $"Active: {activeStates}  Catalyst: {_vectorModule.CatalystRatio:P0}");
+    }
+
+    private static void DrawCatalystBar(Rect plotRect, float catalystRatio)
+    {
+        // maxReduction(보통 0.7) 기준으로 정규화해서 꽉 찼을 때가 "촉매 포화"를 뜻하게 함
+        Rect barBg = new Rect(plotRect.x, plotRect.yMax + 32f, plotRect.width, 6f);
+        DrawRect(barBg, new Color(1f, 1f, 1f, 0.15f));
+        DrawRect(new Rect(barBg.x, barBg.y, barBg.width * Mathf.Clamp01(catalystRatio / 0.7f), barBg.height), new Color(0.6f, 0.3f, 1f, 0.85f));
     }
 
     private string GetActiveStatesText()
