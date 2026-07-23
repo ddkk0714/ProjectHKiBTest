@@ -23,10 +23,30 @@ public class EmotionVectorModule : MonoBehaviour
     [SerializeField] private EmotionVectorTableSO table;
     [SerializeField] private bool showDebugLog = false;
 
+    [Header("Threshold")]
+    [SerializeField] private EmotionThresholdProfileSO profile;
+    [SerializeField] private EmotionThresholdProfileSO defaultProfile;
+    [SerializeField] private bool applyThresholds = true; // 플레이어는 false로 둘 것 (spec §5.5)
+
+    private static readonly EmotionAxis[] AllAxes =
+    {
+        EmotionAxis.PositiveX, EmotionAxis.NegativeX, EmotionAxis.PositiveY, EmotionAxis.NegativeY
+    };
+
+    // 역치로 부여한 statBuff는 SO 자체의 BuffTime(예: Madness_Other의 5초 자동만료)을 무시하고
+    // 이 값으로 오버라이드한다 — 지속 여부는 벡터 조건(EvaluateThresholds)이 결정해야지 타이머가 결정하면 안 됨.
+    private const float ThresholdBuffOverrideDuration = 86400f;
+
     private EmotionModule _emotionModule;
+    private IBuffable _buffable;
+    private Enemy _enemy; // 없으면(플레이어 등) Mental 100 고정 — spec §5.5 "적 전용"
     private readonly Dictionary<EmotionColor, int> _lastStacks = new();
+    private readonly HashSet<EmotionAxis> _activeAxes = new();
     private bool _isDirty;
     private EmotionVector _current;
+    private bool _warnedNoProfile;
+
+    public event Action<EmotionState, bool> OnStateChanged;
 
     [ShowNativeProperty] public Vector2 Vector => new Vector2(_current.X, _current.Y);
     [ShowNativeProperty] public float Magnitude => _current.Magnitude;
@@ -39,9 +59,37 @@ public class EmotionVectorModule : MonoBehaviour
     // 디버그 뷰의 "가짜 주입" 미리보기용 — 실제 게임 상태(EmotionModule)는 건드리지 않는다 (Step 1.2, spec §8).
     public int GetRawStack(EmotionColor color) => _emotionModule.GetStacks(color, EmotionModule.EmotionApplyTarget.Other);
 
+    [ShowNativeProperty] public float Mental => _enemy != null && _enemy.BaseData != null ? _enemy.BaseData.Mental : 100f;
+
+    public bool IsAxisActive(EmotionAxis axis) => _activeAxes.Contains(axis);
+
     private void Awake()
     {
         _emotionModule = GetComponent<EmotionModule>();
+        _buffable = GetComponent<IBuffable>();
+        _enemy = GetComponent<Enemy>();
+    }
+
+    // profile 미지정 시 defaultProfile로 폴백 (게이트 2.1). 둘 다 없으면 경고 1회 + null 반환.
+    public EmotionThresholdProfileSO GetEffectiveProfile()
+    {
+        if (profile != null) return profile;
+        if (defaultProfile != null) return defaultProfile;
+
+        if (!_warnedNoProfile)
+        {
+            _warnedNoProfile = true;
+            Debug.LogWarning($"[EmotionVectorModule] {name}: profile/defaultProfile 둘 다 없음 — 역치 조회 불가");
+        }
+
+        return null;
+    }
+
+    // T = baseThreshold * (mental/100), spec §5.3. 아직 판정(EvaluateThresholds)은 안 함 — 조회만 (Step 2.2에서 사용).
+    public float GetEffectiveThreshold(EmotionAxis axis)
+    {
+        EmotionThresholdProfileSO effectiveProfile = GetEffectiveProfile();
+        return effectiveProfile != null ? effectiveProfile.GetEffectiveThreshold(axis, Mental) : float.PositiveInfinity;
     }
 
     private void Update()
@@ -63,8 +111,89 @@ public class EmotionVectorModule : MonoBehaviour
     {
         if (!_isDirty) return;
         Recalculate();
+        if (applyThresholds) EvaluateThresholds();
         _isDirty = false;
     }
+
+    // 4축 독립 판정 + 히스테리시스 (spec §5.4). 여기서 발생하는 스택 변경(예: 역치 버프가 감정색을
+    // 부여하도록 설정된 경우)은 Update()의 폴링이 dirty만 세팅하고 끝나므로, 같은 프레임에 재귀적으로
+    // 다시 판정되지 않는다 — 다음 프레임에 반영된다 (EvaluateReaction의 _isEvaluatingReaction과 동일 취지).
+    private void EvaluateThresholds()
+    {
+        EmotionThresholdProfileSO effectiveProfile = GetEffectiveProfile();
+        if (effectiveProfile == null) return;
+
+        for (int i = 0; i < AllAxes.Length; i++)
+        {
+            EmotionAxis axis = AllAxes[i];
+            if (!effectiveProfile.TryGetEntry(axis, out EmotionThresholdProfileSO.ThresholdEntry entry)) continue;
+
+            float value = GetAxisValue(_current, axis);
+            float effectiveThreshold = effectiveProfile.GetEffectiveThreshold(axis, Mental);
+            bool wasActive = _activeAxes.Contains(axis);
+
+            bool nextActive = EvaluateAxisActive(wasActive, value, effectiveThreshold, entry.hysteresis, entry.locked);
+
+            if (nextActive && !wasActive) ActivateAxis(axis, entry);
+            else if (!nextActive && wasActive) DeactivateAxis(axis, entry);
+        }
+    }
+
+    // 순수 함수로 분리 — 히스테리시스/locked 판정 로직 자체를 실제 버프 시스템 없이 단위 테스트 가능하게 함.
+    // 부여: value >= threshold / 해제: value < threshold - hysteresis / locked면 활성 상태 유지.
+    public static bool EvaluateAxisActive(bool wasActive, float value, float threshold, float hysteresis, bool locked)
+    {
+        if (!wasActive) return value >= threshold;
+        if (locked) return true;
+        return !(value < threshold - hysteresis);
+    }
+
+    private void ActivateAxis(EmotionAxis axis, EmotionThresholdProfileSO.ThresholdEntry entry)
+    {
+        _activeAxes.Add(axis);
+
+        if (entry.statBuff != null && _buffable != null)
+            _buffable.Buff(entry.statBuff, 1, 1, ThresholdBuffOverrideDuration);
+
+        EmotionState state = AxisToState(axis);
+        OnStateChanged?.Invoke(state, true);
+
+        if (showDebugLog)
+            Debug.Log($"[EmotionVectorModule] Threshold ON: {axis} -> {state} (value={GetAxisValue(_current, axis):F1})");
+    }
+
+    private void DeactivateAxis(EmotionAxis axis, EmotionThresholdProfileSO.ThresholdEntry entry)
+    {
+        _activeAxes.Remove(axis);
+
+        if (entry.statBuff != null && _buffable != null)
+            _buffable.UnBuff(entry.statBuff);
+
+        EmotionState state = AxisToState(axis);
+        OnStateChanged?.Invoke(state, false);
+
+        if (showDebugLog)
+            Debug.Log($"[EmotionVectorModule] Threshold OFF: {axis} -> {state}");
+    }
+
+    public static EmotionState AxisToState(EmotionAxis axis) => axis switch
+    {
+        EmotionAxis.PositiveY => EmotionState.Madness,
+        EmotionAxis.NegativeY => EmotionState.Sleep,
+        EmotionAxis.NegativeX => EmotionState.Doom,
+        EmotionAxis.PositiveX => EmotionState.Ecstasy,
+        _ => throw new ArgumentOutOfRangeException(nameof(axis)),
+    };
+
+    // 부정(-x)/비각성(-y) 방향은 값이 음수일수록 강해지므로 부호를 뒤집어 "역치 초과"를 항상 >=로 통일한다.
+    public static float GetAxisValue(EmotionVector v, EmotionAxis axis) => axis switch
+    {
+        EmotionAxis.PositiveY => v.Y,
+        EmotionAxis.NegativeY => -v.Y,
+        EmotionAxis.NegativeX => -v.X,
+        EmotionAxis.PositiveX => v.X,
+        _ => 0f,
+    };
 
     private void Recalculate()
     {

@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 492ec2486e77fa94b97dc38eb37b7b3d, type: 3}
+  m_Name: EmotionThresholdProfileSO_Rusher
+  m_EditorClassIdentifier:
+  thresholds:
+  - axis: 2
+    value: 50
+    hysteresis: 5
+    statBuff: {fileID: 11400000, guid: 2734a2312a45ce042828a486982958ea, type: 2}
+    behavior: {fileID: 0}
+    locked: 0
+  - axis: 3
+    value: 40
+    hysteresis: 5
+    statBuff: {fileID: 0}
+    behavior: {fileID: 0}
+    locked: 1
+  - axis: 1
+    value: 60
+    hysteresis: 5
+    statBuff: {fileID: 0}
+    behavior: {fileID: 0}
+    locked: 0
+  - axis: 0
+    value: 45
+    hysteresis: 5
+    statBuff: {fileID: 0}
+    behavior: {fileID: 0}
+    locked: 1

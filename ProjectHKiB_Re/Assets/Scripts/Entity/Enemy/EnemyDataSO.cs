@@ -29,6 +29,9 @@ IPathFindableBase, IDamagableBase, IPoolable, IAnimatableBase, IFootstepBase
     [field: NaughtyAttributes.Foldout("Health")][field: SerializeField] public AudioDataSO HitSound { get; set; }
     [field: NaughtyAttributes.Foldout("Health")][field: SerializeField] public ParticlePlayer HitParticle { get; set; }
 
+    // 감정 벡터 역치 저항력 — 100이 기준치, 낮을수록 역치가 쉽게 발동됨 (emotion-vector-module-spec.md §5.3)
+    [field: NaughtyAttributes.Foldout("Health")][field: SerializeField] public float Mental { get; set; } = 100f;
+
 
     [field: NaughtyAttributes.Foldout("Control")][field: SerializeField] public StateMachineSO StateMachine { get; set; }
     [field: NaughtyAttributes.Foldout("Visual")][field: SerializeField] public SimpleAnimationDataSO AnimationData { get; set; }

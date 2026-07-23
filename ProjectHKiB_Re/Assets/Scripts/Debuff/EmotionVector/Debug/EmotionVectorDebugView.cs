@@ -137,6 +137,7 @@ public class EmotionVectorDebugView : MonoBehaviour
 
         DrawBackground(plotRect);
         DrawQuadrants(center, halfSize);
+        DrawThresholdBoundaries(center, halfSize, ToScreen);
         DrawAxes(center, halfSize);
         DrawEmotionLabels(table, ToScreen);
         DrawContributions(ToScreen, center);
@@ -144,8 +145,80 @@ public class EmotionVectorDebugView : MonoBehaviour
         DrawVectorArrow(center, ToScreen(_displayVector));
         DrawEntropyBar(plotRect, _displayEntropy);
 
+        string activeStates = GetActiveStatesText();
         GUI.Label(new Rect(plotRect.x, plotRect.yMax + 2f, panelSize, 20f),
             $"V=({_displayVector.x:F1}, {_displayVector.y:F1})  |V|={_displayVector.magnitude:F1}  Entropy={_displayEntropy:F2}  Dominant={dominant}");
+        GUI.Label(new Rect(plotRect.x, plotRect.yMax + 36f, panelSize, 20f), $"Active: {activeStates}");
+    }
+
+    private string GetActiveStatesText()
+    {
+        List<string> active = new();
+        foreach (EmotionAxis axis in AllAxesForDisplay)
+        {
+            if (_vectorModule.IsAxisActive(axis))
+                active.Add(EmotionVectorModule.AxisToState(axis).ToString());
+        }
+        return active.Count > 0 ? string.Join(", ", active) : "없음";
+    }
+
+    private static readonly EmotionAxis[] AllAxesForDisplay =
+    {
+        EmotionAxis.PositiveX, EmotionAxis.NegativeX, EmotionAxis.PositiveY, EmotionAxis.NegativeY
+    };
+
+    // 역치 경계선 + 바깥(발동 영역) 어둡게, 활성화면 빨강, 비활성이면 흰색 (Step 2.2, spec §8)
+    private void DrawThresholdBoundaries(Vector2 center, float halfSize, System.Func<Vector2, Vector2> toScreen)
+    {
+        DrawAxisBoundary(EmotionAxis.PositiveX, center, halfSize, toScreen, isVertical: true, positiveSide: true);
+        DrawAxisBoundary(EmotionAxis.NegativeX, center, halfSize, toScreen, isVertical: true, positiveSide: false);
+        DrawAxisBoundary(EmotionAxis.PositiveY, center, halfSize, toScreen, isVertical: false, positiveSide: true);
+        DrawAxisBoundary(EmotionAxis.NegativeY, center, halfSize, toScreen, isVertical: false, positiveSide: false);
+    }
+
+    private void DrawAxisBoundary(EmotionAxis axis, Vector2 center, float halfSize, System.Func<Vector2, Vector2> toScreen, bool isVertical, bool positiveSide)
+    {
+        float threshold = _vectorModule.GetEffectiveThreshold(axis);
+        if (float.IsInfinity(threshold)) return;
+
+        bool active = _vectorModule.IsAxisActive(axis);
+        Color lineColor = active ? new Color(1f, 0.15f, 0.15f, 0.95f) : new Color(1f, 1f, 1f, 0.5f);
+        Color darkRegion = new Color(0f, 0f, 0f, 0.45f);
+
+        Vector2 worldPoint = isVertical
+            ? new Vector2(positiveSide ? threshold : -threshold, 0f)
+            : new Vector2(0f, positiveSide ? threshold : -threshold);
+        Vector2 screenPoint = toScreen(worldPoint);
+
+        float minX = center.x - halfSize, maxX = center.x + halfSize;
+        float minY = center.y - halfSize, maxY = center.y + halfSize;
+
+        if (isVertical)
+        {
+            float x = Mathf.Clamp(screenPoint.x, minX, maxX);
+            DrawLine(new Vector2(x, minY), new Vector2(x, maxY), lineColor, 2f);
+
+            if (positiveSide)
+                DrawRect(new Rect(x, minY, Mathf.Max(0f, maxX - x), maxY - minY), darkRegion);
+            else
+                DrawRect(new Rect(minX, minY, Mathf.Max(0f, x - minX), maxY - minY), darkRegion);
+        }
+        else
+        {
+            float y = Mathf.Clamp(screenPoint.y, minY, maxY);
+            DrawLine(new Vector2(minX, y), new Vector2(maxX, y), lineColor, 2f);
+
+            // 화면 y는 위로 갈수록 작음. positiveSide(+y, 각성)의 바깥은 화면 위쪽(y가 더 작은 영역)
+            if (positiveSide)
+                DrawRect(new Rect(minX, minY, maxX - minX, Mathf.Max(0f, y - minY)), darkRegion);
+            else
+                DrawRect(new Rect(minX, y, maxX - minX, Mathf.Max(0f, maxY - y)), darkRegion);
+        }
+
+        GUI.color = lineColor;
+        Vector2 labelAnchor = isVertical ? new Vector2(Mathf.Clamp(screenPoint.x, minX, maxX - 40f), minY + 2f) : new Vector2(minX + 2f, Mathf.Clamp(screenPoint.y, minY, maxY - 14f));
+        GUI.Label(new Rect(labelAnchor.x, labelAnchor.y, 60f, 16f), EmotionVectorModule.AxisToState(axis).ToString());
+        GUI.color = Color.white;
     }
 
     private static void DrawBackground(Rect rect)
