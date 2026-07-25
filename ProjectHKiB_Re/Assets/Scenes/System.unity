@@ -14769,6 +14769,24 @@ MonoBehaviour:
   - color: 16
     selfBuff: {fileID: 11400000, guid: b736a8b1fe034bf7910d7900ad8378a0, type: 2}
     otherBuff: {fileID: 11400000, guid: 5d0c51cc33a9b404ba3e2fe6b53aeb85, type: 2}
+  - color: 18
+    selfBuff: {fileID: 11400000, guid: 6f5d6ec4b7ca91e8645fcc813585bd11, type: 2}
+    otherBuff: {fileID: 11400000, guid: 1b509fe48ee460a50eb46395bc354bb7, type: 2}
+  - color: 19
+    selfBuff: {fileID: 11400000, guid: a85183643907158fc8d7f5ae4b14bbc0, type: 2}
+    otherBuff: {fileID: 11400000, guid: b303cf9fd6fa95ef02720c84fae52aa3, type: 2}
+  - color: 20
+    selfBuff: {fileID: 11400000, guid: 09c8dd875b28e936159b6e32d7027672, type: 2}
+    otherBuff: {fileID: 11400000, guid: 4424f50466097abe2df6b74df1cc0ee9, type: 2}
+  - color: 21
+    selfBuff: {fileID: 11400000, guid: 8f95949bb5ae782e14996d3422b59607, type: 2}
+    otherBuff: {fileID: 11400000, guid: a88502396795eb414d843c8572bb82e6, type: 2}
+  - color: 22
+    selfBuff: {fileID: 11400000, guid: b4fcc11776af56bd7ff89040f92ca594, type: 2}
+    otherBuff: {fileID: 11400000, guid: 4f0d2f9f701d4e432388aaafa7b24512, type: 2}
+  - color: 23
+    selfBuff: {fileID: 11400000, guid: 8d603d03f6b5f95473aa5d44a75c3f05, type: 2}
+    otherBuff: {fileID: 11400000, guid: 49800e94dc051b3a0ac56dfdfdde0177, type: 2}
   applyCancelColor: 1
   highStackThreshold: 5
   showDebugLog: 0
@@ -19925,6 +19943,24 @@ MonoBehaviour:
   - color: 16
     selfBuff: {fileID: 11400000, guid: b736a8b1fe034bf7910d7900ad8378a0, type: 2}
     otherBuff: {fileID: 11400000, guid: 5d0c51cc33a9b404ba3e2fe6b53aeb85, type: 2}
+  - color: 18
+    selfBuff: {fileID: 11400000, guid: 6f5d6ec4b7ca91e8645fcc813585bd11, type: 2}
+    otherBuff: {fileID: 11400000, guid: 1b509fe48ee460a50eb46395bc354bb7, type: 2}
+  - color: 19
+    selfBuff: {fileID: 11400000, guid: a85183643907158fc8d7f5ae4b14bbc0, type: 2}
+    otherBuff: {fileID: 11400000, guid: b303cf9fd6fa95ef02720c84fae52aa3, type: 2}
+  - color: 20
+    selfBuff: {fileID: 11400000, guid: 09c8dd875b28e936159b6e32d7027672, type: 2}
+    otherBuff: {fileID: 11400000, guid: 4424f50466097abe2df6b74df1cc0ee9, type: 2}
+  - color: 21
+    selfBuff: {fileID: 11400000, guid: 8f95949bb5ae782e14996d3422b59607, type: 2}
+    otherBuff: {fileID: 11400000, guid: a88502396795eb414d843c8572bb82e6, type: 2}
+  - color: 22
+    selfBuff: {fileID: 11400000, guid: b4fcc11776af56bd7ff89040f92ca594, type: 2}
+    otherBuff: {fileID: 11400000, guid: 4f0d2f9f701d4e432388aaafa7b24512, type: 2}
+  - color: 23
+    selfBuff: {fileID: 11400000, guid: 8d603d03f6b5f95473aa5d44a75c3f05, type: 2}
+    otherBuff: {fileID: 11400000, guid: 49800e94dc051b3a0ac56dfdfdde0177, type: 2}
   applyCancelColor: 1
   highStackThreshold: 5
   showDebugLog: 0

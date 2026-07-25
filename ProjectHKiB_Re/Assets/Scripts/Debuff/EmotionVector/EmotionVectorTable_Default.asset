@@ -53,6 +53,30 @@ MonoBehaviour:
     displayName: "\uD5C8\uC138"
     position: {x: -0.35, y: -0.78}
     isCatalyst: 0
+  - color: 18
+    displayName: "\uD610\uC624"
+    position: {x: -0.78, y: 0.12}
+    isCatalyst: 0
+  - color: 19
+    displayName: "\uC2A4\uD2B8\uB808\uC2A4"
+    position: {x: -0.18, y: 0.6}
+    isCatalyst: 0
+  - color: 20
+    displayName: "\uB9CC\uC871"
+    position: {x: 0.55, y: -0.22}
+    isCatalyst: 0
+  - color: 21
+    displayName: "\uD3C9\uC548"
+    position: {x: 0.18, y: -0.8}
+    isCatalyst: 0
+  - color: 22
+    displayName: "\uD53C\uB85C"
+    position: {x: -0.15, y: -0.8}
+    isCatalyst: 0
+  - color: 23
+    displayName: "\uC0AC\uB791(\uC784\uC2DC)"
+    position: {x: 0.65, y: 0.72}
+    isCatalyst: 0
   - color: 6
     displayName: "\uACF5\uD5C8"
     position: {x: 0, y: 0}

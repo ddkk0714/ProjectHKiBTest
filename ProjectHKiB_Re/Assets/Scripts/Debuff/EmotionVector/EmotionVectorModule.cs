@@ -9,6 +9,8 @@ using UnityEngine;
 [RequireComponent(typeof(EmotionModule))]
 public class EmotionVectorModule : MonoBehaviour
 {
+    // ⚠️ Phase 5에서 발견된 하드코딩 지점 — "SO 편집만으로 신규 감정 추가"가 여기서는 안 통한다.
+    // 새 감정을 벡터 합산/폴링/조합 판정 대상에 포함시키려면 이 배열에 추가해야 한다(코드 1줄).
     public static readonly EmotionColor[] PolledColors =
     {
         EmotionColor.SadnessBlue,
@@ -19,6 +21,12 @@ public class EmotionVectorModule : MonoBehaviour
         EmotionColor.AngerScarlet,
         EmotionColor.VoidBlack,
         EmotionColor.FearDarkRed,
+        EmotionColor.Disgust,
+        EmotionColor.Stress,
+        EmotionColor.Satisfaction,
+        EmotionColor.Peace,
+        EmotionColor.Fatigue,
+        EmotionColor.Love, // Step 5.2 — 임시 등록, spec §2.5 재논의 전까지 잠정치
     };
 
     [SerializeField] private EmotionVectorTableSO table;

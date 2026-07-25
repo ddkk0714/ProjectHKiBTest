@@ -35,6 +35,20 @@ public enum EmotionColor
     [System.Obsolete("EmotionVector Phase 4(useVectorCombination)에서 상쇄(Cancel) 판정이 색을 남기지 않음 — 반응색으로 미사용")]
     Cancel              = 17,
 
+    // EmotionVector Phase 5 — 신규 감정 5종. 좌표만 SO로 추가하는 게 원칙이었으나 EmotionColor가
+    // C# enum이라 새 감정은 결국 코드 한 줄(enum 값 추가)이 불가피함 — Phase 5 게이트 자체가 예상한
+    // "설계 결함" 지점(사용자 확인 후 진행, 2026-07-25). 기존 번호는 그대로 두고 아래에만 추가.
+    Disgust             = 18, // 혐오
+    Stress              = 19, // 스트레스
+    Satisfaction        = 20, // 만족
+    Peace               = 21, // 평안
+    Fatigue             = 22, // 피로
+
+    // Step 5.2 — 사랑. spec §2.5: 1사분면 고각성·고긍정이라 황홀(Ecstasy) 역치 방향과 거의 겹쳐서
+    // 밸런싱 부담이 크다고 보류돼 있던 것 — "일단 임시값" 지시로 스펙 좌표 그대로 등록만 해둔다.
+    // 좌표/스탯 전부 잠정치, 실제 밸런싱은 재논의 후 진행할 것.
+    Love                = 23, // 사랑 (임시)
+
     // 새 값은 반드시 여기 아래에 추가할 것 (기존 번호 절대 변경 금지)
 }
 
