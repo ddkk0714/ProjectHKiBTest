@@ -32,9 +32,9 @@ public class CommandPair
 
         switch (type)
         {
-            case EnumManager.InputActionType.Performed: trigger.action.performed += _cachedBindFunction; break;
-            case EnumManager.InputActionType.Started: trigger.action.started += _cachedBindFunction; break;
-            case EnumManager.InputActionType.Canceled: trigger.action.canceled += _cachedBindFunction; break;
+            case EnumManager.InputActionType.Performed: if (trigger) trigger.action.performed += _cachedBindFunction; break;
+            case EnumManager.InputActionType.Started: if (trigger) trigger.action.started += _cachedBindFunction; break;
+            case EnumManager.InputActionType.Canceled: if (trigger) trigger.action.canceled += _cachedBindFunction; break;
         }
     }
 
@@ -42,9 +42,9 @@ public class CommandPair
     {
         switch (type)
         {
-            case EnumManager.InputActionType.Performed: trigger.action.performed -= _cachedBindFunction; break;
-            case EnumManager.InputActionType.Started: trigger.action.started -= _cachedBindFunction; break;
-            case EnumManager.InputActionType.Canceled: trigger.action.canceled -= _cachedBindFunction; break;
+            case EnumManager.InputActionType.Performed: if (trigger) trigger.action.performed -= _cachedBindFunction; break;
+            case EnumManager.InputActionType.Started: if (trigger) trigger.action.started -= _cachedBindFunction; break;
+            case EnumManager.InputActionType.Canceled: if (trigger) trigger.action.canceled -= _cachedBindFunction; break;
         }
         _cachedBindFunction = null;
     }
