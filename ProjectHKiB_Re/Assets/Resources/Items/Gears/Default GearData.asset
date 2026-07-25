@@ -19,19 +19,25 @@ MonoBehaviour:
   name: 
   description: 
   canStack: 0
-  parentProperties:
-  - {fileID: 11400000, guid: f0a265f5283123f4493fd2602bff1e17, type: 2}
   itemUseEvent: {fileID: 0}
-  gearType: {fileID: 11400000, guid: 4eca67b0f421e65408b2caa3ec573ae3, type: 2}
-  playerBaseData: {fileID: 11400000, guid: 230a0858ca264b14d845b4ce86a9c944, type: 2}
+  gearType: 1
+  stateMachine: {fileID: 11400000, guid: 1d95a8fa0bc3e7b40973736148392837, type: 2}
+  startStateName: Idle
+  transformTime: 0
+  baseBuff: {fileID: 0}
+  stackableBuff: {fileID: 0}
+  mainAnimationData: {fileID: 11400000, guid: daad9d5cf78123747aab07a3c9568203, type: 2}
+  mainSpriteLibrary: {fileID: 11400000, guid: 7e987b287b83d684c8de2c2ef71b2b7b, type: 2}
+  effectAnimationData: {fileID: 0}
+  effectSpriteLibrary: {fileID: 0}
+  skinData: {fileID: 11400000, guid: 1482b858a052cd84eb0e0c7efcbc36a6, type: 2}
   standingCGData: {fileID: 0}
-  tutorialPrefab: {fileID: 0}
   mergeSet: []
   mergePriority: 0
+  SkinMixList:
+    _serializedList: []
   mainGearEffectDiscription: 
-  subGearEffectDiscription: 
   mainGearEffects: []
-  subGearEffects: []
   graffitiCodes:
   - code:
     - {x: 0, y: 0}

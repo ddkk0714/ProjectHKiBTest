@@ -19,22 +19,27 @@ MonoBehaviour:
   name: "\uC30D\uAC80"
   description: 
   canStack: 0
-  parentProperties:
-  - {fileID: 11400000, guid: f0a265f5283123f4493fd2602bff1e17, type: 2}
-  - {fileID: 11400000, guid: 47fc9c7075a105a4f967a8c2b2fdcdbc, type: 2}
   itemUseEvent: {fileID: 0}
-  gearType: {fileID: 11400000, guid: 2029ef83ecc44a54d8e6dc69619eff6e, type: 2}
-  playerBaseData: {fileID: 11400000, guid: 52562898c225b6846a33c0f861648e29, type: 2}
+  gearType: 0
+  stateMachine: {fileID: 11400000, guid: 1d95a8fa0bc3e7b40973736148392837, type: 2}
+  startStateName: Idle
+  transformTime: 10
+  baseBuff: {fileID: 0}
+  stackableBuff: {fileID: 0}
+  mainAnimationData: {fileID: 11400000, guid: daad9d5cf78123747aab07a3c9568203, type: 2}
+  mainSpriteLibrary: {fileID: 11400000, guid: a848b86f1d3bdef439218068040b0575, type: 2}
+  effectAnimationData: {fileID: 0}
+  effectSpriteLibrary: {fileID: 0}
+  skinData: {fileID: 11400000, guid: d754eb6f7172976478e6179abd178718, type: 2}
   standingCGData: {fileID: 0}
-  tutorialPrefab: {fileID: 0}
   mergeSet:
   - {fileID: 11400000, guid: cba07c1f1556c3b469772f464811b36e, type: 2}
   - {fileID: 11400000, guid: cde322ce6505e4842ba0195fee16dec1, type: 2}
   mergePriority: 0
+  SkinMixList:
+    _serializedList: []
   mainGearEffectDiscription: 
-  subGearEffectDiscription: 
   mainGearEffects: []
-  subGearEffects: []
   graffitiCodes:
   - code:
     - {x: 0, y: 0}

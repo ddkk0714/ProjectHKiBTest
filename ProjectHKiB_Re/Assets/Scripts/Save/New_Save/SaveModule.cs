@@ -21,10 +21,10 @@ public class SaveModule : InterfaceModule, IInitializable
     [SerializeField] private int maxWaitFrames = 120;
 
     // ====== 런타임 주입(인스펙터 보기용 노출 제거) ======
-    [SerializeField]private InventoryManager inventory;
-    [SerializeField]private GearManager gearManager;
-    [SerializeField]private Component playerRoot;
-    [SerializeField]private IEventSaveProvider eventProvider;
+    [SerializeField] private InventoryManager inventory;
+    [SerializeField] private GearManager gearManager;
+    [SerializeField] private Component playerRoot;
+    [SerializeField] private IEventSaveProvider eventProvider;
 
     // ====== (필수) 외부에서 읽을 수 있어야 하는 값들 ======
     [SerializeField] public int Slot { get; private set; } = -1;
@@ -322,7 +322,7 @@ public class SaveModule : InterfaceModule, IInitializable
                 gearManager.SetGearData(cardIndex, slotIndex, owned);
             }
 
-            gearManager.MergeGear(runtimeCard);
+            //gearManager.MergeGear(runtimeCard);
         }
     }
 

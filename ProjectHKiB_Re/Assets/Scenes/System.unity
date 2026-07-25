@@ -3692,7 +3692,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   localManager: {fileID: 0}
-  initialMap: {fileID: 11400000, guid: 0e206c1f89d359f46a996f13d7a8dd1c, type: 2}
+  initialMap: {fileID: 0}
 --- !u!1 &79349639
 GameObject:
   m_ObjectHideFlags: 0
@@ -7232,14 +7232,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7870c0d75b703704fbb440286e1810e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gearMergeManager: {fileID: 11400000, guid: 38b0ca7a74d982b4faf0069dbccbc88b, type: 2}
+  activeGear: []
+  DefaultGearData: {fileID: 11400000, guid: de01b61372793f94d8138842516b098a, type: 2}
+  allMergedGearDatas: []
   playerCardEquipData: []
   <PhysicalMaxGearSlotCount>k__BackingField: 4
   _maxGearSlotCount: 4
   <PhysicalMaxCardCount>k__BackingField: 5
   _maxCardCount: 5
   canChangeCard: 1
-  equippedCardIndex: 0
+  currentActiveCardNum: 0
+  currentEdittingCardNum: 0
+  currentEdittingSlotNum: 0
 --- !u!1 &147738041
 GameObject:
   m_ObjectHideFlags: 0
@@ -15557,8 +15561,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0f1216edf8a1cd438f8653f6af549f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <MainAnimationData>k__BackingField: {fileID: 0}
+  <MainSpriteLibrary>k__BackingField: {fileID: 0}
   <AnimationPlayer>k__BackingField: {fileID: 327803506}
-  <CurrentAnimation>k__BackingField: 
+  mainSpriteLibrary: {fileID: 0}
   mathManager: {fileID: 11400000, guid: d70d30fe513b9cc4bb4206690e1ecbf7, type: 2}
 --- !u!114 &327803499
 MonoBehaviour:
@@ -15573,7 +15579,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <SkinData>k__BackingField: {fileID: 0}
-  mainSpriteLibrary: {fileID: 126782215}
   mainSpriteRenderer: {fileID: 126782213}
   effectSpriteRenderer: {fileID: 2144363247}
 --- !u!114 &327803500
@@ -15814,7 +15819,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID: player
   Target: {fileID: 327803505}
-  InitInfos: []
 --- !u!1 &331044352
 GameObject:
   m_ObjectHideFlags: 0
@@ -80485,9 +80489,9 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.14172535
+    x: 0
     y: 0
-    width: 0.71596247
+    width: 1
     height: 1
   near clip plane: -5000
   far clip plane: 5000
@@ -86518,11 +86522,9 @@ MonoBehaviour:
   pathFindingManager: {fileID: 1414484760}
   chunkManager: {fileID: 1622729448}
   cameraManager: {fileID: 1718942449}
-  cooltimeManager: {fileID: 2732933}
-  enemyManager: {fileID: 0}
+  timerManager: {fileID: 2732933}
   objectSpawnManager: {fileID: 1310757089}
   objectDeathCountManager: {fileID: 857761130}
-  databaseManager: {fileID: 724609690}
   gearManager: {fileID: 147051296}
   inventoryManager: {fileID: 1855532042}
   UIManager: {fileID: 1568758192}
@@ -86905,6 +86907,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3822c1bb7dbb8f64b8c18ebb250e96db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerInventory:
+    _serializedList: []
+  playerGearInventory:
+    _serializedList: []
 --- !u!1 &1857636232
 GameObject:
   m_ObjectHideFlags: 0

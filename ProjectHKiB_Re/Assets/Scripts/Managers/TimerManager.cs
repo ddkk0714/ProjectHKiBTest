@@ -89,7 +89,7 @@ public class Timer
     }
 }
 
-public class CooltimeManager : MonoBehaviour
+public class TimerManager : MonoBehaviour
 {
     private readonly Dictionary<int, Sequence> _cooltimes = new();
 
