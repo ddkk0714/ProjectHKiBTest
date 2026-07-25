@@ -312,8 +312,10 @@ public class EmotionModule : InterfaceModule, IEmotionModule
         RemoveGroupStacks(a, sourceGear, applyTarget, stackA);
         RemoveGroupStacks(b, sourceGear, applyTarget, stackB);
 
-        if (applyCancelColor)
-            ApplyReactionColor(EmotionColor.Cancel, sourceGear, applyTarget, resultStack);
+        // EmotionVector Phase 4(useVectorCombination)에서 상쇄가 결과색을 안 남기는 걸로 흡수됨 —
+        // 필요하면 이 두 줄만 살리면 원복됨(Cancel은 enum에 [Obsolete] 표시, 삭제 아님).
+        // if (applyCancelColor)
+        //     ApplyReactionColor(EmotionColor.Cancel, sourceGear, applyTarget, resultStack);
 
         if (showDebugLog)
             Debug.Log($"[EmotionModule] {a} + {b} = Cancel");
@@ -329,14 +331,16 @@ public class EmotionModule : InterfaceModule, IEmotionModule
         // 예: SadnessBlue + SadnessSky → 설움(Sorrow)
         if (GetActiveColorCountInGroup(group, sourceGear, applyTarget) < 2) return false;
 
-        if (group == EmotionGroup.Sadness)
-            return ReactSameGroup(EmotionGroup.Sadness, EmotionColor.Sorrow, sourceGear, applyTarget, ReactionStackMode.Sum);
-
-        if (group == EmotionGroup.Excitement)
-            return ReactSameGroup(EmotionGroup.Excitement, EmotionColor.Madness, sourceGear, applyTarget, ReactionStackMode.Sum);
-
-        if (group == EmotionGroup.Anger)
-            return ReactSameGroup(EmotionGroup.Anger, EmotionColor.Fury, sourceGear, applyTarget, ReactionStackMode.Product);
+        // EmotionVector Phase 4(useVectorCombination)에서 동일 사분면 중첩(단순 합산)으로 흡수됨 —
+        // Sorrow/Madness/Fury 전부 [Obsolete] 표시만, 삭제 아님. 되돌리려면 아래 3줄만 살리면 됨.
+        // if (group == EmotionGroup.Sadness)
+        //     return ReactSameGroup(EmotionGroup.Sadness, EmotionColor.Sorrow, sourceGear, applyTarget, ReactionStackMode.Sum);
+        //
+        // if (group == EmotionGroup.Excitement)
+        //     return ReactSameGroup(EmotionGroup.Excitement, EmotionColor.Madness, sourceGear, applyTarget, ReactionStackMode.Sum);
+        //
+        // if (group == EmotionGroup.Anger)
+        //     return ReactSameGroup(EmotionGroup.Anger, EmotionColor.Fury, sourceGear, applyTarget, ReactionStackMode.Product);
 
         return false;
     }
@@ -366,22 +370,25 @@ public class EmotionModule : InterfaceModule, IEmotionModule
         return true;
     }
 
+    // EmotionVector Phase 4(useVectorCombination)에서 공허 촉매(spec §2.4)로 대체됨 — VoidReaction은
+    // [Obsolete] 표시만, 삭제 아님. 되돌리려면 return false; 줄 지우고 아래 원본 로직 주석만 풀면 됨.
     // 공허(Void)는 흥분(Excitement) 을 제외한 모든 그룹과 곱 방식으로 반응 → VoidReaction
     private bool TryVoidReaction(EmotionColor appliedColor, Gear sourceGear, EmotionApplyTarget applyTarget)
     {
-        EmotionGroup appliedGroup = GetGroup(appliedColor);
-        if (appliedGroup == EmotionGroup.Excitement) return false;
-        if (GetGroupStacks(EmotionGroup.Void, sourceGear, applyTarget) <= 0) return false;
-        if (appliedGroup == EmotionGroup.Void)
-        {
-            return TryPair(EmotionGroup.Void, EmotionGroup.Sadness, EmotionColor.VoidReaction, sourceGear, applyTarget, ReactionStackMode.Product)
-                || TryPair(EmotionGroup.Void, EmotionGroup.Happiness, EmotionColor.VoidReaction, sourceGear, applyTarget, ReactionStackMode.Product)
-                || TryPair(EmotionGroup.Void, EmotionGroup.Anger, EmotionColor.VoidReaction, sourceGear, applyTarget, ReactionStackMode.Product)
-                || TryPair(EmotionGroup.Void, EmotionGroup.Fear, EmotionColor.VoidReaction, sourceGear, applyTarget, ReactionStackMode.Product);
-        }
-
-        if (appliedGroup == EmotionGroup.None || appliedGroup == EmotionGroup.Void) return false;
-        return TryPair(appliedGroup, EmotionGroup.Void, EmotionColor.VoidReaction, sourceGear, applyTarget, ReactionStackMode.Product);
+        return false;
+        // EmotionGroup appliedGroup = GetGroup(appliedColor);
+        // if (appliedGroup == EmotionGroup.Excitement) return false;
+        // if (GetGroupStacks(EmotionGroup.Void, sourceGear, applyTarget) <= 0) return false;
+        // if (appliedGroup == EmotionGroup.Void)
+        // {
+        //     return TryPair(EmotionGroup.Void, EmotionGroup.Sadness, EmotionColor.VoidReaction, sourceGear, applyTarget, ReactionStackMode.Product)
+        //         || TryPair(EmotionGroup.Void, EmotionGroup.Happiness, EmotionColor.VoidReaction, sourceGear, applyTarget, ReactionStackMode.Product)
+        //         || TryPair(EmotionGroup.Void, EmotionGroup.Anger, EmotionColor.VoidReaction, sourceGear, applyTarget, ReactionStackMode.Product)
+        //         || TryPair(EmotionGroup.Void, EmotionGroup.Fear, EmotionColor.VoidReaction, sourceGear, applyTarget, ReactionStackMode.Product);
+        // }
+        //
+        // if (appliedGroup == EmotionGroup.None || appliedGroup == EmotionGroup.Void) return false;
+        // return TryPair(appliedGroup, EmotionGroup.Void, EmotionColor.VoidReaction, sourceGear, applyTarget, ReactionStackMode.Product);
     }
 
     // 교차 반응 전체 (기획서 반응표):
@@ -391,13 +398,16 @@ public class EmotionModule : InterfaceModule, IEmotionModule
     {
         EmotionGroup appliedGroup = GetGroup(appliedColor);
 
+        // Madness/Resentment/Panic 결과 분기는 EmotionVector Phase 4(useVectorCombination)에서
+        // 각각 각성 역치 상태/대체(Replace) 판정/(현재는 미사용 분기, 이후 스트레스+만족 복합으로
+        // 재활용)로 흡수됨 — [Obsolete] 표시만, 삭제 아님. 되돌리려면 아래 주석 처리된 3줄만 살리면 됨.
         return TryPair(appliedGroup, EmotionGroup.Sadness, EmotionGroup.Excitement, EmotionColor.Collapse, sourceGear, applyTarget, ReactionStackMode.Product)
             || TryPair(appliedGroup, EmotionGroup.Sadness, EmotionGroup.Fear, EmotionColor.Collapse, sourceGear, applyTarget, ReactionStackMode.Product)
-            || TryPair(appliedGroup, EmotionGroup.Happiness, EmotionGroup.Excitement, EmotionColor.Madness, sourceGear, applyTarget, ReactionStackMode.Sum)
-            || TryPair(appliedGroup, EmotionGroup.Anger, EmotionGroup.Excitement, EmotionColor.Madness, sourceGear, applyTarget, ReactionStackMode.Sum)
+            // || TryPair(appliedGroup, EmotionGroup.Happiness, EmotionGroup.Excitement, EmotionColor.Madness, sourceGear, applyTarget, ReactionStackMode.Sum)
+            // || TryPair(appliedGroup, EmotionGroup.Anger, EmotionGroup.Excitement, EmotionColor.Madness, sourceGear, applyTarget, ReactionStackMode.Sum)
             || TryPair(appliedGroup, EmotionGroup.Sadness, EmotionGroup.Happiness, EmotionColor.Longing, sourceGear, applyTarget, ReactionStackMode.Sum)
-            || TryPair(appliedGroup, EmotionGroup.Sadness, EmotionGroup.Anger, EmotionColor.Resentment, sourceGear, applyTarget, ReactionStackMode.Product)
-            || TryPair(appliedGroup, EmotionGroup.Fear, EmotionGroup.Excitement, EmotionColor.Panic, sourceGear, applyTarget, ReactionStackMode.Sum)
+            // || TryPair(appliedGroup, EmotionGroup.Sadness, EmotionGroup.Anger, EmotionColor.Resentment, sourceGear, applyTarget, ReactionStackMode.Product)
+            // || TryPair(appliedGroup, EmotionGroup.Fear, EmotionGroup.Excitement, EmotionColor.Panic, sourceGear, applyTarget, ReactionStackMode.Sum)
             || TryPair(appliedGroup, EmotionGroup.Fear, EmotionGroup.Anger, EmotionColor.Bluff, sourceGear, applyTarget, ReactionStackMode.Sum);
     }
 

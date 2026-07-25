@@ -29,8 +29,7 @@ public enum EmotionColor
     Sorrow              = 13,
     [System.Obsolete("EmotionVector Phase 4(useVectorCombination)에서 동일 사분면 중첩으로 흡수됨 — 반응색으로 미사용")]
     Fury                = 14,
-    [System.Obsolete("EmotionVector Phase 4(useVectorCombination)에서 대응하는 대각선 조합이 없어 미사용 분기가 됨 — 반응색으로 미사용")]
-    Panic               = 15,
+    Panic               = 15, // EmotionVector 후속 작업에서 1사분면(스트레스+만족) 복합으로 재활용(좌표 등록됨, 유지) — Step 4.2의 Bluff 재활용과 동일 패턴
     Bluff               = 16, // EmotionVector Step 4.2에서 3사분면 복합으로 재활용(좌표 등록됨, 유지)
     [System.Obsolete("EmotionVector Phase 4(useVectorCombination)에서 상쇄(Cancel) 판정이 색을 남기지 않음 — 반응색으로 미사용")]
     Cancel              = 17,
@@ -45,8 +44,10 @@ public enum EmotionColor
     Fatigue             = 22, // 피로
 
     // Step 5.2 — 사랑. spec §2.5: 1사분면 고각성·고긍정이라 황홀(Ecstasy) 역치 방향과 거의 겹쳐서
-    // 밸런싱 부담이 크다고 보류돼 있던 것 — "일단 임시값" 지시로 스펙 좌표 그대로 등록만 해둔다.
-    // 좌표/스탯 전부 잠정치, 실제 밸런싱은 재논의 후 진행할 것.
+    // 밸런싱 부담이 크다고 보류돼 있던 것 — "일단 임시값" 지시로 스펙 좌표 그대로 등록. 이후 실기기
+    // 테스트로 "90스택에서 황홀+광기 동시 발동" 문제가 실제로 재현되어 y값을 낮춰 광기 동시발동만
+    // 제거함(2026-07-26) — 황홀과 겹치는 결(사랑→황홀) 자체는 의도로 볼 여지가 있어 x는 유지.
+    // 여전히 최종 밸런스는 아님, 필요시 재논의.
     Love                = 23, // 사랑 (임시)
 
     // 새 값은 반드시 여기 아래에 추가할 것 (기존 번호 절대 변경 금지)

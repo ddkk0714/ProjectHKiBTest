@@ -60,7 +60,26 @@ public class EmotionCompositeTests
         Assert.IsTrue(_rule.TryGetCompositeColor(3, out EmotionColor q3));
         Assert.AreEqual(EmotionColor.Bluff, q3);
 
-        Assert.IsFalse(_rule.TryGetCompositeColor(1, out _), "1사분면은 현재 구현색으로는 도달 불가 (spec §4.3)");
+        // 스트레스+만족(Phase 5 신규) 도입으로 1사분면도 도달 가능해져서 Panic(기존 미사용 반응색)을 재활용 등록함
+        Assert.IsTrue(_rule.TryGetCompositeColor(1, out EmotionColor q1));
+        Assert.AreEqual(EmotionColor.Panic, q1);
+    }
+
+    // 스트레스+만족이 1사분면으로 떨어져 Panic 재활용 복합으로 해석되는지 (spec §4.3이 예견한 신규 케이스)
+    [Test]
+    public void StressPlusSatisfaction_ResolvesToPanic()
+    {
+        Vector2 stress = _table.GetPosition(EmotionColor.Stress);
+        Vector2 satisfaction = _table.GetPosition(EmotionColor.Satisfaction);
+
+        var result = EmotionCombinationEvaluator.Evaluate(
+            stress, 10, EmotionColor.Stress,
+            satisfaction, 10, EmotionColor.Satisfaction,
+            ReplaceThreshold);
+
+        Assert.AreEqual(EmotionCombinationType.Composite, result.Type);
+        Assert.IsTrue(_rule.TryGetCompositeColor(result.CompositeQuadrant, out EmotionColor composite));
+        Assert.AreEqual(EmotionColor.Panic, composite);
     }
 
     // #1/#2 재현 + 사분면->색 해석까지 엔드투엔드로 확인 (기존 4.1 테스트는 사분면 숫자까지만 검증했음)
@@ -132,6 +151,10 @@ public class EmotionCompositeTests
 
         Assert.IsTrue(_rule.IsMaterialOf(EmotionColor.Bluff, EmotionColor.SadnessSky));
         Assert.IsFalse(_rule.IsMaterialOf(EmotionColor.Bluff, EmotionColor.SadnessBlue));
+
+        Assert.IsTrue(_rule.IsMaterialOf(EmotionColor.Panic, EmotionColor.Stress));
+        Assert.IsTrue(_rule.IsMaterialOf(EmotionColor.Panic, EmotionColor.Satisfaction));
+        Assert.IsFalse(_rule.IsMaterialOf(EmotionColor.Panic, EmotionColor.HappinessYellow));
     }
 
     // 재료 재공급 스택/지속시간 규칙(spec §4.4) — 0.5배, 반올림

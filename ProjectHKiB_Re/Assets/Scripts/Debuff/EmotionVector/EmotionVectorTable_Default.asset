@@ -75,7 +75,11 @@ MonoBehaviour:
     isCatalyst: 0
   - color: 23
     displayName: "\uC0AC\uB791(\uC784\uC2DC)"
-    position: {x: 0.65, y: 0.72}
+    position: {x: 0.65, y: 0.35}
+    isCatalyst: 0
+  - color: 15
+    displayName: "\uC2A4\uD2B8\uB808\uC2A4+\uB9CC\uC871 \uBCF5\uD569(\uC784\uC2DC\uBA85)"
+    position: {x: 0.42, y: 0.42}
     isCatalyst: 0
   - color: 6
     displayName: "\uACF5\uD5C8"

@@ -34,3 +34,8 @@ MonoBehaviour:
     materials:
     - 1
     - 2
+  - quadrant: 1
+    result: 15
+    materials:
+    - 19
+    - 20
