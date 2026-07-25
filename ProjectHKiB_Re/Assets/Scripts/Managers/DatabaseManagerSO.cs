@@ -106,6 +106,7 @@ public class DatabaseManagerSO : ScriptableObject
     public void SetIAnimatable(IAnimatableBase animatable, IAnimatableBase data)
     {
         animatable.MainAnimationData = data.MainAnimationData;
+        animatable.MainSpriteLibrary = data.MainSpriteLibrary;
     }
 
     public void SetIDirAnimatable(IInterfaceRegistable entity, IAnimatableBase data)
@@ -113,6 +114,7 @@ public class DatabaseManagerSO : ScriptableObject
     public void SetIDirAnimatable(IAnimatableBase animatable, IAnimatableBase data)
     {
         animatable.MainAnimationData = data.MainAnimationData;
+        animatable.MainSpriteLibrary = data.MainSpriteLibrary;
     }
 
     public void SetIGraffitiable(IInterfaceRegistable entity, IGraffitiableBase data)

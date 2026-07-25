@@ -30,9 +30,9 @@ public class SkinableModule : InterfaceModule, ISkinable
     {
         if (SkinData == null) return;
         MaterialPropertyBlock materialPropertyBlock = new();
-        //materialPropertyBlock.SetTexture("_MainTex", gearData.mainTex);
         materialPropertyBlock.SetTexture("_SkinTex", SkinData.skinTexture);
         materialPropertyBlock.SetTexture("_EmissionSkinTex", SkinData.emissionSkinTexture);
+        materialPropertyBlock.SetTexture("_MainTex", mainSpriteRenderer.sprite.texture);
         mainSpriteRenderer.SetPropertyBlock(materialPropertyBlock);
 
         materialPropertyBlock.SetTexture("_SkinTex", SkinData.effectSkinTexture);

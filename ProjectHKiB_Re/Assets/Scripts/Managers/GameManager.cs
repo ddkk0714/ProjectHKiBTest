@@ -22,8 +22,6 @@ public class GameManager : MonoBehaviour
     public MapManager mapManager;
 
     public Player player;
-
-
     private void Awake()
     {
         instance = this;

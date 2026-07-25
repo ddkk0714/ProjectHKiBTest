@@ -3677,7 +3677,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1845891765}
-  m_RootOrder: 17
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &75784913
 MonoBehaviour:
@@ -3692,7 +3692,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   localManager: {fileID: 0}
-  initialMap: {fileID: 0}
+  initialMap: {fileID: 11400000, guid: 0e206c1f89d359f46a996f13d7a8dd1c, type: 2}
 --- !u!1 &79349639
 GameObject:
   m_ObjectHideFlags: 0
@@ -7218,7 +7218,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1845891765}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &147051296
 MonoBehaviour:
@@ -15564,7 +15564,7 @@ MonoBehaviour:
   <MainAnimationData>k__BackingField: {fileID: 0}
   <MainSpriteLibrary>k__BackingField: {fileID: 0}
   <AnimationPlayer>k__BackingField: {fileID: 327803506}
-  mainSpriteLibrary: {fileID: 0}
+  mainSpriteLibrary: {fileID: 126782215}
   mathManager: {fileID: 11400000, guid: d70d30fe513b9cc4bb4206690e1ecbf7, type: 2}
 --- !u!114 &327803499
 MonoBehaviour:
@@ -15663,6 +15663,7 @@ MonoBehaviour:
   TransitionConditions: 
   Timers: []
   yay: {fileID: 1601855039}
+  BaseData: {fileID: 11400000, guid: 230a0858ca264b14d845b4ce86a9c944, type: 2}
   databaseManager: {fileID: 11400000, guid: 6bc54106ea95a9242946feafc44a5dfe, type: 2}
   sprite: {fileID: 126782212}
   canInteractHeight: 0
@@ -32292,7 +32293,7 @@ Transform:
   m_Children:
   - {fileID: 980040270}
   m_Father: {fileID: 1845891765}
-  m_RootOrder: 15
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &684965945
 GameObject:
@@ -34501,71 +34502,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 723694138}
   m_CullTransparentMesh: 1
---- !u!1 &724609688
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 724609689}
-  - component: {fileID: 724609690}
-  m_Layer: 0
-  m_Name: DatabaseManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &724609689
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 724609688}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1845891765}
-  m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &724609690
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 724609688}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 808b7dab11189c04c99f57d573f28663, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  customVariables:
-    boolVariables:
-      _serializedList: []
-    intVariables:
-      _serializedList: []
-    floatVariables:
-      _serializedList: []
-  _currentState: {fileID: 0}
-  _stateMachine: {fileID: 0}
-  TransitionConditions: 
-  Timers: []
-  parameters:
-    boolVariables:
-      _serializedList: []
-    intVariables:
-      _serializedList: []
-    floatVariables:
-      _serializedList: []
-  playerPos: {x: 0, y: 0, z: 0}
-  scene:
-    m_Handle: 0
 --- !u!1 &725407579
 GameObject:
   m_ObjectHideFlags: 0
@@ -37720,7 +37656,7 @@ Transform:
   - {fileID: 378585083}
   - {fileID: 1583371137}
   m_Father: {fileID: 1845891765}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &781276478
 MonoBehaviour:
@@ -42420,7 +42356,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1845891765}
-  m_RootOrder: 14
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &858256630
 GameObject:
@@ -63740,7 +63676,7 @@ Transform:
   m_Children:
   - {fileID: 1876752276}
   m_Father: {fileID: 1845891765}
-  m_RootOrder: 13
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1310757089
 MonoBehaviour:
@@ -65117,7 +65053,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1845891765}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1346231658
 MonoBehaviour:
@@ -67826,7 +67762,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1845891765}
-  m_RootOrder: 16
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1422708912
 GameObject:
@@ -67858,7 +67794,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1845891765}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1422708914
 MonoBehaviour:
@@ -78140,7 +78076,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1845891765}
-  m_RootOrder: 12
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1646426892
 MonoBehaviour:
@@ -84087,7 +84023,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1845891765}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1800336235
 MonoBehaviour:
@@ -86549,7 +86485,6 @@ Transform:
   - {fileID: 1622729447}
   - {fileID: 2732934}
   - {fileID: 767613042}
-  - {fileID: 724609689}
   - {fileID: 1346231657}
   - {fileID: 147051295}
   - {fileID: 781276477}
@@ -86893,7 +86828,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1845891765}
-  m_RootOrder: 11
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1855532042
 MonoBehaviour:

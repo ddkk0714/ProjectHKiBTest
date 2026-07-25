@@ -8,7 +8,7 @@ public class StateMachineSO : ScriptableObject
     public StateSO initialState;
     private StateMachineGraph graph;
 
-    [NaughtyAttributes.Expandable] public StateSO[] allStates;
+    [NaughtyAttributes.Expandable] public List<StateSO> allStates;
 
     public List<CommandPair> _commandPairs;
 
@@ -20,6 +20,7 @@ public class StateMachineSO : ScriptableObject
         foreach (StateSO state in allStates)
         {
             state.temporaryID = Random.value;
+            if (state.transitions == null) continue;
             foreach (StateTransition transition in state.transitions)
             {
                 if (transition.activationInput != EnumManager.InputType.None || transition.trigger)

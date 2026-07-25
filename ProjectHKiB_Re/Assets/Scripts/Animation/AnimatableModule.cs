@@ -27,6 +27,7 @@ public class AnimatableModule : InterfaceModule, IAnimatable
 
     public virtual void Initialize()
     {
+        if (!MainAnimationData || !MainSpriteLibrary) return;
         SetAnimationData(MainAnimationData, MainSpriteLibrary);
         Play("Idle");
     }

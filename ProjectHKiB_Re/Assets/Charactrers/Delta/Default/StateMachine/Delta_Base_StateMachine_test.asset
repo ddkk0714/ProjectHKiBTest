@@ -1,0 +1,798 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8535163290515908542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: Walk
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0.22197166
+  transitions:
+  - name: Idle
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642959117700038670
+      negate: 1
+    trueState: {fileID: 1856367217050726960}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  - name: Run
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642959117700038671
+      negate: 0
+    trueState: {fileID: 5050385956708415890}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642959117700038664
+  - rid: 8642959117700038682
+  UpdateActions:
+  - rid: 8642959117700038665
+  - rid: 8642959117700038666
+  ExitActions:
+  - rid: 8642959117700038667
+  actionSequence:
+  - time: 0.2
+    Action:
+      rid: 8642959117700038668
+  - time: 0.4
+    Action:
+      rid: 8642959117700038669
+  - time: 0.2
+    Action:
+      rid: -2
+  loopActionSequence: 1
+  useTimer: 0
+  timerID: 0
+  time: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642959117700038664
+      type: {class: ApplyWalkAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        apply: 1
+    - rid: 8642959117700038665
+      type: {class: WalkByInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642959117700038666
+      type: {class: SetDirFromLastSetDirAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642959117700038667
+      type: {class: ApplyWalkAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        apply: 0
+    - rid: 8642959117700038668
+      type: {class: PlayFootstepAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642959117700038669
+      type: {class: PlayFootstepAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642959117700038670
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 6923667502783770647, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 0
+    - rid: 8642959117700038671
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 4333535293481838232, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 0
+    - rid: 8642959117700038682
+      type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        animationName: Walk
+--- !u!114 &-947137812395660653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d5bce95d28994049b5bb57841a729ee, type: 3}
+  m_Name: Delta_Base_StateMachine_testEditor
+  m_EditorClassIdentifier: 
+  serializedNodes: []
+  nodes:
+  - rid: 8642959117700038656
+  - rid: 8642959117700038657
+  - rid: 8642959117700038663
+  - rid: 8642959117700038672
+  - rid: 8642959117700038683
+  - rid: 8642959117700038688
+  - rid: 8642959117700038709
+  edges:
+  - GUID: 66f98306-a465-4f5f-a424-2eada66d3cf0
+    owner: {fileID: -947137812395660653}
+    inputNodeGUID: 6dc57530-3d37-4e71-9a75-ee9747614623
+    outputNodeGUID: 17a4af34-4ee0-4221-9ffc-19d33480c5a2
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: d68df6a8-c923-4479-bb44-f11cf74ce1c6
+    owner: {fileID: -947137812395660653}
+    inputNodeGUID: f39921df-095b-4c20-9922-031ece68f479
+    outputNodeGUID: 6dc57530-3d37-4e71-9a75-ee9747614623
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 42b4ed29-0f3c-4dc4-ae91-9167be635d67
+    owner: {fileID: -947137812395660653}
+    inputNodeGUID: c807915f-40d0-4ed2-9ab7-ff1a13432f6b
+    outputNodeGUID: f39921df-095b-4c20-9922-031ece68f479
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 78d486d9-e791-4ca6-8dbe-d00f37f32f6a
+    owner: {fileID: -947137812395660653}
+    inputNodeGUID: 6dc57530-3d37-4e71-9a75-ee9747614623
+    outputNodeGUID: f39921df-095b-4c20-9922-031ece68f479
+    inputFieldName: inputStateV
+    outputFieldName: outputTransitionsV
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: d0fc6ada-c81c-42f0-8b75-01e91fa88cdd
+    owner: {fileID: -947137812395660653}
+    inputNodeGUID: f39921df-095b-4c20-9922-031ece68f479
+    outputNodeGUID: c807915f-40d0-4ed2-9ab7-ff1a13432f6b
+    inputFieldName: inputStateV
+    outputFieldName: outputTransitionsV
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: fab0d6da-19db-47f6-bfd8-75e9c0e6985d
+    owner: {fileID: -947137812395660653}
+    inputNodeGUID: 6dc57530-3d37-4e71-9a75-ee9747614623
+    outputNodeGUID: c807915f-40d0-4ed2-9ab7-ff1a13432f6b
+    inputFieldName: inputStateV
+    outputFieldName: outputTransitionsV
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 203f1c2b-e51c-49f4-90c4-a1e7a4c01e00
+    owner: {fileID: -947137812395660653}
+    inputNodeGUID: c89b84f4-939b-439f-bdea-b61147668bc5
+    outputNodeGUID: 6dc57530-3d37-4e71-9a75-ee9747614623
+    inputFieldName: inputStateV
+    outputFieldName: outputTransitionsV
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 10f71152-a420-4e73-9eba-ec64cf9d4260
+    owner: {fileID: -947137812395660653}
+    inputNodeGUID: c89b84f4-939b-439f-bdea-b61147668bc5
+    outputNodeGUID: 6dc57530-3d37-4e71-9a75-ee9747614623
+    inputFieldName: inputStateV
+    outputFieldName: outputTransitionsV
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: 51eb2ac1-4c4a-48c4-9c16-a84c98cb5c88
+    owner: {fileID: -947137812395660653}
+    inputNodeGUID: c89b84f4-939b-439f-bdea-b61147668bc5
+    outputNodeGUID: 6dc57530-3d37-4e71-9a75-ee9747614623
+    inputFieldName: inputStateV
+    outputFieldName: outputTransitionsV
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: eb03c25a-8184-4dbf-97de-225e6a4c9b23
+    owner: {fileID: -947137812395660653}
+    inputNodeGUID: c89b84f4-939b-439f-bdea-b61147668bc5
+    outputNodeGUID: 6dc57530-3d37-4e71-9a75-ee9747614623
+    inputFieldName: inputStateV
+    outputFieldName: outputTransitionsV
+    inputPortIdentifier: 
+    outputPortIdentifier: T_4_True
+  - GUID: bda65e73-8d0a-42e0-adfc-b6a6a130cc50
+    owner: {fileID: -947137812395660653}
+    inputNodeGUID: c89b84f4-939b-439f-bdea-b61147668bc5
+    outputNodeGUID: 6dc57530-3d37-4e71-9a75-ee9747614623
+    inputFieldName: inputStateV
+    outputFieldName: outputTransitionsV
+    inputPortIdentifier: 
+    outputPortIdentifier: T_5_True
+  - GUID: 5cc1196c-5259-40eb-8fa8-ef7ad5cf56d2
+    owner: {fileID: -947137812395660653}
+    inputNodeGUID: 6dc57530-3d37-4e71-9a75-ee9747614623
+    outputNodeGUID: c89b84f4-939b-439f-bdea-b61147668bc5
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: aa90d353-bc79-45e5-b4e2-6b0ba011fde8
+    owner: {fileID: -947137812395660653}
+    inputNodeGUID: 00017fb8-6a22-4c70-a9d7-57036e2da08f
+    outputNodeGUID: c89b84f4-939b-439f-bdea-b61147668bc5
+    inputFieldName: inputStateV
+    outputFieldName: outputTransitionsV
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  groups: []
+  stackNodes: []
+  pinnedElements: []
+  exposedParameters: []
+  serializedParameterList: []
+  stickyNotes: []
+  nodeInspectorReference: {fileID: 0}
+  position: {x: -608, y: -146, z: 0}
+  scale: {x: 1, y: 1, z: 1}
+  targetStateMachine: {fileID: 11400000}
+  references:
+    version: 2
+    RefIds:
+    - rid: 8642959117700038656
+      type: {class: InitialStateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: 
+        GUID: 17a4af34-4ee0-4221-9ffc-19d33480c5a2
+        computeOrder: 0
+        position:
+          serializedVersion: 2
+          x: 334.00003
+          y: 110
+          width: 106
+          height: 75
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        outputTransitions: {fileID: 0}
+    - rid: 8642959117700038657
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Idle
+        GUID: 6dc57530-3d37-4e71-9a75-ee9747614623
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 439.6026
+          y: 110.489685
+          width: 400
+          height: 570
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 1856367217050726960}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 8642959117700038663
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Walk
+        GUID: f39921df-095b-4c20-9922-031ece68f479
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 870.22864
+          y: 110.00001
+          width: 400
+          height: 571
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -8535163290515908542}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 8642959117700038672
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Run
+        GUID: c807915f-40d0-4ed2-9ab7-ff1a13432f6b
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 1320.9781
+          y: 110.00001
+          width: 400
+          height: 571
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 5050385956708415890}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 8642959117700038683
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: TransformStart
+        GUID: c89b84f4-939b-439f-bdea-b61147668bc5
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 440
+          y: 423.192
+          width: 400
+          height: 170
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 3046542915067589525}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 8642959117700038688
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Transform
+        GUID: 00017fb8-6a22-4c70-a9d7-57036e2da08f
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 439.99997
+          y: 613.36487
+          width: 400
+          height: 139
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 528884035536718042}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 8642959117700038709
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: 
+        GUID: aff4fc64-1a10-4b9e-b80c-62cba1f7dea5
+        computeOrder: 1
+        position:
+          serializedVersion: 2
+          x: 1018
+          y: 420
+          width: 100
+          height: 100
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 0}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97cc48d9291f2784caac4164ff25b2ab, type: 3}
+  m_Name: Delta_Base_StateMachine_test
+  m_EditorClassIdentifier: 
+  customVariables:
+    boolVariables:
+      _serializedList: []
+    intVariables:
+      _serializedList: []
+    floatVariables:
+      _serializedList: []
+  initialState: {fileID: 1856367217050726960}
+  allStates:
+  - {fileID: 1856367217050726960}
+  - {fileID: 5050385956708415890}
+  - {fileID: 528884035536718042}
+  - {fileID: 3046542915067589525}
+  - {fileID: -8535163290515908542}
+  _commandPairs:
+  - conditionState: {fileID: 1856367217050726960}
+    triggerInput: 13
+    trigger: {fileID: -3516219743474145824, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+    type: 0
+  - conditionState: {fileID: 1856367217050726960}
+    triggerInput: 13
+    trigger: {fileID: -835859375761437590, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+    type: 0
+  - conditionState: {fileID: 1856367217050726960}
+    triggerInput: 13
+    trigger: {fileID: 3886288031618007989, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+    type: 0
+  - conditionState: {fileID: 1856367217050726960}
+    triggerInput: 13
+    trigger: {fileID: 4095408534432108295, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+    type: 0
+  - conditionState: {fileID: 1856367217050726960}
+    triggerInput: 13
+    trigger: {fileID: 7265750507833155019, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+    type: 0
+--- !u!114 &528884035536718042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: Transform
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0.3362873
+  transitions: []
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642959117700038690
+  UpdateActions: []
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 8642959117700038690
+      type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        animationName: Transforming
+--- !u!114 &1856367217050726960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: Idle
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0.632129
+  transitions:
+  - name: Walk
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642959117700038658
+      negate: 0
+    trueState: {fileID: -8535163290515908542}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  - name: GraffitiSkill1
+    activationInput: 13
+    trigger: {fileID: -3516219743474145824, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 3046542915067589525}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  - name: GraffitiSkill2
+    activationInput: 13
+    trigger: {fileID: -835859375761437590, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 3046542915067589525}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  - name: GraffitiSkill3
+    activationInput: 13
+    trigger: {fileID: 3886288031618007989, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 3046542915067589525}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  - name: GraffitiSkill4
+    activationInput: 13
+    trigger: {fileID: 4095408534432108295, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 3046542915067589525}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  - name: GraffitiSkill5
+    activationInput: 13
+    trigger: {fileID: 7265750507833155019, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 3046542915067589525}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642959117700038662
+  UpdateActions: []
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642959117700038658
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 6923667502783770647, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 0
+    - rid: 8642959117700038662
+      type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        animationName: Idle
+--- !u!114 &3046542915067589525
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: TransformStart
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0.40078598
+  transitions:
+  - name: Graffiti
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642959117700038686
+      negate: 0
+    trueState: {fileID: 528884035536718042}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  - name: Idle
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642959117700038687
+      negate: 0
+    trueState: {fileID: 1856367217050726960}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642959117700038684
+  - rid: 8642959117700038689
+  UpdateActions: []
+  ExitActions: []
+  actionSequence:
+  - time: 0.5
+    Action:
+      rid: 8642959117700038685
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642959117700038684
+      type: {class: StartGraffitiAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetSlot: 0
+    - rid: 8642959117700038685
+      type: {class: StartGraffitiTinkerAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        apply: 0
+    - rid: 8642959117700038686
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642959117700038687
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: -2053164015228634320, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 0
+    - rid: 8642959117700038689
+      type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        animationName: Transform
+--- !u!114 &5050385956708415890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: Run
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0.34247938
+  transitions:
+  - name: Idle
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642959117700038673
+      negate: 1
+    trueState: {fileID: 1856367217050726960}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  - name: Walk
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642959117700038674
+      negate: 1
+    trueState: {fileID: -8535163290515908542}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642959117700038675
+  - rid: 8642959117700038681
+  UpdateActions:
+  - rid: 8642959117700038676
+  - rid: 8642959117700038677
+  ExitActions:
+  - rid: 8642959117700038678
+  actionSequence:
+  - time: 0.1
+    Action:
+      rid: 8642959117700038679
+  - time: 0.3
+    Action:
+      rid: 8642959117700038680
+  - time: 0.2
+    Action:
+      rid: -2
+  loopActionSequence: 1
+  useTimer: 0
+  timerID: 0
+  time: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642959117700038673
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 6923667502783770647, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 0
+    - rid: 8642959117700038674
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 4333535293481838232, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 0
+    - rid: 8642959117700038675
+      type: {class: ApplySprintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        apply: 1
+    - rid: 8642959117700038676
+      type: {class: WalkByInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642959117700038677
+      type: {class: SetDirFromLastSetDirAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642959117700038678
+      type: {class: ApplySprintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        apply: 0
+    - rid: 8642959117700038679
+      type: {class: PlayFootstepAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642959117700038680
+      type: {class: PlayFootstepAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642959117700038681
+      type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        animationName: Run

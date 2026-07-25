@@ -28,9 +28,11 @@ public class StateMachineGraph : BaseGraph
             StateSO newfile = CreateInstance<StateSO>();
             newfile.name = "New State";
             sn.stateSO = newfile;
+            targetStateMachine.allStates.Add(newfile);
+            targetStateMachine.UpdateStateMachine();
 
             AssetDatabase.AddObjectToAsset(sn.stateSO, targetStateMachine);
-            
+
             Undo.RegisterCreatedObjectUndo(sn.stateSO, "Create State Node");
 
             EditorUtility.SetDirty(targetStateMachine);
@@ -48,6 +50,8 @@ public class StateMachineGraph : BaseGraph
             if (targetStateMachine != null)
             {
                 Undo.RecordObject(targetStateMachine, "Delete State Node");
+                targetStateMachine.allStates.Remove(sn.stateSO);
+                targetStateMachine.UpdateStateMachine();
             }
 
             Undo.DestroyObjectImmediate(sn.stateSO);

@@ -21,7 +21,7 @@ public class Player : Entity
     }
     */
 
-    public MergedPlayerBaseData BaseData;
+    public PlayerBaseDataSO BaseData;
 
     [SerializeField] private DatabaseManagerSO databaseManager;
 
@@ -64,7 +64,7 @@ public class Player : Entity
         InitializeModules();
     }
 
-    public void SetGear(MergedPlayerBaseData mergedGear)
+    public void SetGear(PlayerBaseDataSO mergedGear)
     {
         BaseData = mergedGear;
         Initialize();

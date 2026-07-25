@@ -65,9 +65,9 @@ MonoBehaviour:
   <GraffitiAttackState>k__BackingField: {fileID: 0}
   <GraffitiSkillState>k__BackingField: {fileID: 0}
   <GraffitiTinkerOffset>k__BackingField: {x: 1, y: 1}
-  <StateMachine>k__BackingField: {fileID: 11400000, guid: 1d95a8fa0bc3e7b40973736148392837, type: 2}
-  <SkinData>k__BackingField: {fileID: 11400000, guid: d754eb6f7172976478e6179abd178718, type: 2}
+  <StateMachine>k__BackingField: {fileID: 11400000, guid: f9cdd2d789dc5d943a524ac8d9284653, type: 2}
+  <SkinData>k__BackingField: {fileID: 11400000, guid: 1482b858a052cd84eb0e0c7efcbc36a6, type: 2}
   <MainAnimationData>k__BackingField: {fileID: 11400000, guid: daad9d5cf78123747aab07a3c9568203, type: 2}
-  <MainSpriteLibrary>k__BackingField: {fileID: 11400000, guid: a848b86f1d3bdef439218068040b0575, type: 2}
+  <MainSpriteLibrary>k__BackingField: {fileID: 11400000, guid: 7e987b287b83d684c8de2c2ef71b2b7b, type: 2}
   <EffectAnimationData>k__BackingField: {fileID: 0}
   <EffectSpriteLibrary>k__BackingField: {fileID: 0}

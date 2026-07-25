@@ -81,7 +81,7 @@ public class StateController : InterfaceRegister
 
     public virtual void ChangeState(string stateName)
     {
-        StateSO targetState = Array.Find(StateMachine.allStates, a => a.name == stateName);
+        StateSO targetState = StateMachine.allStates.Find(a => a.name == stateName);
         if (targetState) ChangeState(targetState);
     }
 

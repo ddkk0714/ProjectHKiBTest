@@ -6,7 +6,7 @@ using UnityEngine;
 public class GearManager : MonoBehaviour
 {
     public List<Gear> activeGear;
-    public Timer transformTimer;
+    [HideInInspector] public Timer transformTimer = new();
     //[SerializeField] private GearMergeManagerSO gearMergeManager;
     public GearDataSO DefaultGearData;
     [SerializeField] private GearDataSO[] allMergedGearDatas;
