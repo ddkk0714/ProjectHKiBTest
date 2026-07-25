@@ -15,6 +15,10 @@ public class EmotionThresholdProfileSO : ScriptableObject
         public StatBuffSO statBuff;
         public BehaviorOverrideSO behavior; // Phase 3(Step 3.1) 전까지는 null
         public bool locked; // Step 2.2에서 사용 — true면 해제 불가 (잠·황홀 후기)
+
+        // Step 3.1(황홀) — statBuff의 BuffTime이 지나면 statBuff를 빼고 이걸로 교체 적용한다.
+        // (예: 황홀 초반 "예측 불가 행동" 버프 -> 시간 경과 후 "황홀 후기" 그로기로 전환)
+        public StatBuffSO followUpBuff;
     }
 
     [ReorderableList]

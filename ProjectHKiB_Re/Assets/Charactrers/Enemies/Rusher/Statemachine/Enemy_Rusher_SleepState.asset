@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Enemy_Rusher_SleepState
+  m_EditorClassIdentifier:
+  temporaryID: 0
+  transitions:
+  - activationInput: 10
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - decision: {fileID: 11400000, guid: 80a9e7adebd446a99d5b92ccc6c24459, type: 2}
+      negate: 1
+    trueState: {fileID: 11400000, guid: fb76677276d637f40a069bb3eafdf772, type: 2}
+    falseState: {fileID: 0}
+    action: {fileID: 0}
+  enterActions: []
+  updateActions: []
+  exitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: Idle

@@ -28,12 +28,14 @@ MonoBehaviour:
   - axis: 1
     value: 60
     hysteresis: 5
-    statBuff: {fileID: 0}
+    statBuff: {fileID: 11400000, guid: fda5930dac744ba29d9bc55e1bb15d03, type: 2}
     behavior: {fileID: 0}
     locked: 0
+    followUpBuff: {fileID: 0}
   - axis: 0
     value: 45
     hysteresis: 5
-    statBuff: {fileID: 0}
+    statBuff: {fileID: 11400000, guid: 7430711a8ece4a7b83936d3c8730ea23, type: 2}
     behavior: {fileID: 0}
     locked: 1
+    followUpBuff: {fileID: 11400000, guid: 4e6c30c286ffe534ca6d472ebb2928e2, type: 2}

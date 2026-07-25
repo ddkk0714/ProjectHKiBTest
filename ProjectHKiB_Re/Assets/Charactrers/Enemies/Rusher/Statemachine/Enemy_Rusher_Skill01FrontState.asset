@@ -43,6 +43,24 @@ MonoBehaviour:
     availableTime: 0
     disableTime: 0
     decisions:
+    - decision: {fileID: 11400000, guid: 80a9e7adebd446a99d5b92ccc6c24459, type: 2}
+      negate: 0
+    trueState: {fileID: 11400000, guid: be17b2e0b3144cd89e6cb195c46c464c, type: 2}
+    falseState: {fileID: 0}
+    action: {fileID: 0}
+  - activationInput: 10
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - decision: {fileID: 11400000, guid: 9b275cb6931a414a9711e2c31ba3e476, type: 2}
+      negate: 0
+    trueState: {fileID: 11400000, guid: 4b4ae3e5b8ba4f1a874c39f0ec3ccd1c, type: 2}
+    falseState: {fileID: 0}
+    action: {fileID: 0}
+  - activationInput: 10
+    availableTime: 0
+    disableTime: 0
+    decisions:
     - decision: {fileID: 11400000, guid: 32f2c5ff068557b43becca29f5d19726, type: 2}
       negate: 0
     trueState: {fileID: 11400000, guid: fb9b3e1b66281fe47ab93eec87c5a178, type: 2}

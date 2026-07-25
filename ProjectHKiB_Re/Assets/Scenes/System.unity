@@ -11438,6 +11438,22 @@ PrefabInstance:
       propertyPath: <Buff>k__BackingField
       value: 
       objectReference: {fileID: 11400000, guid: f131f6c469d94056bfd129d3b7f72242, type: 2}
+    - target: {fileID: 2171765671295649272, guid: 499e36180833458488e611504074b9c1, type: 3}
+      propertyPath: _buff
+      value: 
+      objectReference: {fileID: 11400000, guid: aa9c5e1ca1b282d43873eb175a7bef2b, type: 2}
+    - target: {fileID: 2171765671295649272, guid: 499e36180833458488e611504074b9c1, type: 3}
+      propertyPath: _firstColor
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2171765671295649272, guid: 499e36180833458488e611504074b9c1, type: 3}
+      propertyPath: _firstStack
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2171765671295649272, guid: 499e36180833458488e611504074b9c1, type: 3}
+      propertyPath: _defaultTarget
+      value: 
+      objectReference: {fileID: 457691554}
     - target: {fileID: 3402870450317852475, guid: 499e36180833458488e611504074b9c1, type: 3}
       propertyPath: m_RootOrder
       value: 6
@@ -11488,11 +11504,11 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: f131f6c469d94056bfd129d3b7f72242, type: 2}
     - target: {fileID: 5111664485049529841, guid: 499e36180833458488e611504074b9c1, type: 3}
       propertyPath: _firstColor
-      value: 0
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 5111664485049529841, guid: 499e36180833458488e611504074b9c1, type: 3}
       propertyPath: _firstStack
-      value: 1
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 5111664485049529841, guid: 499e36180833458488e611504074b9c1, type: 3}
       propertyPath: _applyTarget
@@ -11500,7 +11516,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5111664485049529841, guid: 499e36180833458488e611504074b9c1, type: 3}
       propertyPath: _secondColor
-      value: 1
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111664485049529841, guid: 499e36180833458488e611504074b9c1, type: 3}
+      propertyPath: _secondStack
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 5111664485049529841, guid: 499e36180833458488e611504074b9c1, type: 3}
       propertyPath: _defaultTarget
@@ -11516,7 +11536,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8102317475134299211, guid: 499e36180833458488e611504074b9c1, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 499e36180833458488e611504074b9c1, type: 3}
@@ -14766,6 +14786,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   table: {fileID: 11400000, guid: 34285b8e0b511fa42a122dbf5c0f5aab, type: 2}
   showDebugLog: 1
+  profile: {fileID: 11400000, guid: 95be63060787b5a41acc184db2aa04ff, type: 2}
+  defaultProfile: {fileID: 11400000, guid: 15f0d1fc2fef77b4cb121e932468d8b6, type: 2}
+  applyThresholds: 1
+  rule: {fileID: 11400000, guid: ebcbb2b88ce97f34e82e927e92b4ea87, type: 2}
 --- !u!114 &327803510
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14783,6 +14807,7 @@ MonoBehaviour:
   panelSize: 320
   injectColor: 0
   injectStack: 10
+  smoothTime: 0.15
 --- !u!1 &331044352
 GameObject:
   m_ObjectHideFlags: 0
@@ -19914,6 +19939,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dfacbf76c0599c4aa3326aa7f0bc6a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &457691540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 457691522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7aada689abb9c4f43a7cbd5e90368406, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  table: {fileID: 11400000, guid: 34285b8e0b511fa42a122dbf5c0f5aab, type: 2}
+  showDebugLog: 1
+  profile: {fileID: 11400000, guid: 95be63060787b5a41acc184db2aa04ff, type: 2}
+  defaultProfile: {fileID: 11400000, guid: 95be63060787b5a41acc184db2aa04ff, type: 2}
+  applyThresholds: 1
+  rule: {fileID: 11400000, guid: ebcbb2b88ce97f34e82e927e92b4ea87, type: 2}
+--- !u!4 &457691554 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6324719739634341055, guid: 312b7ed3679345a4bbc281cb78c590df, type: 3}
+  m_PrefabInstance: {fileID: 851811593}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &459721256
 GameObject:
   m_ObjectHideFlags: 0
@@ -37540,7 +37588,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6324719739634341053, guid: 312b7ed3679345a4bbc281cb78c590df, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6324719739634341055, guid: 312b7ed3679345a4bbc281cb78c590df, type: 3}
       propertyPath: m_RootOrder

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using NaughtyAttributes;
 using UnityEngine;
@@ -43,6 +44,8 @@ public class EmotionVectorModule : MonoBehaviour
     private Enemy _enemy; // 없으면(플레이어 등) Mental 100 고정 — spec §5.5 "적 전용"
     private readonly Dictionary<EmotionColor, int> _lastStacks = new();
     private readonly HashSet<EmotionAxis> _activeAxes = new();
+    private readonly Dictionary<EmotionAxis, Coroutine> _followUpCoroutines = new();
+    private readonly HashSet<EmotionAxis> _followedUpAxes = new(); // followUpBuff가 이미 적용된 축 (statBuff -> followUpBuff 전환 완료)
     private bool _isDirty;
     private EmotionVector _current;
     private bool _warnedNoProfile;
@@ -58,11 +61,23 @@ public class EmotionVectorModule : MonoBehaviour
     public EmotionVectorTableSO Table => table;
 
     // 디버그 뷰의 "가짜 주입" 미리보기용 — 실제 게임 상태(EmotionModule)는 건드리지 않는다 (Step 1.2, spec §8).
-    public int GetRawStack(EmotionColor color) => _emotionModule.GetStacks(color, EmotionModule.EmotionApplyTarget.Other);
+    // Awake() 이전(에디터에서 컴포넌트만 막 추가한 시점 등)엔 _emotionModule이 null일 수 있어 방어.
+    public int GetRawStack(EmotionColor color)
+    {
+        if (_emotionModule == null) _emotionModule = GetComponent<EmotionModule>();
+        if (_emotionModule == null) return 0;
+
+        return _emotionModule.GetStacks(color, EmotionModule.EmotionApplyTarget.Other);
+    }
 
     [ShowNativeProperty] public float Mental => _enemy != null && _enemy.BaseData != null ? _enemy.BaseData.Mental : 100f;
 
     public bool IsAxisActive(EmotionAxis axis) => _activeAxes.Contains(axis);
+
+    // FSM 행동 오버라이드(EmotionAxisActiveDecision)가 참조하는 값 — followUpBuff로 이미 전환된 축은
+    // (예: 황홀 초반 -> 후기 그로기) 더 이상 "초반 전용 State"로 라우팅하면 안 되므로 false를 반환한다.
+    // locked=true라 _activeAxes 자체는 계속 true로 남아있어도(축 판정/스탯은 유지) FSM 진입만 여기서 끊는다.
+    public bool IsAxisBehaviorActive(EmotionAxis axis) => _activeAxes.Contains(axis) && !_followedUpAxes.Contains(axis);
 
     private void Awake()
     {
@@ -170,6 +185,9 @@ public class EmotionVectorModule : MonoBehaviour
         if (entry.statBuff != null && _buffable != null)
             _buffable.Buff(entry.statBuff, 1, 1, ThresholdBuffOverrideDuration);
 
+        if (entry.followUpBuff != null && entry.statBuff != null && entry.statBuff.BuffTime > 0f)
+            _followUpCoroutines[axis] = StartCoroutine(FollowUpRoutine(axis, entry));
+
         EmotionState state = AxisToState(axis);
         OnStateChanged?.Invoke(state, true);
 
@@ -181,14 +199,53 @@ public class EmotionVectorModule : MonoBehaviour
     {
         _activeAxes.Remove(axis);
 
-        if (entry.statBuff != null && _buffable != null)
-            _buffable.UnBuff(entry.statBuff);
+        if (_followUpCoroutines.TryGetValue(axis, out Coroutine routine))
+        {
+            StopCoroutine(routine);
+            _followUpCoroutines.Remove(axis);
+        }
+
+        if (_buffable != null)
+        {
+            if (_followedUpAxes.Remove(axis))
+            {
+                if (entry.followUpBuff != null) _buffable.UnBuff(entry.followUpBuff);
+            }
+            else if (entry.statBuff != null)
+            {
+                _buffable.UnBuff(entry.statBuff);
+            }
+        }
 
         EmotionState state = AxisToState(axis);
         OnStateChanged?.Invoke(state, false);
 
         if (showDebugLog)
             Debug.Log($"[EmotionVectorModule] Threshold OFF: {axis} -> {state}");
+    }
+
+    // entry.statBuff의 BuffTime이 지나면 entry.followUpBuff로 교체 (예: 황홀 초반 버프 -> 황홀 후기 그로기).
+    // 역치로 부여한 statBuff는 ActivateAxis에서 지속시간을 override하므로, 이 타이머는 BuffableModule의
+    // 자연 만료를 기다리는 게 아니라 EmotionVectorModule이 statBuff.BuffTime 값을 "페이즈 길이"로 직접 읽어 독자적으로 잰다.
+    private IEnumerator FollowUpRoutine(EmotionAxis axis, EmotionThresholdProfileSO.ThresholdEntry entry)
+    {
+        yield return new WaitForSeconds(entry.statBuff.BuffTime);
+
+        _followUpCoroutines.Remove(axis);
+        if (!_activeAxes.Contains(axis)) yield break;
+
+        if (_buffable != null)
+        {
+            _buffable.UnBuff(entry.statBuff);
+            // followUpBuff는 override 없이 SO 자체의 BuffTime으로 적용 — 유한 시간 뒤 자연 만료되어야
+            // (예: 황홀 후기 그로기가 일정 시간 후 풀리고 정상 행동으로 복귀) 하기 때문에, 축이 계속
+            // "활성" 상태인 것과 별개로 이 버프만은 시간이 다 되면 스스로 사라지게 둔다.
+            _buffable.Buff(entry.followUpBuff, 1, 1, -1f);
+        }
+        _followedUpAxes.Add(axis);
+
+        if (showDebugLog)
+            Debug.Log($"[EmotionVectorModule] FollowUp: {axis} -> {entry.followUpBuff.name}");
     }
 
     public static EmotionState AxisToState(EmotionAxis axis) => axis switch
