@@ -28,7 +28,13 @@ public class EmotionVectorModule : MonoBehaviour
     [SerializeField] private EmotionThresholdProfileSO profile;
     [SerializeField] private EmotionThresholdProfileSO defaultProfile;
     [SerializeField] private bool applyThresholds = true; // 플레이어는 false로 둘 것 (spec §5.5)
-    [SerializeField] private EmotionCombinationRuleSO rule; // 공허 촉매 파라미터 (Step 2.3, spec §2.4)
+    [SerializeField] private EmotionCombinationRuleSO rule; // 공허 촉매 파라미터 (Step 2.3, spec §2.4) + 조합 판정 파라미터 (Step 4.1)
+
+    [Header("Combination Shadow Mode (Step 4.1)")]
+    [SerializeField] private bool showCombinationShadowLog = false; // 기존 EvaluateReaction()과 병행 실행, 로그만 — 실제 적용 안 함 (spec §4.1~4.3)
+
+    [Header("Combination Live Apply (Step 4.3)")]
+    [SerializeField] private bool useVectorCombination = false; // true면 기존 EvaluateReaction()을 끄고 이 모듈이 실제로 상쇄/대체/복합을 적용한다. 기본값 false — 롤백 안전선(spec §5, 계획서 "롤백 안전선" 표)
 
     private static readonly EmotionAxis[] AllAxes =
     {
@@ -124,6 +130,9 @@ public class EmotionVectorModule : MonoBehaviour
 
     private void Update()
     {
+        // 이 모듈이 켜져 있는 동안은 매 프레임 동기화 — 인스펙터에서 값을 바꿔도(Play 모드 포함) 바로 반영됨.
+        if (_emotionModule != null) _emotionModule.SuppressLegacyReaction = useVectorCombination;
+
         for (int i = 0; i < PolledColors.Length; i++)
         {
             EmotionColor color = PolledColors[i];
@@ -137,12 +146,181 @@ public class EmotionVectorModule : MonoBehaviour
         }
     }
 
+    private void OnDisable()
+    {
+        // 컴포넌트가 꺼지면 억제도 같이 풀어서 기존 반응 시스템이 고아 상태로 막혀있지 않게 함.
+        if (_emotionModule != null) _emotionModule.SuppressLegacyReaction = false;
+    }
+
     private void LateUpdate()
     {
         if (!_isDirty) return;
         Recalculate();
         if (applyThresholds) EvaluateThresholds();
+        if (useVectorCombination) ApplyCombinations();
+        else if (showCombinationShadowLog) LogShadowCombinations();
         _isDirty = false;
+    }
+
+    // Step 4.1 — 섀도 모드. 기존 EvaluateReaction()은 손대지 않고 그대로 병행 가동되며, 여기서는
+    // "새 벡터 조합 판정이라면 이 두 색을 어떻게 처리했을지"를 로그로만 남긴다(실제 스택/버프 미적용).
+    // 기존 시스템은 대개 두 번째 색이 적용되는 그 프레임에 즉시 반응해 소각하므로, 이 폴링이 두 색이
+    // 공존하는 순간을 실제로 잡아내는 경우는 드물다 — 주 검증 수단은 EditMode 단위 테스트(§10 검증쌍).
+    private void LogShadowCombinations()
+    {
+        if (table == null || rule == null) return;
+
+        for (int i = 0; i < PolledColors.Length; i++)
+        {
+            EmotionColor colorA = PolledColors[i];
+            if (colorA == EmotionColor.VoidBlack) continue;
+            int stackA = _emotionModule.GetStacks(colorA, EmotionModule.EmotionApplyTarget.Other);
+            if (stackA <= 0) continue;
+
+            for (int j = i + 1; j < PolledColors.Length; j++)
+            {
+                EmotionColor colorB = PolledColors[j];
+                if (colorB == EmotionColor.VoidBlack) continue;
+                int stackB = _emotionModule.GetStacks(colorB, EmotionModule.EmotionApplyTarget.Other);
+                if (stackB <= 0) continue;
+
+                EmotionCombinationResult result = EmotionCombinationEvaluator.Evaluate(
+                    table.GetPosition(colorA), stackA, colorA,
+                    table.GetPosition(colorB), stackB, colorB,
+                    rule.ReplaceThreshold);
+
+                if (result.Type != EmotionCombinationType.Overlap)
+                {
+                    string extra = "";
+                    if (result.Type == EmotionCombinationType.Composite &&
+                        rule.TryGetCompositeColor(result.CompositeQuadrant, out EmotionColor composite))
+                    {
+                        int fusionStack = EmotionCombinationEvaluator.ComputeFusionStack(result.ConsumedStack, rule.FusionEfficiency);
+                        extra = $", composite={composite}(fusionStack={fusionStack})";
+                    }
+
+                    Debug.Log($"[EmotionVectorModule] Shadow combination: {colorA}({stackA}) + {colorB}({stackB}) -> {result}{extra}");
+                }
+            }
+        }
+    }
+
+    // Step 4.3 — 실제 적용. useVectorCombination이 켜져 있을 때만 LateUpdate에서 호출되며, 이때
+    // EmotionModule.SuppressLegacyReaction이 Update()에서 이미 true로 동기화되어 있어 기존
+    // EvaluateReaction()과 이중 처리될 일은 없다. 한 프레임에 "재공급 1건" 또는 "쌍 1건"만 적용하고
+    // 멈춘다 — 여기서 호출하는 RemoveColor/ApplyColor가 다음 프레임 Update() 폴링에서 새 dirty로
+    // 잡혀 자연히 이어지므로(EvaluateThresholds와 동일한 "같은 프레임 재귀 금지" 원칙), 한 프레임에
+    // 여러 쌍을 연달아 처리하면서 이미 소각된 색의 stale 값을 참조하는 문제가 생기지 않는다.
+    private void ApplyCombinations()
+    {
+        if (table == null || rule == null) return;
+
+        if (TryApplyReplenishment()) return;
+
+        for (int i = 0; i < PolledColors.Length; i++)
+        {
+            EmotionColor colorA = PolledColors[i];
+            if (colorA == EmotionColor.VoidBlack) continue;
+            int stackA = _emotionModule.GetStacks(colorA, EmotionModule.EmotionApplyTarget.Other);
+            if (stackA <= 0) continue;
+
+            for (int j = i + 1; j < PolledColors.Length; j++)
+            {
+                EmotionColor colorB = PolledColors[j];
+                if (colorB == EmotionColor.VoidBlack) continue;
+                int stackB = _emotionModule.GetStacks(colorB, EmotionModule.EmotionApplyTarget.Other);
+                if (stackB <= 0) continue;
+
+                EmotionCombinationResult result = EmotionCombinationEvaluator.Evaluate(
+                    table.GetPosition(colorA), stackA, colorA,
+                    table.GetPosition(colorB), stackB, colorB,
+                    rule.ReplaceThreshold);
+
+                if (ApplyCombinationResult(colorA, stackA, colorB, stackB, result))
+                    return;
+            }
+        }
+    }
+
+    // spec §4.4 — 활성 복합의 재료가 되는 기본색이 새로 유입되면, 그 재료를 소각하고 0.5배 효율로
+    // 기존 복합 스택에 합류시킨다(새 복합을 따로 만들지 않음, 재료 색 자체는 남지 않음).
+    // 지속시간은 건드리지 않는다 — ApplyColor가 기존 BuffableModule 재적용 규칙을 그대로 따른다.
+    private bool TryApplyReplenishment()
+    {
+        IReadOnlyList<EmotionCombinationRuleSO.CompositeEntry> composites = rule.Composites;
+        for (int i = 0; i < composites.Count; i++)
+        {
+            EmotionColor composite = composites[i].result;
+            int compositeStack = _emotionModule.GetStacks(composite, EmotionModule.EmotionApplyTarget.Other);
+            if (compositeStack <= 0) continue;
+
+            List<EmotionColor> materials = composites[i].materials;
+            if (materials == null) continue;
+
+            for (int m = 0; m < materials.Count; m++)
+            {
+                EmotionColor material = materials[m];
+                int materialStack = _emotionModule.GetStacks(material, EmotionModule.EmotionApplyTarget.Other);
+                if (materialStack <= 0) continue;
+
+                int replenishStack = EmotionCombinationEvaluator.ComputeReplenishStack(materialStack);
+                _emotionModule.RemoveColor(material, EmotionModule.EmotionApplyTarget.Other, materialStack);
+                if (replenishStack > 0)
+                    _emotionModule.ApplyColor(composite, replenishStack, EmotionModule.EmotionApplyTarget.Other);
+
+                if (showDebugLog)
+                    Debug.Log($"[EmotionVectorModule] Replenish: {composite} += {replenishStack} (material {material} consumed {materialStack})");
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // 판정 결과를 실제 EmotionModule 스택에 반영. 처리했으면 true(호출부가 이번 프레임을 종료함).
+    private bool ApplyCombinationResult(EmotionColor colorA, int stackA, EmotionColor colorB, int stackB, EmotionCombinationResult result)
+    {
+        switch (result.Type)
+        {
+            case EmotionCombinationType.Cancel:
+                _emotionModule.RemoveColor(colorA, EmotionModule.EmotionApplyTarget.Other, result.ConsumedStack);
+                _emotionModule.RemoveColor(colorB, EmotionModule.EmotionApplyTarget.Other, result.ConsumedStack);
+                if (showDebugLog)
+                    Debug.Log($"[EmotionVectorModule] Cancel: {colorA} - {colorB} (-{result.ConsumedStack} each)");
+                return true;
+
+            case EmotionCombinationType.Replace:
+            {
+                bool aWins = result.Winner == colorA;
+                EmotionColor loser = aWins ? colorB : colorA;
+                int loserStack = aWins ? stackB : stackA;
+                _emotionModule.RemoveColor(loser, EmotionModule.EmotionApplyTarget.Other, loserStack);
+                if (showDebugLog)
+                    Debug.Log($"[EmotionVectorModule] Replace: {result.Winner} survives, {loser} annihilated (-{loserStack})");
+                return true;
+            }
+
+            case EmotionCombinationType.Composite:
+            {
+                if (!rule.TryGetCompositeColor(result.CompositeQuadrant, out EmotionColor composite))
+                    return false; // 아직 등록되지 않은 사분면(1사분면 등) — 조용히 스킵, 다음 새 쌍에서 재시도
+
+                _emotionModule.RemoveColor(colorA, EmotionModule.EmotionApplyTarget.Other, result.ConsumedStack);
+                _emotionModule.RemoveColor(colorB, EmotionModule.EmotionApplyTarget.Other, result.ConsumedStack);
+
+                int fusionStack = EmotionCombinationEvaluator.ComputeFusionStack(result.ConsumedStack, rule.FusionEfficiency);
+                if (fusionStack > 0)
+                    _emotionModule.ApplyColor(composite, fusionStack, EmotionModule.EmotionApplyTarget.Other);
+
+                if (showDebugLog)
+                    Debug.Log($"[EmotionVectorModule] Composite: {colorA} + {colorB} -> {composite} (+{fusionStack})");
+                return true;
+            }
+
+            default:
+                return false; // Overlap — 처리 없음
+        }
     }
 
     // 4축 독립 판정 + 히스테리시스 (spec §5.4). 여기서 발생하는 스택 변경(예: 역치 버프가 감정색을

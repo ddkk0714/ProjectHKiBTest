@@ -86,6 +86,10 @@ public class EmotionModule : InterfaceModule, IEmotionModule
     [Header("Debug")]
     [SerializeField] private bool showDebugLog = true;
 
+    // Step 4.3(EmotionVector) — 새 벡터 조합 시스템이 대신 처리 중일 때 기존 자동 반응을 끄는 스위치.
+    // EmotionVectorModule 등 외부에서만 설정한다. 기본값 false면 지금까지와 완전히 동일하게 동작한다.
+    public bool SuppressLegacyReaction = false;
+
     private IBuffable _buffable;
     private BuffableModule _buffableModule;
 
@@ -185,7 +189,7 @@ public class EmotionModule : InterfaceModule, IEmotionModule
         if (showDebugLog)
             Debug.Log($"[EmotionModule] Apply {color} / {applyTarget} +{addStack}, Total {nextStack}");
 
-        if (evaluateReaction && IsBaseColor(color))
+        if (evaluateReaction && IsBaseColor(color) && !SuppressLegacyReaction)
             EvaluateReaction(color, sourceGear, applyTarget, previousStack);
     }
 
