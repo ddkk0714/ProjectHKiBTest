@@ -77,7 +77,39 @@ MonoBehaviour:
       rid: -2
     showTrueStatePort: 1
     showFalseStatePort: 1
-  - name: 
+  - name:
+    activationInput: 10
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - decision: {fileID: 0}
+      Decision:
+        rid: 9000000007
+      negate: 0
+    trueState: {fileID: 11400000, guid: be17b2e0b3144cd89e6cb195c46c464c, type: 2}
+    falseState: {fileID: 0}
+    action: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name:
+    activationInput: 10
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - decision: {fileID: 0}
+      Decision:
+        rid: 9000000008
+      negate: 0
+    trueState: {fileID: 11400000, guid: 4b4ae3e5b8ba4f1a874c39f0ec3ccd1c, type: 2}
+    falseState: {fileID: 0}
+    action: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name:
     activationInput: 10
     availableTime: 0
     disableTime: 0
@@ -86,7 +118,7 @@ MonoBehaviour:
       Decision:
         rid: 8642958643451396602
       negate: 0
-    trueState: {fileID: 11400000, guid: 4fabbcbfb1804744c9a24b30efc12ac4, type: 2}
+    trueState: {fileID: 11400000, guid: f8ae2b2def4691b4fa05643d5881f217, type: 2}
     falseState: {fileID: 0}
     action: {fileID: 0}
     Action:
@@ -156,4 +188,12 @@ MonoBehaviour:
       data: 
     - rid: 8642958643451396607
       type: {class: CombinedAction, ns: StateMachine, asm: Assembly-CSharp}
-      data: 
+      data:
+    - rid: 9000000007
+      type: {class: EmotionAxisActiveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        axis: 3
+    - rid: 9000000008
+      type: {class: EmotionAxisActiveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        axis: 0

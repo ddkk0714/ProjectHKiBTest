@@ -1266,19 +1266,7 @@ public partial class @PlayerAction: IInputActionCollection2, IDisposable
             ]
         }
     ],
-    ""controlSchemes"": [
-        {
-            ""name"": ""PC"",
-            ""bindingGroup"": ""PC"",
-            ""devices"": [
-                {
-                    ""devicePath"": ""<Keyboard>"",
-                    ""isOptional"": false,
-                    ""isOR"": false
-                }
-            ]
-        }
-    ]
+    ""controlSchemes"": []
 }");
         // PLAY
         m_PLAY = asset.FindActionMap("PLAY", throwIfNotFound: true);
@@ -1817,15 +1805,6 @@ public partial class @PlayerAction: IInputActionCollection2, IDisposable
         }
     }
     public GRAFFITIActions @GRAFFITI => new GRAFFITIActions(this);
-    private int m_PCSchemeIndex = -1;
-    public InputControlScheme PCScheme
-    {
-        get
-        {
-            if (m_PCSchemeIndex == -1) m_PCSchemeIndex = asset.FindControlSchemeIndex("PC");
-            return asset.controlSchemes[m_PCSchemeIndex];
-        }
-    }
     public interface IPLAYActions
     {
         void OnMove(InputAction.CallbackContext context);

@@ -35,13 +35,15 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   enterActions: []
-  EnterActions: []
+  EnterActions:
+  - rid: 9100000003
   updateActions:
   - {fileID: 11400000, guid: e85d9897af9e951499f24208703cd6a5, type: 2}
   UpdateActions:
   - rid: 8642958643451396409
   exitActions: []
-  ExitActions: []
+  ExitActions:
+  - rid: 9100000004
   actionSequence: []
   loopActionSequence: 0
   useTimer: 0
@@ -55,8 +57,16 @@ MonoBehaviour:
       type: {class: , ns: , asm: }
     - rid: 8642958643451396408
       type: {class: IsRunawayDecision, ns: StateMachine, asm: Assembly-CSharp}
-      data: 
+      data:
     - rid: 8642958643451396409
       type: {class: WalkByLastSetAnimationDirAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         _negate: 1
+    - rid: 9100000003
+      type: {class: SetSpriteTintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        color: {r: 0.4, g: 0.85, b: 1, a: 1}
+    - rid: 9100000004
+      type: {class: SetSpriteTintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        color: {r: 1, g: 1, b: 1, a: 1}

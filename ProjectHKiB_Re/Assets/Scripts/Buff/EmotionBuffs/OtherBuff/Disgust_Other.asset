@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
+  m_Name: Disgust_Other
+  m_EditorClassIdentifier:
+  <Description>k__BackingField: "(공격력 증가 소) + (저항 -1)"
+  <IsBuffTimeInfinite>k__BackingField: 0
+  <BuffTime>k__BackingField: 5
+  isEmotionBuff: 1
+  emotionColor: 18
+  maxStack: 200
+  <TimeStackType>k__BackingField: 2
+  <BuffStackType>k__BackingField: 1
+  <BuffRemoveType>k__BackingField: 0
+  <Effects>k__BackingField:
+  - <BuffType>k__BackingField: {fileID: 11400000, guid: d67239f1a85a134428b8ee4ce734e2dd, type: 2}
+    <IsDebuff>k__BackingField: 1
+    <Value>k__BackingField: 1
+    <IsValuePropositional>k__BackingField: 0
+  - <BuffType>k__BackingField: {fileID: 11400000, guid: 76ccfc27f53ed0a4ba32218bb173d74a, type: 2}
+    <IsDebuff>k__BackingField: 0
+    <Value>k__BackingField: 0.5
+    <IsValuePropositional>k__BackingField: 0

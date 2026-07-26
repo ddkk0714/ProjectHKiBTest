@@ -151,6 +151,7 @@ public class PhysicsModule : InterfaceModule, IPhysics
         ExForce = new();
         Grid = new();
         Phys = new();
+        SpeedBuffer = new();
         PrevEntityPos = transform.position;
         if (Size.x <= 0 || Size.y <= 0) Size = Vector2Int.one;
         InvM = 1f / Mass;

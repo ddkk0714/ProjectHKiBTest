@@ -33,7 +33,7 @@ MonoBehaviour:
       rid: -2
     showTrueStatePort: 1
     showFalseStatePort: 1
-  - name: 
+  - name:
     activationInput: 13
     _trigger: {fileID: -3516219743474145824, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
     _type: 1
@@ -98,6 +98,38 @@ MonoBehaviour:
       rid: -2
     showTrueStatePort: 1
     showFalseStatePort: 1
+  - name:
+    activationInput: 10
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - decision: {fileID: 0}
+      Decision:
+        rid: 9200000101
+      negate: 0
+    trueState: {fileID: 11400000, guid: 500efa273b6726d43c8aa155424762a4, type: 2}
+    falseState: {fileID: 0}
+    action: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name:
+    activationInput: 10
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - decision: {fileID: 0}
+      Decision:
+        rid: 9200000102
+      negate: 0
+    trueState: {fileID: 11400000, guid: ea53649ae1bbae99a7efdc5a8cc6063d, type: 2}
+    falseState: {fileID: 0}
+    action: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
   additionalTransitions: []
   EnterActions: []
   UpdateActions: []
@@ -119,3 +151,11 @@ MonoBehaviour:
         _trigger: {fileID: 6923667502783770647, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
         _type: 0
         _inputType: 0
+    - rid: 9200000101
+      type: {class: EmotionAxisActiveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        axis: 3
+    - rid: 9200000102
+      type: {class: EmotionAxisActiveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        axis: 0

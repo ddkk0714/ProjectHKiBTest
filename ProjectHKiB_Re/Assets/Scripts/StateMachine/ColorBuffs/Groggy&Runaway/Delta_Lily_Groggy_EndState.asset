@@ -35,7 +35,8 @@ MonoBehaviour:
   updateActions: []
   UpdateActions: []
   exitActions: []
-  ExitActions: []
+  ExitActions:
+  - rid: 9100000002
   actionSequence: []
   loopActionSequence: 0
   useTimer: 0
@@ -47,3 +48,7 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+    - rid: 9100000002
+      type: {class: SetSpriteTintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        color: {r: 1, g: 1, b: 1, a: 1}

@@ -159,7 +159,8 @@ namespace NaughtyAttributes.Editor
                     buttonEnabled &= (Application.isPlaying ? true : false);
                 }
 
-                EditorGUI.BeginDisabledGroup(!buttonEnabled);
+                bool hotControlBlocking = Event.current.type == EventType.MouseDown && GUIUtility.hotControl != 0;
+                EditorGUI.BeginDisabledGroup(!buttonEnabled || hotControlBlocking);
 
                 if (GUILayout.Button(buttonText, _buttonStyle))
                 {

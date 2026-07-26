@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using RouteFinding.Note; // NoteRouteGraphView(그래프 위치/펼침 상태 세이브 연동, 2026-07-21) — NoteModule 등과
+                          // 달리 이 타입만 네임스페이스가 있어 using이 필요하다.
 
 [RequireComponent(typeof(StateController))]
 public class SaveModule : InterfaceModule, IInitializable
@@ -162,19 +164,71 @@ public class SaveModule : InterfaceModule, IInitializable
         _currentSaveData.eventFlags.Clear();
         _currentSaveData.passages.Clear();
 
-        if (eventProvider == null) return;
-
-        if (eventProvider.EventFlags != null)
+        if (eventProvider != null)
         {
-            foreach (var kv in eventProvider.EventFlags)
-                _currentSaveData.eventFlags.Add(new EventFlagSaveInfo { id = kv.Key, value = kv.Value });
+            if (eventProvider.EventFlags != null)
+            {
+                foreach (var kv in eventProvider.EventFlags)
+                    _currentSaveData.eventFlags.Add(new EventFlagSaveInfo { id = kv.Key, value = kv.Value });
+            }
+
+            if (eventProvider.Passages != null)
+            {
+                foreach (var kv in eventProvider.Passages)
+                    _currentSaveData.passages.Add(new PassageSaveInfo { id = kv.Key, opened = kv.Value });
+            }
+        }
+        else
+        {
+            // provider 없이 저장하면 이벤트/통로 진행이 통째로 빈 채로 저장되는데도 예외가 나지 않아
+            // 눈치채기 어렵다 — 조용히 실패하는 대신 경고를 남긴다.
+            Debug.LogWarning("[SaveModule] eventProvider가 없어 이벤트 플래그/통로를 저장하지 않습니다.");
         }
 
-        if (eventProvider.Passages != null)
-        {
-            foreach (var kv in eventProvider.Passages)
-                _currentSaveData.passages.Add(new PassageSaveInfo { id = kv.Key, opened = kv.Value });
-        }
+        // 노트(핀 단서)/도감(유저 메모) 스냅샷 — eventProvider 유무와 무관하게 항상 저장한다.
+        // IEventSaveProvider(Dictionary<string,bool> 전용)로 표현 안 되는 구조화 데이터라 이 메서드에
+        // 같이 얹었다. NoteModule/CodexModule은 자동 생성되는 싱글턴이라 별도 주입 없이 Instance로 접근.
+        _currentSaveData.noteEntries = NoteModule.Instance != null
+            ? new List<NoteEntry>(NoteModule.Instance.Entries)
+            : new List<NoteEntry>();
+        _currentSaveData.codexUserEntries = CodexModule.Instance != null
+            ? new List<CodexUserEntry>(CodexModule.Instance.UserEntries)
+            : new List<CodexUserEntry>();
+
+        // 노트 "저장한 루트" 보드 목록 — 위 noteEntries(현재 화면 상태)와 별개인 이름 붙은 다중 스냅샷.
+        _currentSaveData.noteSavedBoards = NoteModule.Instance != null
+            ? NoteModule.Instance.ExportSavedBoards()
+            : new List<NoteSavedBoard>();
+
+        // 노트 "단서 연동 모드"로 이어둔 단서 관계.
+        _currentSaveData.noteClueLinks = NoteModule.Instance != null
+            ? NoteModule.Instance.ExportClueLinks()
+            : new List<NoteClueLink>();
+
+        // [신설, 2026-07-21] 노트 그래프 위치/펼침 상태 — "저장한 루트" 보드와 같은 이유로 F5/F9
+        // 일반 세이브에도 필요하다(안 그러면 로드 후 경로연동 단서가 카드로 되돌아가 있어, 위
+        // noteClueLinks가 정상 복원돼도 그 간선이 그려질 노드 자체가 없다). NoteRouteGraphView는
+        // NoteModule과 달리 씬 오브젝트라 Instance가 자동 생성되지 않는다 — null이면(예: 아직
+        // Awake가 안 돈 극초반 타이밍) 그냥 빈 목록으로 저장.
+        _currentSaveData.notePositions = NoteRouteGraphView.Instance != null
+            ? NoteRouteGraphView.Instance.ExportCluePositions(NoteRouteGraphView.Instance.GetPlacedClueIds())
+            : new List<CluePositionEntry>();
+        _currentSaveData.noteExpandedClueIds = NoteRouteGraphView.Instance != null
+            ? NoteRouteGraphView.Instance.GetExpandedClueIds().ToList()
+            : new List<string>();
+
+        // 지도/노트에서 마지막으로 커밋한 단일 경로(노트 좌측 그래프가 표시) — PathResult 자체가 아니라
+        // 노드 GUID 순서만 저장한다(SaveData.cs 참고).
+        _currentSaveData.selectedRouteNodeGuids = RouteModule.Instance?.SelectedRoute?.Nodes != null
+            ? RouteModule.Instance.SelectedRoute.Nodes.Select(n => n.guid).ToList()
+            : new List<string>();
+
+        // 장착 장비 + 현재 위치 — 둘 다 위 진행 상태/선택 경로와 같은 이유로 함께 저장해야 로드 후
+        // 노트의 계획 미리보기(난이도)·다음 구간 시작점이 저장 시점과 일치한다.
+        _currentSaveData.equippedGears = RouteModule.Instance != null
+            ? new List<EmotionColor>(RouteModule.Instance.EquippedGears)
+            : new List<EmotionColor>();
+        _currentSaveData.currentLocationGuid = RouteModule.Instance?.CurrentLocation?.guid ?? "";
     }
 
     public void WriteSaveFile()
@@ -337,19 +391,49 @@ public class SaveModule : InterfaceModule, IInitializable
     public void LoadEvents()
     {
         if (_loadedData == null) return;
-        if (eventProvider == null) return;
 
-        if (_loadedData.eventFlags != null)
+        if (eventProvider != null)
         {
-            foreach (var f in _loadedData.eventFlags)
-                eventProvider.SetEventFlag(f.id, f.value);
+            // 항목을 하나씩 SetEventFlag/SetPassage로 넘기기 전에 구현체가 이전 상태를 지울 기회를 준다.
+            eventProvider.ResetForLoad();
+
+            if (_loadedData.eventFlags != null)
+            {
+                foreach (var f in _loadedData.eventFlags)
+                    eventProvider.SetEventFlag(f.id, f.value);
+            }
+
+            if (_loadedData.passages != null)
+            {
+                foreach (var p in _loadedData.passages)
+                    eventProvider.SetPassage(p.id, p.opened);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[SaveModule] eventProvider가 없어 이벤트 플래그/통로를 복원하지 않습니다.");
         }
 
-        if (_loadedData.passages != null)
-        {
-            foreach (var p in _loadedData.passages)
-                eventProvider.SetPassage(p.id, p.opened);
-        }
+        // 지도/노트에서 마지막으로 커밋했던 단일 경로 복원 — Progress(위에서 이미 복원됨) 기준으로
+        // 노드 GUID를 다시 MapNodeData로 해석한다.
+        RouteModule.Instance?.ImportSelectedRoute(_loadedData.selectedRouteNodeGuids);
+
+        // 장착 장비 + 현재 위치 복원 — SaveEvents()에서 같이 저장한 것과 대칭.
+        RouteModule.Instance?.ImportEquippedGears(_loadedData.equippedGears);
+        RouteModule.Instance?.ImportCurrentLocation(_loadedData.currentLocationGuid);
+
+        // [신설, 2026-07-21] 순서 중요 — 그래프 펼침 상태/위치를 먼저 큐잉해둬야, 바로 아래
+        // NoteModule.ImportFrom이 발행하는 OnNoteChanged → NotePanel.Refresh → SetData 재생성 때
+        // 경로연동 단서가 카드가 아니라 노드로 만들어지고, 그 자리에 저장된 위치가 적용된다
+        // ("저장한 루트" 보드 불러오기(NotePanel.HandleBoardLoadRequested)와 동일한 순서 규칙).
+        NoteRouteGraphView.Instance?.ApplyExpandedClueIds(_loadedData.noteExpandedClueIds);
+        NoteRouteGraphView.Instance?.ApplySavedPositions(_loadedData.notePositions);
+
+        // 노트/도감 구조화 데이터 복원 — eventProvider 유무와 무관.
+        NoteModule.Instance?.ImportFrom(_loadedData.noteEntries);
+        CodexModule.Instance?.ImportUserEntries(_loadedData.codexUserEntries);
+        NoteModule.Instance?.ImportSavedBoards(_loadedData.noteSavedBoards);
+        NoteModule.Instance?.ImportClueLinks(_loadedData.noteClueLinks);
     }
 
     // ================= PLAYER RESOLVE =================
