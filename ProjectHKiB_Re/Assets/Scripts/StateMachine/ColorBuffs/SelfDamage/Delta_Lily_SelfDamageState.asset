@@ -34,10 +34,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3c33e962bb03ab44c99f79dfac106eac, type: 2}
   EnterActions:
   - rid: 8642958643451396238
+  - rid: 9100000005
   updateActions: []
   UpdateActions: []
   exitActions: []
-  ExitActions: []
+  ExitActions:
+  - rid: 9100000006
   actionSequence: []
   loopActionSequence: 0
   useTimer: 0
@@ -50,4 +52,12 @@ MonoBehaviour:
       type: {class: , ns: , asm: }
     - rid: 8642958643451396238
       type: {class: SelfDamageAction, ns: StateMachine, asm: Assembly-CSharp}
-      data: 
+      data:
+    - rid: 9100000005
+      type: {class: SetSpriteTintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        color: {r: 1, g: 0.3, b: 0.3, a: 1}
+    - rid: 9100000006
+      type: {class: SetSpriteTintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        color: {r: 1, g: 1, b: 1, a: 1}

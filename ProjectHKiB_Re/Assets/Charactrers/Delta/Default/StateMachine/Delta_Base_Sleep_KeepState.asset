@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Base_Sleep_KeepState
+  m_EditorClassIdentifier:
+  isPacked: 0
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0
+  transitions:
+  - name:
+    activationInput: 10
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - decision: {fileID: 0}
+      Decision:
+        rid: 9200000002
+      negate: 1
+    trueState: {fileID: 11400000, guid: a0b3d079ae83eccd50d1df3bc59fd178, type: 2}
+    falseState: {fileID: 0}
+    action: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  enterActions: []
+  EnterActions: []
+  updateActions: []
+  UpdateActions: []
+  exitActions: []
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: Idle
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 9200000002
+      type: {class: EmotionAxisActiveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        axis: 3

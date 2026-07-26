@@ -22,7 +22,7 @@ MonoBehaviour:
     availableTime: 0.2
     disableTime: 0
     decisions: []
-    trueState: {fileID: 11400000, guid: 920119b521c39e447b20a9de80d75690, type: 2}
+    trueState: {fileID: 11400000, guid: 5dd73ae480487aa4d8cd8287becc7717, type: 2}
     falseState: {fileID: 0}
     action: {fileID: 0}
     Action:
@@ -31,7 +31,8 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   enterActions: []
-  EnterActions: []
+  EnterActions:
+  - rid: 9100000001
   updateActions: []
   UpdateActions: []
   exitActions: []
@@ -47,3 +48,7 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+    - rid: 9100000001
+      type: {class: SetSpriteTintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        color: {r: 1, g: 0.85, b: 0.2, a: 1}

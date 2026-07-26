@@ -35,6 +35,7 @@ MonoBehaviour:
   <BaseMaxHP>k__BackingField: 1000
   <BaseDEF>k__BackingField: 0
   <Mass>k__BackingField: 1
+  <Mental>k__BackingField: 100
   <HitSound>k__BackingField: {fileID: 0}
   <HitParticle>k__BackingField: {fileID: 0}
   <StateMachine>k__BackingField: {fileID: 11400000, guid: 3c361795385b07f4b8fe25c7f5251045, type: 2}

@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db2e067c0540333478528d2bdd2bc2e8, type: 3}
+  m_Name: EmotionVectorTable_Default
+  m_EditorClassIdentifier: 
+  entries:
+  - color: 7
+    displayName: "\uACF5\uD3EC"
+    position: {x: -0.72, y: 0.75}
+    isCatalyst: 0
+  - color: 5
+    displayName: "\uC99D\uC624"
+    position: {x: -0.85, y: 0.55}
+    isCatalyst: 0
+  - color: 4
+    displayName: "\uBD84\uB178"
+    position: {x: -0.6, y: 0.38}
+    isCatalyst: 0
+  - color: 2
+    displayName: "\uD765\uBD84"
+    position: {x: 0.18, y: 0.6}
+    isCatalyst: 0
+  - color: 3
+    displayName: "\uD589\uBCF5"
+    position: {x: 0.78, y: 0.12}
+    isCatalyst: 0
+  - color: 1
+    displayName: "\uC6B0\uC6B8"
+    position: {x: -0.5, y: -0.62}
+    isCatalyst: 0
+  - color: 0
+    displayName: "\uC2AC\uD514"
+    position: {x: -0.62, y: -0.45}
+    isCatalyst: 0
+  - color: 8
+    displayName: "\uBD95\uAD34"
+    position: {x: -0.65, y: 0.6}
+    isCatalyst: 0
+  - color: 10
+    displayName: "\uADF8\uB9AC\uC6C0"
+    position: {x: 0.45, y: -0.5}
+    isCatalyst: 0
+  - color: 16
+    displayName: "\uD5C8\uC138"
+    position: {x: -0.35, y: -0.78}
+    isCatalyst: 0
+  - color: 18
+    displayName: "\uD610\uC624"
+    position: {x: -0.78, y: 0.12}
+    isCatalyst: 0
+  - color: 19
+    displayName: "\uC2A4\uD2B8\uB808\uC2A4"
+    position: {x: -0.18, y: 0.6}
+    isCatalyst: 0
+  - color: 20
+    displayName: "\uB9CC\uC871"
+    position: {x: 0.55, y: -0.22}
+    isCatalyst: 0
+  - color: 21
+    displayName: "\uD3C9\uC548"
+    position: {x: 0.18, y: -0.8}
+    isCatalyst: 0
+  - color: 22
+    displayName: "\uD53C\uB85C"
+    position: {x: -0.15, y: -0.8}
+    isCatalyst: 0
+  - color: 23
+    displayName: "\uC0AC\uB791(\uC784\uC2DC)"
+    position: {x: 0.65, y: 0.35}
+    isCatalyst: 0
+  - color: 15
+    displayName: "\uC2A4\uD2B8\uB808\uC2A4+\uB9CC\uC871 \uBCF5\uD569(\uC784\uC2DC\uBA85)"
+    position: {x: 0.42, y: 0.42}
+    isCatalyst: 0
+  - color: 6
+    displayName: "\uACF5\uD5C8"
+    position: {x: 0, y: 0}
+    isCatalyst: 1
