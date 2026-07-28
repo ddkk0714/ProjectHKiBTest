@@ -27,8 +27,8 @@ MonoBehaviour:
   <Effects>k__BackingField:
   - <BuffType>k__BackingField: {fileID: 11400000, guid: 6bc50189ef6cf6544b2ce3c445adc9dd, type: 2}
     <IsDebuff>k__BackingField: 0
-    <Value>k__BackingField: 1
-    <IsValuePropositional>k__BackingField: 0
+    <Value>k__BackingField: 0.04
+    <IsValuePropositional>k__BackingField: 1
   - <BuffType>k__BackingField: {fileID: 11400000, guid: 0ba2eb9d57c34b54ab9c1f37c916aa82, type: 2}
     <IsDebuff>k__BackingField: 0
     <Value>k__BackingField: 0.5

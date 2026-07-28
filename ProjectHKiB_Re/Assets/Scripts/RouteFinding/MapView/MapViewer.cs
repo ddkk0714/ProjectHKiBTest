@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using TMPro;
 using RouteFinding.Note;
 using RouteFinding.Codex;
@@ -11,7 +12,8 @@ namespace RouteFinding.MapView
 {
     // 씬 내 맵 뷰어 창 — 루트파인딩 시스템의 "그리기" 담당.
     // Canvas 직속 자식 GO에 이 컴포넌트를 붙인다. (BaseWindow와 동일한 계층 구조)
-    // 이 GO 자체는 항상 활성 — M키 감지를 위해 Update가 계속 동작.
+    // 이 GO 자체는 항상 활성 — M키 토글은 InputManager.onOpenMap 구독으로 받는다(2026-07-28,
+    // PlayerAction.inputactions의 UI_TOGGLE 액션맵 참고. 이전엔 Update()에서 Input.GetKeyDown 폴링).
     // 내부 패널(_panelGO)만 Open/Close 시 토글된다.
     //
     // 상태를 직접 소유하지 않는다:
@@ -28,9 +30,6 @@ namespace RouteFinding.MapView
     //   콘텐츠 쪽에서 새 단서에 requiredEventKey를 채우기만 하면 이 표시는 자동으로 따라온다.
     public class MapViewer : MonoBehaviour
     {
-        [Header("조작")]
-        [SerializeField] private KeyCode _toggleKey = KeyCode.M;
-
         [Header("폰트")]
         [SerializeField] private TMP_FontAsset _font;
 
@@ -150,24 +149,44 @@ namespace RouteFinding.MapView
 
         private void Awake()
         {
+            // BuildUI()가 닫기 버튼 라벨(ToggleKeyLabel)을 실제 바인딩 키로 채우려면 그 전에
+            // _inputManager가 준비돼 있어야 한다 — 그래서 BuildUI()보다 먼저 할당한다.
+            _inputManager = FindObjectOfType<InputManager>();
+
             var rt = GetComponent<RectTransform>();
             if (rt != null) StretchFull(rt);
             BuildUI();
             var canvas = GetComponentInParent<Canvas>();
             _graphPanZoom?.Init(_graphContainer, _graphViewport, canvas);
-            _inputManager = FindObjectOfType<InputManager>();
+
+            // [2026-07-28] 레거시 Input.GetKeyDown 폴링 대신 Input System의 UI_TOGGLE 액션맵을
+            // 구독한다 — 이 맵은 PLAY/MENU/GRAFFITI 모드 전환과 무관하게 항상 켜져 있어(InputManager
+            // 참고) 이전과 동일하게 어느 모드에서든 M키로 토글된다.
+            if (_inputManager != null) _inputManager.onOpenMap += HandleOpenMapInput;
         }
+
+        private void OnDestroy()
+        {
+            if (_inputManager != null) _inputManager.onOpenMap -= HandleOpenMapInput;
+        }
+
+        private void HandleOpenMapInput(InputAction.CallbackContext context)
+        {
+            if (context.performed) Toggle();
+        }
+
+        // "닫기 [M]" 같은 UI 라벨용 — 실제 바인딩된 키를 UI_TOGGLE/OpenMap 액션에서 직접 읽어온다.
+        // 고정 KeyCode 필드로 따로 들고 있으면 나중에 PlayerAction.inputactions에서 키를 바꿨을 때
+        // 라벨이 안 따라가서 실제 입력과 어긋나는 문제가 있었다(2026-07-28) — 그래서 필드 대신 항상
+        // 실시간으로 조회한다.
+        private string ToggleKeyLabel
+            => _inputManager != null ? _inputManager.inputs.UI_TOGGLE.OpenMap.GetBindingDisplayString() : "M";
 
         private void Start()
         {
             if (MapGraph.Instance != null)
                 PopulateGraph();
             _panelGO.SetActive(false);
-        }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(_toggleKey)) Toggle();
         }
 
         // ─── Public API ──────────────────────────────────────────
@@ -1281,7 +1300,7 @@ namespace RouteFinding.MapView
             ToolbarFixedBtn(toolbar, "도감", GoToCodex, "BtnGoToCodex", 28f);
 
             // 닫기 버튼 — 툴바 최우측 (사이드패널에서는 제거됨)
-            var closeBtn = ToolbarFixedBtn(toolbar, $"닫기 [{_toggleKey}]", Close, "BtnClose", 40f);
+            var closeBtn = ToolbarFixedBtn(toolbar, $"닫기 [{ToggleKeyLabel}]", Close, "BtnClose", 40f);
             closeBtn.GetComponent<Image>().color = new Color(0.42f, 0.10f, 0.10f);
         }
 

@@ -2,13 +2,15 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using TMPro;
 using RouteFinding.MapView;
 
 namespace RouteFinding.Note
 {
     // 노트 — 도감(CodexPanel)과 같은 패턴으로 완전히 별도의 풀스크린 패널.
-    // Canvas 직속 자식 GO에 붙이고, 이 GO 자체는 항상 활성 — V키 감지를 위해 Update가 계속 동작하며,
+    // Canvas 직속 자식 GO에 붙이고, 이 GO 자체는 항상 활성 — V키 토글은 InputManager.onOpenNote
+    // 구독으로 받는다(2026-07-28, PlayerAction.inputactions의 UI_TOGGLE 액션맵 참고).
     // 내부 패널(_panelGO)만 Open/Close 토글된다.
     //
     // 지도/도감과의 핵심 차이(NoteSystem_기획서.md "UI 진입 / 영속성" 절 참고):
@@ -28,9 +30,6 @@ namespace RouteFinding.Note
     // NoteRouteGraphView.PlaceClueAt이 담당 — NotePanel.HandleClueDropped가 그 다리 역할.
     public class NotePanel : MonoBehaviour
     {
-        [Header("조작")]
-        [SerializeField] private KeyCode _toggleKey = KeyCode.V;
-
         [Header("폰트")]
         [SerializeField] private TMP_FontAsset _font;
 
@@ -76,6 +75,10 @@ namespace RouteFinding.Note
 
         private void Awake()
         {
+            // BuildUI()가 닫기 버튼 라벨(ToggleKeyLabel)을 실제 바인딩 키로 채우려면 그 전에
+            // _inputManager가 준비돼 있어야 한다 — 그래서 BuildUI()보다 먼저 할당한다.
+            _inputManager = FindObjectOfType<InputManager>();
+
             var rt = GetComponent<RectTransform>();
             if (rt != null) StretchFull(rt);
             BuildUI();
@@ -83,8 +86,15 @@ namespace RouteFinding.Note
             // 탔든 이 시점엔 _graphContainerRT/_graphViewportRT가 채워져 있으므로 여기서 한 번만 Init.
             var canvas = GetComponentInParent<Canvas>();
             _graphPanZoom?.Init(_graphContainerRT, _graphViewportRT, canvas);
-            _inputManager = FindObjectOfType<InputManager>();
+
+            // [2026-07-28] 레거시 Input.GetKeyDown 폴링 대신 Input System의 UI_TOGGLE 액션맵을
+            // 구독한다 — MapViewer.Awake와 동일한 이유(PLAY/MENU/GRAFFITI 모드 전환과 무관하게 항상 켜짐).
+            if (_inputManager != null) _inputManager.onOpenNote += HandleOpenNoteInput;
         }
+
+        // "닫기 [V]" 같은 UI 라벨용 — MapViewer.ToggleKeyLabel과 동일한 이유로 필드 대신 실시간 조회.
+        private string ToggleKeyLabel
+            => _inputManager != null ? _inputManager.inputs.UI_TOGGLE.OpenNote.GetBindingDisplayString() : "V";
 
         private void Start()
         {
@@ -98,11 +108,12 @@ namespace RouteFinding.Note
         {
             if (NoteModule.Instance != null) NoteModule.Instance.OnNoteChanged -= Refresh;
             if (RouteModule.Instance != null) RouteModule.Instance.OnRouteSelected -= HandleRouteSelected;
+            if (_inputManager != null) _inputManager.onOpenNote -= HandleOpenNoteInput;
         }
 
-        private void Update()
+        private void HandleOpenNoteInput(InputAction.CallbackContext context)
         {
-            if (Input.GetKeyDown(_toggleKey)) Toggle();
+            if (context.performed) Toggle();
         }
 
         // ─── Public API ──────────────────────────────────────────
@@ -510,7 +521,7 @@ namespace RouteFinding.Note
             StretchFull(closeTxtRT);
             var closeTmp = closeTxtRT.gameObject.AddComponent<TextMeshProUGUI>();
             if (_font != null) closeTmp.font = _font;
-            closeTmp.text = $"닫기 [{_toggleKey}]";
+            closeTmp.text = $"닫기 [{ToggleKeyLabel}]";
             closeTmp.fontSize = 7f;
             closeTmp.alignment = TextAlignmentOptions.Center;
             closeTmp.verticalAlignment = VerticalAlignmentOptions.Middle;

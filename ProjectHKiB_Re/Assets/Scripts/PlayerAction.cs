@@ -1264,6 +1264,74 @@ public partial class @PlayerAction: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""UI_TOGGLE"",
+            ""id"": ""b8e31618-05ef-4916-b1cd-19e4100140ca"",
+            ""actions"": [
+                {
+                    ""name"": ""OpenMap"",
+                    ""type"": ""Button"",
+                    ""id"": ""e5c9f26e-d36a-40d7-b832-f1094b7bcee9"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""OpenNote"",
+                    ""type"": ""Button"",
+                    ""id"": ""bc1325b6-7437-4280-841f-5fed1fbd9eeb"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""OpenCodex"",
+                    ""type"": ""Button"",
+                    ""id"": ""7533139f-7059-475a-8364-fc9191716e95"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""5090aa39-e924-45b5-8acd-44791a3f70e2"",
+                    ""path"": ""<Keyboard>/m"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenMap"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6a19db6c-ce5f-418b-a681-7f3271bc49e9"",
+                    ""path"": ""<Keyboard>/v"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenNote"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bfbfb399-ea17-4057-af9e-96f84778dd91"",
+                    ""path"": ""<Keyboard>/n"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenCodex"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -1314,6 +1382,11 @@ public partial class @PlayerAction: IInputActionCollection2, IDisposable
         m_GRAFFITI_Graffiti3 = m_GRAFFITI.FindAction("Graffiti3", throwIfNotFound: true);
         m_GRAFFITI_Graffiti4 = m_GRAFFITI.FindAction("Graffiti4", throwIfNotFound: true);
         m_GRAFFITI_Graffiti5 = m_GRAFFITI.FindAction("Graffiti5", throwIfNotFound: true);
+        // UI_TOGGLE
+        m_UI_TOGGLE = asset.FindActionMap("UI_TOGGLE", throwIfNotFound: true);
+        m_UI_TOGGLE_OpenMap = m_UI_TOGGLE.FindAction("OpenMap", throwIfNotFound: true);
+        m_UI_TOGGLE_OpenNote = m_UI_TOGGLE.FindAction("OpenNote", throwIfNotFound: true);
+        m_UI_TOGGLE_OpenCodex = m_UI_TOGGLE.FindAction("OpenCodex", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -1805,6 +1878,68 @@ public partial class @PlayerAction: IInputActionCollection2, IDisposable
         }
     }
     public GRAFFITIActions @GRAFFITI => new GRAFFITIActions(this);
+
+    // UI_TOGGLE
+    private readonly InputActionMap m_UI_TOGGLE;
+    private List<IUI_TOGGLEActions> m_UI_TOGGLEActionsCallbackInterfaces = new List<IUI_TOGGLEActions>();
+    private readonly InputAction m_UI_TOGGLE_OpenMap;
+    private readonly InputAction m_UI_TOGGLE_OpenNote;
+    private readonly InputAction m_UI_TOGGLE_OpenCodex;
+    public struct UI_TOGGLEActions
+    {
+        private @PlayerAction m_Wrapper;
+        public UI_TOGGLEActions(@PlayerAction wrapper) { m_Wrapper = wrapper; }
+        public InputAction @OpenMap => m_Wrapper.m_UI_TOGGLE_OpenMap;
+        public InputAction @OpenNote => m_Wrapper.m_UI_TOGGLE_OpenNote;
+        public InputAction @OpenCodex => m_Wrapper.m_UI_TOGGLE_OpenCodex;
+        public InputActionMap Get() { return m_Wrapper.m_UI_TOGGLE; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(UI_TOGGLEActions set) { return set.Get(); }
+        public void AddCallbacks(IUI_TOGGLEActions instance)
+        {
+            if (instance == null || m_Wrapper.m_UI_TOGGLEActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_UI_TOGGLEActionsCallbackInterfaces.Add(instance);
+            @OpenMap.started += instance.OnOpenMap;
+            @OpenMap.performed += instance.OnOpenMap;
+            @OpenMap.canceled += instance.OnOpenMap;
+            @OpenNote.started += instance.OnOpenNote;
+            @OpenNote.performed += instance.OnOpenNote;
+            @OpenNote.canceled += instance.OnOpenNote;
+            @OpenCodex.started += instance.OnOpenCodex;
+            @OpenCodex.performed += instance.OnOpenCodex;
+            @OpenCodex.canceled += instance.OnOpenCodex;
+        }
+
+        private void UnregisterCallbacks(IUI_TOGGLEActions instance)
+        {
+            @OpenMap.started -= instance.OnOpenMap;
+            @OpenMap.performed -= instance.OnOpenMap;
+            @OpenMap.canceled -= instance.OnOpenMap;
+            @OpenNote.started -= instance.OnOpenNote;
+            @OpenNote.performed -= instance.OnOpenNote;
+            @OpenNote.canceled -= instance.OnOpenNote;
+            @OpenCodex.started -= instance.OnOpenCodex;
+            @OpenCodex.performed -= instance.OnOpenCodex;
+            @OpenCodex.canceled -= instance.OnOpenCodex;
+        }
+
+        public void RemoveCallbacks(IUI_TOGGLEActions instance)
+        {
+            if (m_Wrapper.m_UI_TOGGLEActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IUI_TOGGLEActions instance)
+        {
+            foreach (var item in m_Wrapper.m_UI_TOGGLEActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_UI_TOGGLEActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public UI_TOGGLEActions @UI_TOGGLE => new UI_TOGGLEActions(this);
     public interface IPLAYActions
     {
         void OnMove(InputAction.CallbackContext context);
@@ -1853,5 +1988,11 @@ public partial class @PlayerAction: IInputActionCollection2, IDisposable
         void OnGraffiti3(InputAction.CallbackContext context);
         void OnGraffiti4(InputAction.CallbackContext context);
         void OnGraffiti5(InputAction.CallbackContext context);
+    }
+    public interface IUI_TOGGLEActions
+    {
+        void OnOpenMap(InputAction.CallbackContext context);
+        void OnOpenNote(InputAction.CallbackContext context);
+        void OnOpenCodex(InputAction.CallbackContext context);
     }
 }

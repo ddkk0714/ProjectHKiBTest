@@ -28127,8 +28127,24 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5111664485049529841, guid: 499e36180833458488e611504074b9c1, type: 3}
+      propertyPath: _firstColor
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111664485049529841, guid: 499e36180833458488e611504074b9c1, type: 3}
+      propertyPath: _firstStack
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111664485049529841, guid: 499e36180833458488e611504074b9c1, type: 3}
       propertyPath: _applyTarget
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111664485049529841, guid: 499e36180833458488e611504074b9c1, type: 3}
+      propertyPath: _secondColor
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111664485049529841, guid: 499e36180833458488e611504074b9c1, type: 3}
+      propertyPath: _secondStack
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 5111664485049529841, guid: 499e36180833458488e611504074b9c1, type: 3}
       propertyPath: _defaultTarget

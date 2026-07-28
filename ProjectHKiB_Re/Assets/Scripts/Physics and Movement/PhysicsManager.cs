@@ -186,9 +186,9 @@ public class PhysicsManager : MonoBehaviour
 
         if (obj.IsWalking && obj.WalkingDir.sqrMagnitude > EPSILON)
         {
-            float maxSpd = (obj.IsSprinting ? obj.MaxWalkSpeed * obj.SprintCoeff : obj.MaxWalkSpeed) * (obj.CanWalkFrameLeft > 0 ? 1f : 0.1f);
+            float maxSpd = (obj.IsSprinting ? obj.BuffedMaxWalkSpeed * obj.SprintCoeff : obj.BuffedMaxWalkSpeed) * (obj.CanWalkFrameLeft > 0 ? 1f : 0.1f);
             float frictionAccInfluence = obj.Ground ? 1 - Mathf.Clamp01(Mathf.Max(obj.GroundFriction, obj.Ground.frictionCoeff) * obj.FrictionWalkInfluence): 1f;
-            float WalkAcceleration     = (obj.IsSprinting ? obj.WalkAcceleration * obj.SprintCoeff : obj.WalkAcceleration) * (obj.CanWalkFrameLeft > 0 ? 1f : 0.1f);
+            float WalkAcceleration     = (obj.IsSprinting ? obj.BuffedWalkAcceleration * obj.SprintCoeff : obj.BuffedWalkAcceleration) * (obj.CanWalkFrameLeft > 0 ? 1f : 0.1f);
             float currentAlongWalk = Vector2.Dot(obj.HVelocity, obj.WalkingDir.normalized);
             float deficit          = maxSpd - currentAlongWalk;
 
@@ -216,7 +216,7 @@ public class PhysicsManager : MonoBehaviour
     private void UpdateMode(IPhysics obj)
     {
         bool wantsGrid    = obj.Ground && !obj.IsOnSlope
-                         && obj.HVelocity.magnitude < obj.GridEndureSpeed * obj.MaxWalkSpeed
+                         && obj.HVelocity.magnitude < obj.GridEndureSpeed * obj.BuffedMaxWalkSpeed
                          && obj.ExForce.magnitude < obj.GridEndureForce;
         bool wantsPhysics = !wantsGrid;
 

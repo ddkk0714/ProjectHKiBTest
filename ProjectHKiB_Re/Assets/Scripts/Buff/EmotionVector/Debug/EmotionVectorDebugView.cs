@@ -8,7 +8,7 @@ using UnityEngine;
 [RequireComponent(typeof(EmotionVectorModule))]
 public class EmotionVectorDebugView : MonoBehaviour
 {
-    private const int TrailLength = 60;
+    private const int TrailLength = 24;
 
     [SerializeField] private bool showView = true;
     [SerializeField] private Vector2 panelPosition = new Vector2(20, 20);
@@ -31,6 +31,7 @@ public class EmotionVectorDebugView : MonoBehaviour
     private Vector2 _displayVelocity;
     private float _displayEntropy;
     private float _entropyVelocity;
+    private EmotionColor _dominant;
     private readonly Dictionary<EmotionColor, Vector2> _displayContribution = new();
     private readonly Dictionary<EmotionColor, Vector2> _contributionVelocity = new();
 
@@ -79,7 +80,7 @@ public class EmotionVectorDebugView : MonoBehaviour
 
         EmotionVector preview = EmotionVectorModule.ComputeVector(
             _vectorModule.Table, EmotionVectorModule.PolledColors,
-            GetPreviewStack, out float entropy, out _);
+            GetPreviewStack, out float entropy, out _dominant);
 
         Vector2 target = new Vector2(preview.X, preview.Y);
         _displayVector = Vector2.SmoothDamp(_displayVector, target, ref _displayVelocity, smoothTime);
@@ -107,12 +108,13 @@ public class EmotionVectorDebugView : MonoBehaviour
     private void OnGUI()
     {
         if (!showView || _vectorModule == null || _vectorModule.Table == null) return;
+        // OnGUI는 프레임당 Layout+Repaint(및 입력 이벤트 시 추가)로 여러 번 호출된다.
+        // 이 뷰는 GUILayout을 쓰지 않으므로 Layout 패스에서 그릴 이유가 없다 — Repaint에서만 그려서
+        // 프레임당 그리기 비용을 절반 이하로 줄인다 (프레임 드랍의 주된 원인).
+        if (Event.current.type != EventType.Repaint) return;
 
         EmotionVectorTableSO table = _vectorModule.Table;
-
-        // 화면에 그리는 값은 전부 Update()에서 스무딩해둔 _display* — 카테고리 값(Dominant)만 순간값 사용
-        EmotionVectorModule.ComputeVector(table, EmotionVectorModule.PolledColors,
-            GetPreviewStack, out _, out EmotionColor dominant);
+        EmotionColor dominant = _dominant; // Update()에서 이미 계산해둔 값 재사용 (중복 ComputeVector 호출 제거)
 
         Rect panelRect = new Rect(panelPosition.x, panelPosition.y, panelSize, panelSize + 24f);
         Rect plotRect = new Rect(panelRect.x, panelRect.y, panelSize, panelSize);

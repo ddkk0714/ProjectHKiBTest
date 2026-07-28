@@ -130,7 +130,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7758c855768a73408ffae6fabee509a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _toggleKey: 98
   _font: {fileID: 11400000, guid: 534611c51c4fe394ebef066303e1211c, type: 2}
   _drawerWidth: 220
   _topBarHeight: 24
@@ -239,7 +238,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb7592cb1c9eff24fb72e552f73b6f5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _toggleKey: 109
   _font: {fileID: 11400000, guid: 534611c51c4fe394ebef066303e1211c, type: 2}
   _nodeSize: 5
   _nodeHitSizeMultiplier: 2.5
@@ -444,7 +442,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebe76e207ca472746b5699d1af75c9d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _toggleKey: 118
   _font: {fileID: 11400000, guid: 534611c51c4fe394ebef066303e1211c, type: 2}
   _topBarHeight: 24
   _rootBgColor: {r: 0.04, g: 0.04, b: 0.08, a: 0.96}

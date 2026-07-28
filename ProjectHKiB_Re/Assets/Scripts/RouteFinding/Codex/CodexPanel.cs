@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using TMPro;
 
 namespace RouteFinding.Codex
 {
     // 단서 도감 — 완전히 별도의 풀스크린 패널 (지도 패널 안의 탭이 아님).
     // MapViewer와 동일한 패턴: Canvas 직속 자식 GO에 붙이고, 이 GO 자체는 항상 활성 —
-    // C키 감지를 위해 Update가 계속 동작하며, 내부 패널(_panelGO)만 Open/Close 토글된다.
+    // N키 토글은 InputManager.onOpenCodex 구독으로 받는다(2026-07-28, PlayerAction.inputactions의
+    // UI_TOGGLE 액션맵 참고). 내부 패널(_panelGO)만 Open/Close 토글된다.
     //
     // 1단계: CodexModule(획득한 ClueData 목록의 소유자)을 구독해 실제 단서를 좌측 트리에 반영한다.
     // 2단계: CodexFilterService로 맵/출처/키워드 분류 + 검색을 지원한다.
@@ -17,9 +19,6 @@ namespace RouteFinding.Codex
     // 코멘트/지도 연동은 이후 단계에서 추가.
     public class CodexPanel : MonoBehaviour
     {
-        [Header("조작")]
-        [SerializeField] private KeyCode _toggleKey = KeyCode.C;
-
         [Header("폰트")]
         [SerializeField] private TMP_FontAsset _font;
 
@@ -60,11 +59,22 @@ namespace RouteFinding.Codex
 
         private void Awake()
         {
+            // BuildUI()가 닫기 버튼 라벨(ToggleKeyLabel)을 실제 바인딩 키로 채우려면 그 전에
+            // _inputManager가 준비돼 있어야 한다 — 그래서 BuildUI()보다 먼저 할당한다.
+            _inputManager = FindObjectOfType<InputManager>();
+
             var rt = GetComponent<RectTransform>();
             if (rt != null) StretchFull(rt);
             BuildUI();
-            _inputManager = FindObjectOfType<InputManager>();
+
+            // [2026-07-28] 레거시 Input.GetKeyDown 폴링 대신 Input System의 UI_TOGGLE 액션맵을
+            // 구독한다 — MapViewer.Awake와 동일한 이유(PLAY/MENU/GRAFFITI 모드 전환과 무관하게 항상 켜짐).
+            if (_inputManager != null) _inputManager.onOpenCodex += HandleOpenCodexInput;
         }
+
+        // "닫기 [N]" 같은 UI 라벨용 — MapViewer.ToggleKeyLabel과 동일한 이유로 필드 대신 실시간 조회.
+        private string ToggleKeyLabel
+            => _inputManager != null ? _inputManager.inputs.UI_TOGGLE.OpenCodex.GetBindingDisplayString() : "N";
 
         private void Start()
         {
@@ -76,11 +86,12 @@ namespace RouteFinding.Codex
         private void OnDestroy()
         {
             if (CodexModule.Instance != null) CodexModule.Instance.OnCodexChanged -= RefreshTree;
+            if (_inputManager != null) _inputManager.onOpenCodex -= HandleOpenCodexInput;
         }
 
-        private void Update()
+        private void HandleOpenCodexInput(InputAction.CallbackContext context)
         {
-            if (Input.GetKeyDown(_toggleKey)) Toggle();
+            if (context.performed) Toggle();
         }
 
         // ─── Public API ──────────────────────────────────────────
@@ -402,7 +413,7 @@ namespace RouteFinding.Codex
             StretchFull(closeTxtRT);
             var closeTmp = closeTxtRT.gameObject.AddComponent<TextMeshProUGUI>();
             if (_font != null) closeTmp.font = _font;
-            closeTmp.text = $"닫기 [{_toggleKey}]";
+            closeTmp.text = $"닫기 [{ToggleKeyLabel}]";
             closeTmp.fontSize = 7f;
             closeTmp.alignment = TextAlignmentOptions.Center;
             closeTmp.verticalAlignment = VerticalAlignmentOptions.Middle;
