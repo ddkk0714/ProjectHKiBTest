@@ -185,4 +185,28 @@ public class PhysicsModule : InterfaceModule, IPhysics
 
     public void LogicalTeleport(Vector3 position) => physManager.LogicalTeleport(this, position);
     public void RealTeleport(Vector3 position) => physManager.RealTeleport(this, position);
+
+    // 인스펙터 버튼은 클릭하려고 게임 창 포커스를 빼야 해서 그 순간 이동 입력이 끊기고 IsWalking이
+    // False로 찍힌다 — 이동 키를 누른 채로 확인할 수 있도록 키 입력으로도 트리거한다.
+    [SerializeField] private KeyCode dumpSpeedDiagnosticsKey = KeyCode.F6;
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(dumpSpeedDiagnosticsKey))
+            DumpSpeedDiagnostics();
+    }
+
+    // SpeedBuffType이 걸어둔 버프가 실제로 이동 속도에 반영되는지 직접 확인하기 위한 진단 도구.
+    // BuffedMaxWalkSpeed/BuffedWalkAcceleration은 IPhysics 인터페이스의 디폴트 구현이라 이 클래스
+    // 몸체에서 바로 안 보인다 — 인터페이스 타입으로 캐스팅해야 접근된다(C# 8 디폴트 인터페이스 멤버 특성).
+    [NaughtyAttributes.Button]
+    public void DumpSpeedDiagnostics()
+    {
+        IPhysics self = this;
+        Debug.Log($"[PhysicsModule] {name}: MaxWalkSpeed={MaxWalkSpeed:F2} -> Buffed={self.BuffedMaxWalkSpeed:F2}, " +
+                  $"WalkAcceleration={WalkAcceleration:F2} -> Buffed={self.BuffedWalkAcceleration:F2}, " +
+                  $"SpeedBuffer(StatBuffAdd={SpeedBuffer?.StatBuffAdd:F2}, StatBuffProp={SpeedBuffer?.StatBuffProp:F2}), " +
+                  $"HVelocity.magnitude={HVelocity.magnitude:F2}, IsWalking={IsWalking}, IsSprinting={IsSprinting}, " +
+                  $"Mode={Mode}, CanWalkFrameLeft={CanWalkFrameLeft}, SprintCoeff={SprintCoeff:F2}");
+    }
 }

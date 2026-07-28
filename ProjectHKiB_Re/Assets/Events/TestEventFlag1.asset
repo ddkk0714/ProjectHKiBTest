@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 372e430164c1608478e2d7d37b13be98, type: 3}
   m_Name: TestEventFlag1
   m_EditorClassIdentifier: 
+  id: 015d48b9281ebbb4ab3a097627104cff

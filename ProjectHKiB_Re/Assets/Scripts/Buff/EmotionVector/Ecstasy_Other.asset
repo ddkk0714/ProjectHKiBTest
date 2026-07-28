@@ -11,11 +11,12 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: Ecstasy_Other
-  m_EditorClassIdentifier:
-  <Description>k__BackingField: "황홀(초반) - 스킬 명중률
-    곱에 비례 감소(예측불가), 제멋대로
-    배회. 이 버프타임이 지나면 황홀
-    후기(그로기)로 전환됨"
+  m_EditorClassIdentifier: 
+  saveId: 7430711a8ece4a7b83936d3c8730ea23
+  <Description>k__BackingField: "\uD669\uD640(\uCD08\uBC18) - \uC2A4\uD0AC \uBA85\uC911\uB960
+    \uACF1\uC5D0 \uBE44\uB840 \uAC10\uC18C(\uC608\uCE21\uBD88\uAC00), \uC81C\uBA4B\uB300\uB85C
+    \uBC30\uD68C. \uC774 \uBC84\uD504\uD0C0\uC784\uC774 \uC9C0\uB098\uBA74 \uD669\uD640
+    \uD6C4\uAE30(\uADF8\uB85C\uAE30)\uB85C \uC804\uD658\uB428"
   <IsBuffTimeInfinite>k__BackingField: 0
   <BuffTime>k__BackingField: 6
   isEmotionBuff: 0

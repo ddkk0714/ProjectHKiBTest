@@ -19,11 +19,16 @@ public class SaveTester : MonoBehaviour
     [SerializeField] private KeyCode saveKey = KeyCode.F5;
     [SerializeField] private KeyCode loadKey = KeyCode.F9;
 
-    // eventProviderBehaviour를 인스펙터에서 명시적으로 지정하지 않으면 RouteModule을 기본값으로 쓴다
-    // (RouteModule이 IEventSaveProvider를 구현한 이 프로젝트의 유일한 provider, 2026-07-20).
+    // eventProviderBehaviour를 인스펙터에서 명시적으로 지정하지 않으면 RouteModule을 기본값으로 쓴다.
     // RouteModule.Instance는 씬에 없으면 자동 생성되므로 항상 사용 가능 — null이 되는 경우는 없다.
-    // 나중에 다른 시스템(대사/퀘스트 등)도 이벤트 플래그를 저장해야 하게 되면, SaveModule.eventProvider가
-    // 단일 슬롯이라 provider 여러 개를 합성하는 구조로 다시 손봐야 한다.
+    //
+    // [2026-07-28] SaveModule.eventProvider는 여기서 넘기는 이 값 하나만 명시적 provider로 받지만,
+    // EventManager는 SaveModule이 GameManager.instance.eventManager로 직접 찾아 항상 자동으로
+    // 같이 합성한다(SaveModule.CollectEventProviders 참고) — 이전엔 단일 슬롯이라 provider가
+    // 둘 이상이 되면 손봐야 할 부채로 남아 있었는데, 이제 SaveModule 쪽에서 리스트로 합성하므로
+    // 여기서 EventManager를 따로 신경 쓸 필요는 없다. 세 번째 provider가 생기면, 그것도 씬 싱글턴
+    // 수준으로 항상 접근 가능하면 CollectEventProviders에 추가하고, 여기 이 필드처럼 인스펙터로
+    // 명시 주입해야 하는 대상이면 이 프로퍼티가 반환하는 목록을 넓히면 된다.
     private IEventSaveProvider EventProvider =>
         (eventProviderBehaviour as IEventSaveProvider) ?? RouteModule.Instance;
 

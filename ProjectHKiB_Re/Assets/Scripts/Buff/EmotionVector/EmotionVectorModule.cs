@@ -393,6 +393,53 @@ public class EmotionVectorModule : MonoBehaviour
         return !(value < threshold - hysteresis);
     }
 
+    // ─── 세이브 연동 (2026-07-28) ───────────────────────────────────
+    // 역치로 부여한 statBuff/followUpBuff는 ThresholdBuffOverrideDuration(24시간)으로 적용돼
+    // 타이머가 아니라 이 모듈의 _activeAxes 장부가 수명을 소유한다. 세이브가 이 버프들을 그대로
+    // 저장·복원해버리면 장부 없는 24시간 버프가 남아 영영 안 사라지므로, 세이브는 이 버프들을
+    // 건너뛰고(OwnsBuff) 로드 후에는 복원된 스택으로부터 다시 파생시킨다(ResetAxisStateForLoad).
+    public bool OwnsBuff(StatBuffSO buff)
+    {
+        if (buff == null) return false;
+
+        EmotionThresholdProfileSO effectiveProfile = GetEffectiveProfile();
+        if (effectiveProfile == null) return false;
+
+        for (int i = 0; i < AllAxes.Length; i++)
+        {
+            if (!effectiveProfile.TryGetEntry(AllAxes[i], out EmotionThresholdProfileSO.ThresholdEntry entry)) continue;
+            if (entry.statBuff == buff || entry.followUpBuff == buff) return true;
+        }
+
+        return false;
+    }
+
+    // 로드 직후 축 장부를 백지화한다 — 안 그러면 _activeAxes에 남은 옛 축 때문에
+    // EvaluateThresholds가 wasActive=true로 보고 재부여를 건너뛴다.
+    public void ResetAxisStateForLoad()
+    {
+        EmotionThresholdProfileSO effectiveProfile = GetEffectiveProfile();
+
+        // 정상 경로(DeactivateAxis)로 해제해야 UnBuff와 코루틴 정리까지 같이 이뤄진다.
+        // DeactivateAxis가 _activeAxes를 건드리므로 복사본으로 순회한다.
+        foreach (EmotionAxis axis in new List<EmotionAxis>(_activeAxes))
+        {
+            if (effectiveProfile != null && effectiveProfile.TryGetEntry(axis, out EmotionThresholdProfileSO.ThresholdEntry entry))
+                DeactivateAxis(axis, entry);
+        }
+
+        _activeAxes.Clear();
+        _followedUpAxes.Clear();
+
+        foreach (Coroutine routine in _followUpCoroutines.Values)
+            if (routine != null) StopCoroutine(routine);
+        _followUpCoroutines.Clear();
+
+        // 다음 LateUpdate에서 복원된 스택 기준으로 축을 처음부터 다시 판정하게 한다.
+        _lastStacks.Clear();
+        _isDirty = true;
+    }
+
     private void ActivateAxis(EmotionAxis axis, EmotionThresholdProfileSO.ThresholdEntry entry)
     {
         _activeAxes.Add(axis);

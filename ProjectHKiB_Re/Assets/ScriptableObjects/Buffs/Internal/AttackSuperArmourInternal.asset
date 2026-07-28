@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: AttackSuperArmourInternal
   m_EditorClassIdentifier: 
+  saveId: 0d61e4db3d7fc7e45959bfbc2529c302
   <Description>k__BackingField: internal buff that make entity knockback proof when
     attacking
   <IsBuffTimeInfinite>k__BackingField: 1
   <BuffTime>k__BackingField: 0
-  <IsDebuff>k__BackingField: 0
-  <Value>k__BackingField: 0
-  <IsValuePropositional>k__BackingField: 0
-  <BuffType>k__BackingField: {fileID: 11400000, guid: d9b29e0b88136ff4ab72bcb89fffcfdd, type: 2}
+  isEmotionBuff: 0
+  emotionColor: 0
+  maxStack: 200
   <TimeStackType>k__BackingField: 2
   <BuffStackType>k__BackingField: 2
   <BuffRemoveType>k__BackingField: 0
+  <Effects>k__BackingField: []

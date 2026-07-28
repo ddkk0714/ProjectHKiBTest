@@ -62,10 +62,10 @@ MonoBehaviour:
   _useSelfIfTargetIsNull: 1
   _buffKey: 32
   _buff: {fileID: 0}
-  _firstKey: 98
+  _firstKey: 111
   _firstColor: 0
   _firstStack: 1
-  _secondKey: 110
+  _secondKey: 112
   _secondColor: 1
   _secondStack: 1
   _applyTarget: 0
@@ -81,7 +81,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3402870450317852475}
   m_Layer: 0
-  m_Name: DeBuffTestr
+  m_Name: BuffTestr
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -166,10 +166,10 @@ MonoBehaviour:
   _useSelfIfTargetIsNull: 1
   _buffKey: 32
   _buff: {fileID: 0}
-  _firstKey: 103
+  _firstKey: 107
   _firstColor: 0
   _firstStack: 1
-  _secondKey: 104
+  _secondKey: 108
   _secondColor: 1
   _secondStack: 1
   _applyTarget: 1

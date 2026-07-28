@@ -1242,6 +1242,74 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "UI_TOGGLE",
+            "id": "b8e31618-05ef-4916-b1cd-19e4100140ca",
+            "actions": [
+                {
+                    "name": "OpenMap",
+                    "type": "Button",
+                    "id": "e5c9f26e-d36a-40d7-b832-f1094b7bcee9",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "OpenNote",
+                    "type": "Button",
+                    "id": "bc1325b6-7437-4280-841f-5fed1fbd9eeb",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "OpenCodex",
+                    "type": "Button",
+                    "id": "7533139f-7059-475a-8364-fc9191716e95",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "5090aa39-e924-45b5-8acd-44791a3f70e2",
+                    "path": "<Keyboard>/m",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "OpenMap",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6a19db6c-ce5f-418b-a681-7f3271bc49e9",
+                    "path": "<Keyboard>/v",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "OpenNote",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bfbfb399-ea17-4057-af9e-96f84778dd91",
+                    "path": "<Keyboard>/n",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "OpenCodex",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []

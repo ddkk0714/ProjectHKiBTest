@@ -157,33 +157,60 @@ public class SaveModule : InterfaceModule, IInitializable
         }
     }
 
+    // ─── 세이브 연동 provider 합성 (2026-07-28) ─────────────────────
+    // SaveModule.eventProvider는 예전엔 단일 슬롯이라 RouteModule 하나만 담을 수 있었다.
+    // EventManager도 이벤트 플래그를 저장해야 하게 되면서 GameManager.instance.eventManager를
+    // 직접 붙잡는 특별 취급 코드가 SaveEvents/LoadEvents에 따로 생겼었는데(부채로 예고된 상황),
+    // 이제 "명시적으로 주입된 provider(보통 RouteModule) + 항상 존재하는 EventManager"를
+    // 리스트로 합쳐 전부 같은 IEventSaveProvider 경로로 다룬다. 나중에 대사/퀘스트 등 provider가
+    // 더 늘어나도 여기 한 곳에만 추가하면 된다.
+    private List<IEventSaveProvider> CollectEventProviders()
+    {
+        var providers = new List<IEventSaveProvider>();
+        if (eventProvider != null) providers.Add(eventProvider);
+
+        var eventManager = GameManager.instance != null ? GameManager.instance.eventManager : null;
+        if (eventManager != null) providers.Add(eventManager);
+
+        return providers;
+    }
+
     public void SaveEvents()
     {
         if (_currentSaveData == null) return;
 
-        _currentSaveData.eventFlags.Clear();
-        _currentSaveData.passages.Clear();
+        _currentSaveData.providerFlags.Clear();
 
-        if (eventProvider != null)
-        {
-            if (eventProvider.EventFlags != null)
-            {
-                foreach (var kv in eventProvider.EventFlags)
-                    _currentSaveData.eventFlags.Add(new EventFlagSaveInfo { id = kv.Key, value = kv.Value });
-            }
-
-            if (eventProvider.Passages != null)
-            {
-                foreach (var kv in eventProvider.Passages)
-                    _currentSaveData.passages.Add(new PassageSaveInfo { id = kv.Key, opened = kv.Value });
-            }
-        }
-        else
+        var providers = CollectEventProviders();
+        if (providers.Count == 0)
         {
             // provider 없이 저장하면 이벤트/통로 진행이 통째로 빈 채로 저장되는데도 예외가 나지 않아
             // 눈치채기 어렵다 — 조용히 실패하는 대신 경고를 남긴다.
-            Debug.LogWarning("[SaveModule] eventProvider가 없어 이벤트 플래그/통로를 저장하지 않습니다.");
+            Debug.LogWarning("[SaveModule] 등록된 IEventSaveProvider가 없어 이벤트 플래그/통로를 저장하지 않습니다.");
         }
+
+        foreach (var provider in providers)
+        {
+            var snapshot = new ProviderFlagsSaveInfo { providerId = provider.ProviderId };
+
+            if (provider.EventFlags != null)
+            {
+                foreach (var kv in provider.EventFlags)
+                    snapshot.eventFlags.Add(new EventFlagSaveInfo { id = kv.Key, value = kv.Value });
+            }
+
+            if (provider.Passages != null)
+            {
+                foreach (var kv in provider.Passages)
+                    snapshot.passages.Add(new PassageSaveInfo { id = kv.Key, opened = kv.Value });
+            }
+
+            _currentSaveData.providerFlags.Add(snapshot);
+        }
+
+        // 플레이어 버프(= 감정 스택) — 전용 세이브 State를 새로 만들지 않고 여기에 얹었다.
+        // 이 메서드는 이미 노트/도감/경로/장비/위치까지 받아내는 "나머지 전부" 자리가 된 지 오래다.
+        SaveBuffs();
 
         // 노트(핀 단서)/도감(유저 메모) 스냅샷 — eventProvider 유무와 무관하게 항상 저장한다.
         // IEventSaveProvider(Dictionary<string,bool> 전용)로 표현 안 되는 구조화 데이터라 이 메서드에
@@ -229,6 +256,9 @@ public class SaveModule : InterfaceModule, IInitializable
             ? new List<EmotionColor>(RouteModule.Instance.EquippedGears)
             : new List<EmotionColor>();
         _currentSaveData.currentLocationGuid = RouteModule.Instance?.CurrentLocation?.guid ?? "";
+
+        // 플레이어의 실제 씬 좌표 + 현재 맵 — currentLocationGuid(RouteFinding 추상 노드)와 별개.
+        SavePlayerPosition();
     }
 
     public void WriteSaveFile()
@@ -392,27 +422,49 @@ public class SaveModule : InterfaceModule, IInitializable
     {
         if (_loadedData == null) return;
 
-        if (eventProvider != null)
+        var providers = CollectEventProviders();
+        if (providers.Count == 0)
+            Debug.LogWarning("[SaveModule] 등록된 IEventSaveProvider가 없어 이벤트 플래그/통로를 복원하지 않습니다.");
+
+        foreach (var provider in providers)
         {
+            var snapshot = _loadedData.providerFlags?.Find(p => p.providerId == provider.ProviderId);
+
+            if (snapshot == null)
+            {
+                // 이 provider의 데이터가 세이브에 없다 — 이 구조로 개편되기 전(2026-07-28 이전)에
+                // 만들어진 세이브이거나, 그 사이에 새로 추가된 provider다. ResetForLoad를 부르면
+                // 인스펙터/게임 시작 시점에 저작된 초기 상태까지 지워버리므로 아예 건드리지 않는다.
+                // 대가로 "정말 플래그가 하나도 없는 상태"를 저장한 세이브는 로드해도 현재 상태가
+                // 안 지워진다 — 게임 시작 상태가 곧 그 상태라 실질적인 차이가 없다고 보고 감수했다.
+                continue;
+            }
+
             // 항목을 하나씩 SetEventFlag/SetPassage로 넘기기 전에 구현체가 이전 상태를 지울 기회를 준다.
-            eventProvider.ResetForLoad();
+            provider.ResetForLoad();
 
-            if (_loadedData.eventFlags != null)
+            if (snapshot.eventFlags != null)
             {
-                foreach (var f in _loadedData.eventFlags)
-                    eventProvider.SetEventFlag(f.id, f.value);
+                foreach (var f in snapshot.eventFlags)
+                    provider.SetEventFlag(f.id, f.value);
             }
 
-            if (_loadedData.passages != null)
+            if (snapshot.passages != null)
             {
-                foreach (var p in _loadedData.passages)
-                    eventProvider.SetPassage(p.id, p.opened);
+                foreach (var p in snapshot.passages)
+                    provider.SetPassage(p.id, p.opened);
             }
         }
-        else
-        {
-            Debug.LogWarning("[SaveModule] eventProvider가 없어 이벤트 플래그/통로를 복원하지 않습니다.");
-        }
+
+        // ※ EventManager 쪽 이벤트 플래그: 이미 Initialize()가 끝난 월드 오브젝트
+        //   (EventControllableEntity/Animation)는 여기서 값을 되돌려도 스스로 다시 배치되지
+        //   않는다 — 로드 후 맵을 다시 들어갈 때 반영된다.
+
+        // 플레이어 버프(= 감정 스택) 복원 — SaveBuffs()와 대칭.
+        // 로드 순서상 이 시점은 LoadGears/LoadCards 이후라 SourceGear를 인벤토리에서 되찾을 수 있고,
+        // ApplyHP 이후이기도 하다. 버프가 MaxHP를 건드려도 ApplyHP가 프레임 끝에 한 번 더
+        // 재적용(ReapplyHpEndOfFrame)하면서 복원된 버프 기준으로 다시 클램프되므로 순서 문제는 없다.
+        LoadBuffs();
 
         // 지도/노트에서 마지막으로 커밋했던 단일 경로 복원 — Progress(위에서 이미 복원됨) 기준으로
         // 노드 GUID를 다시 MapNodeData로 해석한다.
@@ -421,6 +473,9 @@ public class SaveModule : InterfaceModule, IInitializable
         // 장착 장비 + 현재 위치 복원 — SaveEvents()에서 같이 저장한 것과 대칭.
         RouteModule.Instance?.ImportEquippedGears(_loadedData.equippedGears);
         RouteModule.Instance?.ImportCurrentLocation(_loadedData.currentLocationGuid);
+
+        // 플레이어의 실제 씬 좌표 + 현재 맵 복원 — SavePlayerPosition()과 대칭.
+        LoadPlayerPosition();
 
         // [신설, 2026-07-21] 순서 중요 — 그래프 펼침 상태/위치를 먼저 큐잉해둬야, 바로 아래
         // NoteModule.ImportFrom이 발행하는 OnNoteChanged → NotePanel.Refresh → SetData 재생성 때
@@ -436,7 +491,281 @@ public class SaveModule : InterfaceModule, IInitializable
         NoteModule.Instance?.ImportClueLinks(_loadedData.noteClueLinks);
     }
 
+    // ================= BUFF (감정 스택 포함) =================
+    // 감정 스택은 EmotionModule이 따로 들고 있지 않고 BuffInfo.BuffStack을 그대로 읽으므로
+    // (EmotionModule.GetStacks), 버프를 저장/복원하면 감정 상태도 같이 따라온다.
+    private StatBuffRegistrySO _buffRegistry;
+
+    private StatBuffRegistrySO BuffRegistry
+        => _buffRegistry != null ? _buffRegistry : (_buffRegistry = Resources.Load<StatBuffRegistrySO>("StatBuffRegistry"));
+
+    public void SaveBuffs()
+    {
+        if (_currentSaveData == null) return;
+
+        _currentSaveData.buffs.Clear();
+
+        var buffable = ResolveFromPlayer<IBuffable>(playerRoot);
+        if (buffable == null || buffable.CurrentBuffs == null)
+        {
+            Debug.LogWarning($"[SaveModule] SaveBuffs: playerRoot='{(playerRoot != null ? playerRoot.name : "(null)")}'에서 IBuffable을 찾을 수 없어 버프/감정 스택을 저장하지 않습니다.");
+            return;
+        }
+
+        var vectorModules = ThresholdBuffOwners();
+
+        foreach (var info in buffable.CurrentBuffs)
+        {
+            if (info == null || info.Buff == null) continue;
+
+            // 무한 지속 버프는 남은 시간 개념이 없다 — 복원할 때도 타이머를 걸지 않도록 -1로 저장.
+            float remain = -1f;
+            if (!info.Buff.IsBuffTimeInfinite && info.Cooltime != null && GameManager.instance != null)
+                remain = info.Cooltime.RemainTime;
+
+            // 역치 버프(예: Madness_Other)는 EmotionVectorModule이 걸 때 24시간으로 오버라이드해서
+            // 저장한다 — 이 SO가 "색상 버프"와 별개 존재가 아니라 **같은 BuffInfo를 공유**하는 경우가
+            // 있기 때문에(BuffStackType=Stack이라 축 활성화 시 +1이 기존 색상 스택 위에 그냥 누적됨),
+            // 이 버프를 통째로 저장에서 빼면 그 안에 섞여 있던 진짜 색상 스택까지 같이 날아간다
+            // (실제로 겪은 버그 — 세이브/로드 후 Madness/Sorrow 계열 스택이 어긋남).
+            // 그래서 스택은 항상 그대로 저장하고, 지속시간만 SO 기본값(-1)으로 되돌린다 — 그러면
+            // 로드 후 정상 BuffTime(5~6초)으로 자연 만료되어 "안 사라지는 24시간 버프" 문제도
+            // 그대로 해결된다. 축 장부 자체는 ResetAxisStateForLoad()가 별도로 정리한다.
+            if (remain > 0f && IsThresholdOwned(vectorModules, info.Buff))
+                remain = -1f;
+
+            _currentSaveData.buffs.Add(new BuffSaveInfo
+            {
+                buffId = info.Buff.SaveId,
+                gearGuid = (info.SourceGear != null && info.SourceGear.data != null) ? info.SourceGear.data.GUID : "",
+                buffStack = info.BuffStack,
+                remainTime = remain
+            });
+        }
+
+    }
+
+    public void LoadBuffs()
+    {
+        if (_loadedData == null) return;
+
+        var buffable = ResolveFromPlayer<IBuffable>(playerRoot);
+        if (buffable == null || buffable.CurrentBuffs == null)
+        {
+            Debug.LogWarning($"[SaveModule] LoadBuffs: playerRoot='{(playerRoot != null ? playerRoot.name : "(null)")}'에서 IBuffable을 찾을 수 없어 버프/감정 스택을 복원하지 않습니다.");
+            return;
+        }
+
+        // 기존 버프 제거 — 리스트만 비우면 버프가 걸어둔 스탯 보정이 그대로 남으므로 반드시 UnBuff를 탄다.
+        // ignorePermanent=true라야 Permanent 타입도 걷힌다. 순회 중 CurrentBuffs가 변형되므로 복사본으로 돈다.
+        foreach (var existing in new List<BuffInfo>(buffable.CurrentBuffs))
+        {
+            if (existing == null || existing.Buff == null) continue;
+            buffable.UnBuff(existing.Buff, existing.SourceGear, existing.BuffStack, 0, true);
+        }
+
+        if (buffable.CurrentBuffs.Count > 0)
+            Debug.LogWarning($"[SaveModule] UnBuff 후에도 버프 {buffable.CurrentBuffs.Count}개가 남아 있습니다 — 스탯이 중복 적용될 수 있습니다.");
+
+        // 역치 버프 장부 백지화 — 위에서 버프를 전부 걷어냈으므로 EmotionVectorModule의 _activeAxes도
+        // 같이 비워야 한다. 안 그러면 옛 축이 활성으로 남아 재부여가 건너뛰어지고, 복원된 스택에
+        // 맞는 역치 버프가 다시 걸리지 않는다. 저장된 버프가 하나도 없어도 반드시 거쳐야 하므로
+        // 아래 early return보다 앞에 둔다.
+        foreach (var module in ThresholdBuffOwners())
+        {
+            if (module != null) module.ResetAxisStateForLoad();
+        }
+
+        if (_loadedData.buffs == null || _loadedData.buffs.Count == 0)
+            return;
+
+        var registry = BuffRegistry;
+        if (registry == null)
+        {
+            Debug.LogWarning("[SaveModule] Resources/StatBuffRegistry를 찾을 수 없어 버프를 복원하지 않습니다.");
+            return;
+        }
+
+        var loadVectorModules = ThresholdBuffOwners();
+
+        foreach (var saved in _loadedData.buffs)
+        {
+            if (!registry.TryGet(saved.buffId, out var buffSO) || buffSO == null)
+            {
+                Debug.LogWarning($"[SaveModule] 버프 에셋을 찾을 수 없습니다(id={saved.buffId}). StatBuffRegistry에서 '버프 에셋 전체 다시 수집'을 실행해보세요.");
+                continue;
+            }
+
+            // remainTime이 -1(무한 지속)이거나 0 이하면 overrideTime을 -1로 넘겨 SO 기본값/무한 규칙을 그대로 따르게 한다.
+            float duration = saved.remainTime > 0f ? saved.remainTime : -1f;
+
+            // 이 필드가 -1로 저장되기 전(구버전 세이브)에 만들어진 파일 대비 안전장치 — 역치 버프인데
+            // 저장된 남은 시간이 SO의 BuffTime보다 길면 24시간 오버라이드가 그대로 저장된 것이다.
+            // 역치 소유 버프로 한정해서만 잘라낸다 — 다른 시스템이 의도적으로 BuffTime보다 긴
+            // overrideTime을 주는 경우(예: 아이템으로 지속시간 연장)까지 건드리면 안 되기 때문이다.
+            if (duration > 0f && !buffSO.IsBuffTimeInfinite && buffSO.BuffTime > 0f && duration > buffSO.BuffTime
+                && IsThresholdOwned(loadVectorModules, buffSO))
+            {
+                Debug.LogWarning($"[SaveModule] 역치 버프 '{buffSO.name}'의 저장된 남은 시간({duration:F1}s)이 BuffTime({buffSO.BuffTime:F1}s)보다 깁니다(구버전 세이브 추정) — BuffTime으로 잘라 복원합니다.");
+                duration = buffSO.BuffTime;
+            }
+
+            // gearGuid가 비어 있으면 "장비 없음" 상태였다는 뜻이다 — 이때 sourceGear로 C# null을
+            // 넘기면 안 된다. Card.cs는 "빈 슬롯"을 null이 아니라 new Gear(null) 플레이스홀더로
+            // 표현하고, 이 플레이스홀더는 LoadCards()가 재초기화할 때마다 새 인스턴스로 교체된다.
+            // FindBuff/UnBuff는 SourceGear를 참조(==) 비교하므로, 여기서 null을 쓰면 이 버프는
+            // 영원히 "현재 장비 없음" 상태(GetCurrentSourceGear()가 반환하는, 로드 후 새로 만들어진
+            // 플레이스홀더)와 매치되지 않는 고아가 된다 — EmotionModule.GetStacks가 항상 0을 보고하고,
+            // 이 버프를 대상으로 한 이후의 모든 UnBuff(자연 만료 포함)도 못 찾아서 조용히 무시된다.
+            // 그래서 빈 GUID는 FindOwnedGear가 아니라 지금 시점의 GetCurrentSourceGear()로 푼다.
+            Gear sourceGear = string.IsNullOrEmpty(saved.gearGuid) ? buffable.GetCurrentSourceGear() : FindOwnedGear(saved.gearGuid);
+
+            buffable.Buff(buffSO, sourceGear, saved.buffStack, 1, duration);
+        }
+    }
+
+    private EmotionVectorModule[] ThresholdBuffOwners()
+        => playerRoot != null
+            ? playerRoot.GetComponentsInChildren<EmotionVectorModule>(true)
+            : System.Array.Empty<EmotionVectorModule>();
+
+    private static bool IsThresholdOwned(EmotionVectorModule[] owners, StatBuffSO buff)
+    {
+        foreach (var module in owners)
+        {
+            if (module != null && module.OwnsBuff(buff)) return true;
+        }
+
+        return false;
+    }
+
+    private Gear FindOwnedGear(string gearGuid)
+    {
+        if (string.IsNullOrEmpty(gearGuid) || inventory == null) return null;
+
+        foreach (var gear in inventory.playerGearInventory.Values)
+        {
+            if (gear != null && gear.data != null && gear.data.GUID == gearGuid) return gear;
+        }
+
+        return null;
+    }
+
+    // ================= PLAYER POSITION (실제 씬 좌표 + 현재 맵) =================
+    // RouteModule.CurrentLocation(currentLocationGuid)은 RouteFinding 추상 그래프 노드 단위라
+    // 지도 화면·난이도 계산에는 쓰이지만, 실제 게임플레이 씬 안에서 플레이어가 정확히 어디
+    // 서 있었는지는 담지 못한다. 이 두 메서드가 그 간극을 메운다 — 씬 전환은 MapChangeManager
+    // (SceneManager 기반의 실제 맵 전환 시스템, RouteFinding과는 별개)가 담당한다.
+    private MapChangeManager _mapChangeManager;
+
+    private MapChangeManager ResolveMapChangeManager()
+        => _mapChangeManager != null ? _mapChangeManager : (_mapChangeManager = FindObjectOfType<MapChangeManager>(true));
+
+    public void SavePlayerPosition()
+    {
+        if (_currentSaveData == null || playerRoot == null) return;
+
+        var mapChangeManager = ResolveMapChangeManager();
+
+        _currentSaveData.hasPlayerPosition = true;
+        _currentSaveData.currentMapSceneName = mapChangeManager != null ? mapChangeManager.currentMap : "";
+        _currentSaveData.playerPosition = playerRoot.transform.position;
+
+        var dirAnimatable = ResolveFromPlayer<IDirAnimatable>(playerRoot);
+        if (dirAnimatable != null)
+            _currentSaveData.playerDirection = dirAnimatable.AnimationDirection;
+    }
+
+    public void LoadPlayerPosition()
+    {
+        // hasPlayerPosition이 false면 이 필드가 생기기 전(구버전) 세이브다 — playerPosition이
+        // JsonUtility 기본값(0,0,0)으로 채워져 있을 뿐 실제로 저장된 좌표가 아니므로, 원점
+        // 텔레포트 같은 오동작을 막기 위해 아예 건드리지 않는다.
+        if (_loadedData == null || !_loadedData.hasPlayerPosition || playerRoot == null) return;
+
+        var mapChangeManager = ResolveMapChangeManager();
+        Vector3 targetPosition = _loadedData.playerPosition;
+        EnumManager.AnimDir targetDirection = _loadedData.playerDirection;
+
+        bool needsMapChange = mapChangeManager != null
+            && !string.IsNullOrEmpty(_loadedData.currentMapSceneName)
+            && _loadedData.currentMapSceneName != mapChangeManager.currentMap;
+
+        if (!needsMapChange)
+        {
+            TeleportPlayer(targetPosition, targetDirection);
+            return;
+        }
+
+        // ChangeMap()은 내부적으로 코루틴이라 완료를 동기적으로 기다릴 수 없다 — 완료 이벤트가
+        // 올 때까지 텔레포트를 미룬다. 로드 스테이트머신 자체는 이 완료를 기다리지 않고 그대로
+        // 진행한다(씬 전환이 끝나는 몇 프레임 동안 플레이어가 이전 위치에 남아 있다가, 전환이
+        // 끝나는 순간 저장된 좌표/방향으로 텔레포트된다).
+        void OnMapChanged(string _)
+        {
+            mapChangeManager.OnMapChanged -= OnMapChanged;
+            TeleportPlayer(targetPosition, targetDirection);
+        }
+
+        mapChangeManager.OnMapChanged += OnMapChanged;
+        mapChangeManager.ChangeMap(_loadedData.currentMapSceneName);
+    }
+
+    private void TeleportPlayer(Vector3 position, EnumManager.AnimDir direction)
+    {
+        var physics = ResolveFromPlayer<IPhysics>(playerRoot);
+        if (physics != null) physics.RealTeleport(position);
+        else playerRoot.transform.position = position; // IPhysics 없는 대상(테스트 리그 등) 대비 폴백
+
+        var dirAnimatable = ResolveFromPlayer<IDirAnimatable>(playerRoot);
+        if (dirAnimatable == null) return;
+
+        dirAnimatable.SetAnimationDirection(direction);
+
+        // SetAnimationDirection은 CurrentAnimDir 값만 즉시 바꾼다 — 화면에 보이는 스프라이트는
+        // SimpleAnimationPlayer.ApplyFrame이 이 값을 읽어 갱신하는데, 그 호출은 지금 재생 중인
+        // 클립이 스스로 다음 프레임으로 넘어갈 때(클립의 프레임 지속시간만큼, 보통 0.1~0.2초 뒤)
+        // 되어야 일어난다. resetWhenDirectionChange가 꺼진 클립(대개 Idle)이 재생 중이면 이 지연이
+        // 그대로 체감된다. 로드 직후에는 이 지연이 어색하므로, 지금 재생 중인 클립을 강제로
+        // 즉시 재시작해 첫 프레임을 새 방향으로 바로 반영한다.
+        var animationPlayer = dirAnimatable.AnimationPlayer;
+        if (animationPlayer != null)
+            animationPlayer.Play(animationPlayer.CurrentAnimationName);
+    }
+
     // ================= PLAYER RESOLVE =================
+    // ResolvePlayerFromRegister(IDamagable 전용)와 같은 탐색 순서를 임의 인터페이스로 일반화한 것.
+    private static T ResolveFromPlayer<T>(Component playerRoot) where T : class
+    {
+        if (playerRoot == null) return null;
+
+        if (playerRoot is IInterfaceRegistable selfReg)
+        {
+            if (selfReg.TryGetInterface<T>(out var t0) && t0 != null) return t0;
+
+            var t1 = selfReg.GetInterface<T>();
+            if (t1 != null) return t1;
+        }
+
+        var regs = playerRoot.GetComponentsInChildren<MonoBehaviour>(true)
+                             .OfType<IInterfaceRegistable>();
+
+        foreach (var reg in regs)
+        {
+            if (reg.TryGetInterface<T>(out var t2) && t2 != null) return t2;
+
+            var t3 = reg.GetInterface<T>();
+            if (t3 != null) return t3;
+        }
+
+        foreach (var mb in playerRoot.GetComponentsInChildren<MonoBehaviour>(true))
+        {
+            if (mb is T t4) return t4;
+        }
+
+        return null;
+    }
+
     private static IDamagable ResolvePlayerFromRegister(Component playerRoot)
     {
         if (playerRoot == null) return null;

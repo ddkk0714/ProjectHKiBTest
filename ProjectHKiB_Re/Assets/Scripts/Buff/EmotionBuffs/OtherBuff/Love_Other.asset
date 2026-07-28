@@ -11,8 +11,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: Love_Other
-  m_EditorClassIdentifier:
-  <Description>k__BackingField: "(임시값 — 재논의 전) (공격력 감소 소) + (이동속도 증가 소) + (저항 -1)"
+  m_EditorClassIdentifier: 
+  saveId: 49800e94dc051b3a0ac56dfdfdde0177
+  <Description>k__BackingField: "(\uC784\uC2DC\uAC12 \u2014 \uC7AC\uB17C\uC758 \uC804)
+    (\uACF5\uACA9\uB825 \uAC10\uC18C \uC18C) + (\uC774\uB3D9\uC18D\uB3C4 \uC99D\uAC00
+    \uC18C) + (\uC800\uD56D -1)"
   <IsBuffTimeInfinite>k__BackingField: 0
   <BuffTime>k__BackingField: 5
   isEmotionBuff: 1
@@ -32,5 +35,5 @@ MonoBehaviour:
     <IsValuePropositional>k__BackingField: 0
   - <BuffType>k__BackingField: {fileID: 11400000, guid: 6bc50189ef6cf6544b2ce3c445adc9dd, type: 2}
     <IsDebuff>k__BackingField: 0
-    <Value>k__BackingField: 0.5
-    <IsValuePropositional>k__BackingField: 0
+    <Value>k__BackingField: 0.04
+    <IsValuePropositional>k__BackingField: 1

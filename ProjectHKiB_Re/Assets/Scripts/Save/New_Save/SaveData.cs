@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 [Serializable]
 public class ItemSaveInfo
@@ -24,6 +25,15 @@ public class CardSaveInfo
 }
 
 [Serializable]
+public class BuffSaveInfo
+{
+    public string buffId;    // StatBuffSO.SaveId (에셋 GUID)
+    public string gearGuid;  // BuffInfo.SourceGear의 GearDataSO.GUID — 없으면 빈 문자열
+    public int buffStack;
+    public float remainTime; // 남은 지속시간. 무한 지속(IsBuffTimeInfinite)이면 -1
+}
+
+[Serializable]
 public class EventFlagSaveInfo
 {
     public string id;
@@ -37,6 +47,19 @@ public class PassageSaveInfo
     public bool opened;
 }
 
+// IEventSaveProvider 구현체(RouteModule, EventManager, ...) 한 개 분량의 스냅샷.
+// provider별로 리스트를 나눈 이유: RouteModule은 "mapGuid:eventKey" 형식 ID를, EventManager는
+// EventFlagSO.Id(에셋 GUID) 형식 ID를 쓴다 — 서로 다른 ID 체계를 한 리스트에 섞으면 충돌 위험은
+// 낮아도(형식이 달라 실제 매치는 안 되지만) 다른 provider의 정체불명 항목을 서로 떠안게 되어
+// 지저분해진다. providerId(IEventSaveProvider.ProviderId)로 로드 시 자기 몫만 정확히 되찾는다.
+[Serializable]
+public class ProviderFlagsSaveInfo
+{
+    public string providerId;
+    public List<EventFlagSaveInfo> eventFlags = new();
+    public List<PassageSaveInfo> passages = new();
+}
+
 [Serializable]
 public class SaveSlotData
 {
@@ -48,8 +71,20 @@ public class SaveSlotData
     public List<GearSaveInfo> ownedGears = new();
     public List<CardSaveInfo> cards = new();
 
-    public List<EventFlagSaveInfo> eventFlags = new();
-    public List<PassageSaveInfo> passages = new();
+    // [2026-07-28 개편] RouteModule/EventManager 등 모든 IEventSaveProvider 구현체가 이 리스트
+    // 하나에 provider별로 스코프를 나눠 들어간다(ProviderFlagsSaveInfo.providerId로 구분).
+    // 예전엔 RouteModule 전용 eventFlags/passages 필드와, SaveModule이 GameManager.eventManager를
+    // 직접 붙잡던 별도의 worldEventFlags 필드가 나뉘어 있었다 — SaveModule.eventProvider가 단일
+    // 슬롯이라 provider를 늘릴 때마다 필드를 하나씩 추가해야 했던 구조를, provider 목록을 합성하는
+    // 방식으로 바꾸며 통합했다(SaveModule.SaveEvents/LoadEvents 참고).
+    public List<ProviderFlagsSaveInfo> providerFlags = new();
+
+    // [신설, 2026-07-28] 플레이어의 활성 버프(BuffableModule.CurrentBuffs).
+    // 감정 스택도 여기 같이 담긴다 — EmotionModule은 스택을 따로 들고 있지 않고
+    // BuffInfo.BuffStack을 그대로 읽기 때문에(EmotionModule.GetStacks), 버프를 복원하면
+    // 감정 상태가 함께 복원된다. EmotionVectorModule의 축/엔트로피도 스택에서 재계산되는
+    // 파생값이라 별도 저장 대상이 아니다(게다가 그쪽은 적 전용이라 세이브 범위 밖).
+    public List<BuffSaveInfo> buffs = new();
 
     // 노트(핀 단서)/도감(유저 메모) — IEventSaveProvider(Dictionary<string,bool> 전용)로는
     // 표현 안 되는 구조화 데이터라 별도 필드로 둔다. NoteEntry/CodexUserEntry는
@@ -94,4 +129,18 @@ public class SaveSlotData
     // 아직 구현되지 않았고(CLAUDE.md MVP 잔여 1번), 죽음/미세이브 진도 손실 설계상 이동 중 저장은
     // 애초에 지원 대상이 아니다.
     public string currentLocationGuid = "";
+
+    // [신설] 플레이어의 실제 씬 좌표 + 그 좌표가 속한 씬(맵). 위 currentLocationGuid는 RouteFinding
+    // 추상 그래프 노드 단위(지도 화면·난이도 계산용)라, 실제 게임플레이 씬 안에서 플레이어가
+    // 정확히 어디 서 있었는지는 담지 못한다 — 이 필드가 그 간극을 메운다.
+    // hasPlayerPosition: 이 필드가 생기기 전(구버전) 세이브는 currentMapSceneName/playerPosition이
+    // JsonUtility 기본값(""/(0,0,0))으로 채워지는데, 그 기본값을 "정말 원점에 저장된 좌표"와 구분할
+    // 방법이 없다. 원점 텔레포트 같은 오동작을 막기 위해, 새로 저장할 때만 명시적으로 true를 채운다.
+    public bool hasPlayerPosition = false;
+    public string currentMapSceneName = "";
+    public Vector3 playerPosition = Vector3.zero;
+
+    // 세이브 당시 바라보던 방향(IDirAnimatable.AnimationDirection) — hasPlayerPosition과 같은
+    // 조건으로 유효성을 판단한다(위치·방향은 같은 순간의 한 상태라 플래그를 따로 두지 않는다).
+    public EnumManager.AnimDir playerDirection = EnumManager.AnimDir.D;
 }

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: VoidBlack_Other
   m_EditorClassIdentifier: 
+  saveId: 8fbcc0863ad5cfb4eb85263a4403a947
   <Description>k__BackingField: "(\uC2A4\uD0AC \uCFE8\uD0C0\uC784 \uC99D\uAC00 \uC18C)
     + (\uC800\uD56D -1)"
   <IsBuffTimeInfinite>k__BackingField: 0

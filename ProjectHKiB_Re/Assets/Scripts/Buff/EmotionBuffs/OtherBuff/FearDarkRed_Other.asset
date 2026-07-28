@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: FearDarkRed_Other
   m_EditorClassIdentifier: 
+  saveId: b7186f4d6ac3d024f9fee822d213142b
   <Description>k__BackingField: "(\uC800\uD56D -2)"
   <IsBuffTimeInfinite>k__BackingField: 0
   <BuffTime>k__BackingField: 5

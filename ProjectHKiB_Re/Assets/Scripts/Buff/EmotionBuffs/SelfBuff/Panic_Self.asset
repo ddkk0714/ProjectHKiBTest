@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: Panic_Self
   m_EditorClassIdentifier: 
+  saveId: 81db87ad3fd641238a6f884944138c34
   <Description>k__BackingField: "(\uC774\uB3D9\uC18D\uB3C4 \uC99D\uAC00 \uB300) +
     (\uC800\uD56D \uACF1\uB9CC\uD07C \uAC10\uC18C) + (\uD569 \uC784\uACC4 \uC2DC
     \uB3C4\uB9DD)"
@@ -26,8 +27,8 @@ MonoBehaviour:
   <Effects>k__BackingField:
   - <BuffType>k__BackingField: {fileID: 11400000, guid: 6bc50189ef6cf6544b2ce3c445adc9dd, type: 2}
     <IsDebuff>k__BackingField: 0
-    <Value>k__BackingField: 2
-    <IsValuePropositional>k__BackingField: 0
+    <Value>k__BackingField: 0.04
+    <IsValuePropositional>k__BackingField: 1
   - <BuffType>k__BackingField: {fileID: 11400000, guid: d67239f1a85a134428b8ee4ce734e2dd, type: 2}
     <IsDebuff>k__BackingField: 1
     <Value>k__BackingField: 1

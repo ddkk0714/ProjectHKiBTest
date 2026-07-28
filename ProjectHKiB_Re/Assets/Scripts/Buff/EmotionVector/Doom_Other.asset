@@ -11,11 +11,12 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: Doom_Other
-  m_EditorClassIdentifier:
-  <Description>k__BackingField: "파멸 - 공격력 증가 중,
-    이동속도 증가 중, 공격 시 자해
-    확률 대 (자신을 포함해 모든 것을
-    파멸하려 함)"
+  m_EditorClassIdentifier: 
+  saveId: fda5930dac744ba29d9bc55e1bb15d03
+  <Description>k__BackingField: "\uD30C\uBA78 - \uACF5\uACA9\uB825 \uC99D\uAC00 \uC911,
+    \uC774\uB3D9\uC18D\uB3C4 \uC99D\uAC00 \uC911, \uACF5\uACA9 \uC2DC \uC790\uD574
+    \uD655\uB960 \uB300 (\uC790\uC2E0\uC744 \uD3EC\uD568\uD574 \uBAA8\uB4E0 \uAC83\uC744
+    \uD30C\uBA78\uD558\uB824 \uD568)"
   <IsBuffTimeInfinite>k__BackingField: 0
   <BuffTime>k__BackingField: 5
   isEmotionBuff: 0
@@ -31,8 +32,8 @@ MonoBehaviour:
     <IsValuePropositional>k__BackingField: 0
   - <BuffType>k__BackingField: {fileID: 11400000, guid: 6bc50189ef6cf6544b2ce3c445adc9dd, type: 2}
     <IsDebuff>k__BackingField: 0
-    <Value>k__BackingField: 1
-    <IsValuePropositional>k__BackingField: 0
+    <Value>k__BackingField: 0.04
+    <IsValuePropositional>k__BackingField: 1
   - <BuffType>k__BackingField: {fileID: 11400000, guid: 4737b60cc4a249c4885966d880ab46c5, type: 2}
     <IsDebuff>k__BackingField: 0
     <Value>k__BackingField: 0.8

@@ -22,8 +22,7 @@ public class EventControllableAnimation : EventControllableBase<SimpleAnimationP
         EventManager eventManager = GameManager.instance.eventManager;
         for (int i = 0; i < initinfos.Count; i++)
         {
-            if (eventManager.eventFlags.ContainsKey(initinfos[i].eventFlag)
-             && eventManager.eventFlags[initinfos[i].eventFlag] == initinfos[i].eventFlagCondition)
+            if (eventManager.HasEventFlag(initinfos[i].eventFlag, initinfos[i].eventFlagCondition))
             {
                 Target.Initialize();
                 Target.transform.position = initinfos[i].position;

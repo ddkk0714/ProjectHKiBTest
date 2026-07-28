@@ -12,10 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: DodgeSuperArmourInternal
   m_EditorClassIdentifier: 
+  saveId: 71434dab3a658bd459b9ace7b753c2b1
   <Description>k__BackingField: internal buff that make entity knockback proof when
     dodging
   <IsBuffTimeInfinite>k__BackingField: 1
   <BuffTime>k__BackingField: 0
+  isEmotionBuff: 0
+  emotionColor: 0
+  maxStack: 200
   <TimeStackType>k__BackingField: 2
   <BuffStackType>k__BackingField: 2
   <BuffRemoveType>k__BackingField: 0
