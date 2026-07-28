@@ -11,8 +11,10 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: Longing_Self
-  m_EditorClassIdentifier:
-  <Description>k__BackingField: "(이동속도 감소 소) + (공격력 감소 중) + (스킬쿨 증가 소)"
+  m_EditorClassIdentifier: 
+  saveId: 8a8be33114964d5c9952439d55d0e882
+  <Description>k__BackingField: "(\uC774\uB3D9\uC18D\uB3C4 \uAC10\uC18C \uC18C) +
+    (\uACF5\uACA9\uB825 \uAC10\uC18C \uC911) + (\uC2A4\uD0AC\uCFE8 \uC99D\uAC00 \uC18C)"
   <IsBuffTimeInfinite>k__BackingField: 0
   <BuffTime>k__BackingField: 5
   isEmotionBuff: 1

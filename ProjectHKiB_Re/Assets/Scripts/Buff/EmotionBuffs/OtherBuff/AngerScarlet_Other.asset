@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: AngerScarlet_Other
   m_EditorClassIdentifier: 
+  saveId: 6c1ae7c28d398a24986f36a8f7fa4926
   <Description>k__BackingField: "(\uACF5\uACA9\uB825 \uC99D\uAC00 \uC18C) + (\uC800\uD56D
     -1)"
   <IsBuffTimeInfinite>k__BackingField: 0

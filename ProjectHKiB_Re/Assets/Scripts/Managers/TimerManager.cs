@@ -108,7 +108,13 @@ public class TimerManager : MonoBehaviour
         _cooltimes[ID] = sequence;
     }
 
-    public float GetElapsedTime(int ID) => _cooltimes.ContainsKey(ID) ? _cooltimes[ID].ElapsedDelay() : 0f;
+    // ElapsedDelay()는 "경과 시간"이 아니라 SetDelay()로 설정한 딜레이 값을 반환하는 API다(DOTween 문서:
+    // "Returns the eventual elapsed delay set for this tween"). 여기 시퀀스들은 딜레이를 준 적이 없어
+    // 항상 0을 반환했고, 그 결과 Timer.RemainTime(= Time - ElapsedTime)이 절대 줄어들지 않고 항상
+    // 전체 시간을 보고하는 버그가 있었다 — 실제 만료(OnComplete 콜백)는 DOTween 내부 재생 시계로
+    // 별개로 동작해 정상 발동했지만, RemainTime을 읽는 모든 코드(세이브 시스템 등)는 항상 "풀타임
+    // 남음"으로 잘못 봤다. Elapsed(includeLoops:true)가 실제 경과 시간을 반환하는 올바른 API다.
+    public float GetElapsedTime(int ID) => _cooltimes.ContainsKey(ID) ? _cooltimes[ID].Elapsed(true) : 0f;
 
     public void CancelTimer(int ID)
     {

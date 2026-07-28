@@ -11,8 +11,10 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: Peace_Self
-  m_EditorClassIdentifier:
-  <Description>k__BackingField: "(이동속도 감소 소) + (저항 -1)"
+  m_EditorClassIdentifier: 
+  saveId: 8f95949bb5ae782e14996d3422b59607
+  <Description>k__BackingField: "(\uC774\uB3D9\uC18D\uB3C4 \uAC10\uC18C \uC18C) +
+    (\uC800\uD56D -1)"
   <IsBuffTimeInfinite>k__BackingField: 0
   <BuffTime>k__BackingField: 5
   isEmotionBuff: 1

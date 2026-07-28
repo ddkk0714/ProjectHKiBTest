@@ -359,6 +359,9 @@ public class RouteModule : MonoBehaviour, IEventSaveProvider
     // 저장/복원한다 — RouteFinding 쪽은 SaveSlotData 타입을 몰라도 된다(RouteProgressState 참고).
     // Progress가 null(MapGraph 미배치)이면 빈 상태로 취급해 세이브/로드 파이프라인이 죽지 않게 한다.
 
+    // 세이브 파일에서 이 provider의 항목을 다른 provider(EventManager 등)와 구분해 담는 키.
+    public string ProviderId => "RouteModule";
+
     // RouteProgressState는 이벤트 플래그를 순수 bool(존재 여부)로 다룬다 — IEventSaveProvider가
     // int로 정의돼 있어(세이브 시스템이 bool 이외의 값도 저장할 수 있도록 확장된 것) 여기서 0/1로 변환한다.
     public Dictionary<string, int> EventFlags => Progress?.BuildEventFlagsSnapshot()
@@ -385,9 +388,14 @@ public class RouteModule : MonoBehaviour, IEventSaveProvider
         Progress.ResetToInitial();
         if (lastSaved == null) return;
 
-        foreach (var f in lastSaved.eventFlags)
+        // [2026-07-28 개편] provider별로 스코프가 나뉜 providerFlags에서 이 provider(RouteModule)
+        // 몫만 찾아온다 — SaveModule.LoadEvents()와 같은 조회 방식(ProviderId로 매칭).
+        var snapshot = lastSaved.providerFlags?.Find(p => p.providerId == ProviderId);
+        if (snapshot == null) return;
+
+        foreach (var f in snapshot.eventFlags)
             Progress.ApplyEventFlag(f.id, f.value != 0);
-        foreach (var p in lastSaved.passages)
+        foreach (var p in snapshot.passages)
             Progress.ApplyPassage(p.id, p.opened);
     }
 

@@ -575,6 +575,7 @@ public class EmotionModule : InterfaceModule, IEmotionModule
         return _buffableModule != null ? _buffableModule.GetCurrentSourceGear() : null;
     }
 
+
     public string GetApproxRomanStack(EmotionColor color)
     {
         return GetApproxRomanStack(color, GetCurrentSourceGear());

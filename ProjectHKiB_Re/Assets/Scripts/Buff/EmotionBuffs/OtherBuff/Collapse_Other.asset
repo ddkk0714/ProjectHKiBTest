@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: Collapse_Other
   m_EditorClassIdentifier: 
+  saveId: 709687b5d72111c4f96897feeb89cf4c
   <Description>k__BackingField: "\uCC29\uC0C9 \uC989\uC2DC \uAC01 \uC2A4\uD0DD\uC758
     \uACF1\uC5D0 \uBE44\uB840\uD574 \uB300\uBBF8\uC9C0"
   <IsBuffTimeInfinite>k__BackingField: 0

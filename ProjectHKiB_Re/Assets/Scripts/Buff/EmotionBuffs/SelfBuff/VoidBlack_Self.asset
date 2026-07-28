@@ -11,8 +11,10 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: VoidBlack_Self
-  m_EditorClassIdentifier:
-  <Description>k__BackingField: "(스킬 쿨타임 증가 소) + (저항 -1)"
+  m_EditorClassIdentifier: 
+  saveId: 4b8941a58cdd4fb8a87566614cf2ca63
+  <Description>k__BackingField: "(\uC2A4\uD0AC \uCFE8\uD0C0\uC784 \uC99D\uAC00 \uC18C)
+    + (\uC800\uD56D -1)"
   <IsBuffTimeInfinite>k__BackingField: 0
   <BuffTime>k__BackingField: 5
   isEmotionBuff: 1

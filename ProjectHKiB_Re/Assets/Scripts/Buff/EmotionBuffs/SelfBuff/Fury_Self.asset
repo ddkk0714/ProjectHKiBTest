@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: Fury_Self
   m_EditorClassIdentifier: 
+  saveId: 3645db31aab8443593ee878dd25cf1b1
   <Description>k__BackingField: "(\uACF5\uACA9\uB825 \uC99D\uAC00 \uC911) + (\uC800\uD56D
     \uACF1\uB9CC\uD07C \uAC10\uC18C) + (\uD569 \uC784\uACC4 \uC2DC \uC2A4\uD0AC \uBA85\uC911\uB960
     \uAC10\uC18C \uC18C)"

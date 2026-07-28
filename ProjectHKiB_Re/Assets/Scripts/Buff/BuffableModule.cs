@@ -6,6 +6,12 @@ public interface IBuffable : IInitializable
 {
     public List<BuffInfo> CurrentBuffs { get; set; }
 
+    // "장비 없음"은 Card.cs가 null이 아니라 new Gear(null) 플레이스홀더로 표현하고, 그 플레이스홀더는
+    // LoadCards() 등이 재초기화할 때마다 새 인스턴스로 교체된다 — 세이브 로드 시 이 값을 다시 조회해서
+    // BuffInfo.SourceGear로 써야, 저장 당시의 "장비 없음" 참조가 아니라 로드 후의 현재 참조와 맞아
+    // FindBuff(참조 비교)가 정상 매치된다.
+    public Gear GetCurrentSourceGear();
+
     public BuffInfo FindBuff(StatBuffSO buff);
     public BuffInfo FindBuff(StatBuffSO buff, Gear sourceGear);
 
@@ -174,7 +180,7 @@ public class BuffableModule : InterfaceModule, IBuffable
             || isForceRemove)
         {
             buffInfo.RemoveBuff(entityToBuff, 1, true);
-            CurrentBuffs.Remove(buffInfo);
+            RemoveFromCurrentBuffs(buffInfo);
         }
 
         if (!isForceRemove && buff.BuffRemoveType == StatBuffSO.BuffRemoveTypeEnum.Unstack)
@@ -182,8 +188,18 @@ public class BuffableModule : InterfaceModule, IBuffable
             buffInfo.RemoveBuff(entityToBuff, buffStack, false);
             buffInfo.BuffStack -= buffStack;
             if (buffInfo.BuffStack <= 0)
-                CurrentBuffs.Remove(buffInfo);
+                RemoveFromCurrentBuffs(buffInfo);
         }
+    }
+
+    // 목록에서 빼면서 그 버프의 타이머도 반드시 같이 끈다.
+    // 안 끄면 이미 제거된 BuffInfo의 DOTween 시퀀스가 살아남아 나중에 UnBuff(buff, sourceGear)를
+    // 한 번 더 쏘는데, 그 사이에 같은 (buff, sourceGear) 조합이 새로 걸려 있으면(예: 세이브 로드로
+    // 복원된 버프) 엉뚱하게 그쪽이 걷혀버린다.
+    private void RemoveFromCurrentBuffs(BuffInfo buffInfo)
+    {
+        buffInfo.Cooltime?.CancelTimer();
+        CurrentBuffs.Remove(buffInfo);
     }
 
     public Gear GetCurrentSourceGear()

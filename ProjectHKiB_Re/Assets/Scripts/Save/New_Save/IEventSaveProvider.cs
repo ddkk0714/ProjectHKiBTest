@@ -4,6 +4,12 @@ using UnityEngine;
 
 public interface IEventSaveProvider
 {
+    // 세이브 파일 안에서 이 provider의 항목들을 다른 provider와 구분해 담아두는 안정적 키
+    // (예: "RouteModule", "EventManager"). 여러 provider가 합성될 때 서로 다른 ID 체계
+    // (RouteModule은 "mapGuid:eventKey", EventManager는 EventFlagSO.Id 즉 에셋 GUID)를 쓰므로,
+    // 세이브 파일에서 한 리스트에 섞어 넣지 않고 provider별로 스코프를 나누기 위해 필요하다.
+    string ProviderId { get; }
+
     Dictionary<string, int> EventFlags { get; }
     void SetEventFlag(string id, int value);
 
@@ -16,4 +22,3 @@ public interface IEventSaveProvider
     // 새로 로드되는 값이 섞일 수 있다.
     void ResetForLoad();
 }
-

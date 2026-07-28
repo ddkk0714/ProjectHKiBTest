@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: SadnessSky_Self
   m_EditorClassIdentifier: 
+  saveId: 38b006332acc81d48ae5868a1a83cbad
   <Description>k__BackingField: "(\uC774\uB3D9\uC18D\uB3C4 \uAC10\uC18C \uC18C) +
     (\uC800\uD56D -1)"
   <IsBuffTimeInfinite>k__BackingField: 0

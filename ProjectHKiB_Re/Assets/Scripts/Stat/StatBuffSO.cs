@@ -22,6 +22,33 @@ public class StatBuffSO : ScriptableObject
 
     public int ID => this.GetInstanceID();
 
+    // 세이브 파일에 기록되는 안정적 식별자 — 위 ID(InstanceID)는 실행할 때마다 달라져 저장에 못 쓴다.
+    // 에셋 GUID를 그대로 쓰며 에디터에서 자동으로 채워진다(이름 변경·폴더 이동에도 안 깨짐).
+    // 로드할 때 이 ID로 에셋을 되찾는 건 StatBuffRegistrySO가 담당한다 — EventFlagSO와 달리
+    // 버프는 "복원할 때 SO 참조를 손에 들고 오는 호출자"가 없어서 역참조가 반드시 필요하다.
+    [SerializeField] private string saveId;
+
+    public string SaveId => string.IsNullOrEmpty(saveId) ? name : saveId;
+
+#if UNITY_EDITOR
+    private void OnValidate() => EnsureSaveId();
+
+    // StatBuffRegistrySO가 수집할 때도 호출한다 — 인스펙터에서 한 번도 열어본 적 없는 에셋은
+    // OnValidate가 안 돌아 saveId가 빈 채로 남고, 그러면 SaveId가 name으로 폴백하는데
+    // EmotionBuffs/SelfBuff와 OtherBuff에 같은 이름의 에셋이 쌍으로 있어 ID가 충돌한다.
+    public void EnsureSaveId()
+    {
+        string assetPath = UnityEditor.AssetDatabase.GetAssetPath(this);
+        if (string.IsNullOrEmpty(assetPath)) return;
+
+        string assetGuid = UnityEditor.AssetDatabase.AssetPathToGUID(assetPath);
+        if (string.IsNullOrEmpty(assetGuid) || saveId == assetGuid) return;
+
+        saveId = assetGuid;
+        UnityEditor.EditorUtility.SetDirty(this);
+    }
+#endif
+
     [field: NaughtyAttributes.ResizableTextArea]
     [field: SerializeField] public string Description { get; set; }
 

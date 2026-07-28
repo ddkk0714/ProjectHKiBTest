@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: Sorrow_Self
   m_EditorClassIdentifier: 
+  saveId: 6e6b3061bf973bb44a5bb877cae176bc
   <Description>k__BackingField: "\uC774\uB3D9\uC18D\uB3C4 \uAC10\uC18C \uB300"
   <IsBuffTimeInfinite>k__BackingField: 0
   <BuffTime>k__BackingField: 5

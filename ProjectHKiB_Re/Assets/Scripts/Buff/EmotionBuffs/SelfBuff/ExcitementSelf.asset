@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: ExcitementSelf
   m_EditorClassIdentifier: 
+  saveId: f118e5b45b930d84580dc526c28f8a61
   <Description>k__BackingField: "\uC2A4\uD0DD\uB2F9 \uC800\uD56D -1, \uC774\uB3D9\uC18D\uB3C4
     \uC99D\uAC00 \uC18C"
   <IsBuffTimeInfinite>k__BackingField: 0

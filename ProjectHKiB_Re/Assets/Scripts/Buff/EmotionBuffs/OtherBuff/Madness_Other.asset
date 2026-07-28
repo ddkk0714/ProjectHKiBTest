@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: Madness_Other
   m_EditorClassIdentifier: 
+  saveId: 2734a2312a45ce042828a486982958ea
   <Description>k__BackingField: "\uC774\uB3D9\uC18D\uB3C4 \uC99D\uAC00 \uC911, \uC2A4\uD0AC\uCFE8
     \uAC10\uC18C \uC18C, \uC2A4\uD0AC \uBA85\uC911\uB960 \uACF1\uC5D0 \uBE44\uB840
     \uAC10\uC18C, \uACF5\uACA9 \uC2DC \uC790\uD574 \uD655\uB960 \uC18C"
