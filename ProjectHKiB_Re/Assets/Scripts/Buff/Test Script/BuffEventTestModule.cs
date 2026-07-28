@@ -130,7 +130,7 @@ public class BuffEventTestModule : MonoBehaviour
             return childModule;
 
         if (target.TryGetComponent(out InterfaceRegister register) &&
-            register.TryGetInterface(out IEmotionModule emotionInterface) &&
+            register.TryGetInterface(out IEmotion emotionInterface) &&
             emotionInterface is EmotionModule moduleFromRegister)
             return moduleFromRegister;
 

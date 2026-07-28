@@ -7,27 +7,20 @@ public interface IBuffable : IInitializable
     public List<BuffInfo> CurrentBuffs { get; set; }
 
     public BuffInfo FindBuff(StatBuffSO buff);
-    public BuffInfo FindBuff(StatBuffSO buff, Gear sourceGear);
-
     public BuffInfo Buff(StatBuffSO buff, int buffStack = 1, int timeStack = 1, float overrideTime = -1);
-    public BuffInfo Buff(StatBuffSO buff, Gear sourceGear, int buffStack = 1, int timeStack = 1, float overrideTime = -1);
-
     public void UnBuff(StatBuffSO buff, int buffStack = 1, int reduceTime = 0, bool byTimer = false);
-    public void UnBuff(StatBuffSO buff, Gear sourceGear, int buffStack = 1, int reduceTime = 0, bool byTimer = false);
 }
 
 [Serializable]
 public class BuffInfo
 {
     [field: SerializeField] public StatBuffSO Buff { get; set; }
-    [field: SerializeField] public Gear SourceGear { get; set; }
     [field: SerializeField] public int BuffStack { get; set; }
     public Timer Cooltime { get; set; }
 
-    public BuffInfo(StatBuffSO buff, Gear sourceGear)
+    public BuffInfo(StatBuffSO buff)
     {
         Buff = buff;
-        SourceGear = sourceGear;
         Cooltime = new();
     }
 
@@ -36,11 +29,11 @@ public class BuffInfo
         if (stack) BuffStack += multiplyer;
         else BuffStack = multiplyer;
 
-        Buff.AddBuff(interfaceReg, SourceGear, multiplyer, stack);
+        Buff.AddBuff(interfaceReg, multiplyer, stack);
     }
 
     public void RemoveBuff(InterfaceRegister interfaceReg, int multiplyer, bool remove)
-        => Buff.RemoveBuff(interfaceReg, SourceGear, multiplyer, remove);
+        => Buff.RemoveBuff(interfaceReg, multiplyer, remove);
 }
 
 /*
@@ -97,26 +90,20 @@ public class BuffableModule : InterfaceModule, IBuffable
     }
 
     public BuffInfo FindBuff(StatBuffSO buff)
-        => FindBuff(buff, GetCurrentSourceGear());
-
-    public BuffInfo FindBuff(StatBuffSO buff, Gear sourceGear)
-        => CurrentBuffs.Find(b => b.Buff == buff && b.SourceGear == sourceGear);
+        => CurrentBuffs.Find(b => b.Buff == buff);
 
     public BuffInfo Buff(StatBuffSO buff, int buffStack = 1, int timeStack = 1, float overrideTime = -1)
-        => Buff(buff, GetCurrentSourceGear(), buffStack, timeStack, overrideTime);
-
-    public BuffInfo Buff(StatBuffSO buff, Gear sourceGear, int buffStack = 1, int timeStack = 1, float overrideTime = -1)
     {
         float cooltime = overrideTime > 0 ? overrideTime : buff.BuffTime;
-        BuffInfo buffInfo = FindBuff(buff, sourceGear);
+        BuffInfo buffInfo = FindBuff(buff);
 
         if (buffInfo == null || buff.BuffStackType == StatBuffSO.BuffStackTypeEnum.Independant)
         {
-            buffInfo = new(buff, sourceGear);
+            buffInfo = new(buff);
             buffInfo.AddBuff(entityToBuff, buffStack, false);
 
             if (!buffInfo.Buff.IsBuffTimeInfinite)
-                buffInfo.Cooltime.StartTimer(cooltime, () => UnBuff(buff, sourceGear));
+                buffInfo.Cooltime.StartTimer(cooltime, () => UnBuff(buff));
 
             CurrentBuffs.Add(buffInfo);
         }
@@ -133,13 +120,13 @@ public class BuffableModule : InterfaceModule, IBuffable
                 {
                     float remain = buffInfo.Cooltime.RemainTime;
                     buffInfo.Cooltime.CancelTimer();
-                    buffInfo.Cooltime.StartTimer(cooltime + remain, () => UnBuff(buff, sourceGear));
+                    buffInfo.Cooltime.StartTimer(cooltime + remain, () => UnBuff(buff));
                 }
 
                 if (buff.TimeStackType == StatBuffSO.TimeStackTypeEnum.Overwrite)
                 {
                     buffInfo.Cooltime.CancelTimer();
-                    buffInfo.Cooltime.StartTimer(cooltime, () => UnBuff(buff, sourceGear));
+                    buffInfo.Cooltime.StartTimer(cooltime, () => UnBuff(buff));
                 }
             }
         }
@@ -147,13 +134,9 @@ public class BuffableModule : InterfaceModule, IBuffable
         return buffInfo;
     }
 
-    // ignorePermanent=true: Permanent 타입이어도 강제 전체 제거
     public void UnBuff(StatBuffSO buff, int buffStack = 1, int reduceTime = 0, bool ignorePermanent = false)
-        => UnBuff(buff, GetCurrentSourceGear(), buffStack, reduceTime, ignorePermanent);
-
-    public void UnBuff(StatBuffSO buff, Gear sourceGear, int buffStack = 1, int reduceTime = 0, bool ignorePermanent = false)
     {
-        BuffInfo buffInfo = FindBuff(buff, sourceGear);
+        BuffInfo buffInfo = FindBuff(buff);
         if (buffInfo == null) return;
 
         if (!ignorePermanent && buff.BuffRemoveType == StatBuffSO.BuffRemoveTypeEnum.Permanent)
@@ -164,7 +147,7 @@ public class BuffableModule : InterfaceModule, IBuffable
             float remain = buffInfo.Cooltime.RemainTime - reduceTime;
             buffInfo.Cooltime.CancelTimer();
             if (remain > 0)
-                buffInfo.Cooltime.StartTimer(remain, () => UnBuff(buff, sourceGear));
+                buffInfo.Cooltime.StartTimer(remain, () => UnBuff(buff));
         }
 
         bool isForceRemove = ignorePermanent && buff.BuffRemoveType == StatBuffSO.BuffRemoveTypeEnum.Permanent;
@@ -184,14 +167,5 @@ public class BuffableModule : InterfaceModule, IBuffable
             if (buffInfo.BuffStack <= 0)
                 CurrentBuffs.Remove(buffInfo);
         }
-    }
-
-    public Gear GetCurrentSourceGear()
-    {
-        if (gearManager == null)
-            gearManager = FindObjectOfType<GearManager>(true);
-
-        if (gearManager == null) return null;
-        return gearManager.GetCurrentWeaponGear(weaponSlotIndex);
     }
 }

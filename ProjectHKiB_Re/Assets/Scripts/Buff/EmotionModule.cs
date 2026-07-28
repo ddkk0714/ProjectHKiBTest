@@ -36,7 +36,7 @@ using UnityEngine;
  *
  * ────────────────────────────────────────────────────────────────────────────
  */
-public class EmotionModule : InterfaceModule, IEmotionModule
+public class EmotionModule : InterfaceModule, IEmotion
 {
     // Self: 자신에게 걸리는 긍정 효과 / Other: 상대(적)에게 걸리는 부정 효과
     public enum EmotionApplyTarget
@@ -100,7 +100,7 @@ public class EmotionModule : InterfaceModule, IEmotionModule
 
     public override void Register(IInterfaceRegistable interfaceRegistable)
     {
-        interfaceRegistable.RegisterInterface<IEmotionModule>(this);
+        interfaceRegistable.RegisterInterface<IEmotion>(this);
     }
 
     public void Initialize()
@@ -150,25 +150,15 @@ public class EmotionModule : InterfaceModule, IEmotionModule
 
     public void ApplyColor(EmotionColor color, int stack, float overrideDuration = -1f)
     {
-        ApplyColor(color, GetCurrentSourceGear(), stack, EmotionApplyTarget.Other, overrideDuration);
-    }
-
-    public void ApplyColor(EmotionColor color, Gear sourceGear, int stack, float overrideDuration = -1f)
-    {
-        ApplyColor(color, sourceGear, stack, EmotionApplyTarget.Other, overrideDuration);
+        ApplyColor(color, stack, EmotionApplyTarget.Other, overrideDuration);
     }
 
     public void ApplyColor(EmotionColor color, int stack, EmotionApplyTarget applyTarget, float overrideDuration = -1f)
     {
-        ApplyColor(color, GetCurrentSourceGear(), stack, applyTarget, overrideDuration);
+        ApplyColorInternal(color, stack, applyTarget, overrideDuration, true);
     }
 
-    public void ApplyColor(EmotionColor color, Gear sourceGear, int stack, EmotionApplyTarget applyTarget, float overrideDuration = -1f)
-    {
-        ApplyColorInternal(color, sourceGear, stack, applyTarget, overrideDuration, true);
-    }
-
-    private void ApplyColorInternal(EmotionColor color, Gear sourceGear, int stack, EmotionApplyTarget applyTarget, float overrideDuration, bool evaluateReaction)
+    private void ApplyColorInternal(EmotionColor color, int stack, EmotionApplyTarget applyTarget, float overrideDuration, bool evaluateReaction)
     {
         if (_buffable == null || stack <= 0) return;
 
@@ -179,18 +169,18 @@ public class EmotionModule : InterfaceModule, IEmotionModule
             return;
         }
 
-        int previousStack = GetStacks(color, sourceGear, applyTarget);
+        int previousStack = GetStacks(color, applyTarget);
         int nextStack = Mathf.Min(buff.MaxStack, previousStack + stack);
         int addStack = nextStack - previousStack;
         if (addStack <= 0) return;
 
-        _buffable.Buff(buff, sourceGear, addStack, 1, overrideDuration);
+        _buffable.Buff(buff, addStack, 1, overrideDuration);
 
         if (showDebugLog)
             Debug.Log($"[EmotionModule] Apply {color} / {applyTarget} +{addStack}, Total {nextStack}");
 
         if (evaluateReaction && IsBaseColor(color) && !SuppressLegacyReaction)
-            EvaluateReaction(color, sourceGear, applyTarget, previousStack);
+            EvaluateReaction(color, applyTarget, previousStack);
     }
 
     private bool TryGetBuff(EmotionColor color, EmotionApplyTarget applyTarget, out StatBuffSO buff)
@@ -199,72 +189,53 @@ public class EmotionModule : InterfaceModule, IEmotionModule
         return map.TryGetValue(color, out buff) && buff != null;
     }
 
-    public int GetStacks(EmotionColor color) => GetStacks(color, GetCurrentSourceGear());
-
     // Self와 Other 중 큰 값 반환. 한 색상에 둘 다 활성화되는 경우는 없으므로 사실상 활성 스택 수
-    public int GetStacks(EmotionColor color, Gear sourceGear)
+    public int GetStacks(EmotionColor color)
     {
         return Mathf.Max(
-            GetStacks(color, sourceGear, EmotionApplyTarget.Self),
-            GetStacks(color, sourceGear, EmotionApplyTarget.Other)
+            GetStacks(color, EmotionApplyTarget.Self),
+            GetStacks(color, EmotionApplyTarget.Other)
         );
     }
 
     public int GetStacks(EmotionColor color, EmotionApplyTarget applyTarget)
     {
-        return GetStacks(color, GetCurrentSourceGear(), applyTarget);
-    }
-
-    public int GetStacks(EmotionColor color, Gear sourceGear, EmotionApplyTarget applyTarget)
-    {
         if (_buffable == null) return 0;
         if (!TryGetBuff(color, applyTarget, out StatBuffSO buff)) return 0;
 
-        BuffInfo info = _buffable.FindBuff(buff, sourceGear);
+        BuffInfo info = _buffable.FindBuff(buff);
         return info != null ? info.BuffStack : 0;
     }
 
     public bool HasColor(EmotionColor color) => GetStacks(color) > 0;
-    public bool HasColor(EmotionColor color, Gear sourceGear) => GetStacks(color, sourceGear) > 0;
     public bool HasColor(EmotionColor color, EmotionApplyTarget applyTarget) => GetStacks(color, applyTarget) > 0;
-    public bool HasColor(EmotionColor color, Gear sourceGear, EmotionApplyTarget applyTarget) => GetStacks(color, sourceGear, applyTarget) > 0;
-
-    public void RemoveColor(EmotionColor color, int stack = 1)
-    {
-        RemoveColor(color, GetCurrentSourceGear(), stack);
-    }
 
     // Self + Other 양쪽 모두에서 N스택 제거. 특정 대상만 제거하려면 ApplyTarget 오버로드 사용
-    public void RemoveColor(EmotionColor color, Gear sourceGear, int stack = 1)
+    public void RemoveColor(EmotionColor color, int stack = 1)
     {
-        RemoveColor(color, sourceGear, EmotionApplyTarget.Self, stack);
-        RemoveColor(color, sourceGear, EmotionApplyTarget.Other, stack);
+        RemoveColor(color, EmotionApplyTarget.Self, stack);
+        RemoveColor(color, EmotionApplyTarget.Other, stack);
     }
 
     public void RemoveColor(EmotionColor color, EmotionApplyTarget applyTarget, int stack = 1)
     {
-        RemoveColor(color, GetCurrentSourceGear(), applyTarget, stack);
-    }
-
-    public void RemoveColor(EmotionColor color, Gear sourceGear, EmotionApplyTarget applyTarget, int stack = 1)
-    {
         if (_buffable == null || stack <= 0) return;
         if (!TryGetBuff(color, applyTarget, out StatBuffSO buff)) return;
 
-        _buffable.UnBuff(buff, sourceGear, stack);
+        _buffable.UnBuff(buff, stack);
 
         if (showDebugLog)
             Debug.Log($"[EmotionModule] Remove {color} / {applyTarget} -{stack}");
     }
 
-    private void RemoveAll(EmotionColor color, Gear sourceGear, EmotionApplyTarget applyTarget)
+    private void RemoveAll(EmotionColor color, EmotionApplyTarget applyTarget)
     {
-        int stack = GetStacks(color, sourceGear, applyTarget);
+        int stack = GetStacks(color, applyTarget);
         if (stack > 0)
-            RemoveColor(color, sourceGear, applyTarget, stack);
+            RemoveColor(color, applyTarget, stack);
     }
 
-    private void EvaluateReaction(EmotionColor appliedColor, Gear sourceGear, EmotionApplyTarget applyTarget, int previousStack)
+    private void EvaluateReaction(EmotionColor appliedColor, EmotionApplyTarget applyTarget, int previousStack)
     {
         if (_isEvaluatingReaction) return;
         _isEvaluatingReaction = true;
@@ -272,10 +243,10 @@ public class EmotionModule : InterfaceModule, IEmotionModule
         try
         {
             // 우선순위: 상쇄/덮어쓰기 → 동그룹 반응 → 공허 반응 → 교차 반응
-            if (TryCancelOrOverwrite(sourceGear, applyTarget)) return;
-            if (TrySameGroupReaction(appliedColor, sourceGear, applyTarget, previousStack)) return;
-            if (TryVoidReaction(appliedColor, sourceGear, applyTarget)) return;
-            TryNormalReaction(appliedColor, sourceGear, applyTarget);
+            if (TryCancelOrOverwrite(applyTarget)) return;
+            if (TrySameGroupReaction(appliedColor, applyTarget, previousStack)) return;
+            if (TryVoidReaction(appliedColor, applyTarget)) return;
+            TryNormalReaction(appliedColor, applyTarget);
         }
         finally
         {
@@ -283,13 +254,13 @@ public class EmotionModule : InterfaceModule, IEmotionModule
         }
     }
 
-    private bool TryCancelOrOverwrite(Gear sourceGear, EmotionApplyTarget applyTarget)
+    private bool TryCancelOrOverwrite(EmotionApplyTarget applyTarget)
     {
         // 공포+행복: 행복만 제거하고 공포 유지 (덮어쓰기 — 공포가 행복을 압도)
-        if (GetGroupStacks(EmotionGroup.Fear, sourceGear, applyTarget) > 0 &&
-            GetGroupStacks(EmotionGroup.Happiness, sourceGear, applyTarget) > 0)
+        if (GetGroupStacks(EmotionGroup.Fear, applyTarget) > 0 &&
+            GetGroupStacks(EmotionGroup.Happiness, applyTarget) > 0)
         {
-            RemoveGroupStacks(EmotionGroup.Happiness, sourceGear, applyTarget, int.MaxValue);
+            RemoveGroupStacks(EmotionGroup.Happiness, applyTarget, int.MaxValue);
 
             if (showDebugLog)
                 Debug.Log("[EmotionModule] Fear overwrites Happiness");
@@ -297,25 +268,25 @@ public class EmotionModule : InterfaceModule, IEmotionModule
             return true;
         }
 
-        if (TryCancel(EmotionGroup.Void, EmotionGroup.Excitement, sourceGear, applyTarget)) return true;
-        if (TryCancel(EmotionGroup.Anger, EmotionGroup.Happiness, sourceGear, applyTarget)) return true;
+        if (TryCancel(EmotionGroup.Void, EmotionGroup.Excitement, applyTarget)) return true;
+        if (TryCancel(EmotionGroup.Anger, EmotionGroup.Happiness, applyTarget)) return true;
         return false;
     }
 
-    private bool TryCancel(EmotionGroup a, EmotionGroup b, Gear sourceGear, EmotionApplyTarget applyTarget)
+    private bool TryCancel(EmotionGroup a, EmotionGroup b, EmotionApplyTarget applyTarget)
     {
-        int stackA = GetGroupStacks(a, sourceGear, applyTarget);
-        int stackB = GetGroupStacks(b, sourceGear, applyTarget);
+        int stackA = GetGroupStacks(a, applyTarget);
+        int stackB = GetGroupStacks(b, applyTarget);
         if (stackA <= 0 || stackB <= 0) return false;
 
         int resultStack = stackA + stackB;
-        RemoveGroupStacks(a, sourceGear, applyTarget, stackA);
-        RemoveGroupStacks(b, sourceGear, applyTarget, stackB);
+        RemoveGroupStacks(a, applyTarget, stackA);
+        RemoveGroupStacks(b, applyTarget, stackB);
 
         // EmotionVector Phase 4(useVectorCombination)에서 상쇄가 결과색을 안 남기는 걸로 흡수됨 —
         // 필요하면 이 두 줄만 살리면 원복됨(Cancel은 enum에 [Obsolete] 표시, 삭제 아님).
         // if (applyCancelColor)
-        //     ApplyReactionColor(EmotionColor.Cancel, sourceGear, applyTarget, resultStack);
+        //     ApplyReactionColor(EmotionColor.Cancel, applyTarget, resultStack);
 
         if (showDebugLog)
             Debug.Log($"[EmotionModule] {a} + {b} = Cancel");
@@ -323,31 +294,31 @@ public class EmotionModule : InterfaceModule, IEmotionModule
         return true;
     }
 
-    private bool TrySameGroupReaction(EmotionColor appliedColor, Gear sourceGear, EmotionApplyTarget applyTarget, int previousStack)
+    private bool TrySameGroupReaction(EmotionColor appliedColor, EmotionApplyTarget applyTarget, int previousStack)
     {
         EmotionGroup group = GetGroup(appliedColor);
 
         // 같은 그룹 내 서로 다른 색상 2종이 동시에 존재할 때만 반응 (단일 색상 중첩은 반응 없음)
         // 예: SadnessBlue + SadnessSky → 설움(Sorrow)
-        if (GetActiveColorCountInGroup(group, sourceGear, applyTarget) < 2) return false;
+        if (GetActiveColorCountInGroup(group, applyTarget) < 2) return false;
 
         // EmotionVector Phase 4(useVectorCombination)에서 동일 사분면 중첩(단순 합산)으로 흡수됨 —
         // Sorrow/Madness/Fury 전부 [Obsolete] 표시만, 삭제 아님. 되돌리려면 아래 3줄만 살리면 됨.
         // if (group == EmotionGroup.Sadness)
-        //     return ReactSameGroup(EmotionGroup.Sadness, EmotionColor.Sorrow, sourceGear, applyTarget, ReactionStackMode.Sum);
+        //     return ReactSameGroup(EmotionGroup.Sadness, EmotionColor.Sorrow, applyTarget, ReactionStackMode.Sum);
         //
         // if (group == EmotionGroup.Excitement)
-        //     return ReactSameGroup(EmotionGroup.Excitement, EmotionColor.Madness, sourceGear, applyTarget, ReactionStackMode.Sum);
+        //     return ReactSameGroup(EmotionGroup.Excitement, EmotionColor.Madness, applyTarget, ReactionStackMode.Sum);
         //
         // if (group == EmotionGroup.Anger)
-        //     return ReactSameGroup(EmotionGroup.Anger, EmotionColor.Fury, sourceGear, applyTarget, ReactionStackMode.Product);
+        //     return ReactSameGroup(EmotionGroup.Anger, EmotionColor.Fury, applyTarget, ReactionStackMode.Product);
 
         return false;
     }
 
-    private bool ReactSameGroup(EmotionGroup group, EmotionColor result, Gear sourceGear, EmotionApplyTarget applyTarget, ReactionStackMode stackMode)
+    private bool ReactSameGroup(EmotionGroup group, EmotionColor result, EmotionApplyTarget applyTarget, ReactionStackMode stackMode)
     {
-        int totalStack = GetGroupStacks(group, sourceGear, applyTarget);
+        int totalStack = GetGroupStacks(group, applyTarget);
         if (totalStack <= 0) return false;
 
         if (!CanApplyColor(result, applyTarget))
@@ -358,11 +329,11 @@ public class EmotionModule : InterfaceModule, IEmotionModule
         }
 
         int resultStack = stackMode == ReactionStackMode.Product
-            ? Mathf.Max(1, GetGroupStackProduct(group, sourceGear, applyTarget))
+            ? Mathf.Max(1, GetGroupStackProduct(group, applyTarget))
             : totalStack;
 
-        RemoveGroupStacks(group, sourceGear, applyTarget, totalStack);
-        ApplyReactionColor(result, sourceGear, applyTarget, resultStack);
+        RemoveGroupStacks(group, applyTarget, totalStack);
+        ApplyReactionColor(result, applyTarget, resultStack);
 
         if (showDebugLog)
             Debug.Log($"[EmotionModule] {group} + {group} = {result}, Stack {resultStack}, TotalBefore {totalStack}, Threshold {highStackThreshold}");
@@ -373,54 +344,54 @@ public class EmotionModule : InterfaceModule, IEmotionModule
     // EmotionVector Phase 4(useVectorCombination)에서 공허 촉매(spec §2.4)로 대체됨 — VoidReaction은
     // [Obsolete] 표시만, 삭제 아님. 되돌리려면 return false; 줄 지우고 아래 원본 로직 주석만 풀면 됨.
     // 공허(Void)는 흥분(Excitement) 을 제외한 모든 그룹과 곱 방식으로 반응 → VoidReaction
-    private bool TryVoidReaction(EmotionColor appliedColor, Gear sourceGear, EmotionApplyTarget applyTarget)
+    private bool TryVoidReaction(EmotionColor appliedColor, EmotionApplyTarget applyTarget)
     {
         return false;
         // EmotionGroup appliedGroup = GetGroup(appliedColor);
         // if (appliedGroup == EmotionGroup.Excitement) return false;
-        // if (GetGroupStacks(EmotionGroup.Void, sourceGear, applyTarget) <= 0) return false;
+        // if (GetGroupStacks(EmotionGroup.Void, applyTarget) <= 0) return false;
         // if (appliedGroup == EmotionGroup.Void)
         // {
-        //     return TryPair(EmotionGroup.Void, EmotionGroup.Sadness, EmotionColor.VoidReaction, sourceGear, applyTarget, ReactionStackMode.Product)
-        //         || TryPair(EmotionGroup.Void, EmotionGroup.Happiness, EmotionColor.VoidReaction, sourceGear, applyTarget, ReactionStackMode.Product)
-        //         || TryPair(EmotionGroup.Void, EmotionGroup.Anger, EmotionColor.VoidReaction, sourceGear, applyTarget, ReactionStackMode.Product)
-        //         || TryPair(EmotionGroup.Void, EmotionGroup.Fear, EmotionColor.VoidReaction, sourceGear, applyTarget, ReactionStackMode.Product);
+        //     return TryPair(EmotionGroup.Void, EmotionGroup.Sadness, EmotionColor.VoidReaction, applyTarget, ReactionStackMode.Product)
+        //         || TryPair(EmotionGroup.Void, EmotionGroup.Happiness, EmotionColor.VoidReaction, applyTarget, ReactionStackMode.Product)
+        //         || TryPair(EmotionGroup.Void, EmotionGroup.Anger, EmotionColor.VoidReaction, applyTarget, ReactionStackMode.Product)
+        //         || TryPair(EmotionGroup.Void, EmotionGroup.Fear, EmotionColor.VoidReaction, applyTarget, ReactionStackMode.Product);
         // }
         //
         // if (appliedGroup == EmotionGroup.None || appliedGroup == EmotionGroup.Void) return false;
-        // return TryPair(appliedGroup, EmotionGroup.Void, EmotionColor.VoidReaction, sourceGear, applyTarget, ReactionStackMode.Product);
+        // return TryPair(appliedGroup, EmotionGroup.Void, EmotionColor.VoidReaction, applyTarget, ReactionStackMode.Product);
     }
 
     // 교차 반응 전체 (기획서 반응표):
     //   슬픔+흥분→붕괴(곱)  슬픔+공포→붕괴(곱)  행복+흥분→광기(합)  분노+흥분→광기(합)
     //   슬픔+행복→그리움(합) 슬픔+분노→울분(곱)  공포+흥분→혼비백산(합) 공포+분노→허세(합)
-    private bool TryNormalReaction(EmotionColor appliedColor, Gear sourceGear, EmotionApplyTarget applyTarget)
+    private bool TryNormalReaction(EmotionColor appliedColor, EmotionApplyTarget applyTarget)
     {
         EmotionGroup appliedGroup = GetGroup(appliedColor);
 
         // Madness/Resentment/Panic 결과 분기는 EmotionVector Phase 4(useVectorCombination)에서
         // 각각 각성 역치 상태/대체(Replace) 판정/(현재는 미사용 분기, 이후 스트레스+만족 복합으로
         // 재활용)로 흡수됨 — [Obsolete] 표시만, 삭제 아님. 되돌리려면 아래 주석 처리된 3줄만 살리면 됨.
-        return TryPair(appliedGroup, EmotionGroup.Sadness, EmotionGroup.Excitement, EmotionColor.Collapse, sourceGear, applyTarget, ReactionStackMode.Product)
-            || TryPair(appliedGroup, EmotionGroup.Sadness, EmotionGroup.Fear, EmotionColor.Collapse, sourceGear, applyTarget, ReactionStackMode.Product)
-            // || TryPair(appliedGroup, EmotionGroup.Happiness, EmotionGroup.Excitement, EmotionColor.Madness, sourceGear, applyTarget, ReactionStackMode.Sum)
-            // || TryPair(appliedGroup, EmotionGroup.Anger, EmotionGroup.Excitement, EmotionColor.Madness, sourceGear, applyTarget, ReactionStackMode.Sum)
-            || TryPair(appliedGroup, EmotionGroup.Sadness, EmotionGroup.Happiness, EmotionColor.Longing, sourceGear, applyTarget, ReactionStackMode.Sum)
-            // || TryPair(appliedGroup, EmotionGroup.Sadness, EmotionGroup.Anger, EmotionColor.Resentment, sourceGear, applyTarget, ReactionStackMode.Product)
-            // || TryPair(appliedGroup, EmotionGroup.Fear, EmotionGroup.Excitement, EmotionColor.Panic, sourceGear, applyTarget, ReactionStackMode.Sum)
-            || TryPair(appliedGroup, EmotionGroup.Fear, EmotionGroup.Anger, EmotionColor.Bluff, sourceGear, applyTarget, ReactionStackMode.Sum);
+        return TryPair(appliedGroup, EmotionGroup.Sadness, EmotionGroup.Excitement, EmotionColor.Collapse, applyTarget, ReactionStackMode.Product)
+            || TryPair(appliedGroup, EmotionGroup.Sadness, EmotionGroup.Fear, EmotionColor.Collapse, applyTarget, ReactionStackMode.Product)
+            // || TryPair(appliedGroup, EmotionGroup.Happiness, EmotionGroup.Excitement, EmotionColor.Madness, applyTarget, ReactionStackMode.Sum)
+            // || TryPair(appliedGroup, EmotionGroup.Anger, EmotionGroup.Excitement, EmotionColor.Madness, applyTarget, ReactionStackMode.Sum)
+            || TryPair(appliedGroup, EmotionGroup.Sadness, EmotionGroup.Happiness, EmotionColor.Longing, applyTarget, ReactionStackMode.Sum)
+            // || TryPair(appliedGroup, EmotionGroup.Sadness, EmotionGroup.Anger, EmotionColor.Resentment, applyTarget, ReactionStackMode.Product)
+            // || TryPair(appliedGroup, EmotionGroup.Fear, EmotionGroup.Excitement, EmotionColor.Panic, applyTarget, ReactionStackMode.Sum)
+            || TryPair(appliedGroup, EmotionGroup.Fear, EmotionGroup.Anger, EmotionColor.Bluff, applyTarget, ReactionStackMode.Sum);
     }
 
-    private bool TryPair(EmotionGroup appliedGroup, EmotionGroup a, EmotionGroup b, EmotionColor result, Gear sourceGear, EmotionApplyTarget applyTarget, ReactionStackMode stackMode)
+    private bool TryPair(EmotionGroup appliedGroup, EmotionGroup a, EmotionGroup b, EmotionColor result, EmotionApplyTarget applyTarget, ReactionStackMode stackMode)
     {
         if (appliedGroup != a && appliedGroup != b) return false;
-        return TryPair(a, b, result, sourceGear, applyTarget, stackMode);
+        return TryPair(a, b, result, applyTarget, stackMode);
     }
 
-    private bool TryPair(EmotionGroup a, EmotionGroup b, EmotionColor result, Gear sourceGear, EmotionApplyTarget applyTarget, ReactionStackMode stackMode)
+    private bool TryPair(EmotionGroup a, EmotionGroup b, EmotionColor result, EmotionApplyTarget applyTarget, ReactionStackMode stackMode)
     {
-        int stackA = GetGroupStacks(a, sourceGear, applyTarget);
-        int stackB = GetGroupStacks(b, sourceGear, applyTarget);
+        int stackA = GetGroupStacks(a, applyTarget);
+        int stackB = GetGroupStacks(b, applyTarget);
         if (stackA <= 0 || stackB <= 0) return false;
 
         if (!CanApplyColor(result, applyTarget))
@@ -432,9 +403,9 @@ public class EmotionModule : InterfaceModule, IEmotionModule
 
         int resultStack = stackMode == ReactionStackMode.Product ? stackA * stackB : stackA + stackB;
 
-        RemoveGroupStacks(a, sourceGear, applyTarget, stackA);
-        RemoveGroupStacks(b, sourceGear, applyTarget, stackB);
-        ApplyReactionColor(result, sourceGear, applyTarget, resultStack);
+        RemoveGroupStacks(a, applyTarget, stackA);
+        RemoveGroupStacks(b, applyTarget, stackB);
+        ApplyReactionColor(result, applyTarget, resultStack);
 
         if (showDebugLog)
             Debug.Log($"[EmotionModule] {a} + {b} = {result}, Stack {resultStack}, Sum {stackA + stackB}, Product {stackA * stackB}, Threshold {highStackThreshold}");
@@ -442,9 +413,9 @@ public class EmotionModule : InterfaceModule, IEmotionModule
         return true;
     }
 
-    private void ApplyReactionColor(EmotionColor color, Gear sourceGear, EmotionApplyTarget applyTarget, int stack)
+    private void ApplyReactionColor(EmotionColor color, EmotionApplyTarget applyTarget, int stack)
     {
-        ApplyColorInternal(color, sourceGear, Mathf.Max(1, stack), applyTarget, -1f, false);
+        ApplyColorInternal(color, Mathf.Max(1, stack), applyTarget, -1f, false);
     }
 
     private bool CanApplyColor(EmotionColor color, EmotionApplyTarget applyTarget)
@@ -508,30 +479,30 @@ public class EmotionModule : InterfaceModule, IEmotionModule
     }
 
 
-    private int GetActiveColorCountInGroup(EmotionGroup group, Gear sourceGear, EmotionApplyTarget applyTarget)
+    private int GetActiveColorCountInGroup(EmotionGroup group, EmotionApplyTarget applyTarget)
     {
         int count = 0;
         EmotionColor[] colors = GetGroupColors(group);
 
         for (int i = 0; i < colors.Length; i++)
         {
-            if (GetStacks(colors[i], sourceGear, applyTarget) > 0)
+            if (GetStacks(colors[i], applyTarget) > 0)
                 count++;
         }
 
         return count;
     }
 
-    private int GetGroupStacks(EmotionGroup group, Gear sourceGear, EmotionApplyTarget applyTarget)
+    private int GetGroupStacks(EmotionGroup group, EmotionApplyTarget applyTarget)
     {
         int result = 0;
         EmotionColor[] colors = GetGroupColors(group);
         for (int i = 0; i < colors.Length; i++)
-            result += GetStacks(colors[i], sourceGear, applyTarget);
+            result += GetStacks(colors[i], applyTarget);
         return result;
     }
 
-    private int GetGroupStackProduct(EmotionGroup group, Gear sourceGear, EmotionApplyTarget applyTarget)
+    private int GetGroupStackProduct(EmotionGroup group, EmotionApplyTarget applyTarget)
     {
         int product = 1;
         bool hasAny = false;
@@ -539,7 +510,7 @@ public class EmotionModule : InterfaceModule, IEmotionModule
         EmotionColor[] colors = GetGroupColors(group);
         for (int i = 0; i < colors.Length; i++)
         {
-            int stack = GetStacks(colors[i], sourceGear, applyTarget);
+            int stack = GetStacks(colors[i], applyTarget);
             if (stack <= 0) continue;
 
             product *= stack;
@@ -549,7 +520,7 @@ public class EmotionModule : InterfaceModule, IEmotionModule
         return hasAny ? product : 0;
     }
 
-    private void RemoveGroupStacks(EmotionGroup group, Gear sourceGear, EmotionApplyTarget applyTarget, int stackToRemove)
+    private void RemoveGroupStacks(EmotionGroup group, EmotionApplyTarget applyTarget, int stackToRemove)
     {
         EmotionColor[] colors = GetGroupColors(group);
         int remain = stackToRemove;
@@ -558,42 +529,24 @@ public class EmotionModule : InterfaceModule, IEmotionModule
         {
             if (remain <= 0) return;
 
-            int stack = GetStacks(colors[i], sourceGear, applyTarget);
+            int stack = GetStacks(colors[i], applyTarget);
             if (stack <= 0) continue;
 
             int remove = Mathf.Min(stack, remain);
-            RemoveColor(colors[i], sourceGear, applyTarget, remove);
+            RemoveColor(colors[i], applyTarget, remove);
             remain -= remove;
         }
     }
 
-    private Gear GetCurrentSourceGear()
-    {
-        if (_buffableModule == null)
-            _buffableModule = GetComponent<BuffableModule>();
-
-        return _buffableModule != null ? _buffableModule.GetCurrentSourceGear() : null;
-    }
-
     public string GetApproxRomanStack(EmotionColor color)
     {
-        return GetApproxRomanStack(color, GetCurrentSourceGear());
-    }
-
-    public string GetApproxRomanStack(EmotionColor color, Gear sourceGear)
-    {
-        int stack = GetStacks(color, sourceGear);
+        int stack = GetStacks(color);
         return StackToRomanText(stack);
     }
 
     public string GetApproxRomanStack(EmotionColor color, EmotionApplyTarget applyTarget)
     {
-        return GetApproxRomanStack(color, GetCurrentSourceGear(), applyTarget);
-    }
-
-    public string GetApproxRomanStack(EmotionColor color, Gear sourceGear, EmotionApplyTarget applyTarget)
-    {
-        int stack = GetStacks(color, sourceGear, applyTarget);
+        int stack = GetStacks(color, applyTarget);
         return StackToRomanText(stack);
     }
 

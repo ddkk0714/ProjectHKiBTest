@@ -226,21 +226,4 @@ public class GearManager : MonoBehaviour
         }
         return newGear;
     }
-
-    //버프 시스템용
-    public Gear GetEquippedGear(int slotIndex)
-    {
-        Card currentCard = GetCardData(currentActiveCardNum);
-        if (currentCard == null) return null;
-        if (currentCard.GearList == null) return null;
-        if (slotIndex < 0 || slotIndex >= currentCard.GearList.Length) return null;
-        if (slotIndex >= MaxGearSlotCount) return null;
-
-        return currentCard.GearList[slotIndex];
-    }
-
-    public Gear GetCurrentWeaponGear(int weaponSlotIndex = 0)
-    {
-        return GetEquippedGear(weaponSlotIndex);
-    }
 }
