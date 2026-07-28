@@ -6,12 +6,6 @@ public interface IBuffable : IInitializable
 {
     public List<BuffInfo> CurrentBuffs { get; set; }
 
-    // "장비 없음"은 Card.cs가 null이 아니라 new Gear(null) 플레이스홀더로 표현하고, 그 플레이스홀더는
-    // LoadCards() 등이 재초기화할 때마다 새 인스턴스로 교체된다 — 세이브 로드 시 이 값을 다시 조회해서
-    // BuffInfo.SourceGear로 써야, 저장 당시의 "장비 없음" 참조가 아니라 로드 후의 현재 참조와 맞아
-    // FindBuff(참조 비교)가 정상 매치된다.
-    public Gear GetCurrentSourceGear();
-
     public BuffInfo FindBuff(StatBuffSO buff);
     public BuffInfo Buff(StatBuffSO buff, int buffStack = 1, int timeStack = 1, float overrideTime = -1);
     public void UnBuff(StatBuffSO buff, int buffStack = 1, int reduceTime = 0, bool byTimer = false);

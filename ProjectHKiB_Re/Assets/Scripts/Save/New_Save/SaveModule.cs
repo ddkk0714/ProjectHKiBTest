@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using RouteFinding.Note; // NoteRouteGraphView(그래프 위치/펼침 상태 세이브 연동, 2026-07-21) — NoteModule 등과
-                          // 달리 이 타입만 네임스페이스가 있어 using이 필요하다.
+                         // 달리 이 타입만 네임스페이스가 있어 using이 필요하다.
 
 [RequireComponent(typeof(StateController))]
 public class SaveModule : InterfaceModule, IInitializable
@@ -537,7 +537,6 @@ public class SaveModule : InterfaceModule, IInitializable
             _currentSaveData.buffs.Add(new BuffSaveInfo
             {
                 buffId = info.Buff.SaveId,
-                gearGuid = (info.SourceGear != null && info.SourceGear.data != null) ? info.SourceGear.data.GUID : "",
                 buffStack = info.BuffStack,
                 remainTime = remain
             });
@@ -561,7 +560,7 @@ public class SaveModule : InterfaceModule, IInitializable
         foreach (var existing in new List<BuffInfo>(buffable.CurrentBuffs))
         {
             if (existing == null || existing.Buff == null) continue;
-            buffable.UnBuff(existing.Buff, existing.SourceGear, existing.BuffStack, 0, true);
+            buffable.UnBuff(existing.Buff, existing.BuffStack, 0, true);
         }
 
         if (buffable.CurrentBuffs.Count > 0)
@@ -618,9 +617,8 @@ public class SaveModule : InterfaceModule, IInitializable
             // 플레이스홀더)와 매치되지 않는 고아가 된다 — EmotionModule.GetStacks가 항상 0을 보고하고,
             // 이 버프를 대상으로 한 이후의 모든 UnBuff(자연 만료 포함)도 못 찾아서 조용히 무시된다.
             // 그래서 빈 GUID는 FindOwnedGear가 아니라 지금 시점의 GetCurrentSourceGear()로 푼다.
-            Gear sourceGear = string.IsNullOrEmpty(saved.gearGuid) ? buffable.GetCurrentSourceGear() : FindOwnedGear(saved.gearGuid);
 
-            buffable.Buff(buffSO, sourceGear, saved.buffStack, 1, duration);
+            buffable.Buff(buffSO, saved.buffStack, 1, duration);
         }
     }
 
@@ -637,18 +635,6 @@ public class SaveModule : InterfaceModule, IInitializable
         }
 
         return false;
-    }
-
-    private Gear FindOwnedGear(string gearGuid)
-    {
-        if (string.IsNullOrEmpty(gearGuid) || inventory == null) return null;
-
-        foreach (var gear in inventory.playerGearInventory.Values)
-        {
-            if (gear != null && gear.data != null && gear.data.GUID == gearGuid) return gear;
-        }
-
-        return null;
     }
 
     // ================= PLAYER POSITION (실제 씬 좌표 + 현재 맵) =================
