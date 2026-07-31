@@ -1,13 +1,7 @@
-using Assets.Scripts.Interfaces.Modules;
 using UnityEngine;
-using UnityEngine.Events;
-public class Enemy : Entity, IPoolable
+public class Enemy : Entity
 {
-    [field: SerializeField] public int PoolSize { get; set; }
-
     public int LastAttackIndicatorID { get; set; }
-    public UnityEvent<int, int> OnGameObjectDisabled { get; set; } = new();
-    public int ID { get; set; }
 
     public EnemyDataSO BaseData;
     [SerializeField] private DatabaseManagerSO databaseManager;
@@ -36,7 +30,6 @@ public class Enemy : Entity, IPoolable
         databaseManager.SetIAttackable(this, BaseData);
         databaseManager.SetIDamagable(this, BaseData);
         databaseManager.SetIFootstep(this, BaseData);
-        databaseManager.SetIPathFindable(this, BaseData);
         databaseManager.SetIDirAnimatable(this, BaseData);
         databaseManager.SetITargetable(this, BaseData);
         //databaseManager.SetISkinable(this, BaseData);
@@ -44,21 +37,9 @@ public class Enemy : Entity, IPoolable
         InitializeModules();
     }
 
-    public void InitializeFromPool(EnemyDataSO enemyData)
-    {
-        BaseData = enemyData;
-        Initialize();
-    }
-
-    public void OnDisable()
-    {
-        OnGameObjectDisabled?.Invoke(ID, this.gameObject.GetHashCode());
-    }
-
     public void OnDie()
     {
         if (LastAttackIndicatorID != 0)
             GameManager.instance.attackAreaIndicatorManager.StopIndicating(LastAttackIndicatorID);
-
     }
 }

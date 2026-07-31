@@ -126,6 +126,7 @@ namespace Assets.Scripts.Interfaces.Modules
 
         public virtual void Die()
         {
+            Debug.Log("Dead: " + gameObject.name);
             gameObject.SetActive(false);
             OnDie?.Invoke();
         }

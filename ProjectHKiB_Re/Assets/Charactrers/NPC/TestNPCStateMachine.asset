@@ -1,0 +1,414 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7606902824307922870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d5bce95d28994049b5bb57841a729ee, type: 3}
+  m_Name: TestNPCStateMachineEditor
+  m_EditorClassIdentifier: 
+  serializedNodes: []
+  nodes:
+  - rid: 8642959236645257217
+  - rid: 8642959236645257219
+  - rid: 8642959251600834560
+  - rid: 8642959251600834573
+  edges:
+  - GUID: 94fd9d64-58c0-4e7d-90b0-e5ba3aba4ab4
+    owner: {fileID: -7606902824307922870}
+    inputNodeGUID: 5e2b1823-4f21-435e-8ce3-904e371e356a
+    outputNodeGUID: 28b9c76a-6f76-4482-8152-e55988de4b4c
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: e07fbe1d-4c1a-4b55-b60e-56b5df6fa6e1
+    owner: {fileID: -7606902824307922870}
+    inputNodeGUID: 40ed2e18-13a4-4288-af73-7df1c284697b
+    outputNodeGUID: 5e2b1823-4f21-435e-8ce3-904e371e356a
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 4c9d2752-43ac-4659-867c-fb89ab763b1f
+    owner: {fileID: -7606902824307922870}
+    inputNodeGUID: 2718bf49-9696-4f14-a0e0-62f74513fc1e
+    outputNodeGUID: 40ed2e18-13a4-4288-af73-7df1c284697b
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 7370b2aa-c58f-4a56-a471-32c3cdf6a45d
+    owner: {fileID: -7606902824307922870}
+    inputNodeGUID: 5e2b1823-4f21-435e-8ce3-904e371e356a
+    outputNodeGUID: 40ed2e18-13a4-4288-af73-7df1c284697b
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_False
+  - GUID: 8c53978d-0199-418a-b53a-d0c275fed918
+    owner: {fileID: -7606902824307922870}
+    inputNodeGUID: 5e2b1823-4f21-435e-8ce3-904e371e356a
+    outputNodeGUID: 2718bf49-9696-4f14-a0e0-62f74513fc1e
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_False
+  groups: []
+  stackNodes: []
+  pinnedElements: []
+  exposedParameters: []
+  serializedParameterList: []
+  stickyNotes: []
+  nodeInspectorReference: {fileID: 0}
+  position: {x: -448, y: -230, z: 0}
+  scale: {x: 0.8695652, y: 0.8695652, z: 1}
+  targetStateMachine: {fileID: 11400000}
+  references:
+    version: 2
+    RefIds:
+    - rid: 8642959236645257217
+      type: {class: InitialStateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: 
+        GUID: 28b9c76a-6f76-4482-8152-e55988de4b4c
+        computeOrder: 0
+        position:
+          serializedVersion: 2
+          x: 136
+          y: 203
+          width: 106
+          height: 75
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        outputTransitions: {fileID: 0}
+    - rid: 8642959236645257219
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Patrol
+        GUID: 5e2b1823-4f21-435e-8ce3-904e371e356a
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 242
+          y: 203
+          width: 400
+          height: 468
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -7037357356322256847}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 8642959251600834560
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Keep Distance
+        GUID: 40ed2e18-13a4-4288-af73-7df1c284697b
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 676.5501
+          y: 250.25003
+          width: 400
+          height: 1138
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 6934019978581043967}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 8642959251600834573
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Flee
+        GUID: 2718bf49-9696-4f14-a0e0-62f74513fc1e
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 1115.9001
+          y: 402.05008
+          width: 400
+          height: 1204
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 5448338236649558630}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+--- !u!114 &-7037357356322256847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: Patrol
+  m_EditorClassIdentifier: 
+  isPacked: 0
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0.06541861
+  transitions:
+  - name: TargetDetected
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642959251600834566
+      negate: 0
+    trueState: {fileID: 6934019978581043967}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642959236645257220
+  - rid: 8642959236645257222
+  UpdateActions:
+  - rid: 8642959251600834563
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642959236645257220
+      type: {class: SetNavigationBehaviourAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        behaviour: {fileID: 11400000, guid: d3efeabccd6e5994ea3fda2d37c07760, type: 2}
+        useCurrentTarget: 0
+        explicitTarget: {fileID: 0}
+    - rid: 8642959236645257222
+      type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        animationName: Walk
+    - rid: 8642959251600834563
+      type: {class: SetDirFromLastSetDirAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642959251600834566
+      type: {class: DetectAndTargetDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        radius: 3
+        targetManager: {fileID: 11400000, guid: b3f38c5a6e0762d4ba6cc8d3042b3e9d, type: 2}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97cc48d9291f2784caac4164ff25b2ab, type: 3}
+  m_Name: TestNPCStateMachine
+  m_EditorClassIdentifier: 
+  customVariables:
+    boolVariables:
+      _serializedList: []
+    intVariables:
+      _serializedList: []
+    floatVariables:
+      _serializedList: []
+  initialState: {fileID: -7037357356322256847}
+  graph: {fileID: -7606902824307922870}
+  allStates:
+  - {fileID: -7037357356322256847}
+  - {fileID: 6934019978581043967}
+  - {fileID: 5448338236649558630}
+  _commandPairs: []
+--- !u!114 &5448338236649558630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: Flee
+  m_EditorClassIdentifier: 
+  isPacked: 0
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0.032057885
+  transitions:
+  - name: TargetDetected
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642959251600834579
+      negate: 0
+    trueState: {fileID: 0}
+    falseState: {fileID: -7037357356322256847}
+    Action:
+      rid: -2
+    showTrueStatePort: 0
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642959251600834574
+  - rid: 8642959251600834576
+  - rid: 8642959251600834577
+  UpdateActions:
+  - rid: 8642959251600834575
+  ExitActions:
+  - rid: 8642959251600834578
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642959251600834574
+      type: {class: SetNavigationBehaviourAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        behaviour: {fileID: 11400000, guid: 7fd2abc60492b2345bcebf74fef165a0, type: 2}
+        useCurrentTarget: 1
+        explicitTarget: {fileID: 0}
+    - rid: 8642959251600834575
+      type: {class: SetDirFromLastSetDirAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642959251600834576
+      type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        animationName: Walk
+    - rid: 8642959251600834577
+      type: {class: ApplySprintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        apply: 1
+    - rid: 8642959251600834578
+      type: {class: ApplySprintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        apply: 0
+    - rid: 8642959251600834579
+      type: {class: DetectAndTargetDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        radius: 30
+        targetManager: {fileID: 11400000, guid: b3f38c5a6e0762d4ba6cc8d3042b3e9d, type: 2}
+--- !u!114 &6934019978581043967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: Keep Distance
+  m_EditorClassIdentifier: 
+  isPacked: 0
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0.23521498
+  transitions:
+  - name: TargetClose
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642959251600834572
+      negate: 0
+    trueState: {fileID: 5448338236649558630}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  - name: TargetDetected
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642959251600834567
+      negate: 0
+    trueState: {fileID: 0}
+    falseState: {fileID: -7037357356322256847}
+    Action:
+      rid: -2
+    showTrueStatePort: 0
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642959251600834561
+  - rid: 8642959251600834562
+  UpdateActions:
+  - rid: 8642959251600834564
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642959251600834561
+      type: {class: SetNavigationBehaviourAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        behaviour: {fileID: 11400000, guid: a7df2b102db81374aa6528e32e258141, type: 2}
+        useCurrentTarget: 1
+        explicitTarget: {fileID: 0}
+    - rid: 8642959251600834562
+      type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        animationName: Walk
+    - rid: 8642959251600834564
+      type: {class: SetDirFromTargetPosAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642959251600834567
+      type: {class: DetectAndTargetDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        radius: 8
+        targetManager: {fileID: 11400000, guid: b3f38c5a6e0762d4ba6cc8d3042b3e9d, type: 2}
+    - rid: 8642959251600834572
+      type: {class: DetectAndTargetDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        radius: 1
+        targetManager: {fileID: 11400000, guid: b3f38c5a6e0762d4ba6cc8d3042b3e9d, type: 2}

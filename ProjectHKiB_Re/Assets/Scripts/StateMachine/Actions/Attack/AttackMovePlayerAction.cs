@@ -34,7 +34,7 @@ namespace StateMachine
 
                     if (autoTarget)
                     {
-                        target = targetingManager.DirectionalTarget(targetable.CurrentTarget, thisTransform.position, moveRadius, animatable.GetAnimationRestrictedDirection(GameManager.instance.inputManager.MoveInput), targetable.TargetLayers);
+                        target = targetingManager.DirectionalTarget(thisTransform.position, moveRadius, animatable.GetAnimationRestrictedDirection(GameManager.instance.inputManager.MoveInput), targetable.TargetLayers, targetable.CurrentTarget);
                         if (target)
                         {
                             targetable.CurrentTarget = target;
@@ -61,7 +61,7 @@ namespace StateMachine
                         return;
                     }
 
-                    target = targetingManager.PositianalTarget(thisTransform.position, moveRadius, targetable.TargetLayers);
+                    target = targetingManager.PositianalTarget(thisTransform.position, moveRadius, targetable.TargetLayers, targetable.CurrentTarget);
                     if (target)
                     {
                         animatable.SetAnimationDirection(target.position - thisTransform.position);

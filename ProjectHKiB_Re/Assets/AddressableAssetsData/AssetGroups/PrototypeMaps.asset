@@ -16,17 +16,7 @@ MonoBehaviour:
   m_Data:
     m_SerializedData: []
   m_GUID: ec261c7596ac2114d9ff95f659354183
-  m_SerializeEntries:
-  - m_GUID: aebe1265615695c4aaebe03fbac3bf4b
-    m_Address: Assets/Scenes/TestMap/TestMap2.unity
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c7b84e74def3f8940a3e01b87171a65c
-    m_Address: Assets/Scenes/TestMap/TestMap1.unity
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
+  m_SerializeEntries: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: a7ef9517c5b9c6340b6d379aeb2be43f, type: 2}
   m_SchemaSet:

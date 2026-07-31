@@ -90,8 +90,8 @@ public class GearDataSO : ItemDataSO
 
         if (player.TryGetInterface(out IBuffable buffable))
         {
-            buffable.Buff(baseBuff);
-            buffable.Buff(stackableBuff);
+            if (baseBuff) buffable.Buff(baseBuff);
+            if (stackableBuff) buffable.Buff(stackableBuff);
         }
     }
 
@@ -99,7 +99,7 @@ public class GearDataSO : ItemDataSO
     {
         if (player.TryGetInterface(out IBuffable buffable))
         {
-            buffable.UnBuff(baseBuff);
+            if (baseBuff) buffable.UnBuff(baseBuff);
         }
     }
 }

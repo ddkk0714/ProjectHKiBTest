@@ -6,7 +6,7 @@ public class StateMachineSO : ScriptableObject
 {
     public CustomVariableSets customVariables;
     public StateSO initialState;
-    private StateMachineGraph graph;
+    public StateMachineGraph graph;
 
     [NaughtyAttributes.Expandable] public List<StateSO> allStates;
 

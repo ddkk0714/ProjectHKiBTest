@@ -1,3 +1,4 @@
+using EntityControl;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.ResourceProviders;
@@ -9,6 +10,7 @@ public class MapManager : MonoBehaviour
     private SceneInstance currentLoadedScene;
     public MapDataSO CurrentMapData { get; private set; }
     public MapLocalManager localManager;
+    public NavigationManager navigationManager;
 
     public MapDataSO initialMap;
     [NaughtyAttributes.Button] public void LoadMap() => LoadMap(initialMap);
@@ -46,6 +48,8 @@ public class MapManager : MonoBehaviour
                     break;
                 }
             }
+
+            navigationManager.RebuildWorld();
 
             Debug.Log("loaded: " + mapData.name + " (" + mapData.mapAddressableID + ")");
         };

@@ -1,0 +1,118 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: PlayerRun
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 1
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.34247938
+  transitions:
+  - name: Idle
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642959117700038673
+      negate: 1
+    trueState: {fileID: 1856367217050726960, guid: f9cdd2d789dc5d943a524ac8d9284653, type: 2}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  - name: Walk
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642959117700038674
+      negate: 1
+    trueState: {fileID: -8535163290515908542, guid: f9cdd2d789dc5d943a524ac8d9284653, type: 2}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642959117700038675
+  - rid: 8642959117700038681
+  UpdateActions:
+  - rid: 8642959117700038676
+  - rid: 8642959117700038677
+  ExitActions:
+  - rid: 8642959117700038678
+  actionSequence:
+  - time: 0.1
+    Action:
+      rid: 8642959117700038679
+  - time: 0.3
+    Action:
+      rid: 8642959117700038680
+  - time: 0.2
+    Action:
+      rid: -2
+  loopActionSequence: 1
+  useTimer: 0
+  timerID: 0
+  time: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642959117700038673
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 6923667502783770647, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 0
+    - rid: 8642959117700038674
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 4333535293481838232, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 0
+    - rid: 8642959117700038675
+      type: {class: ApplySprintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        apply: 1
+    - rid: 8642959117700038676
+      type: {class: WalkByInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642959117700038677
+      type: {class: SetDirFromLastSetDirAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642959117700038678
+      type: {class: ApplySprintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        apply: 0
+    - rid: 8642959117700038679
+      type: {class: PlayFootstepAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642959117700038680
+      type: {class: PlayFootstepAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642959117700038681
+      type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        animationName: Run

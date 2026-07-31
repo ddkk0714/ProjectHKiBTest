@@ -10,11 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
-  m_Name: Walk
+  m_Name: PlayerWalk
   m_EditorClassIdentifier: 
   isPacked: 1
   isTemplate: 0
-  exposedVariables: []
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
   temporaryID: 0.22197166
   transitions:
   - name: Idle
@@ -134,7 +136,6 @@ MonoBehaviour:
   - rid: 8642959117700038672
   - rid: 8642959117700038683
   - rid: 8642959117700038688
-  - rid: 8642959117700038709
   edges:
   - GUID: 66f98306-a465-4f5f-a424-2eada66d3cf0
     owner: {fileID: -947137812395660653}
@@ -247,8 +248,8 @@ MonoBehaviour:
   serializedParameterList: []
   stickyNotes: []
   nodeInspectorReference: {fileID: 0}
-  position: {x: -83, y: 74, z: 0}
-  scale: {x: 0.65751624, y: 0.65751624, z: 1}
+  position: {x: 29, y: 82, z: 0}
+  scale: {x: 0.49717674, y: 0.49717674, z: 1}
   targetStateMachine: {fileID: 11400000}
   references:
     version: 2
@@ -272,7 +273,7 @@ MonoBehaviour:
     - rid: 8642959117700038657
       type: {class: StateNode, ns: , asm: Assembly-CSharp}
       data:
-        nodeCustomName: Idle
+        nodeCustomName: PlayerIdle
         GUID: 6dc57530-3d37-4e71-9a75-ee9747614623
         computeOrder: -2
         position:
@@ -292,7 +293,7 @@ MonoBehaviour:
     - rid: 8642959117700038663
       type: {class: StateNode, ns: , asm: Assembly-CSharp}
       data:
-        nodeCustomName: Walk
+        nodeCustomName: PlayerWalk
         GUID: f39921df-095b-4c20-9922-031ece68f479
         computeOrder: -2
         position:
@@ -312,7 +313,7 @@ MonoBehaviour:
     - rid: 8642959117700038672
       type: {class: StateNode, ns: , asm: Assembly-CSharp}
       data:
-        nodeCustomName: Run
+        nodeCustomName: PlayerRun
         GUID: c807915f-40d0-4ed2-9ab7-ff1a13432f6b
         computeOrder: -2
         position:
@@ -369,26 +370,6 @@ MonoBehaviour:
         inputStateV: {fileID: 0}
         outputTransitions: {fileID: 0}
         outputTransitionsV: {fileID: 0}
-    - rid: 8642959117700038709
-      type: {class: StateNode, ns: , asm: Assembly-CSharp}
-      data:
-        nodeCustomName: 
-        GUID: aff4fc64-1a10-4b9e-b80c-62cba1f7dea5
-        computeOrder: 1
-        position:
-          serializedVersion: 2
-          x: 1018
-          y: 420
-          width: 100
-          height: 100
-        expanded: 0
-        debug: 0
-        nodeLock: 0
-        stateSO: {fileID: 0}
-        inputState: {fileID: 0}
-        inputStateV: {fileID: 0}
-        outputTransitions: {fileID: 0}
-        outputTransitionsV: {fileID: 0}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -409,6 +390,7 @@ MonoBehaviour:
     floatVariables:
       _serializedList: []
   initialState: {fileID: 1856367217050726960}
+  graph: {fileID: -947137812395660653}
   allStates:
   - {fileID: 1856367217050726960}
   - {fileID: 5050385956708415890}
@@ -480,11 +462,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
-  m_Name: Idle
+  m_Name: PlayerIdle
   m_EditorClassIdentifier: 
   isPacked: 1
   isTemplate: 0
-  exposedVariables: []
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
   temporaryID: 0.632129
   transitions:
   - name: Walk
@@ -692,11 +676,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
-  m_Name: Run
+  m_Name: PlayerRun
   m_EditorClassIdentifier: 
   isPacked: 1
   isTemplate: 0
-  exposedVariables: []
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
   temporaryID: 0.34247938
   transitions:
   - name: Idle

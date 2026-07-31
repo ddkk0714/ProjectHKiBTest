@@ -30,10 +30,11 @@ public class CardView : MonoBehaviour
     public void UpdateCard(Card card)
     {
         if (card == null) Initialize();
+
         for (int i = 0; i < patternView.Length; i++)
         {
             patternView[i].gameObject.SetActive(true);
-            if (i < card.GearList[0].data.graffitiCodes.Count)
+            if (card.GearList[0].data && i < card.GearList[0].data.graffitiCodes.Count)
             {
                 patternView[i].UpdatePattern(card.GearList[0].data.graffitiCodes[i]);
             }
@@ -47,7 +48,7 @@ public class CardView : MonoBehaviour
         for (int i = 0; i < gearImage.Length; i++)
         {
             gearImage[i].enabled = true;
-            if (i < card.GearList.Length && gearImage[i] != null && card.GearList[i].data.itemIcon != null)
+            if (i < card.GearList.Length && gearImage[i] != null && card.GearList[i].data != null && card.GearList[i].data.itemIcon != null)
                 gearImage[i].sprite = card.GearList[i].data.itemIcon;
             else
                 gearImage[i].enabled = false;

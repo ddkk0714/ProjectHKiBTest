@@ -10,21 +10,18 @@ public interface ITargetable : ITargetableBase, IInitializable
     public Transform CurrentTarget { get; set; }
 }
 
-namespace Assets.Scripts.Interfaces.Modules
+public class TargetableModule : InterfaceModule, ITargetable
 {
-    public class TargetableModule : InterfaceModule, ITargetable
+    [field: SerializeField][field: NaughtyAttributes.ReadOnly] public Transform CurrentTarget { get; set; }
+    [field: SerializeField] public LayerMask[] TargetLayers { get; set; }
+
+    public override void Register(IInterfaceRegistable interfaceRegistable)
     {
-        [field: SerializeField][field: NaughtyAttributes.ReadOnly] public Transform CurrentTarget { get; set; }
-        public LayerMask[] TargetLayers { get; set; }
+        interfaceRegistable.RegisterInterface<ITargetable>(this);
+    }
 
-        public override void Register(IInterfaceRegistable interfaceRegistable)
-        {
-            interfaceRegistable.RegisterInterface<ITargetable>(this);
-        }
-
-        public void Initialize()
-        {
-            CurrentTarget = null;
-        }
+    public void Initialize()
+    {
+        CurrentTarget = null;
     }
 }

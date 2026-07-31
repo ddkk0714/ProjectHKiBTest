@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: TransformStart
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 1
+  exposedVariables: []
+  temporaryID: 0.40078598
+  transitions:
+  - name: Graffiti
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642959117700038686
+      negate: 0
+    trueState: {fileID: 528884035536718042, guid: f9cdd2d789dc5d943a524ac8d9284653, type: 2}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  - name: Idle
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642959117700038687
+      negate: 0
+    trueState: {fileID: 1856367217050726960, guid: f9cdd2d789dc5d943a524ac8d9284653, type: 2}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642959117700038684
+  - rid: 8642959117700038689
+  UpdateActions: []
+  ExitActions: []
+  actionSequence:
+  - time: 0.5
+    Action:
+      rid: 8642959117700038685
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642959117700038684
+      type: {class: StartGraffitiAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetSlot: 0
+    - rid: 8642959117700038685
+      type: {class: StartGraffitiTinkerAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        apply: 0
+    - rid: 8642959117700038686
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642959117700038687
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: -2053164015228634320, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 0
+    - rid: 8642959117700038689
+      type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        animationName: Transform

@@ -10,7 +10,7 @@ namespace StateMachine
         {
             if (stateController.TryGetInterface(out ITargetable targetable))
             {
-                Transform t = targetManager.PositianalTarget(stateController.transform.position, radius, targetable.TargetLayers);
+                Transform t = targetManager.PositianalTarget(stateController.transform.position, radius, targetable.TargetLayers, targetable.CurrentTarget);
                 targetable.CurrentTarget = t;
                 return t;
             }

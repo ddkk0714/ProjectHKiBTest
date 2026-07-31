@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0889972bf4a71534a9dd1737754df357, type: 3}
+  m_Name: TestNPC
+  m_EditorClassIdentifier: 
+  <Size>k__BackingField: {x: 1, y: 1}
+  <Mass>k__BackingField: 1
+  <WalkAcceleration>k__BackingField: 300
+  <MaxWalkSpeed>k__BackingField: 5
+  <SprintCoeff>k__BackingField: 1.5
+  <FrictionWalkInfluence>k__BackingField: 1
+  <DefaultFootstepAudio>k__BackingField: {fileID: 0}
+  <GroundFriction>k__BackingField: 0.6
+  <AirFriction>k__BackingField: 0.98
+  <BounceCoeff>k__BackingField: 0.3
+  <GridEndureSpeed>k__BackingField: 10
+  <GridEndureForce>k__BackingField: 50
+  <StaticEndureForce>k__BackingField: 100
+  <StepUpTolerance>k__BackingField: 0.5
+  <StepDownTolerance>k__BackingField: 0.2
+  <WallLayer>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 8
+  <FloorLayer>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 128
+  <CanPushLayer>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 0
+  <BaseATK>k__BackingField: 100
+  <CriticalChanceRate>k__BackingField: 0.1
+  <CriticalDamageRate>k__BackingField: 2
+  <AttackDatas>k__BackingField: []
+  <TargetLayers>k__BackingField:
+  - serializedVersion: 2
+    m_Bits: 1024
+  <DamageParticle>k__BackingField: {fileID: 0}
+  <PoolSize>k__BackingField: 0
+  <BaseMaxHP>k__BackingField: 100
+  <BaseDEF>k__BackingField: 0
+  <HitSound>k__BackingField: {fileID: 0}
+  <HitParticle>k__BackingField: {fileID: 0}
+  <Mental>k__BackingField: 100
+  <StateMachine>k__BackingField: {fileID: 11400000, guid: 80ccc2dc52ea0ce4dad7853815f51541, type: 2}
+  <SkinData>k__BackingField: {fileID: 0}
+  <MainAnimationData>k__BackingField: {fileID: 11400000, guid: a8fe28a3356166e4fb1b72d7a898f463, type: 2}
+  <MainSpriteLibrary>k__BackingField: {fileID: 11400000, guid: 8489d749e010f9e489010892164bd720, type: 2}
+  <EffectAnimationData>k__BackingField: {fileID: 11400000, guid: 8743491f5b7d7c547aaf22a6c206c30c, type: 2}
+  <EffectSpriteLibrary>k__BackingField: {fileID: 11400000, guid: d1ae97a3f0d91f742a58efa78e41257c, type: 2}

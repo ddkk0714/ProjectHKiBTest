@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GearManager : MonoBehaviour
 {
-    public List<Gear> activeGear;
+    [HideInInspector] public List<Gear> activeGear;
     [HideInInspector] public Timer transformTimer = new();
     //[SerializeField] private GearMergeManagerSO gearMergeManager;
     public GearDataSO DefaultGearData;
@@ -85,6 +85,9 @@ public class GearManager : MonoBehaviour
     [Button] public void AddMaxSlot() => SetMaxSlot(MaxGearSlotCount + 1);
     [Button] public void SubMaxSlot() => SetMaxSlot(MaxGearSlotCount - 1);
 
+    public GearDataSO setGearData;
+    [Button] public void ActivateGear() => ActivateGear(setGearData);
+
     public void SetMaxSlot(int max)
     {
         if (max < 0 || max > PhysicalMaxGearSlotCount) return;
@@ -161,27 +164,30 @@ public class GearManager : MonoBehaviour
         return playerCardEquipData[currentActiveCardNum].GearList[slotIndex].data;
     }
 
-    public void ActivateGear(int slotIndex)
+    public void ActivateGear(int slotIndex) => ActivateGear(playerCardEquipData[currentActiveCardNum].GearList[slotIndex].data);
+
+
+    public void ActivateGear(GearDataSO gearData)
     {
-        Card card = playerCardEquipData[currentActiveCardNum];
-        Gear mergedGear = GetMergedGear(card.GearList[slotIndex]);
+        GearDataSO mergedGear = GetMergedGear(gearData);
 
-        transformTimer.ExtendTimer(mergedGear.data.transformTime, DeactivateAllGears);
-        GearDataSO recentGear = activeGear.Count > 0 ? activeGear[^1].data : mergedGear.data;
+        transformTimer.ExtendTimer(mergedGear.transformTime, DeactivateAllGears);
+        GearDataSO recentGear = activeGear.Count > 0 ? activeGear[^1].data : mergedGear;
 
-        if (mergedGear.data.gearType != GearDataSO.GearType.Damage) // damageType doesn't go in activeGear list
+        if (mergedGear.gearType != GearDataSO.GearType.Damage) // damageType doesn't go in activeGear list
         {
-            if (activeGear.Exists(a => a.data == mergedGear.data)) DeactivateGear(mergedGear);
-            activeGear.Add(mergedGear);
+            if (activeGear.Exists(a => a.data == mergedGear)) DeactivateGear(mergedGear);
+            activeGear.Add(new(mergedGear));
         }
         mergedGear.Activate(GameManager.instance.player, recentGear);
     }
 
-    public void DeactivateGear(Gear gear)
+    public void DeactivateGear(GearDataSO gearData)
     {
-        if (activeGear.Exists(a => a == gear))
+        Gear gear = activeGear.Find(a => a.data == gearData);
+        if (gear != null)
         {
-            gear.Deactivate(GameManager.instance.player);
+            gearData.Deactivate(GameManager.instance.player);
             activeGear.Remove(gear);
         }
     }
@@ -193,6 +199,7 @@ public class GearManager : MonoBehaviour
         activeGear.Remove(g);
     }
 
+    [Button]
     public void DeactivateAllGears()
     {
         for (int i = 0; i < activeGear.Count; i++)
@@ -205,10 +212,10 @@ public class GearManager : MonoBehaviour
     }
 
     // this also deactivates another merge component gear
-    public Gear GetMergedGear(Gear newGear)
+    public GearDataSO GetMergedGear(GearDataSO newGear)
     {
         GearDataSO[] mergeOptions;
-        mergeOptions = Array.FindAll(allMergedGearDatas, a => Array.Exists(a.mergeSet, b => b == newGear.data));
+        mergeOptions = Array.FindAll(allMergedGearDatas, a => Array.Exists(a.mergeSet, b => b == newGear));
         Array.Sort(mergeOptions, (a, b) => a.mergePriority.CompareTo(b.mergePriority));
 
         for (int i = activeGear.Count - 1; i > -1; i--)
@@ -218,9 +225,8 @@ public class GearManager : MonoBehaviour
                 GearDataSO mergedGear = Array.Find(mergeOptions[j].mergeSet, a => a == activeGear[i].data);
                 if (mergedGear)
                 {
-                    Gear mergedNewGear = new(mergedGear);
                     DeactivateGear(i);
-                    return mergedNewGear;
+                    return mergedGear;
                 }
             }
         }

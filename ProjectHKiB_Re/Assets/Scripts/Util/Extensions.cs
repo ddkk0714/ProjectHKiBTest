@@ -51,30 +51,6 @@ public static class Extensions
         return current.parent.GetPath() + "/" + current.name;
     }
 
-    public static Quaternion DirToQuaternion4(this EnumManager.AnimDir dir)
-    {
-        return dir switch
-        {
-            EnumManager.AnimDir.D => Quaternion.identity,
-            EnumManager.AnimDir.L => Quaternion.Euler(0, 0, -90),
-            EnumManager.AnimDir.R => Quaternion.Euler(0, 0, 90),
-            EnumManager.AnimDir.U => Quaternion.Euler(0, 0, 180),
-            _ => Quaternion.identity,
-        };
-    }
-
-    public static int DirToAngle4(this EnumManager.AnimDir dir)
-    {
-        return dir switch
-        {
-            EnumManager.AnimDir.D => 0,
-            EnumManager.AnimDir.L => -90,
-            EnumManager.AnimDir.R => 90,
-            EnumManager.AnimDir.U => 180,
-            _ => 0,
-        };
-    }
-
     public static List<T> ShuffleList<T>(this List<T> list)
     {
         int random1, random2;
@@ -99,5 +75,41 @@ public static class Extensions
 
         string json = JsonUtility.ToJson(source);
         return JsonUtility.FromJson<T>(json);
+    }
+
+    public static Quaternion DirToQuaternion4(this EnumManager.AnimDir dir)
+    {
+        return dir switch
+        {
+            EnumManager.AnimDir.D => Quaternion.identity,
+            EnumManager.AnimDir.L => Quaternion.Euler(0, 0, -90),
+            EnumManager.AnimDir.R => Quaternion.Euler(0, 0, 90),
+            EnumManager.AnimDir.U => Quaternion.Euler(0, 0, 180),
+            _ => Quaternion.identity,
+        };
+    }
+
+    public static int DirToAngle4(this EnumManager.AnimDir dir)
+    {
+        return dir switch
+        {
+            EnumManager.AnimDir.D => 0,
+            EnumManager.AnimDir.L => -90,
+            EnumManager.AnimDir.R => 90,
+            EnumManager.AnimDir.U => 180,
+            _ => 0,
+        };
+    }
+
+    public static Vector2 DirToVector2(this EnumManager.AnimDir dir)
+    {
+        return dir switch
+        {
+            EnumManager.AnimDir.D => Vector2.down,
+            EnumManager.AnimDir.L => Vector2.left,
+            EnumManager.AnimDir.R => Vector2.right,
+            EnumManager.AnimDir.U => Vector2.up,
+            _ => Vector2.down,
+        };
     }
 }

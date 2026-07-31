@@ -14,3 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapAddressableID: TestMap1
   bgmID: 
+  allEntityInitInfos:
+    _serializedList: []
+  allAnimInitInfos:
+    _serializedList: []

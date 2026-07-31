@@ -27,7 +27,7 @@ namespace StateMachine
                 Transform target;
                 if (!targetable.CurrentTarget)
                 {
-                    target = targetingManager.PositianalTarget(thisTransform.position, moveRadius, targetable.TargetLayers);
+                    target = targetingManager.PositianalTarget(thisTransform.position, moveRadius, targetable.TargetLayers, targetable.CurrentTarget);
                     targetable.CurrentTarget = target;
                     if (!target) return;
                 }

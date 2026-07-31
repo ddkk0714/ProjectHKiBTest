@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "TargetingManager", menuName = "Scriptable Objects/Manager/TargetingManager", order = 3)]
@@ -26,8 +25,9 @@ public class TargetingManagerSO : ScriptableObject
         return Vector3.Distance(currentTarget.position, centerPos) < radius;
     }
 
-    public Transform PositianalTarget(Vector3 centerPos, float radius, LayerMask[] targetLayers)
+    public Transform PositianalTarget(Vector3 centerPos, float radius, LayerMask[] targetLayers, Transform currentTarget)
     {
+        if (currentTarget && Vector3.Distance(currentTarget.transform.position, centerPos) < radius) return currentTarget;
         LayerMask targets = 0;
         for (int i = 0; i < targetLayers.Length; i++)
             targets |= targetLayers[i];
@@ -44,17 +44,19 @@ public class TargetingManagerSO : ScriptableObject
     }
 
     private readonly List<Transform> _targets = new(32);
-    public Transform DirectionalTarget(Transform currentTarget, Vector3 centerPos, float radius, Vector2 lookingDir, LayerMask[] targetLayers)
+    public Transform DirectionalTarget(Vector3 centerPos, float radius, Vector2 lookingDir, LayerMask[] targetLayers, Transform currentTarget)
     {
-        if (currentTarget)
-            if (Vector3.Angle(currentTarget.position - centerPos, lookingDir) < maxMaintainRotation)
-                if (radius * maintainRadiusCoeff > Vector3.Distance(currentTarget.position, centerPos))
-                {
-                    Debug.DrawLine(centerPos, centerPos + Quaternion.Euler(0, 0, maxMaintainRotation) * (maintainRadiusCoeff * radius * (Vector3)lookingDir.normalized), Color.red, 0.4f);
-                    Debug.DrawLine(centerPos, centerPos + Quaternion.Euler(0, 0, -maxMaintainRotation) * (maintainRadiusCoeff * radius * (Vector3)lookingDir.normalized), Color.red, 0.4f);
-                    Debug.DrawLine(centerPos, currentTarget.position, Color.cyan, 0.4f);
-                    return currentTarget;
-                }
+        if (currentTarget
+        && Vector3.Angle(currentTarget.position - centerPos, lookingDir) < maxMaintainRotation
+        && radius * maintainRadiusCoeff > Vector3.Distance(currentTarget.position, centerPos))
+        {
+#if UNITY_EDITOR
+            Debug.DrawLine(centerPos, centerPos + Quaternion.Euler(0, 0, maxMaintainRotation) * (maintainRadiusCoeff * radius * (Vector3)lookingDir.normalized), Color.red, 0.4f);
+            Debug.DrawLine(centerPos, centerPos + Quaternion.Euler(0, 0, -maxMaintainRotation) * (maintainRadiusCoeff * radius * (Vector3)lookingDir.normalized), Color.red, 0.4f);
+            Debug.DrawLine(centerPos, currentTarget.position, Color.cyan, 0.4f);
+#endif
+            return currentTarget;
+        }
 
         Debug.DrawLine(centerPos, centerPos + Quaternion.Euler(0, 0, maxRotation) * ((Vector3)lookingDir.normalized * radius), Color.red, 0.4f);
         Debug.DrawLine(centerPos, centerPos + Quaternion.Euler(0, 0, -maxRotation) * ((Vector3)lookingDir.normalized * radius), Color.red, 0.4f);

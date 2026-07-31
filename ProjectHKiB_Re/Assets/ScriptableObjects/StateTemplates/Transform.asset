@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: Transform
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 1
+  exposedVariables: []
+  temporaryID: 0.3362873
+  transitions: []
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642959117700038690
+  UpdateActions: []
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 8642959117700038690
+      type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        animationName: Transforming

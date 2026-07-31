@@ -18,36 +18,6 @@ public interface IDirAnimatable : IAnimatable
     }
     public Vector2 LastSetAnimationDir8 { get; set; }
     public Vector2 LastSetAnimationDir4 { get; set; }
-    public Quaternion LastSetAnimationQuaternion4
-    {
-        get
-        {
-            if (LastSetAnimationDir8 == Vector2.zero) return Quaternion.identity;
-            return AnimationDirection switch
-            {
-                EnumManager.AnimDir.D => Quaternion.identity,
-                EnumManager.AnimDir.L => Quaternion.Euler(0, 0, -90),
-                EnumManager.AnimDir.R => Quaternion.Euler(0, 0, 90),
-                EnumManager.AnimDir.U => Quaternion.Euler(0, 0, 180),
-                _ => Quaternion.identity,
-            };
-        }
-    }
-    public float LastSetAnimationAngle4
-    {
-        get
-        {
-            if (LastSetAnimationDir8 == Vector2.zero) return 0;
-            return AnimationDirection switch
-            {
-                EnumManager.AnimDir.D => 0,
-                EnumManager.AnimDir.L => -90,
-                EnumManager.AnimDir.R => 90,
-                EnumManager.AnimDir.U => 180,
-                _ => 0,
-            };
-        }
-    }
     public Action<EnumManager.AnimDir> OnDirChanged { get; set; }
     public Vector2 GetAnimationRestrictedDirection(Vector3 input);
     public bool CheckIfLastSetDirectionSame(Vector2 input);
@@ -79,24 +49,6 @@ public class DirAnimatableModule : AnimatableModule, IDirAnimatable
     public Vector2 LastSetAnimationDir8 { get; set; }
 
     public Vector2 LastSetAnimationDir4 { get; set; }
-
-    public Quaternion LastSetAnimationQuaternion4
-    {
-        get
-        {
-            if (LastSetAnimationDir8 == Vector2.zero) return Quaternion.identity;
-            return AnimationDirection.DirToQuaternion4();
-        }
-    }
-
-    public float LastSetAnimationAngle4
-    {
-        get
-        {
-            if (LastSetAnimationDir8 == Vector2.zero) return 0;
-            return AnimationDirection.DirToAngle4();
-        }
-    }
 
     public Action<EnumManager.AnimDir> OnDirChanged { get; set; }
 
