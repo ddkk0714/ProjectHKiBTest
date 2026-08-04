@@ -9,9 +9,9 @@ using TMPro;
 namespace RouteFinding.Codex
 {
     // 단서 도감 — 완전히 별도의 풀스크린 패널 (지도 패널 안의 탭이 아님).
-    // MapViewer와 동일한 패턴: Canvas 직속 자식 GO에 붙이고, 이 GO 자체는 항상 활성 —
-    // N키 토글은 InputManager.onOpenCodex 구독으로 받는다(2026-07-28, PlayerAction.inputactions의
-    // UI_TOGGLE 액션맵 참고). 내부 패널(_panelGO)만 Open/Close 토글된다.
+    // MapViewer와 동일한 패턴: 이 GO 자체는 항상 활성이고 내부 패널(_panelGO)만 토글된다.
+    // 같은 GO의 Window가 IWindowContent 구현을 찾아 여닫기를 위임하며, 창 관리는 UIManager의
+    // 창 스택이 담당한다(WindowName = "Clue"). N키는 InputManager.onOpenCodex → Toggle() 경유.
     //
     // 1단계: CodexModule(획득한 ClueData 목록의 소유자)을 구독해 실제 단서를 좌측 트리에 반영한다.
     // 2단계: CodexFilterService로 맵/출처/키워드 분류 + 검색을 지원한다.
@@ -67,8 +67,7 @@ namespace RouteFinding.Codex
             if (rt != null) StretchFull(rt);
             BuildUI();
 
-            // [2026-07-28] 레거시 Input.GetKeyDown 폴링 대신 Input System의 UI_TOGGLE 액션맵을
-            // 구독한다 — MapViewer.Awake와 동일한 이유(PLAY/MENU/GRAFFITI 모드 전환과 무관하게 항상 켜짐).
+            // UI_TOGGLE 액션맵은 모드 전환과 무관하게 항상 켜져 있다(MapViewer.Awake와 동일).
             if (_inputManager != null) _inputManager.onOpenCodex += HandleOpenCodexInput;
         }
 

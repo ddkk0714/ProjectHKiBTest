@@ -78,7 +78,13 @@ public class EmotionModule : InterfaceModule, IEmotion
     [SerializeField] private List<EmotionBuffEntry> emotionBuffEntries = new();
 
     [Header("Reaction")]
+    // 상쇄 반응이 결과색(Cancel)을 남길지 여부. EmotionVector Phase 4에서 "상쇄는 결과색을 남기지
+    // 않는다"로 흡수되면서 지금은 읽는 곳이 없다 — 다만 TryCancelReaction()에 주석 처리된 두 줄
+    // (이 파일 아래쪽 "if (applyCancelColor)")을 살리면 그대로 원복되도록 의도적으로 남겨둔
+    // 필드라 삭제하지 않는다. 대신 "값을 넣기만 하고 읽지 않는다"는 CS0414 경고만 끈다.
+#pragma warning disable 0414
     [SerializeField] private bool applyCancelColor = false;
+#pragma warning restore 0414
 
     [Tooltip("합 스택이 이 값 이상이면 반응 버프 SO 내부 효과로 그로기/명중률 감소 등을 크게 잡아두면 됨. 현재 모듈은 반응 결과 스택을 넘겨주는 역할만 함.")]
     [SerializeField] private int highStackThreshold = 5;

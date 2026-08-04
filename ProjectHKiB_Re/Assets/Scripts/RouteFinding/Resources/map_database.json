@@ -10,7 +10,7 @@
             },
             "isStartNode": true,
             "startsWithClue": true,
-            "sceneName": "Home",
+            "sceneName": "TestMap1",
             "events": [
                 {
                     "key": "hasDiary",
@@ -43,7 +43,7 @@
             },
             "isStartNode": false,
             "startsWithClue": false,
-            "sceneName": "ForestEntrance",
+            "sceneName": "TestMap2",
             "events": [
                 {
                     "key": "hasDiary",

@@ -143,4 +143,10 @@ public class SaveSlotData
     // 세이브 당시 바라보던 방향(IDirAnimatable.AnimationDirection) — hasPlayerPosition과 같은
     // 조건으로 유효성을 판단한다(위치·방향은 같은 순간의 한 상태라 플래그를 따로 두지 않는다).
     public EnumManager.AnimDir playerDirection = EnumManager.AnimDir.D;
+
+    // [신설] TimeManager.GameTime — 일시정지를 제외한 누적 게임 내 경과 시간(초).
+    // 구버전 세이브는 이 필드가 0으로 채워지는데, "정말 0초에 저장했다"와 구분할 수 없다.
+    // 다만 0으로 복원돼도 시간이 처음부터 다시 흐를 뿐 오동작은 아니라서, 위치(hasPlayerPosition)와
+    // 달리 별도 유효성 플래그를 두지 않았다.
+    public float gameTime = 0f;
 }

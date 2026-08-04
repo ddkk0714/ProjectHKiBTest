@@ -259,6 +259,9 @@ public class SaveModule : InterfaceModule, IInitializable
 
         // 플레이어의 실제 씬 좌표 + 현재 맵 — currentLocationGuid(RouteFinding 추상 노드)와 별개.
         SavePlayerPosition();
+
+        // 누적 게임 내 시간 — 일시정지 구간은 제외된 값이다(TimeManager 참고).
+        SaveGameTime();
     }
 
     public void WriteSaveFile()
@@ -477,6 +480,9 @@ public class SaveModule : InterfaceModule, IInitializable
         // 플레이어의 실제 씬 좌표 + 현재 맵 복원 — SavePlayerPosition()과 대칭.
         LoadPlayerPosition();
 
+        // 누적 게임 내 시간 복원 — SaveGameTime()과 대칭.
+        LoadGameTime();
+
         // [신설, 2026-07-21] 순서 중요 — 그래프 펼침 상태/위치를 먼저 큐잉해둬야, 바로 아래
         // NoteModule.ImportFrom이 발행하는 OnNoteChanged → NotePanel.Refresh → SetData 재생성 때
         // 경로연동 단서가 카드가 아니라 노드로 만들어지고, 그 자리에 저장된 위치가 적용된다
@@ -640,21 +646,26 @@ public class SaveModule : InterfaceModule, IInitializable
     // ================= PLAYER POSITION (실제 씬 좌표 + 현재 맵) =================
     // RouteModule.CurrentLocation(currentLocationGuid)은 RouteFinding 추상 그래프 노드 단위라
     // 지도 화면·난이도 계산에는 쓰이지만, 실제 게임플레이 씬 안에서 플레이어가 정확히 어디
-    // 서 있었는지는 담지 못한다. 이 두 메서드가 그 간극을 메운다 — 씬 전환은 MapChangeManager
-    // (SceneManager 기반의 실제 맵 전환 시스템, RouteFinding과는 별개)가 담당한다.
-    private MapChangeManager _mapChangeManager;
+    // 서 있었는지는 담지 못한다. 이 두 메서드가 그 간극을 메운다.
+    //
+    // [2026-08-04] 맵 전환 담당을 MapChangeManager(SceneManager 기반) → MapManager(Addressables
+    // 기반)로 이관했다. 저장하는 문자열도 "씬 이름"에서 "맵 Addressable ID"로 의미가 바뀌었지만,
+    // Addressable 주소를 씬 이름으로 통일해 쓰기로 해서 값 자체는 같다 — 그래서 SaveData의
+    // currentMapSceneName 필드명을 그대로 두었고 기존 세이브도 마이그레이션 없이 읽힌다.
+    [SerializeField] private MapDataRegistrySO mapDataRegistry;
 
-    private MapChangeManager ResolveMapChangeManager()
-        => _mapChangeManager != null ? _mapChangeManager : (_mapChangeManager = FindObjectOfType<MapChangeManager>(true));
+    private MapManager ResolveMapManager()
+        => GameManager.instance == null ? null : GameManager.instance.mapManager;
 
     public void SavePlayerPosition()
     {
         if (_currentSaveData == null || playerRoot == null) return;
 
-        var mapChangeManager = ResolveMapChangeManager();
+        MapManager mapManager = ResolveMapManager();
+        MapDataSO currentMap = mapManager != null ? mapManager.CurrentMapData : null;
 
         _currentSaveData.hasPlayerPosition = true;
-        _currentSaveData.currentMapSceneName = mapChangeManager != null ? mapChangeManager.currentMap : "";
+        _currentSaveData.currentMapSceneName = currentMap != null ? currentMap.mapAddressableID : "";
         _currentSaveData.playerPosition = playerRoot.transform.position;
 
         var dirAnimatable = ResolveFromPlayer<IDirAnimatable>(playerRoot);
@@ -669,13 +680,18 @@ public class SaveModule : InterfaceModule, IInitializable
         // 텔레포트 같은 오동작을 막기 위해 아예 건드리지 않는다.
         if (_loadedData == null || !_loadedData.hasPlayerPosition || playerRoot == null) return;
 
-        var mapChangeManager = ResolveMapChangeManager();
+        MapManager mapManager = ResolveMapManager();
         Vector3 targetPosition = _loadedData.playerPosition;
         EnumManager.AnimDir targetDirection = _loadedData.playerDirection;
 
-        bool needsMapChange = mapChangeManager != null
-            && !string.IsNullOrEmpty(_loadedData.currentMapSceneName)
-            && _loadedData.currentMapSceneName != mapChangeManager.currentMap;
+        string savedMapID = _loadedData.currentMapSceneName;
+        string currentMapID = mapManager != null && mapManager.CurrentMapData != null
+            ? mapManager.CurrentMapData.mapAddressableID
+            : "";
+
+        bool needsMapChange = mapManager != null
+            && !string.IsNullOrEmpty(savedMapID)
+            && savedMapID != currentMapID;
 
         if (!needsMapChange)
         {
@@ -683,18 +699,69 @@ public class SaveModule : InterfaceModule, IInitializable
             return;
         }
 
-        // ChangeMap()은 내부적으로 코루틴이라 완료를 동기적으로 기다릴 수 없다 — 완료 이벤트가
-        // 올 때까지 텔레포트를 미룬다. 로드 스테이트머신 자체는 이 완료를 기다리지 않고 그대로
-        // 진행한다(씬 전환이 끝나는 몇 프레임 동안 플레이어가 이전 위치에 남아 있다가, 전환이
-        // 끝나는 순간 저장된 좌표/방향으로 텔레포트된다).
-        void OnMapChanged(string _)
+        // 저장된 건 문자열 ID뿐이라, 실제 MapDataSO를 레지스트리에서 되찾아야 LoadMap()에 넘길 수 있다.
+        MapDataSO targetMap = mapDataRegistry != null ? mapDataRegistry.Find(savedMapID) : null;
+        if (targetMap == null)
         {
-            mapChangeManager.OnMapChanged -= OnMapChanged;
+            // 맵 전환은 포기하되 좌표 복원까지 버리지는 않는다 — 현재 맵이 이미 맞을 수도 있고,
+            // 아니더라도 원점에 방치하는 것보다는 낫다.
+            Debug.LogWarning($"[SaveModule] 맵 ID '{savedMapID}'에 해당하는 MapDataSO를 찾지 못했습니다. " +
+                             (mapDataRegistry == null
+                                 ? "MapDataRegistry가 연결되지 않았습니다."
+                                 : "레지스트리에서 Collect All을 실행했는지 확인하세요.") +
+                             " 맵 전환 없이 좌표만 복원합니다.");
+            TeleportPlayer(targetPosition, targetDirection);
+            return;
+        }
+
+        // LoadMap()은 Addressables 비동기 콜백이라 완료를 동기적으로 기다릴 수 없다 — 완료 이벤트가
+        // 올 때까지 텔레포트를 미룬다. 로드 스테이트머신 자체는 이 완료를 기다리지 않고 그대로
+        // 진행한다(맵 전환이 끝나는 동안 플레이어가 이전 위치에 남아 있다가, 전환이 끝나는 순간
+        // 저장된 좌표/방향으로 텔레포트된다).
+        void OnMapLoaded(MapDataSO _)
+        {
+            mapManager.OnMapLoaded -= OnMapLoaded;
             TeleportPlayer(targetPosition, targetDirection);
         }
 
-        mapChangeManager.OnMapChanged += OnMapChanged;
-        mapChangeManager.ChangeMap(_loadedData.currentMapSceneName);
+        // 시작 지점 배치를 건너뛰게 한다 — 복원은 저장된 좌표로 직접 텔레포트하므로 배치가
+        // 필요 없고, MapStartPos.SetPlayerToStartPos()가 endEvent까지 발동시켜서 그대로 두면
+        // 세이브를 불러올 때마다 맵 진입 이벤트가 잘못 재생된다.
+        ResolveStartPosPlacer()?.SkipNextPlacement();
+
+        mapManager.OnMapLoaded += OnMapLoaded;
+        mapManager.LoadMap(targetMap);
+    }
+
+    private MapStartPosPlacer _startPosPlacer;
+
+    private MapStartPosPlacer ResolveStartPosPlacer()
+        => _startPosPlacer != null ? _startPosPlacer : (_startPosPlacer = FindObjectOfType<MapStartPosPlacer>(true));
+
+    // ================= GAME TIME =================
+    // TimeManager.GameTime — 일시정지를 뺀 누적 게임 내 시간. 실제 플레이 시간과 다르고
+    // (메뉴를 열어둔 시간은 빠진다) Time.time과도 다르다(세이브를 거쳐 이어진다).
+    private static TimeManager ResolveTimeManager()
+        => GameManager.instance == null ? null : GameManager.instance.timeManager;
+
+    public void SaveGameTime()
+    {
+        if (_currentSaveData == null) return;
+
+        TimeManager timeManager = ResolveTimeManager();
+        if (timeManager == null) return;
+
+        _currentSaveData.gameTime = timeManager.GameTime;
+    }
+
+    public void LoadGameTime()
+    {
+        if (_loadedData == null) return;
+
+        TimeManager timeManager = ResolveTimeManager();
+        if (timeManager == null) return;
+
+        timeManager.SetGameTime(_loadedData.gameTime);
     }
 
     private void TeleportPlayer(Vector3 position, EnumManager.AnimDir direction)

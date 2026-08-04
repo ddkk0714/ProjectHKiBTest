@@ -9,9 +9,9 @@ using RouteFinding.MapView;
 namespace RouteFinding.Note
 {
     // 노트 — 도감(CodexPanel)과 같은 패턴으로 완전히 별도의 풀스크린 패널.
-    // Canvas 직속 자식 GO에 붙이고, 이 GO 자체는 항상 활성 — V키 토글은 InputManager.onOpenNote
-    // 구독으로 받는다(2026-07-28, PlayerAction.inputactions의 UI_TOGGLE 액션맵 참고).
-    // 내부 패널(_panelGO)만 Open/Close 토글된다.
+    // 이 GO 자체는 항상 활성이고 내부 패널(_panelGO)만 토글된다. 같은 GO의 Window가
+    // IWindowContent 구현을 찾아 여닫기를 위임하며, 창 관리는 UIManager의 창 스택이
+    // 담당한다(WindowName = "Note"). V키는 InputManager.onOpenNote → Toggle() 경유.
     //
     // 지도/도감과의 핵심 차이(NoteSystem_기획서.md "UI 진입 / 영속성" 절 참고):
     //   - Open()이 RouteModule.CanOpenMap을 체크하지 않는다 — 이동 중에도 항상 열람 가능
@@ -87,8 +87,7 @@ namespace RouteFinding.Note
             var canvas = GetComponentInParent<Canvas>();
             _graphPanZoom?.Init(_graphContainerRT, _graphViewportRT, canvas);
 
-            // [2026-07-28] 레거시 Input.GetKeyDown 폴링 대신 Input System의 UI_TOGGLE 액션맵을
-            // 구독한다 — MapViewer.Awake와 동일한 이유(PLAY/MENU/GRAFFITI 모드 전환과 무관하게 항상 켜짐).
+            // UI_TOGGLE 액션맵은 모드 전환과 무관하게 항상 켜져 있다(MapViewer.Awake와 동일).
             if (_inputManager != null) _inputManager.onOpenNote += HandleOpenNoteInput;
         }
 

@@ -49,6 +49,12 @@ public class TimeManager : MonoBehaviour
     /// <summary>일시정지 구간을 제외한 누적 게임 내 경과 시간(초).</summary>
     public float GameTime { get; private set; }
 
+    /// <summary>
+    /// 누적 게임 시간을 특정 값으로 되돌린다. 세이브 로드가 저장된 시점의 시간을 복원할 때 쓴다.
+    /// 평상시에는 Update()가 알아서 누적하므로 이 메서드를 부를 일이 없다.
+    /// </summary>
+    public void SetGameTime(float seconds) => GameTime = Mathf.Max(0f, seconds);
+
     /// <summary>정지 상태가 바뀔 때만 발생. 인자는 바뀐 뒤의 IsPaused.</summary>
     public event Action<bool> OnPauseChanged;
 

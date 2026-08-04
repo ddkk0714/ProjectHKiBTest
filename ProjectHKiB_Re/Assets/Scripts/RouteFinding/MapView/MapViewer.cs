@@ -11,10 +11,10 @@ using RouteFinding.Codex;
 namespace RouteFinding.MapView
 {
     // 씬 내 맵 뷰어 창 — 루트파인딩 시스템의 "그리기" 담당.
-    // Canvas 직속 자식 GO에 이 컴포넌트를 붙인다. (BaseWindow와 동일한 계층 구조)
-    // 이 GO 자체는 항상 활성 — M키 토글은 InputManager.onOpenMap 구독으로 받는다(2026-07-28,
-    // PlayerAction.inputactions의 UI_TOGGLE 액션맵 참고. 이전엔 Update()에서 Input.GetKeyDown 폴링).
-    // 내부 패널(_panelGO)만 Open/Close 시 토글된다.
+    // 이 GO 자체는 항상 활성이고(RouteModule/MapGraph가 같이 붙어 있어 끄면 안 된다), 내부
+    // 패널(_panelGO)만 토글된다. 그래서 같은 GO에 붙인 Window가 IWindowContent 구현을 찾아
+    // 여닫기를 위임하는 구조다 — 창 관리는 UIManager의 창 스택이 담당한다(WindowName = "Map").
+    // M키는 InputManager.onOpenMap → Toggle() → UIManager 경유.
     //
     // 상태를 직접 소유하지 않는다:
     //   - 장착 장비, 진행 상태(방문/단서/클리어), 경로 규칙 → RouteModule이 소유
@@ -159,9 +159,8 @@ namespace RouteFinding.MapView
             var canvas = GetComponentInParent<Canvas>();
             _graphPanZoom?.Init(_graphContainer, _graphViewport, canvas);
 
-            // [2026-07-28] 레거시 Input.GetKeyDown 폴링 대신 Input System의 UI_TOGGLE 액션맵을
-            // 구독한다 — 이 맵은 PLAY/MENU/GRAFFITI 모드 전환과 무관하게 항상 켜져 있어(InputManager
-            // 참고) 이전과 동일하게 어느 모드에서든 M키로 토글된다.
+            // UI_TOGGLE 액션맵은 PLAY/MENU/GRAFFITI 모드 전환과 무관하게 항상 켜져 있어
+            // (InputManager 참고) 어느 모드에서든 M키가 먹는다.
             if (_inputManager != null) _inputManager.onOpenMap += HandleOpenMapInput;
         }
 

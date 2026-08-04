@@ -149,6 +149,29 @@ public class MapGraph : MonoBehaviour
     public MapNodeData GetNode(string guid) =>
         _nodeByGuid.TryGetValue(guid, out var n) ? n : null;
 
+    /// <summary>
+    /// sceneName(= 실제 맵의 Addressable ID)으로 노드를 찾는다. 없으면 null.
+    ///
+    /// 실제 맵이 로드됐을 때 "그게 그래프상 어느 노드인가"를 되짚는 용도다 — 단서 공개와 이벤트
+    /// 플래그가 RouteModule.CurrentLocation 기준으로 동작해서, 로드된 맵과 어긋나면 엉뚱한 노드에
+    /// 기록되기 때문이다. 실제 연결은 RouteFinding 폴더 밖의 RouteFindingMapBridge가 담당하고,
+    /// 여기서는 외부 타입을 참조하지 않는 순수 조회만 제공한다.
+    ///
+    /// 콘텐츠상 아직 맵이 없는 노드가 많아(sceneName이 플레이스홀더) 대부분은 매칭되지 않는 게
+    /// 정상이다. 선형 탐색인 이유는 맵 로드 시점에만 호출되고 노드 수가 수십 개 규모라서다.
+    /// </summary>
+    public MapNodeData FindNodeBySceneName(string sceneName)
+    {
+        if (string.IsNullOrEmpty(sceneName)) return null;
+
+        for (int i = 0; i < _allNodes.Length; i++)
+        {
+            if (_allNodes[i].sceneName == sceneName) return _allNodes[i];
+        }
+
+        return null;
+    }
+
     public MapConnectionData GetConnection(string guid) =>
         _connectionByGuid.TryGetValue(guid, out var c) ? c : null;
 

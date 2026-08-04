@@ -3690,6 +3690,8 @@ GameObject:
   m_Component:
   - component: {fileID: 75784912}
   - component: {fileID: 75784913}
+  - component: {fileID: 75784914}
+  - component: {fileID: 75784915}
   m_Layer: 0
   m_Name: MapManager
   m_TagString: Untagged
@@ -3727,6 +3729,34 @@ MonoBehaviour:
   localManager: {fileID: 0}
   navigationManager: {fileID: 490475675}
   initialMap: {fileID: 11400000, guid: 0e206c1f89d359f46a996f13d7a8dd1c, type: 2}
+--- !u!114 &75784914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 75784911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5f3f216525f27949925c357a4f485ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapManager: {fileID: 75784913}
+--- !u!114 &75784915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 75784911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51cd547d2fb267840aea2cfd955d950d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapManager: {fileID: 75784913}
+  mapDataRegistry: {fileID: 11400000, guid: 479c6bb04338a8942905dcbe29cf76c4, type: 2}
+  warnOnMissingMap: 0
 --- !u!1 &79349639
 GameObject:
   m_ObjectHideFlags: 0
@@ -15575,8 +15605,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityToBuff: {fileID: 327803505}
   <CurrentBuffs>k__BackingField: []
-  gearManager: {fileID: 147051296}
-  weaponSlotIndex: 0
 --- !u!114 &327803497
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57581,7 +57609,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2098070915863448384, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 255.4895
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2098070915863448384, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_LocalRotation.x
@@ -57594,6 +57622,10 @@ PrefabInstance:
     - target: {fileID: 2098070915863448384, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_LocalRotation.z
       value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2098070915863448384, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2138894275389594002, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchorMax.y
@@ -83149,10 +83181,10 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.22122878
+    x: 0.28771204
     y: 0
-    width: 0.5563197
-    height: 1.0011001
+    width: 0.4233532
+    height: 0.9992784
   near clip plane: -5000
   far clip plane: 5000
   field of view: 40
@@ -102831,8 +102863,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityToBuff: {fileID: 450080697008727707}
   <CurrentBuffs>k__BackingField: []
-  gearManager: {fileID: 147051296}
-  weaponSlotIndex: 0
 --- !u!1 &7581432610800277552
 GameObject:
   m_ObjectHideFlags: 0

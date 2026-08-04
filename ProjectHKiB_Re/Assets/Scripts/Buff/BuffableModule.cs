@@ -44,9 +44,8 @@ public class BuffInfo
  *   entityToBuff 에 버프를 받을 대상의 InterfaceRegister 를 할당해야 실제 스탯에 반영됨.
  *
  * [2] 버프 적용
- *   Buff(buffSO)                        // 1스택, 현재 장비 소스로 적용
+ *   Buff(buffSO)                        // 1스택 적용
  *   Buff(buffSO, stack)                 // N스택 한 번에 적용
- *   Buff(buffSO, gear, stack)           // 소스 Gear를 직접 지정
  *   Buff(buffSO, stack, 1, overrideTime)// 지속시간 덮어쓰기 (-1이면 SO의 BuffTime 사용)
  *
  * [3] 버프 제거
@@ -65,8 +64,10 @@ public class BuffInfo
  *   TimeStackType  : Ignore(시간 무시) / Stack(남은 시간 + 새 시간) / Overwrite(시간 초기화)
  *   IsBuffTimeInfinite = true → 쿨타임 시작 안 함 (수동 제거 필요)
  *
- * [주의] Buff() 와 UnBuff() 는 sourceGear 가 일치해야 같은 버프로 인식함.
- *        Gear 인자 없이 호출하면 내부에서 GetCurrentSourceGear() 를 자동 사용함.
+ * [주의] 버프의 동일성은 StatBuffSO 하나로만 판단함(FindBuff 참고).
+ *        예외는 BuffStackType.Independant — 이 타입은 매번 별도 BuffInfo 를 새로 만듦.
+ *        예전에는 (buff, sourceGear) 조합으로 구분했으나 2026-07-28 버프 시스템 단순화 때
+ *        sourceGear 개념이 이 모듈에서 제거됨.
  * ────────────────────────────────────────────────────────────────────────────
  */
 public class BuffableModule : InterfaceModule, IBuffable
@@ -74,20 +75,15 @@ public class BuffableModule : InterfaceModule, IBuffable
     public InterfaceRegister entityToBuff;
     [field: SerializeField] public List<BuffInfo> CurrentBuffs { get; set; } = new();
 
-    [Header("Gear Source")]
-    [SerializeField] private GearManager gearManager;
-    [SerializeField] private int weaponSlotIndex = 0;
-
     public override void Register(IInterfaceRegistable interfaceRegistable)
     {
         interfaceRegistable.RegisterInterface<IBuffable>(this);
     }
 
-    public void Initialize()
-    {
-        if (gearManager == null)
-            gearManager = FindObjectOfType<GearManager>(true);
-    }
+    // 지금은 할 일이 없다. 예전엔 GetCurrentSourceGear()에 쓰던 gearManager를 여기서 찾아뒀는데,
+    // 2026-07-28 버프 시스템 단순화로 sourceGear 개념이 사라지면서 그 탐색도 불필요해졌다.
+    // 메서드 자체는 IBuffable → IInitializable 계약이라 남겨둔다.
+    public void Initialize() { }
 
     public BuffInfo FindBuff(StatBuffSO buff)
         => CurrentBuffs.Find(b => b.Buff == buff);
@@ -170,9 +166,9 @@ public class BuffableModule : InterfaceModule, IBuffable
     }
 
     // 목록에서 빼면서 그 버프의 타이머도 반드시 같이 끈다.
-    // 안 끄면 이미 제거된 BuffInfo의 DOTween 시퀀스가 살아남아 나중에 UnBuff(buff, sourceGear)를
-    // 한 번 더 쏘는데, 그 사이에 같은 (buff, sourceGear) 조합이 새로 걸려 있으면(예: 세이브 로드로
-    // 복원된 버프) 엉뚱하게 그쪽이 걷혀버린다.
+    // 안 끄면 이미 제거된 BuffInfo의 DOTween 시퀀스가 살아남아 나중에 UnBuff(buff)를 한 번 더
+    // 쏘는데, 그 사이에 같은 버프가 새로 걸려 있으면(예: 세이브 로드로 복원된 버프) 엉뚱하게
+    // 그쪽이 걷혀버린다.
     private void RemoveFromCurrentBuffs(BuffInfo buffInfo)
     {
         buffInfo.Cooltime?.CancelTimer();

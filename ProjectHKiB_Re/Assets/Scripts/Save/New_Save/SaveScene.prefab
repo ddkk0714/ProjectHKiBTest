@@ -58,7 +58,9 @@ MonoBehaviour:
     floatVariables:
       _serializedList: []
   _currentState: {fileID: 0}
+  _stateMachine: {fileID: 0}
   TransitionConditions: 
+  Timers: []
 --- !u!114 &4986903765723808927
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -77,6 +79,7 @@ MonoBehaviour:
   inventory: {fileID: 0}
   gearManager: {fileID: 0}
   playerRoot: {fileID: 0}
+  mapDataRegistry: {fileID: 11400000, guid: 479c6bb04338a8942905dcbe29cf76c4, type: 2}
 --- !u!1 &5986201548285357691
 GameObject:
   m_ObjectHideFlags: 0
