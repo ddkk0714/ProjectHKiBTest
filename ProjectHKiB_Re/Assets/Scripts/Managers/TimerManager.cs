@@ -11,7 +11,17 @@ public class Timer
 
     private TweenCallback _timeEndCallback;
 
-    public float ElapsedTime => GameManager.instance.timerManager.GetElapsedTime(GetHashCode());
+    // 인스펙터/디버그 뷰가 플레이 시작 전이나 GameManager가 아직 안 뜬 시점에 읽을 수 있어
+    // null 가드를 둔다. 예전엔 여기서 바로 NullReferenceException이 났다.
+    public float ElapsedTime
+    {
+        get
+        {
+            if (GameManager.instance == null || GameManager.instance.timerManager == null) return 0f;
+            return GameManager.instance.timerManager.GetElapsedTime(GetHashCode());
+        }
+    }
+
     public float RemainTime => Mathf.Max(0f, Time - ElapsedTime);
 
     public void StartTimer(float cooltime, TweenCallback timerEndCallback = null)
@@ -102,6 +112,10 @@ public class TimerManager : MonoBehaviour
     {
         CancelTimer(ID);
 
+        // 여기 시퀀스는 의도적으로 DOTween 기본 UpdateType.Normal(= Time.timeScale의 영향을
+        // 받는 스케일 시간)을 쓴다. 버프 쿨타임을 비롯한 이 매니저의 모든 타이머가 그 덕분에
+        // TimeManager.Pause()로 게임을 멈추면 함께 멈추고, RemainTime도 얼어붙는다.
+        // → SetUpdate(true)를 붙이면 메뉴를 열어둔 채로 버프가 계속 닳게 되니 붙이지 말 것.
         Sequence sequence = DOTween.Sequence();
         sequence.AppendInterval(duration);
         sequence.OnComplete(timerEnded);

@@ -60,7 +60,9 @@ public class CardSelectorParent : MonoBehaviour, IPointerExitHandler
     public void SpreadCards(int index)
     {
         CompleteAllTweens();
-        Sequence sequence = DOTween.Sequence();
+        // SetUpdate(true): 카드 UI는 TimeManager가 게임을 멈춘 동안에도 움직여야 한다.
+        // 시퀀스에 걸면 안에 넣은 트윈들에도 함께 적용된다.
+        Sequence sequence = DOTween.Sequence().SetUpdate(true);
         for (int i = 0; i < cards.Count; i++)
         {
             sequence.Insert(delayTime * (1 + index - i < 0 ? 0 : 1 + index - i),
@@ -77,7 +79,7 @@ public class CardSelectorParent : MonoBehaviour, IPointerExitHandler
     public void CollectCards()
     {
         CompleteAllTweens();
-        Sequence sequence = DOTween.Sequence();
+        Sequence sequence = DOTween.Sequence().SetUpdate(true);
         for (int i = 0; i < cards.Count; i++)
         {
             sequence.Insert(delayTime * (cards.Count - i), cards[i].transform.DOLocalMove(Vector2.zero, moveTime));
@@ -127,7 +129,7 @@ public class CardSelectorParent : MonoBehaviour, IPointerExitHandler
         float delay = cards.Count * delayTime;
         SetInteractable(false);
         bottomCard.SetCardData(cards[index].cardData, index);
-        Sequence sequence = DOTween.Sequence();
+        Sequence sequence = DOTween.Sequence().SetUpdate(true);
         sequence.Insert(delay, topCard.transform.DOLocalMove(topCardChangeShift, moveTime));
         sequence.Insert(delay, bottomCard.transform.DOLocalMove(bottomCardChangeShift, moveTime));
         delay += moveTime;

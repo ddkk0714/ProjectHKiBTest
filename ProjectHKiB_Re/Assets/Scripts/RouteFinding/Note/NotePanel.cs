@@ -28,7 +28,7 @@ namespace RouteFinding.Note
     // 제거하고 "단서 서랍"(ClueDrawerView)으로 대체했다 — 현재 획득한 모든 단서를 검색/키워드 필터로
     // 훑어보고, 드래그해서 좌측 단서 그래프에 직접 배치할 수 있다. 드롭 처리 자체는
     // NoteRouteGraphView.PlaceClueAt이 담당 — NotePanel.HandleClueDropped가 그 다리 역할.
-    public class NotePanel : MonoBehaviour
+    public class NotePanel : MonoBehaviour, IWindowContent
     {
         [Header("폰트")]
         [SerializeField] private TMP_FontAsset _font;
@@ -118,25 +118,36 @@ namespace RouteFinding.Note
 
         // ─── Public API ──────────────────────────────────────────
 
+        // UIManager의 windows 리스트에 등록할 이름. 같은 GO에 붙인 Window 컴포넌트가 이 창의 실체이고,
+        // Window는 아래 IWindowContent 구현을 찾아 여닫기를 위임한다.
+        public const string WindowName = "Note";
+
+        // ─── UIManager 경유 진입점 ────────────────────────────────
+        // 외부에서 부르는 API는 전부 UIManager를 거친다(MapViewer와 동일한 패턴).
+        // 실제 작업은 OpenPanel/ClosePanel이고, 거기서 다시 UIManager를 부르면 무한 재귀가 된다.
+
+        public void Open() => UI?.OpenWindow(WindowName);
+        public void Close() => UI?.CloseWindow(WindowName);
+        public void Toggle() => UI?.ToggleWindow(WindowName);
+
+        private static UIManager UI => GameManager.instance == null ? null : GameManager.instance.UIManager;
+
+        // ─── IWindowContent — Window가 호출하는 실제 작업 ─────────
+
         // 지도/도감과 달리 이동 중에도 항상 열 수 있다 — CanOpenMap 체크를 의도적으로 하지 않는다.
-        public void Open()
+        public bool CanOpenWindow => true;
+
+        public void OpenWindowContent()
         {
-            ExclusivePanelGroup.NotifyOpening(this, Close); // 지도/도감 등 다른 패널이 열려 있으면 먼저 닫는다
             Refresh();
             _panelGO.SetActive(true);
             _inputManager?.MENUMode();
         }
 
-        public void Close()
+        public void CloseWindowContent()
         {
-            ExclusivePanelGroup.NotifyClosing(this);
             _panelGO.SetActive(false);
             _inputManager?.PLAYMode();
-        }
-
-        public void Toggle()
-        {
-            if (_panelGO.activeSelf) Close(); else Open();
         }
 
         // Editor 스크립트(NotePanelEditor)에서 프리팹 저장 시 접근.

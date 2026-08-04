@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2098070915863448384}
   m_Layer: 0
-  m_Name: RoutFinding_Panel
+  m_Name: RoutFindingWindow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -49,11 +49,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 400046285819344926}
+  - component: {fileID: 1599431374056301227}
   - component: {fileID: 8437274895991529185}
   - component: {fileID: 6592096712670244721}
   - component: {fileID: 8009531465369439037}
   m_Layer: 5
-  m_Name: CluePanel
+  m_Name: ClueWindow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -80,6 +81,29 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1599431374056301227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1421504552094535771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 974f6c0873f314b4fac76937605dcbf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isPopup: 0
+  pausesGame: 1
+  initButton: {fileID: 0}
+  lastSelectedButton: {fileID: 0}
+  buttonSelectMethod: 0
+  OnWindowShow:
+    m_PersistentCalls:
+      m_Calls: []
+  OnWindowHide:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &8437274895991529185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -151,6 +175,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5729804402099417213}
+  - component: {fileID: 5566488864946569903}
   - component: {fileID: 7877698539905340639}
   - component: {fileID: 7140244033983099673}
   - component: {fileID: 3721483423705496307}
@@ -160,7 +185,7 @@ GameObject:
   - component: {fileID: 2401843579066810432}
   - component: {fileID: 5953618743141583736}
   m_Layer: 5
-  m_Name: RoutePanel
+  m_Name: RouteWindow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -187,6 +212,29 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &5566488864946569903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2555709326469848839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 974f6c0873f314b4fac76937605dcbf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isPopup: 0
+  pausesGame: 1
+  initButton: {fileID: 0}
+  lastSelectedButton: {fileID: 0}
+  buttonSelectMethod: 0
+  OnWindowShow:
+    m_PersistentCalls:
+      m_Calls: []
+  OnWindowHide:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &7877698539905340639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -388,10 +436,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6698788734011578827}
+  - component: {fileID: 1162351280440321918}
   - component: {fileID: 1810520641419590521}
   - component: {fileID: 2434269195906903900}
   m_Layer: 5
-  m_Name: NotePanel
+  m_Name: NoteWindow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -418,6 +467,29 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1162351280440321918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6043229084261516025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 974f6c0873f314b4fac76937605dcbf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isPopup: 0
+  pausesGame: 1
+  initButton: {fileID: 0}
+  lastSelectedButton: {fileID: 0}
+  buttonSelectMethod: 0
+  OnWindowShow:
+    m_PersistentCalls:
+      m_Calls: []
+  OnWindowHide:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1810520641419590521
 MonoBehaviour:
   m_ObjectHideFlags: 0

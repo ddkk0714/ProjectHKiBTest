@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public ChunkManager chunkManager;
     public CameraManager cameraManager;
     public TimerManager timerManager;
+    public TimeManager timeManager;
     public ObjectSpawnManager objectSpawnManager;
     public ObjectDeathCountManager objectDeathCountManager;
     public GearManager gearManager;

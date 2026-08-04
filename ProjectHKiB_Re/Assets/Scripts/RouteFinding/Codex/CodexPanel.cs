@@ -17,7 +17,7 @@ namespace RouteFinding.Codex
     // 2단계: CodexFilterService로 맵/출처/키워드 분류 + 검색을 지원한다.
     // 3단계: CodexUserEntry(유저 자유 메모) 추가/편집/삭제.
     // 코멘트/지도 연동은 이후 단계에서 추가.
-    public class CodexPanel : MonoBehaviour
+    public class CodexPanel : MonoBehaviour, IWindowContent
     {
         [Header("폰트")]
         [SerializeField] private TMP_FontAsset _font;
@@ -96,15 +96,41 @@ namespace RouteFinding.Codex
 
         // ─── Public API ──────────────────────────────────────────
 
-        public void Open()
+        // UIManager의 windows 리스트에 등록할 이름. 같은 GO에 붙인 Window 컴포넌트가 이 창의 실체이고,
+        // Window는 아래 IWindowContent 구현을 찾아 여닫기를 위임한다.
+        // 씬의 GO 이름(ClueWindow)과 UIManager.windows 등록명에 맞춰 "Clue"다 — 클래스 이름은
+        // CodexPanel이지만 창 이름은 Clue이니 헷갈리지 말 것. 이 상수와 UIManager 리스트의 name이
+        // 한 글자라도 어긋나면 창이 조용히 안 열린다.
+        public const string WindowName = "Clue";
+
+        // ─── UIManager 경유 진입점 ────────────────────────────────
+        // 외부에서 부르는 API는 전부 UIManager를 거친다(MapViewer와 동일한 패턴).
+        // 실제 작업은 OpenPanel/ClosePanel이고, 거기서 다시 UIManager를 부르면 무한 재귀가 된다.
+
+        public void Open() => UI?.OpenWindow(WindowName);
+        public void Close() => UI?.CloseWindow(WindowName);
+        public void Toggle() => UI?.ToggleWindow(WindowName);
+
+        private static UIManager UI => GameManager.instance == null ? null : GameManager.instance.UIManager;
+
+        // ─── IWindowContent — Window가 호출하는 실제 작업 ─────────
+
+        // 지도와 동일하게 이동 중에는 도감 열람도 막는다 (0단계 임시 결정 — CLAUDE.md 4-4 참고).
+        public bool CanOpenWindow
         {
-            // 지도와 동일하게 이동 중에는 도감 열람도 막는다 (0단계 임시 결정 — CLAUDE.md 4-4 참고).
-            if (RouteModule.Instance != null && !RouteModule.Instance.CanOpenMap)
+            get
             {
-                Debug.LogWarning("[CodexPanel] 이동 중에는 도감을 열 수 없습니다.");
-                return;
+                if (RouteModule.Instance != null && !RouteModule.Instance.CanOpenMap)
+                {
+                    Debug.LogWarning("[CodexPanel] 이동 중에는 도감을 열 수 없습니다.");
+                    return false;
+                }
+                return true;
             }
-            ExclusivePanelGroup.NotifyOpening(this, Close); // 지도/노트 등 다른 패널이 열려 있으면 먼저 닫는다
+        }
+
+        public void OpenWindowContent()
+        {
             // 세이브 로드 직후처럼 OnClueAcquired 이벤트를 놓쳤을 경우를 대비해, 열 때마다 전체 재계산.
             CodexModule.Instance.RebuildFromProgress();
             // [버그 수정, 2026-07-21] 도감이 닫혀 있는 동안 노트에서 이 카드가 보여주던 단서의 핀이
@@ -115,16 +141,10 @@ namespace RouteFinding.Codex
             _inputManager?.MENUMode();
         }
 
-        public void Close()
+        public void CloseWindowContent()
         {
-            ExclusivePanelGroup.NotifyClosing(this);
             _panelGO.SetActive(false);
             _inputManager?.PLAYMode();
-        }
-
-        public void Toggle()
-        {
-            if (_panelGO.activeSelf) Close(); else Open();
         }
 
         // Editor 스크립트(CodexPanelEditor)에서 프리팹 저장 시 접근.

@@ -224,7 +224,8 @@ public class GraffitiManager : MonoBehaviour
     public void PlayBiggerTinkerAnimation()
     {
         if (!canGraffitiTinker) return;
-        sequence = DOTween.Sequence();
+        // SetUpdate(true): 그래피티 입력 UI 연출이므로 TimeManager 일시정지의 영향을 받지 않는다.
+        sequence = DOTween.Sequence().SetUpdate(true);
         for (int i = 0; i < graffitiMoveCount; i++)
         {
             sequence.AppendCallback(BiggerTinkerCallback);

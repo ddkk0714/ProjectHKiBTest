@@ -3588,6 +3588,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPopup: 1
+  pausesGame: 1
   initButton: {fileID: 1106041576}
   lastSelectedButton: {fileID: 0}
   buttonSelectMethod: 1
@@ -19304,6 +19305,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPopup: 0
+  pausesGame: 1
   initButton: {fileID: 2106683139}
   lastSelectedButton: {fileID: 0}
   buttonSelectMethod: 1
@@ -27478,6 +27480,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPopup: 1
+  pausesGame: 1
   initButton: {fileID: 1393018410}
   lastSelectedButton: {fileID: 0}
   buttonSelectMethod: 1
@@ -28902,7 +28905,7 @@ RectTransform:
   - {fileID: 1568758191}
   - {fileID: 1129918845}
   m_Father: {fileID: 1599627550}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -32498,6 +32501,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPopup: 1
+  pausesGame: 1
   initButton: {fileID: 0}
   lastSelectedButton: {fileID: 0}
   buttonSelectMethod: 0
@@ -49820,6 +49824,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 992531269}
   m_CullTransparentMesh: 1
+--- !u!1 &993332392
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 993332393}
+  - component: {fileID: 993332394}
+  m_Layer: 0
+  m_Name: TimeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &993332393
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 993332392}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1845891765}
+  m_RootOrder: 17
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &993332394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 993332392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c335083c0eadff4694a5165d3485681, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &997486441
 GameObject:
   m_ObjectHideFlags: 0
@@ -57365,7 +57413,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1293724689448650618, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_Name
-      value: RoutFinding_Panel
+      value: RoutFindingWindow
+      objectReference: {fileID: 0}
+    - target: {fileID: 1421504552094535771, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
+      propertyPath: m_Name
+      value: ClueWindow
       objectReference: {fileID: 0}
     - target: {fileID: 1428169621846909550, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchorMax.y
@@ -57525,7 +57577,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2098070915863448384, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2098070915863448384, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 255.4895
       objectReference: {fileID: 0}
     - target: {fileID: 2098070915863448384, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_LocalRotation.x
@@ -57782,6 +57838,10 @@ PrefabInstance:
     - target: {fileID: 2523455680485875541, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2555709326469848839, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
+      propertyPath: m_Name
+      value: RouteWindow
       objectReference: {fileID: 0}
     - target: {fileID: 2607662290498145235, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchorMax.y
@@ -58458,6 +58518,10 @@ PrefabInstance:
     - target: {fileID: 5786174812598646247, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6043229084261516025, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
+      propertyPath: m_Name
+      value: NoteWindow
       objectReference: {fileID: 0}
     - target: {fileID: 6102369467949057062, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchorMax.y
@@ -59338,6 +59402,39 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2098070915863448384, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
   m_PrefabInstance: {fileID: 1153737227}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1153737229 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1599431374056301227, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
+  m_PrefabInstance: {fileID: 1153737227}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 974f6c0873f314b4fac76937605dcbf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1153737230 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5566488864946569903, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
+  m_PrefabInstance: {fileID: 1153737227}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 974f6c0873f314b4fac76937605dcbf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1153737231 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1162351280440321918, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
+  m_PrefabInstance: {fileID: 1153737227}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 974f6c0873f314b4fac76937605dcbf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1153848783
 GameObject:
   m_ObjectHideFlags: 0
@@ -76426,6 +76523,18 @@ MonoBehaviour:
     window: {fileID: 1885446772}
     useHotkey: 0
     hotkey: 10
+  - name: Map
+    window: {fileID: 1153737230}
+    useHotkey: 0
+    hotkey: 10
+  - name: Note
+    window: {fileID: 1153737231}
+    useHotkey: 0
+    hotkey: 10
+  - name: Clue
+    window: {fileID: 1153737229}
+    useHotkey: 0
+    hotkey: 10
   openedWindows: []
   defaultPauseWindowIndex: 0
   canExit: 1
@@ -78011,8 +78120,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 717749112}
-  - {fileID: 599265708}
   - {fileID: 1153737228}
+  - {fileID: 599265708}
   - {fileID: 581520141}
   m_Father: {fileID: 0}
   m_RootOrder: 3
@@ -83040,10 +83149,10 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
+    x: 0.22122878
     y: 0
-    width: 1
-    height: 1
+    width: 0.5563197
+    height: 1.0011001
   near clip plane: -5000
   far clip plane: 5000
   field of view: 40
@@ -86826,7 +86935,7 @@ MonoBehaviour:
     m_ActionId: 64d444f1-fcd5-40a2-8499-e7cf65893ab2
     m_ActionName: Player Actions/Skill[/Keyboard/space]
   m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: PC
+  m_DefaultControlScheme: 
   m_DefaultActionMap: PLAY
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
@@ -89154,6 +89263,7 @@ MonoBehaviour:
   chunkManager: {fileID: 1622729448}
   cameraManager: {fileID: 1718942449}
   timerManager: {fileID: 2732933}
+  timeManager: {fileID: 993332394}
   objectSpawnManager: {fileID: 1310757089}
   objectDeathCountManager: {fileID: 857761130}
   gearManager: {fileID: 147051296}
@@ -89192,6 +89302,7 @@ Transform:
   - {fileID: 857761131}
   - {fileID: 681393689}
   - {fileID: 2135137255}
+  - {fileID: 993332393}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -90900,6 +91011,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPopup: 1
+  pausesGame: 1
   initButton: {fileID: 703497892}
   lastSelectedButton: {fileID: 0}
   buttonSelectMethod: 1
@@ -102261,6 +102373,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPopup: 1
+  pausesGame: 0
   initButton: {fileID: 0}
   lastSelectedButton: {fileID: 0}
   buttonSelectMethod: 0

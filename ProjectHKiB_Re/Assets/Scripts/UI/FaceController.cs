@@ -38,7 +38,9 @@ public class FaceController : MonoBehaviour
     public void SayPhrase(string code)
     {
         StopSaying();
-        sayingTween = DOTween.Sequence();
+        // SetUpdate(true): 초상화 연출은 대화창과 함께 쓰이므로 TimeManager가 게임을
+        // 멈춘 동안에도 계속 움직여야 한다. (아래 입/눈 트윈도 동일)
+        sayingTween = DOTween.Sequence().SetUpdate(true);
         char prevCode = 'S';
         for (int i = 0; i < code.Length; i++)
         {
@@ -71,7 +73,7 @@ public class FaceController : MonoBehaviour
         mouthTween?.Complete();
         SetActives(mouth_Normal, false);
         SetActives(mouth_M, true);
-        mouthTween = DOTween.Sequence();
+        mouthTween = DOTween.Sequence().SetUpdate(true);
         mouthTween.AppendInterval(0.25f);
         mouthTween.OnComplete(SayEnd);
         mouthTween.Play();
@@ -82,7 +84,7 @@ public class FaceController : MonoBehaviour
         mouthTween?.Complete();
         SetActives(mouth_Normal, false);
         SetActives(mouth_A, true);
-        mouthTween = DOTween.Sequence();
+        mouthTween = DOTween.Sequence().SetUpdate(true);
         mouthTween.AppendInterval(0.25f);
         mouthTween.OnComplete(SayEnd);
         mouthTween.Play();
@@ -93,7 +95,7 @@ public class FaceController : MonoBehaviour
         mouthTween?.Complete();
         SetActives(mouth_Normal, false);
         SetActives(mouth_O, true);
-        mouthTween = DOTween.Sequence();
+        mouthTween = DOTween.Sequence().SetUpdate(true);
         mouthTween.AppendInterval(0.25f);
         mouthTween.OnComplete(SayEnd);
         mouthTween.Play();
@@ -104,7 +106,7 @@ public class FaceController : MonoBehaviour
         mouthTween?.Complete();
         SetActives(mouth_Normal, false);
         SetActives(mouth_E, true);
-        mouthTween = DOTween.Sequence();
+        mouthTween = DOTween.Sequence().SetUpdate(true);
         mouthTween.AppendInterval(0.25f);
         mouthTween.OnComplete(SayEnd);
         mouthTween.Play();
@@ -129,7 +131,8 @@ public class FaceController : MonoBehaviour
     {
         blinkInProgress = true;
         float interval = UnityEngine.Random.value > 0.05f ? UnityEngine.Random.Range(4f, 10f) : 0.2f;
-        yield return new WaitForSeconds(interval);
+        // WaitForSeconds는 스케일된 시간이라 일시정지 중 눈 깜빡임이 멈춘다. Realtime을 쓴다.
+        yield return new WaitForSecondsRealtime(interval);
         Blink();
         blinkInProgress = false;
     }
@@ -140,7 +143,7 @@ public class FaceController : MonoBehaviour
         eyeTween?.Complete();
         SetActives(eye_Close, true);
         SetActives(eye_Open, false);
-        eyeTween = DOTween.Sequence();
+        eyeTween = DOTween.Sequence().SetUpdate(true);
         eyeTween.AppendInterval(0.12f);
         eyeTween.OnComplete(BlinkEnd);
         eyeTween.Play();

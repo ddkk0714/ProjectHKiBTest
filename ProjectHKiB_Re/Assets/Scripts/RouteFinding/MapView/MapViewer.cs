@@ -28,7 +28,7 @@ namespace RouteFinding.MapView
     //   RouteProgressState.HasEventFlag가 아직 false인) 것이 있으면 "[미공개 단서 N개 - 특정
     //   이벤트 필요]"를 회색으로 보여준다 — 이름/내용은 스포일러라 노출 안 함, 존재/잠김 여부만.
     //   콘텐츠 쪽에서 새 단서에 requiredEventKey를 채우기만 하면 이 표시는 자동으로 따라온다.
-    public class MapViewer : MonoBehaviour
+    public class MapViewer : MonoBehaviour, IWindowContent
     {
         [Header("폰트")]
         [SerializeField] private TMP_FontAsset _font;
@@ -191,16 +191,41 @@ namespace RouteFinding.MapView
 
         // ─── Public API ──────────────────────────────────────────
 
-        public void Open()
+        // UIManager의 windows 리스트에 등록할 이름. 같은 GO에 붙인 Window 컴포넌트가 이 창의 실체이고,
+        // Window는 아래 IWindowContent 구현을 찾아 여닫기를 위임한다.
+        public const string WindowName = "Map";
+
+        // ─── UIManager 경유 진입점 ────────────────────────────────
+        // 외부(단축키, 툴바 버튼 등)에서 부르는 API는 전부 UIManager를 거친다. 그래야 다른 창들과
+        // 같은 스택에서 관리되고(겹쳐 열기·ESC 닫기·pausesGame) 지도만 따로 노는 일이 없다.
+        // 실제 여닫는 작업은 아래 OpenPanel/ClosePanel이며, UIManager가 RouteFindingWindow를
+        // 통해 그걸 호출한다 — 여기서 다시 UIManager를 부르면 무한 재귀가 되니 주의.
+
+        public void Open() => UI?.OpenWindow(WindowName);
+        public void Close() => UI?.CloseWindow(WindowName);
+        public void Toggle() => UI?.ToggleWindow(WindowName);
+
+        private static UIManager UI => GameManager.instance == null ? null : GameManager.instance.UIManager;
+
+        // ─── IWindowContent — Window가 호출하는 실제 작업 ─────────
+
+        // 기획 규칙(이동 중 지도 열람 불가)의 판단은 모듈의 몫 — 뷰는 묻기만 한다.
+        public bool CanOpenWindow
         {
-            // 기획 규칙(이동 중 지도 열람 불가)의 판단은 모듈의 몫 — 뷰는 묻기만 한다.
-            if (!RouteModule.Instance.CanOpenMap)
+            get
             {
-                Debug.LogWarning("[MapViewer] 이동 중에는 지도를 열 수 없습니다.");
-                return;
+                if (RouteModule.Instance != null && !RouteModule.Instance.CanOpenMap)
+                {
+                    Debug.LogWarning("[MapViewer] 이동 중에는 지도를 열 수 없습니다.");
+                    return false;
+                }
+                return true;
             }
-            ExclusivePanelGroup.NotifyOpening(this, Close); // 노트/도감 등 다른 패널이 열려 있으면 먼저 닫는다
-            Debug.Log($"[MapViewer] Open() — nodeViews={_nodeViews.Count}  edgeViews={_edgeViews.Count}  MapGraph={MapGraph.Instance != null}");
+        }
+
+        public void OpenWindowContent()
+        {
+            Debug.Log($"[MapViewer] OpenWindowContent() — nodeViews={_nodeViews.Count}  edgeViews={_edgeViews.Count}  MapGraph={MapGraph.Instance != null}");
             if (_nodeViews.Count == 0 && MapGraph.Instance != null)
                 PopulateGraph();
             _panelGO.SetActive(true);
@@ -208,16 +233,10 @@ namespace RouteFinding.MapView
             Refresh();
         }
 
-        public void Close()
+        public void CloseWindowContent()
         {
-            ExclusivePanelGroup.NotifyClosing(this);
             _panelGO.SetActive(false);
             _inputManager?.PLAYMode();
-        }
-
-        public void Toggle()
-        {
-            if (_panelGO.activeSelf) Close(); else Open();
         }
 
         // "노트로 이동" 툴바 버튼 — 맵을 닫고 씬에 배치된 노트 패널을 연다.

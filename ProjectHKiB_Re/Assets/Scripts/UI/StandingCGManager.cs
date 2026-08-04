@@ -100,7 +100,9 @@ public class StandingCGManager : MonoBehaviour
 
     [NaughtyAttributes.Button()]
     public void Move() => Move(Vector3.zero);
-    public void Move(Vector3 localPosition) => transform.DOLocalMove(localPosition, 0.36f);
+    // SetUpdate(true): 스탠딩 CG는 대화 연출용 UI이므로 TimeManager가 게임을 멈춘
+    // 동안에도 계속 움직여야 한다. (이 파일의 다른 트윈들도 같은 이유)
+    public void Move(Vector3 localPosition) => transform.DOLocalMove(localPosition, 0.36f).SetUpdate(true);
     public void MoveToOriginalPosition() => Move(originalLocallPosition);
 
     [NaughtyAttributes.Button()]
@@ -110,7 +112,7 @@ public class StandingCGManager : MonoBehaviour
         Image[] images = GetComponentsInChildren<Image>(true);
         for (int i = 0; i < images.Length; i++)
         {
-            images[i].DOColor(disabledColor, 0.36f);
+            images[i].DOColor(disabledColor, 0.36f).SetUpdate(true);
         }
         talkEnabled = false;
     }
@@ -121,7 +123,7 @@ public class StandingCGManager : MonoBehaviour
         Image[] images = GetComponentsInChildren<Image>(true);
         for (int i = 0; i < images.Length; i++)
         {
-            images[i].DOColor(originalColor, 0.36f);
+            images[i].DOColor(originalColor, 0.36f).SetUpdate(true);
         }
         talkEnabled = true;
     }
@@ -195,7 +197,7 @@ public class StandingCGManager : MonoBehaviour
             targetLocalAngle = Vector3.forward * clampedZ;
 
             part.tween?.Kill();
-            part.tween = part.transform.DOLocalRotate(targetLocalAngle, 0.36f).SetEase(Ease.OutBack);
+            part.tween = part.transform.DOLocalRotate(targetLocalAngle, 0.36f).SetEase(Ease.OutBack).SetUpdate(true);
         }
     }
     public void ImpactHairRight(float strength) => ImpactRight(strength, true);
@@ -322,7 +324,7 @@ public class StandingCGManager : MonoBehaviour
         head_F.SetActive(true);
         currentHead = head_F;
         headTween?.Complete();
-        headTween = head_F.transform.DOLocalMove(Vector2.zero, 0.1f);
+        headTween = head_F.transform.DOLocalMove(Vector2.zero, 0.1f).SetUpdate(true);
         headTween.Play();
     }
     [NaughtyAttributes.Button()]
@@ -338,7 +340,7 @@ public class StandingCGManager : MonoBehaviour
         head_D.SetActive(true);
         currentHead = head_D;
         headTween?.Complete();
-        headTween = head_D.transform.DOLocalMove(Vector2.down, 0.1f);
+        headTween = head_D.transform.DOLocalMove(Vector2.down, 0.1f).SetUpdate(true);
         headTween.Play();
     }
     [NaughtyAttributes.Button()]
@@ -354,7 +356,7 @@ public class StandingCGManager : MonoBehaviour
         head_U.SetActive(true);
         currentHead = head_U;
         headTween?.Complete();
-        headTween = head_U.transform.DOLocalMove(Vector2.up, 0.1f);
+        headTween = head_U.transform.DOLocalMove(Vector2.up, 0.1f).SetUpdate(true);
         headTween.Play();
     }
     [NaughtyAttributes.Button()]
@@ -368,7 +370,7 @@ public class StandingCGManager : MonoBehaviour
         head_R.SetActive(true);
         currentHead = head_R;
         headTween?.Complete();
-        headTween = head_R.transform.DOLocalMove(Vector2.left, 0.1f);
+        headTween = head_R.transform.DOLocalMove(Vector2.left, 0.1f).SetUpdate(true);
         headTween.Play();
     }
     [NaughtyAttributes.Button()]
@@ -382,7 +384,7 @@ public class StandingCGManager : MonoBehaviour
         head_L.SetActive(true);
         currentHead = head_L;
         headTween?.Complete();
-        headTween = head_L.transform.DOLocalMove(Vector2.right, 0.1f);
+        headTween = head_L.transform.DOLocalMove(Vector2.right, 0.1f).SetUpdate(true);
         headTween.Play();
     }
     public void DisableAllHeads()

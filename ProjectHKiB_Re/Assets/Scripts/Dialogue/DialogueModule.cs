@@ -181,9 +181,12 @@ public class DialogueModule : InterfaceModule, IDialogueable
             LinePrintingTweener.Kill();
 
         // Typing Effect Animation
+        // SetUpdate(true): 대화창은 TimeManager가 게임을 멈춘 동안에도 계속 진행돼야 하므로
+        // timeScale의 영향을 받지 않는 시간축(unscaled)을 쓴다.
         LinePrintingTweener = lineText
             .DOText(resolved, _currentLine.Duration(_subLineIndex))
             .SetEase(Ease.Linear)
+            .SetUpdate(true)
             .OnComplete(() => { ShowNextArrow(); });
 
         LinePrintingTweener?.Play();
@@ -203,6 +206,7 @@ public class DialogueModule : InterfaceModule, IDialogueable
         nextArrowMoveTween = nextArrowRect
             .DOAnchorPosY(nextArrowBasePos.y + 3f, 1.0f)
             .SetEase(Ease.InOutSine)
+            .SetUpdate(true)
             .SetLoops(-1, LoopType.Yoyo);
     }
 
