@@ -1,0 +1,6397 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-9012319306048278284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_Groggy_EndState
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.63029414
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0.3
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: -664540731129353581}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions: []
+  UpdateActions: []
+  ExitActions:
+  - rid: 9100000012
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: GroggyEnd
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 9100000012
+      type: {class: SetSpriteTintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        color: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &-7276837935654686583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_GraffitiAttack0State
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.9590577
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396241
+      negate: 0
+    - Decision:
+        rid: 8642958643451396242
+      negate: 0
+    trueState: {fileID: -4639974132790938046}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396243
+      negate: 1
+    - Decision:
+        rid: 8642958643451396244
+      negate: 0
+    trueState: {fileID: -664540731129353581}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396245
+      negate: 0
+    trueState: {fileID: 7070930723804975772}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396246
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 2
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 0}
+    falseState: {fileID: 0}
+    Action:
+      rid: 8642958643451396247
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 13
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396248
+      negate: 0
+    trueState: {fileID: -5782755152659724157}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396249
+  - rid: 8642958643451396250
+  UpdateActions: []
+  ExitActions:
+  - rid: 8642958643451396251
+  actionSequence:
+  - time: 0.2
+    Action:
+      rid: 8642958643451396252
+  - time: 0
+    Action:
+      rid: 8642958643451396253
+  - time: 0
+    Action:
+      rid: 8642958643451396254
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: NormalAttack1
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396241
+      type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+    - rid: 8642958643451396242
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396243
+      type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+    - rid: 8642958643451396244
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396245
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396246
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396247
+      type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+        value: 1
+    - rid: 8642958643451396248
+      type: {class: CanGraffitiDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396249
+      type: {class: SetDirFromPlayerInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642958643451396250
+      type: {class: SetAttackDataAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        attackNumber: 11
+    - rid: 8642958643451396251
+      type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+        value: 0
+    - rid: 8642958643451396252
+      type: {class: SetDirFromPlayerInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642958643451396253
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396254
+      type: {class: AttackMovePlayerAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetingManager: {fileID: 11400000, guid: b3f38c5a6e0762d4ba6cc8d3042b3e9d, type: 2}
+--- !u!114 &-7165107865824422523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_DodgeEndState
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.59981555
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0.4
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396410
+      negate: 0
+    trueState: {fileID: -664540731129353581}
+    falseState: {fileID: -4478707574491116494}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0.1
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396411
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 2
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0.1
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396412
+      negate: 0
+    trueState: {fileID: -6238667866901568210}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 13
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396413
+      negate: 0
+    trueState: {fileID: -5782755152659724157}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396414
+  - rid: 8642958643451396415
+  UpdateActions:
+  - rid: 8642958643451396416
+  ExitActions:
+  - rid: 8642958643451396417
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: DodgeEnd
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396410
+      type: {class: GridAllignedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mathManager: {fileID: 11400000, guid: d70d30fe513b9cc4bb4206690e1ecbf7, type: 2}
+    - rid: 8642958643451396411
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396412
+      type: {class: CanCounterAttackDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396413
+      type: {class: CanGraffitiDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396414
+      type: {class: SetDirFromPlayerInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642958643451396415
+      type: {class: EndDodgeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396416
+      type: {class: WalkByInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396417
+      type: {class: ApplySprintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        apply: 0
+--- !u!114 &-7110538744563417861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d5bce95d28994049b5bb57841a729ee, type: 3}
+  m_Name: Delta_Roza_StateMachine_packedEditor
+  m_EditorClassIdentifier: 
+  serializedNodes: []
+  nodes:
+  - rid: 6174889309236625520
+  - rid: 6174889309236625521
+  - rid: 6174889309236625522
+  - rid: 6174889309236625523
+  - rid: 6174889309236625524
+  - rid: 6174889309236625525
+  - rid: 6174889309236625526
+  - rid: 6174889309236625527
+  - rid: 6174889309236625528
+  - rid: 6174889309236625529
+  - rid: 6174889309236625530
+  - rid: 6174889309236625531
+  - rid: 6174889309236625532
+  - rid: 6174889309236625533
+  - rid: 6174889309236625534
+  - rid: 6174889309236625535
+  - rid: 6174889309236625536
+  - rid: 6174889309236625537
+  - rid: 6174889309236625538
+  - rid: 6174889309236625539
+  - rid: 6174889309236625540
+  - rid: 6174889309236625541
+  - rid: 6174889309236625542
+  - rid: 6174889309236625543
+  - rid: 6174889309236625544
+  - rid: 6174889309236625545
+  - rid: 6174889309236625546
+  - rid: 6174889309236625547
+  - rid: 6174889309236625548
+  - rid: 6174889309236625549
+  - rid: 6174889309236625550
+  edges:
+  - GUID: 32999db7-bce4-4546-8b6b-b28be7c92ed1
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    outputNodeGUID: a91cfa53-9cfc-4794-9b92-ff6d51847259
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: 53f9af24-85a0-41e0-b120-f6dd897abc1b
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 9282afaa-ec37-4f30-9710-c792191745ed
+    outputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 63ab3a5f-6d8c-4ea9-af75-08d5b337fe64
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 4341b9bb-5b68-4fdb-837b-419a3fe53126
+    outputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 0b7ef78a-08b7-47bc-b0cf-9ea4337241ad
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+    outputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: e415554f-a829-4620-ab06-7b1264cdd529
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: bb254739-0a0e-460c-9c1b-3a79b5cba748
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: dff32fa7-e2a8-44da-8ac1-e8c7f5a7de89
+    outputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_4_True
+  - GUID: b05f3001-b155-46b1-948c-e1810e84b62f
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: a26f1a48-795c-494f-bd29-588fe38c3cc6
+    outputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_5_True
+  - GUID: 18dc50a0-14e8-46f5-b80e-81aedb1d2513
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 06d46b23-5397-451f-9d18-4afe3cb41c48
+    outputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_6_True
+  - GUID: 3dea9341-ee2b-4481-aab6-a6d203b18f86
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 5d08f784-652e-4118-ad47-6c7077e7ae80
+    outputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 08e47959-083b-4415-bbb7-1a130b150e28
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 00581f36-d2ad-4b5a-8c5f-6902b2d62209
+    outputNodeGUID: 5d08f784-652e-4118-ad47-6c7077e7ae80
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 4c5aa5ca-ff8a-4a5e-84eb-4c680178f142
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 00581f36-d2ad-4b5a-8c5f-6902b2d62209
+    outputNodeGUID: 5d08f784-652e-4118-ad47-6c7077e7ae80
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 91b20c2e-be64-4cdf-bc6a-3b97fce2a711
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 6197ad8a-8ced-46ed-9a5a-169215e61063
+    outputNodeGUID: 5d08f784-652e-4118-ad47-6c7077e7ae80
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: 3410ab12-089e-44be-b90b-ec860510bda6
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    outputNodeGUID: 00581f36-d2ad-4b5a-8c5f-6902b2d62209
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 1a05ef4d-9f94-4138-b770-544365980821
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 9282afaa-ec37-4f30-9710-c792191745ed
+    outputNodeGUID: 00581f36-d2ad-4b5a-8c5f-6902b2d62209
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_False
+  - GUID: 8a4d136f-bdfd-4f0a-974a-240164061854
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: 00581f36-d2ad-4b5a-8c5f-6902b2d62209
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 9def5328-d61a-40fd-8e05-20e2f83c9a13
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 6197ad8a-8ced-46ed-9a5a-169215e61063
+    outputNodeGUID: 00581f36-d2ad-4b5a-8c5f-6902b2d62209
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: c1e36be9-cc3b-419e-8ed9-7790fea67987
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: dff32fa7-e2a8-44da-8ac1-e8c7f5a7de89
+    outputNodeGUID: 00581f36-d2ad-4b5a-8c5f-6902b2d62209
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: 60e9f9c6-55ca-4063-8c9f-1893adcfab4e
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: bc846c75-1379-4ff2-9f81-9c8b51629f73
+    outputNodeGUID: 6197ad8a-8ced-46ed-9a5a-169215e61063
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 5fc7eed8-9b88-409f-b3d6-f28f7e3cb596
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 672bb1d7-65ea-4a8c-91c9-0001d0e4b916
+    outputNodeGUID: 6197ad8a-8ced-46ed-9a5a-169215e61063
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 6620ebb3-847e-4dd9-9f3d-b51d930109c9
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+    outputNodeGUID: 6197ad8a-8ced-46ed-9a5a-169215e61063
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: c8b7c4e3-19b3-43c3-bb6f-eb53a4440d81
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: 6197ad8a-8ced-46ed-9a5a-169215e61063
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: ab065c41-86fe-46d8-a53a-dbe80cabf134
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 22a83769-1079-4f1f-9d24-8d30595e66c0
+    outputNodeGUID: a26f1a48-795c-494f-bd29-588fe38c3cc6
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: c0f26452-1761-443f-a3ba-1a3a46254351
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 0c602e9a-e989-48b8-85a2-8b933f1e9790
+    outputNodeGUID: 22a83769-1079-4f1f-9d24-8d30595e66c0
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: c26d6200-4aff-49bc-81c3-8b16c4d747d4
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    outputNodeGUID: 0c602e9a-e989-48b8-85a2-8b933f1e9790
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 783e9a03-403d-4efd-be66-106c8693674b
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e9780a2c-37e8-41d4-a36d-bdb9a64d957f
+    outputNodeGUID: 4341b9bb-5b68-4fdb-837b-419a3fe53126
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: bd562dc3-c6a3-49d0-a4ad-569f27223d88
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    outputNodeGUID: 4341b9bb-5b68-4fdb-837b-419a3fe53126
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: fc47e05d-f951-4540-955a-635b34b13232
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+    outputNodeGUID: 4341b9bb-5b68-4fdb-837b-419a3fe53126
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: 98d97d4e-ebd1-447f-92aa-4eab0e665974
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: 4341b9bb-5b68-4fdb-837b-419a3fe53126
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: 2803e531-0ff1-405c-a0e4-64a86c5546cc
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: dff32fa7-e2a8-44da-8ac1-e8c7f5a7de89
+    outputNodeGUID: 4341b9bb-5b68-4fdb-837b-419a3fe53126
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_5_True
+  - GUID: be575d75-3a7b-4efd-8658-09c9dad7806f
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: a26f1a48-795c-494f-bd29-588fe38c3cc6
+    outputNodeGUID: 4341b9bb-5b68-4fdb-837b-419a3fe53126
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_6_True
+  - GUID: f8a0fe61-48b2-4f5e-ba29-8cbebfb5bf07
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 06d46b23-5397-451f-9d18-4afe3cb41c48
+    outputNodeGUID: 4341b9bb-5b68-4fdb-837b-419a3fe53126
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_7_True
+  - GUID: fd1e97f3-1e23-4928-98cf-d2bed2e68b4b
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 05295c0b-690f-4f65-a8d4-4b710cb3ab7c
+    outputNodeGUID: 4341b9bb-5b68-4fdb-837b-419a3fe53126
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_8_True
+  - GUID: 23d5ef54-ce7c-462d-b792-33b35b03f5d8
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: acce3e25-a0bf-4812-9ddc-30885f11f7e5
+    outputNodeGUID: e9780a2c-37e8-41d4-a36d-bdb9a64d957f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 0cae5eaa-8c6e-4637-9422-36a7dbb3c84e
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    outputNodeGUID: e9780a2c-37e8-41d4-a36d-bdb9a64d957f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 92539c8e-581d-41bd-99ed-903bf8a75b5e
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+    outputNodeGUID: e9780a2c-37e8-41d4-a36d-bdb9a64d957f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: 7d43b504-2500-4cc6-af33-00818be9ab1f
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: e9780a2c-37e8-41d4-a36d-bdb9a64d957f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: 17a045e3-01ad-407f-bcc6-01349ed9bbdc
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: dff32fa7-e2a8-44da-8ac1-e8c7f5a7de89
+    outputNodeGUID: e9780a2c-37e8-41d4-a36d-bdb9a64d957f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_5_True
+  - GUID: 91635316-9e01-499a-b240-07e0166d29db
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: a26f1a48-795c-494f-bd29-588fe38c3cc6
+    outputNodeGUID: e9780a2c-37e8-41d4-a36d-bdb9a64d957f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_6_True
+  - GUID: 0e86855a-3626-4afc-aa98-27f1fe4ec265
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 06d46b23-5397-451f-9d18-4afe3cb41c48
+    outputNodeGUID: e9780a2c-37e8-41d4-a36d-bdb9a64d957f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_7_True
+  - GUID: fc370635-2e38-4a39-81b2-7c14360623fa
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 05295c0b-690f-4f65-a8d4-4b710cb3ab7c
+    outputNodeGUID: e9780a2c-37e8-41d4-a36d-bdb9a64d957f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_8_True
+  - GUID: c17e1154-0d78-4cf4-b356-86b39d762c58
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 89fdf7b1-a26a-4c2c-9b59-2ff0536b8a5f
+    outputNodeGUID: acce3e25-a0bf-4812-9ddc-30885f11f7e5
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 8b6d3375-1bea-4f8c-a9a5-0ab495f3c4d4
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    outputNodeGUID: acce3e25-a0bf-4812-9ddc-30885f11f7e5
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 1b3a7d48-45b0-4554-8063-847be7d74544
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+    outputNodeGUID: acce3e25-a0bf-4812-9ddc-30885f11f7e5
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: bb8740d9-37e7-4876-87a3-7795427027b8
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: acce3e25-a0bf-4812-9ddc-30885f11f7e5
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: ea871803-b201-4720-a91a-45427521794b
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: dff32fa7-e2a8-44da-8ac1-e8c7f5a7de89
+    outputNodeGUID: acce3e25-a0bf-4812-9ddc-30885f11f7e5
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_5_True
+  - GUID: cc1baea6-e564-448c-bc11-35d06b0a919f
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: a26f1a48-795c-494f-bd29-588fe38c3cc6
+    outputNodeGUID: acce3e25-a0bf-4812-9ddc-30885f11f7e5
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_6_True
+  - GUID: caac6063-5ab3-4cfc-95a0-a23a18fe1d5f
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 06d46b23-5397-451f-9d18-4afe3cb41c48
+    outputNodeGUID: acce3e25-a0bf-4812-9ddc-30885f11f7e5
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_7_True
+  - GUID: 2d1ace94-5cd2-4325-bcc1-ab40fecdb140
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 05295c0b-690f-4f65-a8d4-4b710cb3ab7c
+    outputNodeGUID: acce3e25-a0bf-4812-9ddc-30885f11f7e5
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_8_True
+  - GUID: e2253bb7-aaf6-4059-9bf8-7b248fef96f3
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d119a1d7-deea-4948-959d-755993b49625
+    outputNodeGUID: 672bb1d7-65ea-4a8c-91c9-0001d0e4b916
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: fa677a58-1e23-40a6-bd1d-fb4fa8940d8b
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    outputNodeGUID: 672bb1d7-65ea-4a8c-91c9-0001d0e4b916
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 2f1bb059-c60e-4ce9-99e4-201dcfab66ff
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+    outputNodeGUID: 672bb1d7-65ea-4a8c-91c9-0001d0e4b916
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: bc534163-c16a-4c94-8d37-6cbdd99d986e
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: 672bb1d7-65ea-4a8c-91c9-0001d0e4b916
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: 2b6699d7-4728-490e-b0ca-9f1809b70d30
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: dff32fa7-e2a8-44da-8ac1-e8c7f5a7de89
+    outputNodeGUID: 672bb1d7-65ea-4a8c-91c9-0001d0e4b916
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_5_True
+  - GUID: 299f8546-f3bd-43e9-8d7a-fc1cf3899051
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: bc846c75-1379-4ff2-9f81-9c8b51629f73
+    outputNodeGUID: 89fdf7b1-a26a-4c2c-9b59-2ff0536b8a5f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 13dafdbe-9ac6-4e39-a191-ed64e4b3d506
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 672bb1d7-65ea-4a8c-91c9-0001d0e4b916
+    outputNodeGUID: 89fdf7b1-a26a-4c2c-9b59-2ff0536b8a5f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 8420a8ff-11ea-4a96-9e6a-3a90febbbe1c
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+    outputNodeGUID: 89fdf7b1-a26a-4c2c-9b59-2ff0536b8a5f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: f4fcbe98-110c-420c-b2c2-d94282687a65
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: 89fdf7b1-a26a-4c2c-9b59-2ff0536b8a5f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: 46b50b73-f817-4b69-aee9-7a0a8775ec4b
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: a26f1a48-795c-494f-bd29-588fe38c3cc6
+    outputNodeGUID: 89fdf7b1-a26a-4c2c-9b59-2ff0536b8a5f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_5_True
+  - GUID: 655096c4-b710-4430-abdf-5a5dfe657f3e
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 06d46b23-5397-451f-9d18-4afe3cb41c48
+    outputNodeGUID: 89fdf7b1-a26a-4c2c-9b59-2ff0536b8a5f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_6_True
+  - GUID: 7d5e5330-a1a5-43b4-96c2-c1a5808f937d
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 05295c0b-690f-4f65-a8d4-4b710cb3ab7c
+    outputNodeGUID: 89fdf7b1-a26a-4c2c-9b59-2ff0536b8a5f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_7_True
+  - GUID: ec78742d-eab2-4328-9d42-2579847b8534
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 4341b9bb-5b68-4fdb-837b-419a3fe53126
+    outputNodeGUID: d119a1d7-deea-4948-959d-755993b49625
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 8fe9757d-848a-4209-a15b-6a3fad59f654
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    outputNodeGUID: d119a1d7-deea-4948-959d-755993b49625
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 2f855a33-3b26-444b-a17d-667ce3915a25
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+    outputNodeGUID: d119a1d7-deea-4948-959d-755993b49625
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: 5d95e278-26f4-496b-a2bf-8ea5f8aad74d
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: d119a1d7-deea-4948-959d-755993b49625
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: 64384bd8-08e6-498a-8229-322830c93df9
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: dff32fa7-e2a8-44da-8ac1-e8c7f5a7de89
+    outputNodeGUID: d119a1d7-deea-4948-959d-755993b49625
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_5_True
+  - GUID: 72252ac0-f29e-4b3b-8144-6782af27df6c
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: a26f1a48-795c-494f-bd29-588fe38c3cc6
+    outputNodeGUID: d119a1d7-deea-4948-959d-755993b49625
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_6_True
+  - GUID: 3913b617-8fa1-416e-8337-081bfcfb54d0
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 06d46b23-5397-451f-9d18-4afe3cb41c48
+    outputNodeGUID: d119a1d7-deea-4948-959d-755993b49625
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_7_True
+  - GUID: d480435e-d62e-415d-8a17-611a7283d982
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 05295c0b-690f-4f65-a8d4-4b710cb3ab7c
+    outputNodeGUID: d119a1d7-deea-4948-959d-755993b49625
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_8_True
+  - GUID: e0c6f318-a5bf-4f76-b4cf-ca9fe67dee43
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 089c8230-df71-4be6-a9d4-7aee1833bfc7
+    outputNodeGUID: dff32fa7-e2a8-44da-8ac1-e8c7f5a7de89
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 93cd4136-4559-4963-9426-4f8aad1aa5a0
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: dff32fa7-e2a8-44da-8ac1-e8c7f5a7de89
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 68e1465c-96e9-4a3b-8072-3b5d81458a20
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: 089c8230-df71-4be6-a9d4-7aee1833bfc7
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: b1312252-afe4-49c0-951e-a902f58fd48e
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 48dee461-4e6d-4782-9138-154c0f68a01a
+    outputNodeGUID: bc846c75-1379-4ff2-9f81-9c8b51629f73
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: a87b18f9-11cc-420a-9998-7d304a8cd6a6
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: bcbb8f2c-354b-49a6-b9b7-ae0ae7b8515f
+    outputNodeGUID: bc846c75-1379-4ff2-9f81-9c8b51629f73
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: fd8afafc-d360-442c-9816-fa61a88e99f2
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+    outputNodeGUID: bc846c75-1379-4ff2-9f81-9c8b51629f73
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: 7b2094c8-251f-4ddf-8d46-6789e2ee2a1f
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: bc846c75-1379-4ff2-9f81-9c8b51629f73
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: f3b134b8-272b-4fb4-9ce6-b0a50f132469
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 90d52b27-8a84-40d7-8e9c-80ba82eefcda
+    outputNodeGUID: bc846c75-1379-4ff2-9f81-9c8b51629f73
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_4_True
+  - GUID: 46e01d81-91a1-4ab2-bcba-b5e65d9c567c
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 0ec6984e-b7ac-4c57-ba64-3f5d7805791f
+    outputNodeGUID: 48dee461-4e6d-4782-9138-154c0f68a01a
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 747b2741-e44d-49b4-99e0-45fc84c2335e
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: bcbb8f2c-354b-49a6-b9b7-ae0ae7b8515f
+    outputNodeGUID: 48dee461-4e6d-4782-9138-154c0f68a01a
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 6d9d82bc-b7d3-48a7-b97a-de6e1c3dd80c
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+    outputNodeGUID: 48dee461-4e6d-4782-9138-154c0f68a01a
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: 49a2fe56-35e5-41e9-8e0f-2c45bdbb4333
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: 48dee461-4e6d-4782-9138-154c0f68a01a
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: efde676a-3d23-4ca0-be1e-8e3184ce6da6
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 90d52b27-8a84-40d7-8e9c-80ba82eefcda
+    outputNodeGUID: 48dee461-4e6d-4782-9138-154c0f68a01a
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_4_True
+  - GUID: ee05b193-c8be-4aa9-adf2-6af9e22d4fef
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 672bb1d7-65ea-4a8c-91c9-0001d0e4b916
+    outputNodeGUID: bcbb8f2c-354b-49a6-b9b7-ae0ae7b8515f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: a7dc3e62-c092-4c5c-b02f-37050fd9a189
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 90d52b27-8a84-40d7-8e9c-80ba82eefcda
+    outputNodeGUID: bcbb8f2c-354b-49a6-b9b7-ae0ae7b8515f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: b0d58c6b-54af-4ff6-b0ea-69c921bdea60
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+    outputNodeGUID: bcbb8f2c-354b-49a6-b9b7-ae0ae7b8515f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: 4646b733-74ac-46ac-8e96-28fc6eae41da
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: bcbb8f2c-354b-49a6-b9b7-ae0ae7b8515f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: b0d5629d-ab73-4b30-83a9-30382343ae67
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    outputNodeGUID: 90d52b27-8a84-40d7-8e9c-80ba82eefcda
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 9282935e-eba0-4e73-b5a4-47d1a79783ce
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+    outputNodeGUID: 90d52b27-8a84-40d7-8e9c-80ba82eefcda
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 51c4f295-7fcc-4f75-9a2b-394eb68bf2e1
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: 90d52b27-8a84-40d7-8e9c-80ba82eefcda
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: db5bc1cb-99f8-4936-bd3b-5fecbc60c5f9
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: fad9c564-aa7f-48a3-8ba9-790ca1d37f4c
+    outputNodeGUID: 0ec6984e-b7ac-4c57-ba64-3f5d7805791f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 5ee0301c-1e7b-4759-957a-2a7deeb5d2b2
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: bcbb8f2c-354b-49a6-b9b7-ae0ae7b8515f
+    outputNodeGUID: 0ec6984e-b7ac-4c57-ba64-3f5d7805791f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: c4b5e8c9-0983-4532-b4f6-63f73dd6432c
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 0ec6984e-b7ac-4c57-ba64-3f5d7805791f
+    outputNodeGUID: 0ec6984e-b7ac-4c57-ba64-3f5d7805791f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: 56c3966b-c04b-4b7c-afc3-41af0e3e5499
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: 0ec6984e-b7ac-4c57-ba64-3f5d7805791f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: 41804b46-81e0-4bea-88ba-84370191ae7b
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 90d52b27-8a84-40d7-8e9c-80ba82eefcda
+    outputNodeGUID: 0ec6984e-b7ac-4c57-ba64-3f5d7805791f
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_4_True
+  - GUID: 1905c311-4d2b-4904-88e8-bddc5179da28
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e9c4f617-4014-4871-8391-7bbbfb79837d
+    outputNodeGUID: fad9c564-aa7f-48a3-8ba9-790ca1d37f4c
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 8810d520-347a-48d2-bf18-4127534185bb
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: bcbb8f2c-354b-49a6-b9b7-ae0ae7b8515f
+    outputNodeGUID: fad9c564-aa7f-48a3-8ba9-790ca1d37f4c
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 0e3d0038-d321-4840-98ee-43d939b22c02
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 0ec6984e-b7ac-4c57-ba64-3f5d7805791f
+    outputNodeGUID: fad9c564-aa7f-48a3-8ba9-790ca1d37f4c
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: ab848c00-909f-4317-9077-7c8c07831ded
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: fad9c564-aa7f-48a3-8ba9-790ca1d37f4c
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: be2bd86b-5a1d-4429-9fa8-f85e8ed3ee25
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 8dc5a1f1-dde5-48d7-83a6-1e2b55e1f192
+    outputNodeGUID: fad9c564-aa7f-48a3-8ba9-790ca1d37f4c
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_4_True
+  - GUID: 6b72968c-81b8-464c-a2f9-07ad396d9cf1
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e9c4f617-4014-4871-8391-7bbbfb79837d
+    outputNodeGUID: e9c4f617-4014-4871-8391-7bbbfb79837d
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: c4403cda-f833-4a85-9b05-b67b6e3d206e
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: bcbb8f2c-354b-49a6-b9b7-ae0ae7b8515f
+    outputNodeGUID: e9c4f617-4014-4871-8391-7bbbfb79837d
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 596be65d-8ebc-42ac-bcf3-132032e87ab2
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: fad9c564-aa7f-48a3-8ba9-790ca1d37f4c
+    outputNodeGUID: e9c4f617-4014-4871-8391-7bbbfb79837d
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: b08aa6b8-18bf-4bfb-8f50-333ff3571df1
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: e9c4f617-4014-4871-8391-7bbbfb79837d
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: e55bd3ae-d4c9-4102-8d2f-bb7d03569a56
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 8dc5a1f1-dde5-48d7-83a6-1e2b55e1f192
+    outputNodeGUID: e9c4f617-4014-4871-8391-7bbbfb79837d
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_4_True
+  - GUID: 305aee95-bc76-4c79-8938-103f3dd65d42
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 90d52b27-8a84-40d7-8e9c-80ba82eefcda
+    outputNodeGUID: 8dc5a1f1-dde5-48d7-83a6-1e2b55e1f192
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: dc327864-7bed-418b-9a4e-8c764aa86700
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    outputNodeGUID: 06d46b23-5397-451f-9d18-4afe3cb41c48
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 32133b84-77e8-4d04-b858-5770f4e62915
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    outputNodeGUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: f0ee4167-64f0-4338-9218-c6c6a7ef555b
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: c671c375-3b01-4dbb-b8a6-0ad8798996af
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    outputNodeGUID: 9282afaa-ec37-4f30-9710-c792191745ed
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 811d3b62-a519-4881-aa59-5189e9e4eda0
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 6891dc4a-e38f-4353-b829-00afa0aeed73
+    outputNodeGUID: 9282afaa-ec37-4f30-9710-c792191745ed
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 8b8d01c1-00a5-4365-a306-1f03d14f3e9f
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 4341b9bb-5b68-4fdb-837b-419a3fe53126
+    outputNodeGUID: 9282afaa-ec37-4f30-9710-c792191745ed
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: 5c7f75e8-7205-41e8-a04c-7fe21af4df8c
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+    outputNodeGUID: 9282afaa-ec37-4f30-9710-c792191745ed
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: a35e888e-9012-4f63-9411-4cd8509ce678
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: 9282afaa-ec37-4f30-9710-c792191745ed
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_4_True
+  - GUID: 68e4c4e0-4a64-4a96-8dcc-819cdab9839b
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: dff32fa7-e2a8-44da-8ac1-e8c7f5a7de89
+    outputNodeGUID: 9282afaa-ec37-4f30-9710-c792191745ed
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_5_True
+  - GUID: 1a590bc2-f9c6-4ad7-a9f9-8bff20978c09
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: a26f1a48-795c-494f-bd29-588fe38c3cc6
+    outputNodeGUID: 9282afaa-ec37-4f30-9710-c792191745ed
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_6_True
+  - GUID: f8c57fd8-7954-4d91-ab7c-28792ceaeb32
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 06d46b23-5397-451f-9d18-4afe3cb41c48
+    outputNodeGUID: 9282afaa-ec37-4f30-9710-c792191745ed
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_7_True
+  - GUID: 8694a40e-1673-4f00-aaec-08d501a707b4
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    outputNodeGUID: 6891dc4a-e38f-4353-b829-00afa0aeed73
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 50b00647-e893-47bc-bf3b-d25ad5c7bad6
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 9282afaa-ec37-4f30-9710-c792191745ed
+    outputNodeGUID: 6891dc4a-e38f-4353-b829-00afa0aeed73
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: adefd0be-5f22-4dc8-8309-58c7236175dd
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 4341b9bb-5b68-4fdb-837b-419a3fe53126
+    outputNodeGUID: 6891dc4a-e38f-4353-b829-00afa0aeed73
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: 240dee74-8d6b-4a41-ab84-477f6bfc20f6
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+    outputNodeGUID: 6891dc4a-e38f-4353-b829-00afa0aeed73
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: ed467fee-224e-4a6c-8109-486483b18fc4
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: 6891dc4a-e38f-4353-b829-00afa0aeed73
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_4_True
+  - GUID: 6c740673-b088-4d7a-b450-ba1fb0bd7e0c
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: dff32fa7-e2a8-44da-8ac1-e8c7f5a7de89
+    outputNodeGUID: 6891dc4a-e38f-4353-b829-00afa0aeed73
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_5_True
+  - GUID: 1091d3c7-1306-428c-afd5-f2614525c7de
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: a26f1a48-795c-494f-bd29-588fe38c3cc6
+    outputNodeGUID: 6891dc4a-e38f-4353-b829-00afa0aeed73
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_6_True
+  - GUID: 6a1afc78-3185-4bb7-a45c-dcf8ffd04755
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 06d46b23-5397-451f-9d18-4afe3cb41c48
+    outputNodeGUID: 6891dc4a-e38f-4353-b829-00afa0aeed73
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_7_True
+  - GUID: 3fb9ae45-b25b-4e71-bb1d-5c13624d2291
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    outputNodeGUID: 05295c0b-690f-4f65-a8d4-4b710cb3ab7c
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: bb0c6b6c-17e4-481e-a1e4-fcad560fd348
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: acce3e25-a0bf-4812-9ddc-30885f11f7e5
+    outputNodeGUID: 90dffbd7-3157-48b7-837b-eb6053f342a9
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 30e65387-c534-4c29-8072-6a6805036ae0
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+    outputNodeGUID: 90dffbd7-3157-48b7-837b-eb6053f342a9
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: ff0d7507-5c35-439f-b5a3-660044887fd7
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+    outputNodeGUID: 90dffbd7-3157-48b7-837b-eb6053f342a9
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_2_True
+  - GUID: 6d4d14c9-6d1d-46b2-8d98-6a45f27ef16c
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+    outputNodeGUID: 90dffbd7-3157-48b7-837b-eb6053f342a9
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_3_True
+  - GUID: aeb6d599-0c72-4007-b0d6-a1f028cd1ee7
+    owner: {fileID: -7110538744563417861}
+    inputNodeGUID: dff32fa7-e2a8-44da-8ac1-e8c7f5a7de89
+    outputNodeGUID: 90dffbd7-3157-48b7-837b-eb6053f342a9
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_5_True
+  groups: []
+  stackNodes: []
+  pinnedElements: []
+  exposedParameters: []
+  serializedParameterList: []
+  stickyNotes: []
+  nodeInspectorReference: {fileID: 0}
+  position: {x: 84, y: -0, z: 0}
+  scale: {x: 0.15, y: 0.15, z: 1}
+  targetStateMachine: {fileID: 11400000}
+  references:
+    version: 2
+    RefIds:
+    - rid: 6174889309236625520
+      type: {class: InitialStateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: 
+        GUID: a91cfa53-9cfc-4794-9b92-ff6d51847259
+        computeOrder: 0
+        position:
+          serializedVersion: 2
+          x: -560
+          y: 0
+          width: 100
+          height: 100
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        outputTransitions: {fileID: 0}
+    - rid: 6174889309236625521
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_IdleState
+        GUID: 40c883a9-5494-4196-b422-9ed65cbd4e46
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -664540731129353581}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625522
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_DodgeStartState
+        GUID: d47c9478-edc5-4c32-bba9-d4b75d6bcf4f
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 0
+          y: 1000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -659399462289255656}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625523
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_DodgeKeepState
+        GUID: 5d08f784-652e-4118-ad47-6c7077e7ae80
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 560
+          y: 1000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 7296382775210465667}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625524
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_DodgeEndState
+        GUID: 00581f36-d2ad-4b5a-8c5f-6902b2d62209
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 1120
+          y: 1000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -7165107865824422523}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625525
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_DodgeSkillState
+        GUID: 6197ad8a-8ced-46ed-9a5a-169215e61063
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 1680
+          y: 1000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -6238667866901568210}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625526
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_Groggy_StartState
+        GUID: a26f1a48-795c-494f-bd29-588fe38c3cc6
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 0
+          y: 2000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 3757839470465591979}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625527
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_Groggy_KeepState
+        GUID: 22a83769-1079-4f1f-9d24-8d30595e66c0
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 560
+          y: 2000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 6452304038459694689}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625528
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_Groggy_EndState
+        GUID: 0c602e9a-e989-48b8-85a2-8b933f1e9790
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 1120
+          y: 2000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -9012319306048278284}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625529
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_NormalAttack0State
+        GUID: 4341b9bb-5b68-4fdb-837b-419a3fe53126
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 0
+          y: 3000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 5681585848563362503}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625530
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_NormalAttack1State
+        GUID: e9780a2c-37e8-41d4-a36d-bdb9a64d957f
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 560
+          y: 3000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 2499535942128986509}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625531
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_NormalAttack2State
+        GUID: acce3e25-a0bf-4812-9ddc-30885f11f7e5
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 1120
+          y: 3000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -4639974132790938046}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625532
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_NormalAttack3EndState
+        GUID: 672bb1d7-65ea-4a8c-91c9-0001d0e4b916
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 1680
+          y: 3000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 2039751501950398503}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625533
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_NormalAttack3StartState
+        GUID: 89fdf7b1-a26a-4c2c-9b59-2ff0536b8a5f
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 2240
+          y: 3000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -3363943453187024708}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625534
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_NormalAttack4State
+        GUID: d119a1d7-deea-4948-959d-755993b49625
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 2800
+          y: 3000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 8786561761849923755}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625535
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_TransformStartState
+        GUID: dff32fa7-e2a8-44da-8ac1-e8c7f5a7de89
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 0
+          y: 4000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -5782755152659724157}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625536
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_TransformingState
+        GUID: 089c8230-df71-4be6-a9d4-7aee1833bfc7
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 560
+          y: 4000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -5007437887798076079}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625537
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_Spin0State
+        GUID: bc846c75-1379-4ff2-9f81-9c8b51629f73
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 0
+          y: 5000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 5904331406450781235}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625538
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_Spin1State
+        GUID: 48dee461-4e6d-4782-9138-154c0f68a01a
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 560
+          y: 5000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 7511145912108551822}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625539
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_SpinEndDecision
+        GUID: bcbb8f2c-354b-49a6-b9b7-ae0ae7b8515f
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 1120
+          y: 5000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -6371297848911513930}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625540
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_SpinFail
+        GUID: 90d52b27-8a84-40d7-8e9c-80ba82eefcda
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 1680
+          y: 5000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 4511725746843209034}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625541
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_Spin2State
+        GUID: 0ec6984e-b7ac-4c57-ba64-3f5d7805791f
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 2240
+          y: 5000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -935057599489998785}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625542
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_Spin3State
+        GUID: fad9c564-aa7f-48a3-8ba9-790ca1d37f4c
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 2800
+          y: 5000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -1505880187677442173}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625543
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_Spin4State
+        GUID: e9c4f617-4014-4871-8391-7bbbfb79837d
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 3360
+          y: 5000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -3142876215527714076}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625544
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_SpinFailHigh
+        GUID: 8dc5a1f1-dde5-48d7-83a6-1e2b55e1f192
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 3920
+          y: 5000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -5679510383240770117}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625545
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_BackStepState
+        GUID: 06d46b23-5397-451f-9d18-4afe3cb41c48
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 0
+          y: 6000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 2972259351697032120}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625546
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_KnockbackState
+        GUID: e3ee5400-d853-400d-abdc-d61d7676afb0
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 560
+          y: 6000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 7070930723804975772}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625547
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_WalkState
+        GUID: 9282afaa-ec37-4f30-9710-c792191745ed
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 1120
+          y: 6000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -4478707574491116494}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625548
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_RunState
+        GUID: 6891dc4a-e38f-4353-b829-00afa0aeed73
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 1680
+          y: 6000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 8141698084271349272}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625549
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_SelfDamageState
+        GUID: 05295c0b-690f-4f65-a8d4-4b710cb3ab7c
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 2240
+          y: 6000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 2164354820090282483}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889309236625550
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Delta_Roza_GraffitiAttack0State
+        GUID: 90dffbd7-3157-48b7-837b-eb6053f342a9
+        computeOrder: 1
+        position:
+          serializedVersion: 2
+          x: 2800
+          y: 6000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: -7276837935654686583}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+--- !u!114 &-6371297848911513930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_SpinEndDecision
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.2323151
+  transitions:
+  - name: 
+    activationInput: 2
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 2039751501950398503}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0.2
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 4511725746843209034}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396693
+      negate: 0
+    trueState: {fileID: 7070930723804975772}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396694
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396695
+  - rid: 8642958643451396696
+  UpdateActions:
+  - rid: 8642958643451396697
+  ExitActions:
+  - rid: 8642958643451396698
+  - rid: 8642958643451396699
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: Spin1
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396693
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396694
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396695
+      type: {class: SetAttackDataAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        attackNumber: 6
+    - rid: 8642958643451396696
+      type: {class: InternalBuffAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _negate: 0
+        _buff: {fileID: 11400000, guid: 0d61e4db3d7fc7e45959bfbc2529c302, type: 2}
+    - rid: 8642958643451396697
+      type: {class: WalkByInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396698
+      type: {class: InternalBuffAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _negate: 1
+        _buff: {fileID: 11400000, guid: 0d61e4db3d7fc7e45959bfbc2529c302, type: 2}
+    - rid: 8642958643451396699
+      type: {class: StopAttackEffectAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        EffectPlayerNumber: 0
+--- !u!114 &-6238667866901568210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_DodgeSkillState
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.9402772
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396489
+      negate: 0
+    - Decision:
+        rid: 8642958643451396490
+      negate: 0
+    trueState: {fileID: 5904331406450781235}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396491
+      negate: 1
+    - Decision:
+        rid: 8642958643451396492
+      negate: 0
+    - Decision:
+        rid: 8642958643451396493
+      negate: 0
+    trueState: {fileID: 2039751501950398503}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396494
+      negate: 0
+    trueState: {fileID: 7070930723804975772}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396495
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 2
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 0}
+    falseState: {fileID: 0}
+    Action:
+      rid: 8642958643451396496
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396497
+  - rid: 8642958643451396498
+  - rid: 8642958643451396499
+  - rid: 8642958643451396500
+  UpdateActions: []
+  ExitActions:
+  - rid: 8642958643451396501
+  - rid: 8642958643451396502
+  - rid: 8642958643451396503
+  actionSequence:
+  - time: 0.1
+    Action:
+      rid: 8642958643451396504
+  - time: 0.1
+    Action:
+      rid: 8642958643451396505
+  - time: 0.1
+    Action:
+      rid: 8642958643451396506
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: NormalAttack3
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396489
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 52644548763046838, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 23
+    - rid: 8642958643451396490
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396491
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 52644548763046838, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 23
+    - rid: 8642958643451396492
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396493
+      type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+    - rid: 8642958643451396494
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396495
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396496
+      type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+        value: 1
+    - rid: 8642958643451396497
+      type: {class: SetDirFromPlayerInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642958643451396498
+      type: {class: SetAttackDataAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        attackNumber: 3
+    - rid: 8642958643451396499
+      type: {class: InternalBuffAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _negate: 0
+        _buff: {fileID: 11400000, guid: 072c945528fe1fe4d99b850c626ec21d, type: 2}
+    - rid: 8642958643451396500
+      type: {class: InternalBuffAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _negate: 0
+        _buff: {fileID: 11400000, guid: 0d61e4db3d7fc7e45959bfbc2529c302, type: 2}
+    - rid: 8642958643451396501
+      type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+        value: 0
+    - rid: 8642958643451396502
+      type: {class: InternalBuffAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _negate: 1
+        _buff: {fileID: 11400000, guid: 072c945528fe1fe4d99b850c626ec21d, type: 2}
+    - rid: 8642958643451396503
+      type: {class: InternalBuffAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _negate: 1
+        _buff: {fileID: 11400000, guid: 0d61e4db3d7fc7e45959bfbc2529c302, type: 2}
+    - rid: 8642958643451396504
+      type: {class: AttackMovePlayerAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetingManager: {fileID: 11400000, guid: b3f38c5a6e0762d4ba6cc8d3042b3e9d, type: 2}
+    - rid: 8642958643451396505
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396506
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 1
+--- !u!114 &-5782755152659724157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_TransformStartState
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0.98062253
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396280
+      negate: 0
+    trueState: {fileID: -5007437887798076079}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 20
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396281
+  UpdateActions:
+  - rid: 8642958643451396282
+  ExitActions:
+  - rid: 8642958643451396283
+  actionSequence:
+  - time: 0.5
+    Action:
+      rid: 8642958643451396284
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: Transform
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396280
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396281
+      type: {class: StartGraffitiAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetSlot: 0
+    - rid: 8642958643451396282
+      type: {class: WalkByInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396283
+      type: {class: StopAttackEffectAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        EffectPlayerNumber: 0
+    - rid: 8642958643451396284
+      type: {class: StartGraffitiTinkerAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        apply: 0
+--- !u!114 &-5679510383240770117
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_SpinFailHigh
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.5102503
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0.4
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 4511725746843209034}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396285
+  UpdateActions:
+  - rid: 8642958643451396286
+  ExitActions: []
+  actionSequence:
+  - time: 0.075
+    Action:
+      rid: 8642958643451396287
+  - time: 0.075
+    Action:
+      rid: 8642958643451396288
+  - time: 0.075
+    Action:
+      rid: 8642958643451396289
+  - time: 0.075
+    Action:
+      rid: 8642958643451396290
+  loopActionSequence: 1
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: SpinFail
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396285
+      type: {class: SetAttackDataAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        attackNumber: 6
+    - rid: 8642958643451396286
+      type: {class: WalkByInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396287
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396288
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 1
+    - rid: 8642958643451396289
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 2
+    - rid: 8642958643451396290
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 3
+--- !u!114 &-5007437887798076079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_TransformingState
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0.6199451
+  transitions:
+  - name: 
+    activationInput: 20
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions: []
+  UpdateActions: []
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: Transforming
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+--- !u!114 &-4639974132790938046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_NormalAttack2State
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.076369174
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396508
+      negate: 0
+    - Decision:
+        rid: 8642958643451396509
+      negate: 0
+    trueState: {fileID: -3363943453187024708}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396510
+      negate: 1
+    - Decision:
+        rid: 8642958643451396511
+      negate: 0
+    trueState: {fileID: -664540731129353581}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396512
+      negate: 0
+    trueState: {fileID: 7070930723804975772}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396513
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 12
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 0}
+    falseState: {fileID: 0}
+    Action:
+      rid: 8642958643451396514
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 13
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396515
+      negate: 0
+    trueState: {fileID: -5782755152659724157}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396516
+      negate: 0
+    trueState: {fileID: 3757839470465591979}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396517
+      negate: 0
+    trueState: {fileID: 2972259351697032120}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396518
+      negate: 0
+    trueState: {fileID: 2164354820090282483}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396519
+  - rid: 8642958643451396520
+  - rid: 8642958643451396521
+  UpdateActions: []
+  ExitActions:
+  - rid: 8642958643451396522
+  actionSequence:
+  - time: 0
+    Action:
+      rid: 8642958643451396523
+  - time: 0
+    Action:
+      rid: 8642958643451396524
+  - time: 0.4
+    Action:
+      rid: 8642958643451396525
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: NormalAttack2
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396508
+      type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+    - rid: 8642958643451396509
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396510
+      type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+    - rid: 8642958643451396511
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396512
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396513
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396514
+      type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+        value: 1
+    - rid: 8642958643451396515
+      type: {class: CanGraffitiDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396516
+      type: {class: IsGroggyDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396517
+      type: {class: IsRunawayDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396518
+      type: {class: IsSelfDamageTriggeredDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396519
+      type: {class: SetAttackDataAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        attackNumber: 2
+    - rid: 8642958643451396520
+      type: {class: SetDirReverseAccuracyFromInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642958643451396521
+      type: {class: DecisionSelfDamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396522
+      type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+        value: 0
+    - rid: 8642958643451396523
+      type: {class: AttackMovePlayerAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetingManager: {fileID: 11400000, guid: b3f38c5a6e0762d4ba6cc8d3042b3e9d, type: 2}
+    - rid: 8642958643451396524
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396525
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 1
+--- !u!114 &-4478707574491116494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_WalkState
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.8431784
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396448
+      negate: 1
+    - Decision:
+        rid: 8642958643451396449
+      negate: 0
+    trueState: {fileID: -664540731129353581}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396450
+      negate: 0
+    trueState: {fileID: 8141698084271349272}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 2
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 5681585848563362503}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396451
+      negate: 0
+    trueState: {fileID: 7070930723804975772}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396452
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 13
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396453
+      negate: 0
+    trueState: {fileID: -5782755152659724157}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396454
+      negate: 0
+    trueState: {fileID: 3757839470465591979}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396455
+      negate: 0
+    trueState: {fileID: 2972259351697032120}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions: []
+  UpdateActions:
+  - rid: 8642958643451396456
+  - rid: 8642958643451396457
+  ExitActions: []
+  actionSequence:
+  - time: 0.2
+    Action:
+      rid: 8642958643451396458
+  - time: 0.4
+    Action:
+      rid: 8642958643451396459
+  - time: 0.2
+    Action:
+      rid: -2
+  loopActionSequence: 1
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: Walk
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396448
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 6923667502783770647, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 0
+    - rid: 8642958643451396449
+      type: {class: GridAllignedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mathManager: {fileID: 11400000, guid: d70d30fe513b9cc4bb4206690e1ecbf7, type: 2}
+    - rid: 8642958643451396450
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 4333535293481838232, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 1
+    - rid: 8642958643451396451
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396452
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396453
+      type: {class: CanGraffitiDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396454
+      type: {class: IsGroggyDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396455
+      type: {class: IsRunawayDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396456
+      type: {class: WalkByInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396457
+      type: {class: SetDirFromLastSetDirAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642958643451396458
+      type: {class: PlayFootstepAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396459
+      type: {class: PlayFootstepAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+--- !u!114 &-3363943453187024708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_NormalAttack3StartState
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.29830304
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396324
+      negate: 0
+    - Decision:
+        rid: 8642958643451396325
+      negate: 0
+    trueState: {fileID: 5904331406450781235}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396326
+      negate: 1
+    - Decision:
+        rid: 8642958643451396327
+      negate: 0
+    trueState: {fileID: 2039751501950398503}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396328
+      negate: 0
+    trueState: {fileID: 7070930723804975772}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396329
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 2
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 0}
+    falseState: {fileID: 0}
+    Action:
+      rid: 8642958643451396330
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396331
+      negate: 0
+    trueState: {fileID: 3757839470465591979}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396332
+      negate: 0
+    trueState: {fileID: 2972259351697032120}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396333
+      negate: 0
+    trueState: {fileID: 2164354820090282483}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396334
+  - rid: 8642958643451396335
+  - rid: 8642958643451396336
+  UpdateActions: []
+  ExitActions: []
+  actionSequence:
+  - time: 0.1
+    Action:
+      rid: 8642958643451396337
+  - time: 0.1
+    Action:
+      rid: 8642958643451396338
+  - time: 0.1
+    Action:
+      rid: 8642958643451396339
+  loopActionSequence: 0
+  useTimer: 1
+  timerID: 0
+  time: 12
+  animationName: NormalAttack3Start
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396324
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 52644548763046838, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 23
+    - rid: 8642958643451396325
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396326
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 52644548763046838, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 23
+    - rid: 8642958643451396327
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396328
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396329
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396330
+      type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+        value: 1
+    - rid: 8642958643451396331
+      type: {class: IsGroggyDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396332
+      type: {class: IsRunawayDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396333
+      type: {class: IsSelfDamageTriggeredDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396334
+      type: {class: SetAttackDataAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        attackNumber: 3
+    - rid: 8642958643451396335
+      type: {class: SetDirReverseAccuracyFromInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642958643451396336
+      type: {class: DecisionSelfDamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396337
+      type: {class: AttackMovePlayerAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetingManager: {fileID: 11400000, guid: b3f38c5a6e0762d4ba6cc8d3042b3e9d, type: 2}
+    - rid: 8642958643451396338
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396339
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 1
+--- !u!114 &-3142876215527714076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_Spin4State
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.1612251
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 2
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396580
+      negate: 0
+    trueState: {fileID: -3142876215527714076}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396581
+      negate: 1
+    trueState: {fileID: -6371297848911513930}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396582
+      negate: 0
+    trueState: {fileID: -1505880187677442173}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396583
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396584
+      negate: 0
+    trueState: {fileID: -5679510383240770117}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396585
+  UpdateActions:
+  - rid: 8642958643451396586
+  ExitActions: []
+  actionSequence:
+  - time: 0.05
+    Action:
+      rid: 8642958643451396587
+  - time: 0.05
+    Action:
+      rid: 8642958643451396588
+  - time: 0.05
+    Action:
+      rid: 8642958643451396589
+  - time: 0.05
+    Action:
+      rid: 8642958643451396590
+  loopActionSequence: 1
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: Spin3
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396580
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 52644548763046838, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 23
+    - rid: 8642958643451396581
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 52644548763046838, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 23
+    - rid: 8642958643451396582
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396583
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396584
+      type: {class: TimerDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        timerID: 0
+    - rid: 8642958643451396585
+      type: {class: SetAttackDataAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        attackNumber: 10
+    - rid: 8642958643451396586
+      type: {class: WalkByInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396587
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396588
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 1
+    - rid: 8642958643451396589
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 2
+    - rid: 8642958643451396590
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 3
+--- !u!114 &-1505880187677442173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_Spin3State
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.22098365
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 2
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396657
+      negate: 0
+    trueState: {fileID: -3142876215527714076}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396658
+      negate: 1
+    trueState: {fileID: -6371297848911513930}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396659
+      negate: 0
+    trueState: {fileID: -935057599489998785}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396660
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396661
+      negate: 0
+    trueState: {fileID: -5679510383240770117}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396662
+  UpdateActions:
+  - rid: 8642958643451396663
+  ExitActions: []
+  actionSequence:
+  - time: 0.05
+    Action:
+      rid: 8642958643451396664
+  - time: 0.05
+    Action:
+      rid: 8642958643451396665
+  - time: 0.05
+    Action:
+      rid: 8642958643451396666
+  - time: 0.05
+    Action:
+      rid: 8642958643451396667
+  loopActionSequence: 1
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: Spin3
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396657
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 52644548763046838, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 23
+    - rid: 8642958643451396658
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 52644548763046838, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 23
+    - rid: 8642958643451396659
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396660
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396661
+      type: {class: TimerDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        timerID: 0
+    - rid: 8642958643451396662
+      type: {class: SetAttackDataAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        attackNumber: 9
+    - rid: 8642958643451396663
+      type: {class: WalkByInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396664
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396665
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 1
+    - rid: 8642958643451396666
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 2
+    - rid: 8642958643451396667
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 3
+--- !u!114 &-935057599489998785
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_Spin2State
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.45046705
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 2
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396526
+      negate: 0
+    trueState: {fileID: -1505880187677442173}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396527
+      negate: 1
+    trueState: {fileID: -6371297848911513930}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396528
+      negate: 0
+    trueState: {fileID: -935057599489998785}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396529
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396530
+      negate: 0
+    trueState: {fileID: 4511725746843209034}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396531
+  UpdateActions:
+  - rid: 8642958643451396532
+  ExitActions: []
+  actionSequence:
+  - time: 0.05
+    Action:
+      rid: 8642958643451396533
+  - time: 0.05
+    Action:
+      rid: 8642958643451396534
+  - time: 0.05
+    Action:
+      rid: 8642958643451396535
+  - time: 0.05
+    Action:
+      rid: 8642958643451396536
+  loopActionSequence: 1
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: Spin2
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396526
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 52644548763046838, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 23
+    - rid: 8642958643451396527
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 52644548763046838, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 23
+    - rid: 8642958643451396528
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396529
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396530
+      type: {class: TimerDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        timerID: 0
+    - rid: 8642958643451396531
+      type: {class: SetAttackDataAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        attackNumber: 8
+    - rid: 8642958643451396532
+      type: {class: WalkByInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396533
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396534
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 1
+    - rid: 8642958643451396535
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 2
+    - rid: 8642958643451396536
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 3
+--- !u!114 &-664540731129353581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_IdleState
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.3705782
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396701
+      negate: 0
+    trueState: {fileID: -4478707574491116494}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 2
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 5681585848563362503}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396702
+      negate: 0
+    trueState: {fileID: 7070930723804975772}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396703
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 13
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396704
+      negate: 0
+    trueState: {fileID: -5782755152659724157}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396705
+      negate: 0
+    trueState: {fileID: 3757839470465591979}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396706
+      negate: 0
+    trueState: {fileID: 2972259351697032120}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions: []
+  UpdateActions: []
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: Idle
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396701
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 6923667502783770647, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 0
+    - rid: 8642958643451396702
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396703
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396704
+      type: {class: CanGraffitiDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396705
+      type: {class: IsGroggyDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396706
+      type: {class: IsRunawayDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+--- !u!114 &-659399462289255656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_DodgeStartState
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.23734978
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0.15
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 7296382775210465667}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396430
+  - rid: 8642958643451396431
+  UpdateActions: []
+  ExitActions:
+  - rid: 8642958643451396432
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: DodgeStart
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396430
+      type: {class: SetDirFromPlayerInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642958643451396431
+      type: {class: StartDodgeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396432
+      type: {class: StartDodgeMoveByInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97cc48d9291f2784caac4164ff25b2ab, type: 3}
+  m_Name: Delta_Roza_StateMachine_packed
+  m_EditorClassIdentifier: 
+  customVariables:
+    boolVariables:
+      _serializedList:
+      - Key: attackReserved
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+    intVariables:
+      _serializedList: []
+    floatVariables:
+      _serializedList: []
+  initialState: {fileID: -664540731129353581}
+  graph: {fileID: -7110538744563417861}
+  allStates:
+  - {fileID: -7165107865824422523}
+  - {fileID: 7296382775210465667}
+  - {fileID: -6238667866901568210}
+  - {fileID: -659399462289255656}
+  - {fileID: -7276837935654686583}
+  - {fileID: -664540731129353581}
+  - {fileID: 7070930723804975772}
+  - {fileID: 5681585848563362503}
+  - {fileID: 2499535942128986509}
+  - {fileID: -4639974132790938046}
+  - {fileID: 2039751501950398503}
+  - {fileID: -3363943453187024708}
+  - {fileID: 8786561761849923755}
+  - {fileID: 8141698084271349272}
+  - {fileID: 5904331406450781235}
+  - {fileID: 7511145912108551822}
+  - {fileID: -935057599489998785}
+  - {fileID: -1505880187677442173}
+  - {fileID: -3142876215527714076}
+  - {fileID: -6371297848911513930}
+  - {fileID: 4511725746843209034}
+  - {fileID: -5679510383240770117}
+  - {fileID: -5007437887798076079}
+  - {fileID: -5782755152659724157}
+  - {fileID: -4478707574491116494}
+  - {fileID: 3757839470465591979}
+  - {fileID: 2972259351697032120}
+  - {fileID: 2164354820090282483}
+  - {fileID: 6452304038459694689}
+  - {fileID: -9012319306048278284}
+  _commandPairs:
+  - conditionState: {fileID: -7165107865824422523}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -7165107865824422523}
+    triggerInput: 2
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -7165107865824422523}
+    triggerInput: 13
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 7296382775210465667}
+    triggerInput: 2
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -6238667866901568210}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -6238667866901568210}
+    triggerInput: 2
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -7276837935654686583}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -7276837935654686583}
+    triggerInput: 2
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -7276837935654686583}
+    triggerInput: 13
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -664540731129353581}
+    triggerInput: 2
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -664540731129353581}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -664540731129353581}
+    triggerInput: 13
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 7070930723804975772}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 5681585848563362503}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 5681585848563362503}
+    triggerInput: 2
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 5681585848563362503}
+    triggerInput: 13
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 2499535942128986509}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 2499535942128986509}
+    triggerInput: 2
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 2499535942128986509}
+    triggerInput: 13
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -4639974132790938046}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -4639974132790938046}
+    triggerInput: 12
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -4639974132790938046}
+    triggerInput: 13
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 2039751501950398503}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 2039751501950398503}
+    triggerInput: 2
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 2039751501950398503}
+    triggerInput: 13
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -3363943453187024708}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -3363943453187024708}
+    triggerInput: 2
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 8786561761849923755}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 8786561761849923755}
+    triggerInput: 2
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 8786561761849923755}
+    triggerInput: 13
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 8141698084271349272}
+    triggerInput: 2
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 8141698084271349272}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 8141698084271349272}
+    triggerInput: 13
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 5904331406450781235}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 7511145912108551822}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -935057599489998785}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -1505880187677442173}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -3142876215527714076}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -6371297848911513930}
+    triggerInput: 2
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -6371297848911513930}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: 4511725746843209034}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -5007437887798076079}
+    triggerInput: 20
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -5782755152659724157}
+    triggerInput: 20
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -4478707574491116494}
+    triggerInput: 2
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -4478707574491116494}
+    triggerInput: 3
+    trigger: {fileID: 0}
+    type: 0
+  - conditionState: {fileID: -4478707574491116494}
+    triggerInput: 13
+    trigger: {fileID: 0}
+    type: 0
+--- !u!114 &2039751501950398503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_NormalAttack3EndState
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.3451883
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396096
+      negate: 0
+    - Decision:
+        rid: 8642958643451396097
+      negate: 0
+    trueState: {fileID: 8786561761849923755}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396098
+      negate: 1
+    - Decision:
+        rid: 8642958643451396099
+      negate: 0
+    trueState: {fileID: -664540731129353581}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396100
+      negate: 0
+    trueState: {fileID: 7070930723804975772}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396101
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 2
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 0}
+    falseState: {fileID: 0}
+    Action:
+      rid: 8642958643451396102
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 13
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396103
+      negate: 0
+    trueState: {fileID: -5782755152659724157}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396104
+  - rid: 8642958643451396105
+  UpdateActions: []
+  ExitActions:
+  - rid: 8642958643451396106
+  actionSequence:
+  - time: 0
+    Action:
+      rid: 8642958643451396107
+  - time: 0.1
+    Action:
+      rid: 8642958643451396108
+  - time: 0.1
+    Action:
+      rid: 8642958643451396109
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: NormalAttack3End
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396096
+      type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+    - rid: 8642958643451396097
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396098
+      type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+    - rid: 8642958643451396099
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396100
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396101
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396102
+      type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+        value: 1
+    - rid: 8642958643451396103
+      type: {class: CanGraffitiDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396104
+      type: {class: SetDirFromPlayerInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642958643451396105
+      type: {class: SetAttackDataAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        attackNumber: 4
+    - rid: 8642958643451396106
+      type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+        value: 0
+    - rid: 8642958643451396107
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396108
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 1
+    - rid: 8642958643451396109
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 2
+--- !u!114 &2164354820090282483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: Delta_Roza_SelfDamageState
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.21669331
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0.05
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: -664540731129353581}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396692
+  - rid: 9100000015
+  UpdateActions: []
+  ExitActions:
+  - rid: 9100000016
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 9100000015
+      type: {class: SetSpriteTintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        color: {r: 1, g: 0.3, b: 0.3, a: 1}
+    - rid: 9100000016
+      type: {class: SetSpriteTintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        color: {r: 1, g: 1, b: 1, a: 1}
+    - rid: 8642958643451396692
+      type: {class: SelfDamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+--- !u!114 &2499535942128986509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_NormalAttack1State
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.6776144
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396722
+      negate: 0
+    - Decision:
+        rid: 8642958643451396723
+      negate: 0
+    trueState: {fileID: -4639974132790938046}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396724
+      negate: 1
+    - Decision:
+        rid: 8642958643451396725
+      negate: 0
+    trueState: {fileID: -664540731129353581}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396726
+      negate: 0
+    trueState: {fileID: 7070930723804975772}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396727
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 2
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 0}
+    falseState: {fileID: 0}
+    Action:
+      rid: 8642958643451396728
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 13
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396729
+      negate: 0
+    trueState: {fileID: -5782755152659724157}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396730
+      negate: 0
+    trueState: {fileID: 3757839470465591979}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396731
+      negate: 0
+    trueState: {fileID: 2972259351697032120}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396732
+      negate: 0
+    trueState: {fileID: 2164354820090282483}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396733
+  - rid: 8642958643451396734
+  - rid: 8642958643451396735
+  UpdateActions: []
+  ExitActions:
+  - rid: 8642958643451396736
+  actionSequence:
+  - time: 0.1
+    Action:
+      rid: 8642958643451396737
+  - time: 0
+    Action:
+      rid: 8642958643451396738
+  - time: 0.2
+    Action:
+      rid: 8642958643451396739
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: NormalAttack1
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396722
+      type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+    - rid: 8642958643451396723
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396724
+      type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+    - rid: 8642958643451396725
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396726
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396727
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396728
+      type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+        value: 1
+    - rid: 8642958643451396729
+      type: {class: CanGraffitiDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396730
+      type: {class: IsGroggyDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396731
+      type: {class: IsRunawayDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396732
+      type: {class: IsSelfDamageTriggeredDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396733
+      type: {class: SetAttackDataAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        attackNumber: 1
+    - rid: 8642958643451396734
+      type: {class: SetDirReverseAccuracyFromInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642958643451396735
+      type: {class: DecisionSelfDamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396736
+      type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+        value: 0
+    - rid: 8642958643451396737
+      type: {class: AttackMovePlayerAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetingManager: {fileID: 11400000, guid: b3f38c5a6e0762d4ba6cc8d3042b3e9d, type: 2}
+    - rid: 8642958643451396738
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396739
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 1
+--- !u!114 &2972259351697032120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_BackStepState
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.4587527
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396219
+      negate: 1
+    trueState: {fileID: -664540731129353581}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 9100000013
+  UpdateActions:
+  - rid: 8642958643451396220
+  ExitActions:
+  - rid: 9100000014
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: Walk
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 9100000013
+      type: {class: SetSpriteTintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        color: {r: 0.4, g: 0.85, b: 1, a: 1}
+    - rid: 9100000014
+      type: {class: SetSpriteTintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        color: {r: 1, g: 1, b: 1, a: 1}
+    - rid: 8642958643451396219
+      type: {class: IsRunawayDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396220
+      type: {class: WalkByLastSetAnimationDirAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _negate: 1
+--- !u!114 &3757839470465591979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_Groggy_StartState
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.113971606
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0.2
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 6452304038459694689}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 9100000011
+  UpdateActions: []
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: GroggyStart
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 9100000011
+      type: {class: SetSpriteTintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        color: {r: 1, g: 0.85, b: 0.2, a: 1}
+--- !u!114 &4511725746843209034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_SpinFail
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.34637883
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0.4
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: -664540731129353581}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396269
+      negate: 0
+    trueState: {fileID: 7070930723804975772}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396270
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions: []
+  UpdateActions:
+  - rid: 8642958643451396271
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: SpinFail
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396269
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396270
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396271
+      type: {class: WalkByInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+--- !u!114 &5681585848563362503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_NormalAttack0State
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.61826664
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396221
+      negate: 0
+    - Decision:
+        rid: 8642958643451396222
+      negate: 0
+    trueState: {fileID: 2499535942128986509}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396223
+      negate: 1
+    - Decision:
+        rid: 8642958643451396224
+      negate: 0
+    trueState: {fileID: -664540731129353581}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396225
+      negate: 0
+    trueState: {fileID: 7070930723804975772}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396226
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 2
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 0}
+    falseState: {fileID: 0}
+    Action:
+      rid: 8642958643451396227
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 13
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396228
+      negate: 0
+    trueState: {fileID: -5782755152659724157}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396229
+      negate: 0
+    trueState: {fileID: 3757839470465591979}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396230
+      negate: 0
+    trueState: {fileID: 2972259351697032120}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396231
+      negate: 0
+    trueState: {fileID: 2164354820090282483}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396232
+  - rid: 8642958643451396233
+  - rid: 8642958643451396234
+  UpdateActions: []
+  ExitActions:
+  - rid: 8642958643451396235
+  actionSequence:
+  - time: 0.2
+    Action:
+      rid: 8642958643451396236
+  - time: 0
+    Action:
+      rid: 8642958643451396237
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: NormalAttack0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396221
+      type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+    - rid: 8642958643451396222
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396223
+      type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+    - rid: 8642958643451396224
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396225
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396226
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396227
+      type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+        value: 1
+    - rid: 8642958643451396228
+      type: {class: CanGraffitiDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396229
+      type: {class: IsGroggyDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396230
+      type: {class: IsRunawayDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396231
+      type: {class: IsSelfDamageTriggeredDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396232
+      type: {class: SetAttackDataAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        attackNumber: 0
+    - rid: 8642958643451396233
+      type: {class: SetDirReverseAccuracyFromInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642958643451396234
+      type: {class: DecisionSelfDamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396235
+      type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+        value: 0
+    - rid: 8642958643451396236
+      type: {class: AttackMovePlayerAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetingManager: {fileID: 11400000, guid: b3f38c5a6e0762d4ba6cc8d3042b3e9d, type: 2}
+    - rid: 8642958643451396237
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+--- !u!114 &5904331406450781235
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_Spin0State
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.6720086
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 2
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396311
+      negate: 0
+    trueState: {fileID: 7511145912108551822}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396312
+      negate: 1
+    trueState: {fileID: -6371297848911513930}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396313
+      negate: 0
+    trueState: {fileID: 7070930723804975772}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396314
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396315
+      negate: 0
+    trueState: {fileID: 4511725746843209034}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396316
+  UpdateActions:
+  - rid: 8642958643451396317
+  ExitActions: []
+  actionSequence:
+  - time: 0.1
+    Action:
+      rid: 8642958643451396318
+  - time: 0.1
+    Action:
+      rid: 8642958643451396319
+  - time: 0.1
+    Action:
+      rid: 8642958643451396320
+  - time: 0.10000001
+    Action:
+      rid: 8642958643451396321
+  loopActionSequence: 1
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: Spin0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396311
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 52644548763046838, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 23
+    - rid: 8642958643451396312
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 52644548763046838, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 23
+    - rid: 8642958643451396313
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396314
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396315
+      type: {class: TimerDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        timerID: 0
+    - rid: 8642958643451396316
+      type: {class: SetAttackDataAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        attackNumber: 6
+    - rid: 8642958643451396317
+      type: {class: WalkByInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396318
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396319
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 1
+    - rid: 8642958643451396320
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 2
+    - rid: 8642958643451396321
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 3
+--- !u!114 &6452304038459694689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_Groggy_KeepState
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.6792795
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396433
+      negate: 1
+    trueState: {fileID: -9012319306048278284}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions: []
+  UpdateActions: []
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: GroggyKeep
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396433
+      type: {class: IsGroggyDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+--- !u!114 &7070930723804975772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_KnockbackState
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.13312401
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0.9
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396121
+      negate: 1
+    trueState: {fileID: -664540731129353581}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0.5
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions: []
+  UpdateActions:
+  - rid: 8642958643451396122
+  ExitActions:
+  - rid: 8642958643451396123
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: Knockback
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396121
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396122
+      type: {class: SetDirFromVelocityAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 1
+    - rid: 8642958643451396123
+      type: {class: EndKnockbackEarlyAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+--- !u!114 &7296382775210465667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_DodgeKeepState
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.06595171
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0.1
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396340
+      negate: 0
+    trueState: {fileID: -7165107865824422523}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0.1
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396341
+      negate: 1
+    trueState: {fileID: -7165107865824422523}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 2
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0.1
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396342
+      negate: 0
+    trueState: {fileID: -6238667866901568210}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396343
+  UpdateActions:
+  - rid: 8642958643451396344
+  - rid: 8642958643451396345
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: DodgeKeep
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396340
+      type: {class: KeepDodgeEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396341
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: -4181455711128364818, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 4
+    - rid: 8642958643451396342
+      type: {class: CanCounterAttackDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396343
+      type: {class: StartKeepDodgeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396344
+      type: {class: KeepDodgeMoveByInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396345
+      type: {class: SetDirFromLastSetDirAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+--- !u!114 &7511145912108551822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_Spin1State
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.6497621
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 2
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396110
+      negate: 0
+    trueState: {fileID: -935057599489998785}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396111
+      negate: 1
+    trueState: {fileID: -6371297848911513930}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396112
+      negate: 0
+    trueState: {fileID: 7070930723804975772}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396113
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396114
+      negate: 0
+    trueState: {fileID: 4511725746843209034}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396115
+  UpdateActions:
+  - rid: 8642958643451396116
+  ExitActions: []
+  actionSequence:
+  - time: 0.075
+    Action:
+      rid: 8642958643451396117
+  - time: 0.075
+    Action:
+      rid: 8642958643451396118
+  - time: 0.075
+    Action:
+      rid: 8642958643451396119
+  - time: 0.075
+    Action:
+      rid: 8642958643451396120
+  loopActionSequence: 1
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: Spin1
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396110
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 52644548763046838, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 23
+    - rid: 8642958643451396111
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 52644548763046838, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 23
+    - rid: 8642958643451396112
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396113
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396114
+      type: {class: TimerDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        timerID: 0
+    - rid: 8642958643451396115
+      type: {class: SetAttackDataAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        attackNumber: 7
+    - rid: 8642958643451396116
+      type: {class: WalkByInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396117
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396118
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 1
+    - rid: 8642958643451396119
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 2
+    - rid: 8642958643451396120
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 3
+--- !u!114 &8141698084271349272
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_RunState
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.7022893
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396291
+      negate: 1
+    - Decision:
+        rid: 8642958643451396292
+      negate: 0
+    trueState: {fileID: -664540731129353581}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396293
+      negate: 1
+    trueState: {fileID: -4478707574491116494}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 2
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 5681585848563362503}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396294
+      negate: 0
+    trueState: {fileID: 7070930723804975772}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396295
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 13
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396296
+      negate: 0
+    trueState: {fileID: -5782755152659724157}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396297
+      negate: 0
+    trueState: {fileID: 3757839470465591979}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396298
+      negate: 0
+    trueState: {fileID: 2972259351697032120}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396299
+  UpdateActions:
+  - rid: 8642958643451396300
+  - rid: 8642958643451396301
+  ExitActions:
+  - rid: 8642958643451396302
+  actionSequence:
+  - time: 0.1
+    Action:
+      rid: 8642958643451396303
+  - time: 0.3
+    Action:
+      rid: 8642958643451396304
+  - time: 0.2
+    Action:
+      rid: -2
+  loopActionSequence: 1
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: Run
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396291
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 6923667502783770647, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 0
+    - rid: 8642958643451396292
+      type: {class: GridAllignedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mathManager: {fileID: 11400000, guid: d70d30fe513b9cc4bb4206690e1ecbf7, type: 2}
+    - rid: 8642958643451396293
+      type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        _trigger: {fileID: 4333535293481838232, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
+        _inputType: 1
+    - rid: 8642958643451396294
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396295
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396296
+      type: {class: CanGraffitiDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396297
+      type: {class: IsGroggyDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396298
+      type: {class: IsRunawayDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396299
+      type: {class: ApplySprintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        apply: 1
+    - rid: 8642958643451396300
+      type: {class: WalkByInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396301
+      type: {class: SetDirFromLastSetDirAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642958643451396302
+      type: {class: ApplySprintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        apply: 0
+    - rid: 8642958643451396303
+      type: {class: PlayFootstepAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396304
+      type: {class: PlayFootstepAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+--- !u!114 &8786561761849923755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb85084ca5989854b9dbc2cce1298255, type: 3}
+  m_Name: Delta_Roza_NormalAttack4State
+  m_EditorClassIdentifier: 
+  isPacked: 1
+  isTemplate: 0
+  exposedVariables:
+  - propertyPath: additionalTransitions
+    displayName: Additional Transitions
+  temporaryID: 0.90382135
+  transitions:
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396359
+      negate: 0
+    - Decision:
+        rid: 8642958643451396360
+      negate: 0
+    trueState: {fileID: 5681585848563362503}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396361
+      negate: 1
+    - Decision:
+        rid: 8642958643451396362
+      negate: 0
+    trueState: {fileID: -664540731129353581}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396363
+      negate: 0
+    trueState: {fileID: 7070930723804975772}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396364
+      negate: 0
+    trueState: {fileID: -659399462289255656}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 2
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 0}
+    falseState: {fileID: 0}
+    Action:
+      rid: 8642958643451396365
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 13
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396366
+      negate: 0
+    trueState: {fileID: -5782755152659724157}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396367
+      negate: 0
+    trueState: {fileID: 3757839470465591979}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396368
+      negate: 0
+    trueState: {fileID: 2972259351697032120}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: 
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 8642958643451396369
+      negate: 0
+    trueState: {fileID: 2164354820090282483}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 8642958643451396370
+  - rid: 8642958643451396371
+  - rid: 8642958643451396372
+  UpdateActions: []
+  ExitActions:
+  - rid: 8642958643451396373
+  actionSequence:
+  - time: 0.1
+    Action:
+      rid: 8642958643451396374
+  - time: 0
+    Action:
+      rid: 8642958643451396375
+  - time: 0.1
+    Action:
+      rid: 8642958643451396376
+  - time: 0.1
+    Action:
+      rid: 8642958643451396377
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  animationName: NormalAttack4
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8642958643451396359
+      type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+    - rid: 8642958643451396360
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396361
+      type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+    - rid: 8642958643451396362
+      type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396363
+      type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396364
+      type: {class: CanDodgeCooltimeDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396365
+      type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+        value: 1
+    - rid: 8642958643451396366
+      type: {class: CanGraffitiDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396367
+      type: {class: IsGroggyDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396368
+      type: {class: IsRunawayDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396369
+      type: {class: IsSelfDamageTriggeredDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 8642958643451396370
+      type: {class: SetAttackDataAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        attackNumber: 5
+    - rid: 8642958643451396371
+      type: {class: SetDirReverseAccuracyFromInputAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 8642958643451396372
+      type: {class: DecisionSelfDamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396373
+      type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: attackReserved
+        value: 0
+    - rid: 8642958643451396374
+      type: {class: AttackMovePlayerAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetingManager: {fileID: 11400000, guid: b3f38c5a6e0762d4ba6cc8d3042b3e9d, type: 2}
+    - rid: 8642958643451396375
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 0
+    - rid: 8642958643451396376
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 1
+    - rid: 8642958643451396377
+      type: {class: DamageAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        damageNumber: 2

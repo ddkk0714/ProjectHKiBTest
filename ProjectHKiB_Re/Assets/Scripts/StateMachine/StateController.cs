@@ -54,11 +54,31 @@ public class StateController : InterfaceRegister
 
     public virtual void Awake()
     {
+        // Timers는 StateSO.timerID로 접근하고 그 값이 0~9로 제한돼 있어(MinValue/MaxValue) 10개면 충분하다.
+        // TransitionConditions/TransitionSequences는 전이 인덱스로 접근하므로 State에 따라 더 필요할 수
+        // 있다 — 부족한 만큼은 EnsureTransitionCapacity가 채운다.
         for (int i = 0; i < 10; i++)
         {
             TransitionSequences.Add(null);
             TransitionConditions.Add(false);
             Timers.Add(new());
+        }
+    }
+
+    /// <summary>
+    /// 전이 인덱스로 접근하는 두 리스트가 최소 count개는 되도록 보장한다.
+    /// Timers는 timerID로 접근하는 별개의 축이라 여기서 늘리지 않는다.
+    ///
+    /// 전에는 Awake가 채우는 10개가 전부여서, 전이가 10개를 넘는 State에 진입하면
+    /// StateSO.ReserveTransitions가 TransitionConditions[10]을 건드리며 터졌다
+    /// (Delta_Lily_NormalAttack4~8State가 전이 11개다).
+    /// </summary>
+    public void EnsureTransitionCapacity(int count)
+    {
+        while (TransitionConditions.Count < count)
+        {
+            TransitionConditions.Add(false);
+            TransitionSequences.Add(null);
         }
     }
 

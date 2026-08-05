@@ -19,64 +19,58 @@ MonoBehaviour:
   transitions:
   - name: 
     activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
     availableTime: 0.1
     disableTime: 0
     decisions:
-    - decision: {fileID: 11400000, guid: a544cc1d86e2d5b43b59fe4bf0b1808f, type: 2}
-      Decision:
+    - Decision:
         rid: 8642958643451396402
       negate: 0
     trueState: {fileID: 11400000, guid: 65232dbca2f88fb48ae80f43b769b8e0, type: 2}
     falseState: {fileID: 0}
-    action: {fileID: 0}
     Action:
       rid: -2
     showTrueStatePort: 1
     showFalseStatePort: 1
   - name: 
     activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
     availableTime: 0.1
     disableTime: 0
     decisions:
-    - decision: {fileID: 11400000, guid: 612b9fe66ed1ef34793ed729a392fd87, type: 2}
-      Decision:
+    - Decision:
         rid: 8642958643451396403
       negate: 1
     trueState: {fileID: 11400000, guid: 65232dbca2f88fb48ae80f43b769b8e0, type: 2}
     falseState: {fileID: 0}
-    action: {fileID: 0}
     Action:
       rid: -2
     showTrueStatePort: 1
     showFalseStatePort: 1
   - name: 
     activationInput: 2
+    trigger: {fileID: 0}
+    type: 0
     availableTime: 0.1
     disableTime: 0
     decisions:
-    - decision: {fileID: 11400000, guid: 2de41d8b2308a394484a671f6076ea8b, type: 2}
-      Decision:
+    - Decision:
         rid: 8642958643451396404
       negate: 0
     trueState: {fileID: 11400000, guid: 9956e913dbb76fa488b31e01463a7ffb, type: 2}
     falseState: {fileID: 0}
-    action: {fileID: 0}
     Action:
       rid: -2
     showTrueStatePort: 1
     showFalseStatePort: 1
   additionalTransitions: []
-  enterActions:
-  - {fileID: 11400000, guid: 71fdb69f2ecfc5d42a9967f28a3c8d7d, type: 2}
   EnterActions:
   - rid: 8642958643451396405
-  updateActions:
-  - {fileID: 11400000, guid: 4fafb3ceb66aff442a96eff3c9b699cd, type: 2}
-  - {fileID: 11400000, guid: c63fa6e559283a9479d938d317595868, type: 2}
   UpdateActions:
   - rid: 8642958643451396406
   - rid: 8642958643451396407
-  exitActions: []
   ExitActions: []
   actionSequence: []
   loopActionSequence: 0
@@ -95,6 +89,8 @@ MonoBehaviour:
     - rid: 8642958643451396403
       type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
+        _trigger: {fileID: -4181455711128364818, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
         _inputType: 4
     - rid: 8642958643451396404
       type: {class: CanCounterAttackDecision, ns: StateMachine, asm: Assembly-CSharp}

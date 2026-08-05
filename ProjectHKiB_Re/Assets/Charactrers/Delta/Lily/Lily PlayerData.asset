@@ -12,15 +12,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a4552f76dec9764db1bc225722a55f1, type: 3}
   m_Name: Lily PlayerData
   m_EditorClassIdentifier: 
-  <WalkSpeed>k__BackingField: 5
+  <Size>k__BackingField: {x: 1, y: 1}
+  <Mass>k__BackingField: 1
+  <WalkAcceleration>k__BackingField: 300
+  <MaxWalkSpeed>k__BackingField: 5
   <SprintCoeff>k__BackingField: 2
+  <FrictionWalkInfluence>k__BackingField: 1
+  <DefaultFootstepAudio>k__BackingField: {fileID: 0}
+  <GroundFriction>k__BackingField: 0.6
+  <AirFriction>k__BackingField: 0.98
+  <BounceCoeff>k__BackingField: 0.3
+  <GridEndureSpeed>k__BackingField: 10
+  <GridEndureForce>k__BackingField: 50
+  <StaticEndureForce>k__BackingField: 100
+  <StepUpTolerance>k__BackingField: 0.5
+  <StepDownTolerance>k__BackingField: 0.2
   <WallLayer>k__BackingField:
     serializedVersion: 2
     m_Bits: 72
+  <FloorLayer>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 0
   <CanPushLayer>k__BackingField:
     serializedVersion: 2
     m_Bits: 0
-  <DefaultFootstepAudio>k__BackingField: {fileID: 0}
   <BaseATK>k__BackingField: 100
   <CriticalChanceRate>k__BackingField: 0
   <CriticalDamageRate>k__BackingField: 0
@@ -50,14 +65,14 @@ MonoBehaviour:
     Buffs: []
   <BaseMaxHP>k__BackingField: 1000
   <BaseDEF>k__BackingField: 0
-  <Mass>k__BackingField: 1
   <HitSound>k__BackingField: {fileID: 0}
   <HitParticle>k__BackingField: {fileID: 0}
   <GraffitiAttackState>k__BackingField: {fileID: 0}
   <GraffitiSkillState>k__BackingField: {fileID: 0}
   <GraffitiTinkerOffset>k__BackingField: {x: 0, y: 0}
-  <StateMachine>k__BackingField: {fileID: 11400000, guid: 72922fc61a71fee48ad7eba5e9851b8b, type: 2}
+  <StateMachine>k__BackingField: {fileID: 11400000, guid: 4940cf94cc3af4b4592dcf755a6d39da, type: 2}
   <SkinData>k__BackingField: {fileID: 11400000, guid: 2a76691330d7a7f4cbabd147c4cec133, type: 2}
-  <AnimationData>k__BackingField: {fileID: 11400000, guid: c7f213e610025a142b626dfd9d6befd0, type: 2}
+  <MainAnimationData>k__BackingField: {fileID: 0}
+  <MainSpriteLibrary>k__BackingField: {fileID: 0}
   <EffectAnimationData>k__BackingField: {fileID: 11400000, guid: cc8e5658bbd9aec489a0da38a5d5c953, type: 2}
   <EffectSpriteLibrary>k__BackingField: {fileID: 11400000, guid: 2a940f29d9f7d0545adf885902e88687, type: 2}

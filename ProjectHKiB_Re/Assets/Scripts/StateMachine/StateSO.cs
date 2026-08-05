@@ -57,6 +57,10 @@ public class StateSO : ScriptableObject
 
     public void ReserveTransitions(StateController stateController)
     {
+        // 아래 루프와 CheckDecision/ResetTimers가 전이 인덱스로 리스트를 건드린다.
+        // 이 State에 진입하는 지금이 그만큼 자리를 확보해 둘 자리다.
+        stateController.EnsureTransitionCapacity(transitions.Length);
+
         for (int i = 0; i < transitions.Length; i++)
         {
             stateController.TransitionConditions[i] = false;
