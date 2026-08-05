@@ -1,7 +1,10 @@
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(StateSO))]
+// 두 번째 인자(editorForChildClasses)가 없으면 StateSO를 상속한 AnimationState /
+// DirAnimationState에는 이 인스펙터가 붙지 않는다. 그러면 그 State들은 기본 인스펙터로
+// 그려져서 Pack/Unpack/Load Template/Make Template 버튼이 안 나오고 isPacked도 무시된다.
+[CustomEditor(typeof(StateSO), true)]
 public class StateSOEditor : Editor
 {
     public override void OnInspectorGUI()
@@ -110,6 +113,15 @@ public class StateSOEditor : Editor
             string path = AssetDatabase.GUIDToAssetPath(guid);
             StateSO template = AssetDatabase.LoadAssetAtPath<StateSO>(path);
             string menuPath = $"{template.name}";
+
+            // CopySerialized는 같은 형식끼리만 성립한다. StateSO 템플릿을 AnimationState /
+            // DirAnimationState에 부으면 값이 깨지므로 형식이 다르면 고르지 못하게 막는다.
+            if (template.GetType() != stateSO.GetType())
+            {
+                menu.AddDisabledItem(new GUIContent($"{menuPath}  (형식 불일치: {template.GetType().Name})"));
+                continue;
+            }
+
             menu.AddItem(new GUIContent(menuPath), false, () =>
             {
                 Undo.RecordObject(stateSO, "Load Template");
