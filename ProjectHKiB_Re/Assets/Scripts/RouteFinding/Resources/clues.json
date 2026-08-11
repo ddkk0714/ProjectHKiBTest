@@ -249,6 +249,87 @@
             ],
             "comments": [],
             "attachments": []
+        },
+        {
+            "id": "clue-web-wasteland",
+            "name": "황무지 우회로 제보",
+            "description": "지역 게시판에서 읽은 글. 황무지를 가로지르는 길이 실제로 있다고 한다.",
+            "targetMapGuid": "map-006",
+            "targetConnectionGuid": "",
+            "requiredEventKey": "",
+            "type": 1,
+            "timestamp": "",
+            "content": "\"거기 아무것도 없다고들 하는데, 실제로 가 보면 길이 있다. 밟고 지나간 자국이 남아 있으니까.\" — 어느 게시글에서 옮겨 적음.",
+            "source": "지역 게시판",
+            "codexMapGuid": "map-006",
+            "keywords": [
+                "황무지",
+                "우회로",
+                "인터넷"
+            ],
+            "comments": [],
+            "attachments": [
+                {
+                    "kind": 2,
+                    "label": "",
+                    "resourcePath": "",
+                    "mapGuid": "map-006"
+                }
+            ]
+        },
+        {
+            "id": "clue-web-graffiti-photo",
+            "name": "벽에 그려진 표식 사진",
+            "description": "개인 블로그에 올라온 사진. 같은 표식이 여러 곳에서 발견된다.",
+            "targetMapGuid": "",
+            "targetConnectionGuid": "",
+            "requiredEventKey": "",
+            "type": 2,
+            "timestamp": "",
+            "content": "누가 언제 그렸는지 아무도 모른다는 표식. 사진 속 벽의 재질이 황무지 쪽 구조물과 닮았다.",
+            "source": "개인 블로그 '발밑의 도시'",
+            "codexMapGuid": "map-006",
+            "keywords": [
+                "표식",
+                "사진",
+                "인터넷"
+            ],
+            "comments": [],
+            "attachments": [
+                {
+                    "kind": 0,
+                    "label": "블로그에 올라온 사진",
+                    "resourcePath": "RouteFinding/Attachments/20250420_164143_2",
+                    "mapGuid": ""
+                }
+            ]
+        },
+        {
+            "id": "clue-web-night-sound",
+            "name": "새벽에 녹음된 소리",
+            "description": "게시글에 첨부된 녹음 파일. 폐기된 역 근처에서 녹음됐다고 한다.",
+            "targetMapGuid": "",
+            "targetConnectionGuid": "",
+            "requiredEventKey": "",
+            "type": 0,
+            "timestamp": "03:40",
+            "content": "짧은 잡음 뒤에 무언가 규칙적으로 긁히는 소리가 이어진다. 작성자는 열차 소리라고 했지만, 그 역에는 오래전부터 열차가 다니지 않는다.",
+            "source": "지역 게시판",
+            "codexMapGuid": "map-007",
+            "keywords": [
+                "소리",
+                "폐역",
+                "인터넷"
+            ],
+            "comments": [],
+            "attachments": [
+                {
+                    "kind": 1,
+                    "label": "rec_0340.wav",
+                    "resourcePath": "RouteFinding/Attachments/rec_night_call",
+                    "mapGuid": ""
+                }
+            ]
         }
     ]
 }

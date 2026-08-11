@@ -1,0 +1,113 @@
+{
+    "sites": [
+        {
+            "id": "site-local-board",
+            "name": "지역 게시판",
+            "iconPath": "",
+            "unlock": {},
+            "posts": [
+                {
+                    "id": "post-wasteland-detour",
+                    "title": "황무지 쪽으로 돌아가면 빠르다던데",
+                    "author": "익명",
+                    "postedAt": "00:14",
+                    "body": "다들 그쪽은 아무것도 없다고 하는데, 실제로 가 본 사람 있나요?\n제 친구가 저번에 그쪽으로 돌아왔다고 하더라고요. 길이 없는 건 아니고, 밟고 지나간 자국이 남아 있어서 따라가면 된다고 합니다.\n\n혹시 가 보신 분 계시면 어느 쪽으로 진입했는지 알려주세요.",
+                    "grantClueIds": [
+                        "clue-web-wasteland"
+                    ],
+                    "unlock": {},
+                    "attachments": [],
+                    "comments": [
+                        {
+                            "author": "익명2",
+                            "text": "저도 들었어요. 근데 밤에는 가지 말라던데요.",
+                            "createdAt": "00:20"
+                        },
+                        {
+                            "author": "익명5",
+                            "text": "자국이 남아 있다는 게 좀 이상하지 않나요. 거기 사람이 그렇게 자주 다니는 곳이 아닌데.",
+                            "createdAt": "01:02"
+                        }
+                    ]
+                },
+                {
+                    "id": "post-night-sound",
+                    "title": "새벽에 이상한 소리 녹음됨 (파일 첨부)",
+                    "author": "밤샘러",
+                    "postedAt": "03:47",
+                    "body": "폐기된 역 근처에서 녹음했습니다. 열차 소리 같은데 거기 열차 안 다니잖아요.\n볼륨 좀 올려서 들어보세요. 3초쯤부터 들립니다.",
+                    "grantClueIds": [
+                        "clue-web-night-sound"
+                    ],
+                    "unlock": {
+                        "requiredClueIds": [],
+                        "requiredEventKeys": [],
+                        "minGameTime": 60
+                    },
+                    "attachments": [],
+                    "comments": [
+                        {
+                            "author": "익명7",
+                            "text": "이거 그냥 바람 소리 아닌가요",
+                            "createdAt": "04:10"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "site-photo-blog",
+            "name": "발밑의 도시 (개인 블로그)",
+            "iconPath": "",
+            "unlock": {
+                "requiredClueIds": [
+                    "clue-web-wasteland"
+                ],
+                "requiredEventKeys": [],
+                "minGameTime": 0
+            },
+            "posts": [
+                {
+                    "id": "post-graffiti-mark",
+                    "title": "[사진] 벽에 이런 게 그려져 있었다",
+                    "author": "관리자",
+                    "postedAt": "22:31",
+                    "body": "세 번째 발견입니다. 매번 다른 장소인데 표식은 똑같아요.\n찍어 온 사진 올려 둡니다. 벽 재질을 보면 전부 같은 시기에 지어진 구조물 같습니다.",
+                    "grantClueIds": [
+                        "clue-web-graffiti-photo"
+                    ],
+                    "unlock": {},
+                    "attachments": [],
+                    "comments": []
+                }
+            ]
+        },
+        {
+            "id": "site-station-archive",
+            "name": "폐역 기록보관소",
+            "iconPath": "",
+            "unlock": {
+                "requiredClueIds": [],
+                "requiredEventKeys": [
+                    "map-002:metStranger"
+                ],
+                "minGameTime": 0
+            },
+            "posts": [
+                {
+                    "id": "post-station-report",
+                    "title": "폐역 운영 종료 보고서 (요약)",
+                    "author": "보관소",
+                    "postedAt": "—",
+                    "body": "운영 종료 사유는 '이용객 감소'로 기록되어 있으나, 종료 직전 3개월간의 운행 일지가 통째로 비어 있다.\n역사 지하에 별도의 통로가 있었다는 도면이 함께 보관되어 있다.",
+                    "grantClueIds": [
+                        "clue-underground-passage"
+                    ],
+                    "unlock": {},
+                    "attachments": [],
+                    "comments": []
+                }
+            ]
+        }
+    ]
+}

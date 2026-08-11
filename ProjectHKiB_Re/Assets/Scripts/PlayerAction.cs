@@ -1295,6 +1295,15 @@ public partial class @PlayerAction: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""OpenInternet"",
+                    ""type"": ""Button"",
+                    ""id"": ""3a1f7d20-6c48-4a51-9b0e-2f5d8c41a7b3"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -1328,6 +1337,17 @@ public partial class @PlayerAction: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""OpenCodex"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9d2c6b74-1e83-4f0a-8b55-c3a7e51d9f26"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenInternet"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1387,6 +1407,7 @@ public partial class @PlayerAction: IInputActionCollection2, IDisposable
         m_UI_TOGGLE_OpenMap = m_UI_TOGGLE.FindAction("OpenMap", throwIfNotFound: true);
         m_UI_TOGGLE_OpenNote = m_UI_TOGGLE.FindAction("OpenNote", throwIfNotFound: true);
         m_UI_TOGGLE_OpenCodex = m_UI_TOGGLE.FindAction("OpenCodex", throwIfNotFound: true);
+        m_UI_TOGGLE_OpenInternet = m_UI_TOGGLE.FindAction("OpenInternet", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -1885,6 +1906,7 @@ public partial class @PlayerAction: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_TOGGLE_OpenMap;
     private readonly InputAction m_UI_TOGGLE_OpenNote;
     private readonly InputAction m_UI_TOGGLE_OpenCodex;
+    private readonly InputAction m_UI_TOGGLE_OpenInternet;
     public struct UI_TOGGLEActions
     {
         private @PlayerAction m_Wrapper;
@@ -1892,6 +1914,7 @@ public partial class @PlayerAction: IInputActionCollection2, IDisposable
         public InputAction @OpenMap => m_Wrapper.m_UI_TOGGLE_OpenMap;
         public InputAction @OpenNote => m_Wrapper.m_UI_TOGGLE_OpenNote;
         public InputAction @OpenCodex => m_Wrapper.m_UI_TOGGLE_OpenCodex;
+        public InputAction @OpenInternet => m_Wrapper.m_UI_TOGGLE_OpenInternet;
         public InputActionMap Get() { return m_Wrapper.m_UI_TOGGLE; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1910,6 +1933,9 @@ public partial class @PlayerAction: IInputActionCollection2, IDisposable
             @OpenCodex.started += instance.OnOpenCodex;
             @OpenCodex.performed += instance.OnOpenCodex;
             @OpenCodex.canceled += instance.OnOpenCodex;
+            @OpenInternet.started += instance.OnOpenInternet;
+            @OpenInternet.performed += instance.OnOpenInternet;
+            @OpenInternet.canceled += instance.OnOpenInternet;
         }
 
         private void UnregisterCallbacks(IUI_TOGGLEActions instance)
@@ -1923,6 +1949,9 @@ public partial class @PlayerAction: IInputActionCollection2, IDisposable
             @OpenCodex.started -= instance.OnOpenCodex;
             @OpenCodex.performed -= instance.OnOpenCodex;
             @OpenCodex.canceled -= instance.OnOpenCodex;
+            @OpenInternet.started -= instance.OnOpenInternet;
+            @OpenInternet.performed -= instance.OnOpenInternet;
+            @OpenInternet.canceled -= instance.OnOpenInternet;
         }
 
         public void RemoveCallbacks(IUI_TOGGLEActions instance)
@@ -1994,5 +2023,6 @@ public partial class @PlayerAction: IInputActionCollection2, IDisposable
         void OnOpenMap(InputAction.CallbackContext context);
         void OnOpenNote(InputAction.CallbackContext context);
         void OnOpenCodex(InputAction.CallbackContext context);
+        void OnOpenInternet(InputAction.CallbackContext context);
     }
 }

@@ -16,7 +16,7 @@ public class InputManager : MonoBehaviour, @PlayerAction.IPLAYActions, PlayerAct
         inputs.PLAY.SetCallbacks(this);
         inputs.MENU.SetCallbacks(this);
         inputs.UI_TOGGLE.SetCallbacks(this);
-        inputs.UI_TOGGLE.Enable(); // 지도/노트/도감 토글 — PLAY/MENU/GRAFFITI 모드 전환과 무관하게 항상 켜둔다.
+        inputs.UI_TOGGLE.Enable(); // 지도/노트/도감/인터넷 토글 — PLAY/MENU/GRAFFITI 모드 전환과 무관하게 항상 켜둔다.
         PLAYMode();
     }
 
@@ -137,8 +137,8 @@ public class InputManager : MonoBehaviour, @PlayerAction.IPLAYActions, PlayerAct
 
     public void OnGraffiti5(InputAction.CallbackContext context) { }
 
-    // UI_TOGGLE — 지도/노트/도감 패널을 여닫는 단축키. 각 패널이 직접 구독해서 Toggle()을 호출한다
-    // (MapViewer/NotePanel/CodexPanel — 이전엔 이 패널들이 각자 Input.GetKeyDown으로 직접 폴링했다).
+    // UI_TOGGLE — 지도/노트/도감/인터넷 패널을 여닫는 단축키. 각 패널이 직접 구독해서 Toggle()을 호출한다
+    // (MapViewer/NotePanel/CodexPanel/InternetPanel — 이전엔 이 패널들이 각자 Input.GetKeyDown으로 직접 폴링했다).
     public Action<InputAction.CallbackContext> onOpenMap;
     public void OnOpenMap(InputAction.CallbackContext context) => onOpenMap?.Invoke(context);
 
@@ -147,4 +147,7 @@ public class InputManager : MonoBehaviour, @PlayerAction.IPLAYActions, PlayerAct
 
     public Action<InputAction.CallbackContext> onOpenCodex;
     public void OnOpenCodex(InputAction.CallbackContext context) => onOpenCodex?.Invoke(context);
+
+    public Action<InputAction.CallbackContext> onOpenInternet;
+    public void OnOpenInternet(InputAction.CallbackContext context) => onOpenInternet?.Invoke(context);
 }

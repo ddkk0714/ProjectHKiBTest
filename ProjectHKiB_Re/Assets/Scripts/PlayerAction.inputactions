@@ -1273,6 +1273,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "OpenInternet",
+                    "type": "Button",
+                    "id": "3a1f7d20-6c48-4a51-9b0e-2f5d8c41a7b3",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1306,6 +1315,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "OpenCodex",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9d2c6b74-1e83-4f0a-8b55-c3a7e51d9f26",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "OpenInternet",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
