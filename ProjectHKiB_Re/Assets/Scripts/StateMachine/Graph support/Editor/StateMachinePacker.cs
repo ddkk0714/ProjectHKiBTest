@@ -4,6 +4,7 @@ using GraphProcessor;
 using StateMachine;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// 기존 형식(State를 외부 .asset 파일로 두는)의 StateMachineSO를 새 형식(모든 State를 기계 에셋
@@ -26,16 +27,36 @@ using UnityEngine;
 ///   1. allStates의 각 외부 StateSO를 기계 에셋 안으로 복제해 넣는다(원본 파일은 건드리지 않는다).
 ///      allStates에 빠져 있지만 전이로 닿는 State도 따라가서 같이 넣는다 — 새 형식 기계에는
 ///      외부 State 참조가 남으면 안 되기 때문이다.
-///   2. 복제본들 사이의 참조를 다시 엮는다 — initialState, allStates, 각 transition의
-///      trueState/falseState가 외부 원본이 아니라 내부 복제본을 가리키게 한다.
-///      _commandPairs는 UpdateStateMachine()으로 재생성한다.
+///   2. 복제본이 AnimationState면 곧바로 plain StateSO로 바꾸고 animationName을
+///      PlayAnimationAction으로 옮긴다 — ToPlainState / AppendPlayAnimation 참고. 다른 무엇보다
+///      먼저 해야 한다(m_Script를 바꾸면 들고 있던 래퍼가 죽는다).
+///      **DirAnimationState는 건드리지 않는다** — 아래 [애니메이션 State] 참고.
 ///   3. 복제본을 packing 상태로 만들고(isPacked=1, exposedVariables는 템플릿에서 가져옴),
 ///      Enter/Update/ExitActions의 빈 칸(null)을 걷어낸다 — CompactActions 참고.
-///   4. StateMachineGraph를 만들어 InitialStateNode + State별 StateNode를 역할별 레인으로 배치하고,
+///   4. 전이의 activationInput에 맞는 InputAction을 trigger에 물린다 — WireTransitionInputs 참고.
+///   5. 복제본들 사이의 참조를 다시 엮는다 — initialState, allStates, 각 transition의
+///      trueState/falseState가 외부 원본이 아니라 내부 복제본을 가리키게 한다.
+///      _commandPairs는 UpdateStateMachine()으로 재생성한다.
+///   6. StateMachineGraph를 만들어 InitialStateNode + State별 StateNode를 역할별 레인으로 배치하고,
 ///      transitions의 trueState/falseState를 따라 edge를 잇는다.
 ///
-/// [주의] 원본 기계 에셋을 직접 바꾸지 않고 "_packed" 사본을 새로 만든다. 변환 결과가 마음에
-///        들지 않으면 사본만 지우면 되고, 기존 기계는 그대로 살아 있다.
+/// [애니메이션 State]
+/// AnimationState는 쓰지 않는 형식이다(프로젝트 전체 에셋에서 사용처 0). 그 역할은
+/// PlayAnimationAction이 대신하므로, 남아 있는 것이 있으면 plain StateSO + PlayAnimationAction으로
+/// 옮긴다.
+///
+/// DirAnimationState는 다르다. 방향성 애니메이션의 정식 형식이고 실제로 쓰이는 것이 이쪽이다
+/// (프로젝트의 애니메이션 State 74개가 전부 이것이고, 런타임이 물고 있는 Delta_Base_StateMachine의
+/// State 11개도 전부 이것이다). 그러니 형식을 바꾸지 않고 animationName을 가진 채로 둔다.
+///
+/// Delta_Base_StateMachine_test는 State가 plain StateSO + PlayAnimationAction이지만, 그것을
+/// 변환 기준으로 삼으면 안 된다 — 그 기계는 Default.asset과 StateTemplates만 참조하는 형식
+/// 실험용이고, 실제 플레이어(Delta/Hadaka/Training PlayerData, Default/Delta GearData 5곳)는
+/// DirAnimationState를 쓰는 Delta_Base_StateMachine을 물고 있다.
+///
+/// [주의] 원본 기계 에셋을 직접 바꾸지 않고 "_packed" 사본을 만든다. 변환 결과가 마음에 들지
+///        않으면 사본만 지우면 되고, 기존 기계는 그대로 살아 있다. 사본이 이미 있으면 그 에셋을
+///        제자리에서 다시 채운다 — RefillExisting 참고.
 /// </summary>
 public static class StateMachinePacker
 {
@@ -59,6 +80,34 @@ public static class StateMachinePacker
     private const string StateSuffix = "State";
     private static readonly string[] StageSuffixes =
         { "Start", "Keep", "End", "Enter", "Exit", "Begin", "Finish", "ing" };
+
+    /// <summary>
+    /// 전이의 activationInput → 물릴 PLAY 맵 액션 이름. Delta_Base_StateMachine_test를 그대로 따른다.
+    ///
+    /// 값이 여럿이면 그 수만큼 전이를 복제해 각각 다른 액션을 물린다. OnGraffiti가 그런 경우로,
+    /// _test의 PlayerIdle이 낙서 슬롯 1~5 키마다 전이를 하나씩 두고 전부 TransformStart로 보낸다.
+    /// (다섯 전이가 모두 activationInput=OnGraffiti라 CheckInputDecision은 어느 키를 눌러도 첫
+    /// 전이를 고르지만, 셋 다 같은 State로 가므로 결과는 같다. 슬롯별로 다르게 만들려면 State를
+    /// 슬롯 수만큼 두고 StartGraffitiAction.targetSlot을 나눠야 하는데, 그건 Default도 아직 아니다.)
+    ///
+    /// OnGraffitiCancel은 일부러 비워 둔다 — Default도 배선하지 않았고, 낙서 종료는 입력 전이가
+    /// 아니라 GraffitiManager.ExitGraffiti가 player.ChangeState로 직접 처리하기 때문이다.
+    /// 여기에 없는 activationInput은 그대로 두고 경고만 남긴다.
+    /// </summary>
+    private static readonly Dictionary<EnumManager.InputType, string[]> TransitionActionsOf = new()
+    {
+        { EnumManager.InputType.OnAttack, new[] { "Attack" } },
+        { EnumManager.InputType.OnDodge, new[] { "Dodge" } },
+        { EnumManager.InputType.OnSkill, new[] { "Skill" } },
+        { EnumManager.InputType.OnGraffiti,
+            new[] { "Graffiti1", "Graffiti2", "Graffiti3", "Graffiti4", "Graffiti5" } },
+    };
+
+    /// <summary>
+    /// 전이가 성립하는 시점. PLAY 맵 액션에는 interaction이 하나도 안 걸려 있어서 버튼 액션의
+    /// performed는 "누르는 순간"이다. _test의 낙서 전이 5개도 전부 이 값이다.
+    /// </summary>
+    private const EnumManager.InputActionType TriggerWhen = EnumManager.InputActionType.Performed;
 
     [MenuItem("Assets/State Machine/새 형식으로 변환 (Pack)", true)]
     private static bool ValidatePack() => Selection.activeObject is StateMachineSO;
@@ -87,22 +136,36 @@ public static class StateMachinePacker
             return;
         }
 
-        string targetPath = AssetDatabase.GenerateUniqueAssetPath(
-            sourcePath.Replace(".asset", "_packed.asset"));
+        Dictionary<string, InputActionReference> actions =
+            PlayerInputDecisionWirer.LoadPlayActionReferences();
+        if (actions == null) return;
+
+        string targetPath = sourcePath.Replace(".asset", "_packed.asset");
+        var existing = AssetDatabase.LoadAssetAtPath<StateMachineSO>(targetPath);
+        if (existing == null)
+            targetPath = AssetDatabase.GenerateUniqueAssetPath(targetPath);
 
         bool ok = EditorUtility.DisplayDialog(
             "State Machine 변환",
             $"'{source.name}'의 State {source.allStates.Count}개를 새 형식으로 packing합니다.\n" +
-            $"결과: {targetPath}\n\n" +
-            "State의 내용(전이·액션·decision)은 그대로 옮깁니다 — 무손실입니다.\n" +
-            "다만 Enter/Update/ExitActions의 빈 칸(None)은 걷어냅니다 — 실행 시 " +
+            $"결과: {targetPath}\n" +
+            (existing != null
+                ? "\n※ 이 경로에 이미 사본이 있습니다. 새로 만들지 않고 그 에셋을 비운 뒤 다시 채웁니다 — " +
+                  "GUID가 유지되므로 PlayerData/GearData가 물고 있는 참조가 끊기지 않습니다. " +
+                  "그래프에서 손으로 옮겨 둔 노드 배치는 사라집니다.\n"
+                : string.Empty) +
+            "\nState의 내용(전이·액션·decision)은 그대로 옮깁니다.\n" +
+            "다만 다음 셋은 새 형식에 맞춰 바꿉니다.\n" +
+            "  · AnimationState/DirAnimationState → StateSO + PlayAnimationAction\n" +
+            "  · 전이의 activationInput에 맞는 InputAction을 trigger에 배선(낙서는 슬롯 1~5로 분기)\n" +
+            "  · Enter/Update/ExitActions의 빈 칸(None) 제거 — 실행 시 " +
             "NullReferenceException을 내기만 하는 자리입니다.\n\n" +
             "원본 기계와 State 파일들은 그대로 유지됩니다.",
             "변환", "취소");
 
         if (!ok) return;
 
-        StateMachineSO packed = CreatePackedCopy(source, targetPath, LoadTemplates());
+        StateMachineSO packed = CreatePackedCopy(source, targetPath, existing, LoadTemplates(), actions);
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
@@ -123,13 +186,22 @@ public static class StateMachinePacker
     }
 
     private static StateMachineSO CreatePackedCopy(StateMachineSO source, string targetPath,
-                                                   List<StateSO> templates)
+                                                   StateMachineSO existing, List<StateSO> templates,
+                                                   Dictionary<string, InputActionReference> actions)
     {
         // ── 1. 기계 본체 복제 ────────────────────────────────────
-        StateMachineSO packed = Object.Instantiate(source);
-        packed.name = System.IO.Path.GetFileNameWithoutExtension(targetPath);
-        packed.graph = null; // 원본 그래프를 물고 오면 안 된다 — 아래에서 새로 만든다
-        AssetDatabase.CreateAsset(packed, targetPath);
+        StateMachineSO packed;
+        if (existing != null)
+        {
+            packed = RefillExisting(existing, source, targetPath);
+        }
+        else
+        {
+            packed = Object.Instantiate(source);
+            packed.name = System.IO.Path.GetFileNameWithoutExtension(targetPath);
+            packed.graph = null; // 원본 그래프를 물고 오면 안 된다 — 아래에서 새로 만든다
+            AssetDatabase.CreateAsset(packed, targetPath);
+        }
 
         // ── 2. 복제 대상 확정 ───────────────────────────────────
         // allStates + initialState 에서 시작해 전이를 따라 닿는 State를 모두 끌어온다.
@@ -139,6 +211,11 @@ public static class StateMachinePacker
         string prefix = CommonPrefix(ordered.Select(s => s.name).ToList());
         int exposedFromTemplate = 0;
         var compacted = new List<string>();
+        var animated = new List<string>();
+        var notConverted = new List<string>();
+        var unmappedInput = new SortedSet<string>();
+        var missingAction = new SortedSet<string>();
+        int wiredTransitions = 0;
 
         // 같은 State가 allStates에 두 번 들어 있어도 대응표가 중복을 흡수한다.
         var map = new Dictionary<StateSO, StateSO>();
@@ -151,6 +228,32 @@ public static class StateMachinePacker
             copy.name = original.name;
             copy.isTemplate = false;
 
+            // m_Script를 바꾸려면 먼저 에셋 안에 들어가 있어야 한다.
+            AssetDatabase.AddObjectToAsset(copy, packed);
+
+            // AnimationState만 plain StateSO로 바꾼다 — DirAnimationState는 건드리지 않는다.
+            // 반드시 여기서, 다른 무엇보다 먼저 해야 한다. 교체는 관리 객체를 다시 만들기 때문에
+            // 지금 들고 있는 래퍼가 죽고, 죽은 래퍼가 allStates나 그래프에 들어가면 저장할 때
+            // 참조가 통째로 날아간다.
+            string animationName = copy is AnimationState ? ReadAnimationName(copy) : null;
+            if (animationName != null)
+            {
+                copy = ToPlainState(copy, out bool ok);
+                if (copy == null)
+                {
+                    Debug.LogError($"[StateMachinePacker] '{original.name}'을 m_Script 교체 뒤에 다시 찾지 못했습니다. " +
+                                   "변환을 중단합니다 — 만들다 만 사본은 지우고 다시 시도하세요.");
+                    return null;
+                }
+
+                if (ok)
+                {
+                    AppendPlayAnimation(copy, animationName);
+                    animated.Add(original.name);
+                }
+                else notConverted.Add(original.name);
+            }
+
             // 템플릿은 내용이 아니라 "무엇을 노출할지"만 가져온다.
             if (ApplyPackingSettings(copy, MatchTemplate(original.name, prefix, templates)))
                 exposedFromTemplate++;
@@ -158,7 +261,8 @@ public static class StateMachinePacker
             int removed = CompactActions(copy);
             if (removed > 0) compacted.Add($"{original.name}({removed})");
 
-            AssetDatabase.AddObjectToAsset(copy, packed);
+            wiredTransitions += WireTransitionInputs(copy, actions, unmappedInput, missingAction);
+
             map[original] = copy;
         }
 
@@ -196,11 +300,30 @@ public static class StateMachinePacker
                       $"{string.Join(", ", compacted)}. 원본 State 파일에는 그대로 남아 있으니, 원본 기계를 쓰면 " +
                       "해당 State에서 NullReferenceException이 계속 납니다.");
 
+        if (notConverted.Count > 0)
+            Debug.LogError($"[StateMachinePacker] '{packed.name}': m_Script 교체가 듣지 않아 StateSO로 바꾸지 못한 " +
+                           $"State {notConverted.Count}개 — {string.Join(", ", notConverted)}.\n" +
+                           "이 State들은 AnimationState/DirAnimationState인 채로 남아 animationName으로 직접 " +
+                           "재생합니다. 동작은 하지만 형식이 섞이니, 왜 안 됐는지 확인하고 다시 변환하세요 " +
+                           "(PlayAnimationAction은 덧붙이지 않았습니다 — 붙였다면 두 번 재생됩니다).");
+
+        if (unmappedInput.Count > 0)
+            Debug.LogWarning($"[StateMachinePacker] '{packed.name}': 매핑표에 없는 activationInput이라 trigger를 " +
+                             $"비워 둔 전이 {unmappedInput.Count}건 — {string.Join(", ", unmappedInput)}\n" +
+                             "Default도 배선하지 않은 값들입니다. 필요하면 인스펙터에서 직접 지정하세요.");
+
+        if (missingAction.Count > 0)
+            Debug.LogError($"[StateMachinePacker] PlayerAction.inputactions의 " +
+                           $"{PlayerInputDecisionWirer.PlayMap} 맵에서 찾지 못한 액션 — " +
+                           $"{string.Join(", ", missingAction)}");
+
         string extra = pulledIn.Count > 0
             ? $" (allStates에 없었지만 전이로 닿아 함께 넣은 State {pulledIn.Count}개: {string.Join(", ", pulledIn.Select(s => s.name))})"
             : string.Empty;
         Debug.Log($"[StateMachinePacker] '{packed.name}' 생성 완료 — State {map.Count}개를 내부로 packing했습니다. " +
-                  $"(노출 설정을 템플릿에서 가져온 State {exposedFromTemplate}개){extra}");
+                  $"(노출 설정을 템플릿에서 가져온 State {exposedFromTemplate}개, " +
+                  $"PlayAnimationAction으로 옮긴 State {animated.Count}개, " +
+                  $"trigger를 배선한 전이 {wiredTransitions}건){extra}");
         return packed;
     }
 
@@ -231,6 +354,233 @@ public static class StateMachinePacker
         pulledIn = ordered.Skip(declared).ToList();
         return ordered;
     }
+
+    /// <summary>
+    /// 이미 있는 _packed 에셋을 비우고 원본 내용으로 다시 채운다.
+    ///
+    /// 새 파일을 만들면 GUID가 바뀌어서 이 기계를 물고 있는 PlayerData/GearData 참조가 전부
+    /// 끊긴다(Lily/Roza 합쳐 4곳). 메인 에셋 객체를 그대로 두고 서브에셋만 갈아 끼우면
+    /// GUID도 fileID 11400000도 유지되므로 참조가 살아 있다.
+    ///
+    /// 서브에셋(State + 그래프)은 전부 지운다. 남겨 두면 이번 변환에서 만든 것과 섞여
+    /// 어느 쪽이 allStates에 들어 있는지 알 수 없게 된다.
+    /// </summary>
+    private static StateMachineSO RefillExisting(StateMachineSO existing, StateMachineSO source,
+                                                 string targetPath)
+    {
+        foreach (Object o in AssetDatabase.LoadAllAssetsAtPath(targetPath))
+        {
+            if (o == existing || o == null) continue;
+            AssetDatabase.RemoveObjectFromAsset(o);
+            Object.DestroyImmediate(o, true);
+        }
+
+        string keptName = existing.name;
+        EditorUtility.CopySerialized(source, existing); // 같은 형식이므로 안전하다
+        existing.name = keptName;                       // CopySerialized가 원본 이름까지 덮어쓴다
+        existing.graph = null;                          // 원본 그래프를 물고 오면 안 된다
+
+        return existing;
+    }
+
+    /// <summary>
+    /// animationName 필드 값. 그런 필드가 없으면 null.
+    ///
+    /// 호출부에서 형식을 먼저 가른 뒤(AnimationState만) 부른다. 여기서 필드를 직접 보는 것은
+    /// 교체가 실제로 반영됐는지 확인하는 데도 같은 함수를 쓰기 때문이다.
+    /// </summary>
+    private static string ReadAnimationName(StateSO state)
+    {
+        SerializedProperty property = new SerializedObject(state).FindProperty("animationName");
+        return property != null && property.propertyType == SerializedPropertyType.String
+            ? property.stringValue
+            : null;
+    }
+
+    /// <summary>
+    /// 서브에셋의 m_Script를 plain StateSO로 바꾸고, 떨어져 나가는 animationName을
+    /// EnterActions 맨 뒤의 PlayAnimationAction으로 옮긴다.
+    ///
+    /// AnimationState는 StateSO에 animationName 하나만 더한 형식이라, 스크립트만
+    /// 갈아 끼우면 나머지 필드는 이름·형식이 그대로여서 전부 살아남고 animationName만 떨어져 나간다.
+    /// 새 StateSO를 만들어 SerializedObject로 필드를 옮기는 방법도 있지만, 2021.3의
+    /// CopyFromSerializedProperty는 [SerializeReference] 필드(Action/Decision 전부가 이것이다)를
+    /// 제대로 복사하지 못한다. 여기서는 Instantiate가 이미 완전한 복제본을 만들어 둔 상태이므로
+    /// 아무것도 복사할 필요가 없다 — 형식표만 바꾸면 된다.
+    ///
+    /// [죽은 래퍼 주의]
+    /// ApplyModifiedProperties로 m_Script가 바뀌는 순간 Unity는 관리 객체를 버리고 새로 만든다.
+    /// 넘겨받은 copy는 그 시점부터 죽은 래퍼라 SerializedObject에 다시 넣으면
+    /// "ArgumentException: Object at index 0 is null"이 난다. instanceID는 그대로이므로 그것으로
+    /// 다시 받아 오고, 이후로는 돌려받은 쪽만 쓴다.
+    ///
+    /// 그래서 이 교체는 복제 직후, 다른 어떤 작업보다 먼저 해야 한다. 죽은 래퍼가 allStates나
+    /// 그래프 노드에 들어간 뒤에 교체하면 저장할 때 그 참조들이 통째로 날아간다.
+    /// </summary>
+    /// <param name="converted">animationName이 실제로 떨어져 나갔으면 true</param>
+    /// <returns>교체 뒤의 살아 있는 객체. 다시 찾지 못하면 null.</returns>
+    private static StateSO ToPlainState(StateSO copy, out bool converted)
+    {
+        converted = false;
+
+        int instanceID = copy.GetInstanceID();
+        string assetPath = AssetDatabase.GetAssetPath(copy);
+        string stateName = copy.name;
+
+        var serialized = new SerializedObject(copy);
+        SerializedProperty script = serialized.FindProperty("m_Script");
+        if (script == null || PlainStateScript == null) return copy; // 아직 안 건드렸으니 살아 있다
+
+        script.objectReferenceValue = PlainStateScript;
+        serialized.ApplyModifiedProperties();
+        // ↓ 여기서부터 copy는 죽은 래퍼다. 쓰지 말 것.
+
+        var fresh = EditorUtility.InstanceIDToObject(instanceID) as StateSO
+                    ?? AssetDatabase.LoadAllAssetsAtPath(assetPath)
+                        .OfType<StateSO>().FirstOrDefault(s => s.name == stateName);
+        if (fresh == null) return null;
+
+        // 형식(GetType)이 아니라 직렬화 필드로 확인한다 — 교체가 언제 관리 형식에 반영되는지와
+        // 무관하게, animationName이 사라졌다면 그 State는 더 이상 스스로 재생하지 않는다.
+        converted = ReadAnimationName(fresh) == null;
+        return fresh;
+    }
+
+    /// <summary>
+    /// animationName을 EnterActions 맨 뒤의 PlayAnimationAction으로 옮긴다.
+    ///
+    /// 맨 뒤인 이유는 AnimationState.EnterState가 base(=EnterActions)를 먼저 돌리고 나서 Play를
+    /// 부르기 때문이다. _test의 PlayerWalk/TransformStart도 PlayAnimationAction이 뒤에 있다.
+    ///
+    /// SerializedObject로 넣는 것은 m_Script 교체가 관리 형식에 언제 반영되는지와 무관하게
+    /// 같은 결과를 내기 위해서다 — EnterActions는 교체 전후 어느 형식에나 있는 필드다.
+    /// </summary>
+    private static void AppendPlayAnimation(StateSO state, string animationName)
+    {
+        var serialized = new SerializedObject(state);
+        SerializedProperty enterActions = serialized.FindProperty(nameof(StateSO.EnterActions));
+        if (enterActions == null) return;
+
+        enterActions.arraySize++;
+        enterActions.GetArrayElementAtIndex(enterActions.arraySize - 1).managedReferenceValue =
+            new PlayAnimationAction { animationName = animationName };
+
+        serialized.ApplyModifiedProperties();
+    }
+
+    private static MonoScript _plainStateScript;
+    private static MonoScript PlainStateScript
+    {
+        get
+        {
+            if (_plainStateScript != null) return _plainStateScript;
+
+            var probe = ScriptableObject.CreateInstance<StateSO>();
+            _plainStateScript = MonoScript.FromScriptableObject(probe);
+            Object.DestroyImmediate(probe);
+            return _plainStateScript;
+        }
+    }
+
+    /// <summary>
+    /// 전이의 activationInput에 맞는 InputAction을 trigger에 물린다.
+    ///
+    /// trigger가 비어 있으면 CommandPair.Bind가 `if (trigger)`에서 걸러 아무것도 구독하지 않는다.
+    /// 그래서 activationInput만 있고 trigger가 없는 전이는 영원히 성립하지 않는다 — Roza/Lily의
+    /// 공격·회피·스킬·낙서 전이가 전부 그 상태였다(합쳐 95건).
+    ///
+    /// 액션이 여럿인 activationInput은 전이를 그 수만큼 복제한다(낙서 슬롯 1~5). 복제본은
+    /// decisions와 Action의 [SerializeReference] 인스턴스를 원본과 공유한다 — Decision/Action은
+    /// 상태를 갖지 않는 설정 객체이고, Unity는 한 객체 안에서 같은 참조를 rid 하나로 직렬화한다.
+    ///
+    /// 이미 trigger가 채워져 있으면 건드리지 않는다.
+    /// </summary>
+    /// <returns>trigger를 채운 전이 수(복제본 포함)</returns>
+    private static int WireTransitionInputs(StateSO copy, Dictionary<string, InputActionReference> actions,
+                                            SortedSet<string> unmapped, SortedSet<string> missing)
+    {
+        if (copy.transitions == null || copy.transitions.Length == 0) return 0;
+
+        var result = new List<StateTransition>(copy.transitions.Length);
+        int wired = 0;
+
+        foreach (StateTransition transition in copy.transitions)
+        {
+            if (transition == null) continue;
+
+            if (transition.activationInput == EnumManager.InputType.None || transition.trigger != null)
+            {
+                result.Add(transition);
+                continue;
+            }
+
+            if (!TransitionActionsOf.TryGetValue(transition.activationInput, out string[] names))
+            {
+                unmapped.Add($"{copy.name}: {transition.activationInput}");
+                result.Add(transition);
+                continue;
+            }
+
+            var resolved = new List<InputActionReference>();
+            foreach (string actionName in names)
+            {
+                if (actions.TryGetValue(actionName, out InputActionReference reference)) resolved.Add(reference);
+                else missing.Add(actionName);
+            }
+
+            if (resolved.Count == 0)
+            {
+                result.Add(transition);
+                continue;
+            }
+
+            // 첫 칸은 원본을 그대로 쓰고 나머지는 복제한다. 복제는 원본을 고치기 전에 떠 둔
+            // 사본에서 만들어야 이름·trigger가 섞이지 않는다.
+            StateTransition pristine = CloneTransition(transition);
+
+            for (int i = 0; i < resolved.Count; i++)
+            {
+                StateTransition target = i == 0 ? transition : CloneTransition(pristine);
+
+                target.trigger = resolved[i];
+                target.type = TriggerWhen;
+
+                // 이름이 갈라져야 그래프 포트와 인스펙터에서 어느 슬롯인지 알아볼 수 있다.
+                if (resolved.Count > 1)
+                    target.name = string.IsNullOrEmpty(pristine.name)
+                        ? resolved[i].action.name
+                        : $"{pristine.name}{i + 1}";
+
+                result.Add(target);
+                wired++;
+            }
+        }
+
+        copy.transitions = result.ToArray();
+        return wired;
+    }
+
+    /// <summary>
+    /// 전이의 얕은 복사. decisions 배열만 새로 뜨고, 그 안의 Decision과 Action 인스턴스는
+    /// 원본과 공유한다 — 둘 다 상태 없는 설정 객체다.
+    /// </summary>
+    private static StateTransition CloneTransition(StateTransition source) => new()
+    {
+        name = source.name,
+        activationInput = source.activationInput,
+        trigger = source.trigger,
+        type = source.type,
+        availableTime = source.availableTime,
+        disableTime = source.disableTime,
+        decisions = source.decisions == null
+            ? null
+            : (StateTransition.DecisionSet[])source.decisions.Clone(),
+        trueState = source.trueState,
+        falseState = source.falseState,
+        Action = source.Action,
+        showTrueStatePort = source.showTrueStatePort,
+        showFalseStatePort = source.showFalseStatePort,
+    };
 
     /// <summary>Assets/ScriptableObjects/StateTemplates 아래의 템플릿 State들.</summary>
     private static List<StateSO> LoadTemplates()

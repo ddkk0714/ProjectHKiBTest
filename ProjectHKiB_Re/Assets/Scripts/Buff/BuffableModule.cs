@@ -85,8 +85,43 @@ public class BuffableModule : InterfaceModule, IBuffable
     // 메서드 자체는 IBuffable → IInitializable 계약이라 남겨둔다.
     public void Initialize() { }
 
+    // StatBuffSO -> 그 SO의 첫 BuffInfo. FindBuff를 O(1)로 만들기 위한 색인이다.
+    //
+    // 예전 구현은 CurrentBuffs.Find(b => b.Buff == buff) 한 줄이었는데 두 가지가 겹쳐 비쌌다.
+    //   - 람다가 buff를 캡처하므로 호출할 때마다 클로저와 Predicate 델리게이트를 새로 할당한다.
+    //   - b.Buff == buff는 UnityEngine.Object의 == 오버로드라 네이티브 생존 검사까지 탄다.
+    // 둘 다 버프 개수에 비례해 늘어나는데, EmotionVectorModule이 이걸 매 프레임 부른다 —
+    // Update의 색 폴링만 14회, 조합 판정(ApplyCombinations)까지 돌면 프레임당 100회를 넘는다.
+    // 그래서 "버프를 많이 바르면 프레임이 떨어지는" 증상이 났다.
+    private readonly Dictionary<StatBuffSO, BuffInfo> _buffIndex = new();
+
+    // 색인을 갱신한 시점의 CurrentBuffs.Count. CurrentBuffs는 public set이라 외부에서 통째로
+    // 갈아끼울 수 있어서, 개수가 어긋나면 색인을 다시 만든다(O(1) 검사로 desync를 잡는다).
+    private int _indexedCount = -1;
+
+    private void RebuildIndex()
+    {
+        _buffIndex.Clear();
+
+        for (int i = 0; i < CurrentBuffs.Count; i++)
+        {
+            BuffInfo info = CurrentBuffs[i];
+            if (info?.Buff == null) continue;
+
+            // Independant는 같은 SO로 BuffInfo가 여러 개 생긴다. 예전 Find와 같이 "첫 번째"를 준다.
+            if (!_buffIndex.ContainsKey(info.Buff)) _buffIndex[info.Buff] = info;
+        }
+
+        _indexedCount = CurrentBuffs.Count;
+    }
+
     public BuffInfo FindBuff(StatBuffSO buff)
-        => CurrentBuffs.Find(b => b.Buff == buff);
+    {
+        if (buff == null) return null;
+        if (_indexedCount != CurrentBuffs.Count) RebuildIndex();
+
+        return _buffIndex.TryGetValue(buff, out BuffInfo info) ? info : null;
+    }
 
     public BuffInfo Buff(StatBuffSO buff, int buffStack = 1, int timeStack = 1, float overrideTime = -1)
     {
@@ -102,6 +137,8 @@ public class BuffableModule : InterfaceModule, IBuffable
                 buffInfo.Cooltime.StartTimer(cooltime, () => UnBuff(buff));
 
             CurrentBuffs.Add(buffInfo);
+            if (!_buffIndex.ContainsKey(buff)) _buffIndex[buff] = buffInfo;
+            _indexedCount = CurrentBuffs.Count;
         }
         else
         {
@@ -173,5 +210,20 @@ public class BuffableModule : InterfaceModule, IBuffable
     {
         buffInfo.Cooltime?.CancelTimer();
         CurrentBuffs.Remove(buffInfo);
+
+        // 색인이 가리키던 항목이 빠졌으면 같은 SO의 다른 BuffInfo로 넘긴다(Independant면 남아 있다).
+        if (buffInfo.Buff != null && _buffIndex.TryGetValue(buffInfo.Buff, out BuffInfo indexed) && indexed == buffInfo)
+        {
+            _buffIndex.Remove(buffInfo.Buff);
+
+            for (int i = 0; i < CurrentBuffs.Count; i++)
+            {
+                if (CurrentBuffs[i]?.Buff != buffInfo.Buff) continue;
+                _buffIndex[buffInfo.Buff] = CurrentBuffs[i];
+                break;
+            }
+        }
+
+        _indexedCount = CurrentBuffs.Count;
     }
 }

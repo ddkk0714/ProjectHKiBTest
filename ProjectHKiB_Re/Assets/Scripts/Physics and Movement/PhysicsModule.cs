@@ -69,6 +69,8 @@ public interface IPhysics : IPhysicsBase, IInitializable
 
     public void LogicalTeleport(Vector3 position);
     public void RealTeleport(Vector3 position);
+    public void MoveToward(Vector3 targetPos, float maxDistance);
+    public void StopMove();
 }
 
 public class PhysicsModule : InterfaceModule, IPhysics
@@ -185,6 +187,32 @@ public class PhysicsModule : InterfaceModule, IPhysics
 
     public void LogicalTeleport(Vector3 position) => physManager.LogicalTeleport(this, position);
     public void RealTeleport(Vector3 position) => physManager.RealTeleport(this, position);
+
+    // 수평 이동을 멈춘다. 공격을 시작할 때처럼 "여기서부터는 액션이 옮기는 만큼만 움직인다"를
+    // 만들 때 쓴다. ZVelocity는 건드리지 않는다 — 낙하/점프는 별개 축이라 같이 끄면 간섭한다.
+    //
+    // 걷기는 HVelocity가 아니라 IsWalking/WalkingDir이 구동한다. PhysicsManager가 매 프레임
+    // 그 방향으로 최대 보행속도까지 가속하므로(187~199행), 속도만 0으로 만들면 다음 프레임에
+    // 도로 가속된다. WalkingDir을 갱신해 주는 WalkByInputAction이 없는 State(공격 등)에서는
+    // 마지막 입력 방향으로 계속 밀려나간다 — 반드시 걷기 자체를 꺼야 한다.
+    public void StopMove()
+    {
+        IsWalking = false;
+        WalkingDir = Vector2.zero;
+        HVelocity = Vector2.zero;
+    }
+
+    // 공격 돌진용. 목표 쪽으로 maxDistance까지만 가고, 목표가 더 가까우면 거기까지만 간다.
+    // 벽과 다른 엔티티는 InstantMove가 격자 한 칸씩 전진하며 검사해 막히는 자리에서 멈춘다.
+    // interpolate=true라 논리 위치만 옮기고 몸통은 따라붙으므로 순간이동처럼 보이지 않는다.
+    public void MoveToward(Vector3 targetPos, float maxDistance)
+    {
+        Vector2 toTarget = (Vector2)targetPos - HPosition;
+        float distance = Mathf.Min(toTarget.magnitude, maxDistance);
+        if (distance <= 0f) return;
+
+        physManager.InstantMove(this, toTarget.normalized * distance, true);
+    }
 
     // 인스펙터 버튼은 클릭하려고 게임 창 포커스를 빼야 해서 그 순간 이동 입력이 끊기고 IsWalking이
     // False로 찍힌다 — 이동 키를 누른 채로 확인할 수 있도록 키 입력으로도 트리거한다.

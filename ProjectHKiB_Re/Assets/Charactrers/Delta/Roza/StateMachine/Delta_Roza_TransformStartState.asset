@@ -52,10 +52,8 @@ MonoBehaviour:
   - rid: 8642958643451396281
   updateActions:
   - {fileID: 11400000, guid: 7263eacb51896564e8bf3466a98c6b58, type: 2}
-  - {fileID: 0}
   UpdateActions:
   - rid: 8642958643451396282
-  - rid: -2
   exitActions:
   - {fileID: 11400000, guid: eeb57eb8267872f41ad7104a78faf7cd, type: 2}
   ExitActions:

@@ -154,8 +154,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 89eb5a29b6673714bb4de9694caa387a, type: 2}
   - {fileID: 11400000, guid: 9803c0b8775edce4ab1c7847408e6785, type: 2}
   EnterActions:
-  - rid: 8642958643451396717
   - rid: 8642958643451396718
+  - rid: 8642958643451396717
   updateActions:
   - {fileID: 0}
   UpdateActions:

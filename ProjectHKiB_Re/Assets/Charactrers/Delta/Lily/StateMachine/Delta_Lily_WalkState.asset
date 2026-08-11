@@ -150,7 +150,8 @@ MonoBehaviour:
   UpdateActions:
   - rid: 8642958643451396442
   - rid: 8642958643451396443
-  ExitActions: []
+  ExitActions:
+  - rid: 8642958643451396446
   actionSequence:
   - time: 0.2
     Action:
@@ -215,3 +216,7 @@ MonoBehaviour:
     - rid: 8642958643451396445
       type: {class: PlayFootstepAction, ns: StateMachine, asm: Assembly-CSharp}
       data: 
+    - rid: 8642958643451396446
+      type: {class: ApplyWalkAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        apply: 0

@@ -48,6 +48,11 @@ public class DatabaseManagerSO : ScriptableObject
     public void SetIDodgeable(IInterfaceRegistable entity, IDodgeableBase data)
     => SetIDodgeable(entity.GetInterface<IDodgeable>(), data);
     public void SetIDodgeable(IDodgeableBase dodgeable, IDodgeableBase data)
+    => CopyDodgeableData(dodgeable, data);
+
+    // GearDataSO도 기어를 켤 때 같은 복사가 필요한데, ScriptableObject라 인스펙터로 이 매니저를
+    // 물려 주려면 기어 에셋마다 참조를 채워야 한다. 순수 복사라 정적으로 열어 둔다.
+    public static void CopyDodgeableData(IDodgeableBase dodgeable, IDodgeableBase data)
     {
         dodgeable.BaseDodgeCooltime = data.BaseDodgeCooltime;
         dodgeable.InitialDodgeMaxDistance = data.InitialDodgeMaxDistance;

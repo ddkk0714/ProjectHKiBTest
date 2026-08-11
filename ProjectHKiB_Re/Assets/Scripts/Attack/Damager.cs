@@ -99,6 +99,9 @@ public class Damager : MonoBehaviour
 
     public void StopEffect(int animPlayerNum)
     {
+        // StopAttackEffectAction.EffectPlayerNumber는 State 에셋에 손으로 적는 값이라 배열보다
+        // 클 수 있다. 원소 null만 보던 검사로는 범위 초과를 못 막는다.
+        if (animPlayerNum < 0 || animPlayerNum >= _effectAnimationPlayer.Length) return;
         if (!_effectAnimationPlayer[animPlayerNum]) return;
 
         _effectAnimationPlayer[animPlayerNum].Stop();

@@ -43,11 +43,15 @@ public class StateSO : ScriptableObject
     [NaughtyAttributes.ShowIf("useTimer")][NaughtyAttributes.MinValue(0)][NaughtyAttributes.MaxValue(9)] public int timerID;
     [NaughtyAttributes.ShowIf("useTimer")] public float time;
 
+    // 액션 목록에는 빈 칸이 섞일 수 있다. 그래프 편집기에서 슬롯만 늘리고 클래스를 안 고르면
+    // SerializeReference가 null(rid: -2)로 저장되고, 실제로 Delta_Roza_TransformStartState의
+    // updateActions에 그런 칸이 하나 있다. UpdateState는 CheckDecision 바로 앞에서 도는 터라
+    // 여기서 터지면 그 State의 전이가 한 번도 평가되지 못하고 캐릭터가 멈춘 것처럼 보인다.
     public virtual void EnterState(StateController stateController)
     {
         for (int i = 0; i < EnterActions.Length; i++)
         {
-            EnterActions[i].Act(stateController);
+            EnterActions[i]?.Act(stateController);
         }
         //ReserveFrameDecisions(stateController);
         ReserveTransitions(stateController);
@@ -72,7 +76,7 @@ public class StateSO : ScriptableObject
     public virtual void UpdateState(StateController stateController)
     {
         for (int i = 0; i < UpdateActions.Length; i++)
-            UpdateActions[i].Act(stateController);
+            UpdateActions[i]?.Act(stateController);
     }
 
     public IEnumerator TransitionWaitAvailableCoroutine(int i, StateController stateController)
@@ -96,7 +100,7 @@ public class StateSO : ScriptableObject
         if (actionSequence.Length > 0) stateController.StopActionSequence();
         for (int i = 0; i < ExitActions.Length; i++)
         {
-            ExitActions[i].Act(stateController);
+            ExitActions[i]?.Act(stateController);
         }
         ResetTimers(stateController);
     }

@@ -118,7 +118,20 @@ public class TimerManager : MonoBehaviour
         // → SetUpdate(true)를 붙이면 메뉴를 열어둔 채로 버프가 계속 닳게 되니 붙이지 말 것.
         Sequence sequence = DOTween.Sequence();
         sequence.AppendInterval(duration);
-        sequence.OnComplete(timerEnded);
+
+        // 자연 만료한 타이머도 목록에서 뺀다. 예전엔 CancelTimer로만 지워서, 만료된 뒤 다시
+        // 시작되지 않는 타이머의 항목이 영영 남았다(Permanent 버프, 스택이 남은 Unstack 버프 등).
+        // defaultAutoKill이 켜져 있어 시퀀스는 이미 죽은 뒤라 죽은 참조만 쌓였고, 그걸 읽는
+        // GetElapsedTime은 safeMode 경고까지 냈다.
+        //
+        // 콜백보다 먼저 지운다 — 콜백 안에서 같은 Timer가 StartTimer로 다시 시작하는 경우가
+        // 있는데(버프 재적용 등), 나중에 지우면 그 새 항목을 지워버린다.
+        sequence.OnComplete(() =>
+        {
+            _cooltimes.Remove(ID);
+            timerEnded?.Invoke();
+        });
+
         _cooltimes[ID] = sequence;
     }
 

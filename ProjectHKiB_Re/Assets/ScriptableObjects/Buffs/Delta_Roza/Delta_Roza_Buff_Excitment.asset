@@ -11,16 +11,19 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: Delta_Roza_Buff_Excitment
-  m_EditorClassIdentifier: 
-  <Description>k__BackingField: "\uADF9\uD55C\uD68C\uD53C \uC131\uACF5\uC2DC 8\uCD08\uB3D9\uC548
-    \uACF5\uACA9\uB825\uC774 50% \uC0C1\uC2B9\uD55C\uB2E4. \n\uC911\uBCF5\uC2DC \uC9C0\uC18D\uC2DC\uAC04\uC774
-    \uAC31\uC2E0\uB41C\uB2E4."
+  m_EditorClassIdentifier:
+  saveId: ba1380716c5aa394a82753644ed9a0da
+  <Description>k__BackingField: "\uADF9\uD55C\uD68C\uD53C \uC131\uACF5\uC2DC 8\uCD08\uB3D9\uC548 \uACF5\uACA9\uB825\uC774 50% \uC0C1\uC2B9\uD55C\uB2E4. \n\uC911\uBCF5\uC2DC \uC9C0\uC18D\uC2DC\uAC04\uC774 \uAC31\uC2E0\uB41C\uB2E4."
   <IsBuffTimeInfinite>k__BackingField: 0
   <BuffTime>k__BackingField: 8
-  <IsDebuff>k__BackingField: 0
-  <Value>k__BackingField: 0.5
-  <IsValuePropositional>k__BackingField: 1
-  <BuffType>k__BackingField: {fileID: 11400000, guid: 76ccfc27f53ed0a4ba32218bb173d74a, type: 2}
+  isEmotionBuff: 0
+  emotionColor: 0
+  maxStack: 200
   <TimeStackType>k__BackingField: 2
   <BuffStackType>k__BackingField: 2
   <BuffRemoveType>k__BackingField: 0
+  <Effects>k__BackingField:
+  - <BuffType>k__BackingField: {fileID: 11400000, guid: 76ccfc27f53ed0a4ba32218bb173d74a, type: 2}
+    <IsDebuff>k__BackingField: 0
+    <Value>k__BackingField: 0.5
+    <IsValuePropositional>k__BackingField: 1

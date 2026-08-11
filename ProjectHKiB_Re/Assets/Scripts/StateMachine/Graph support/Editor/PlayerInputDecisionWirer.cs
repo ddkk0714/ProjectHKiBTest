@@ -34,7 +34,7 @@ using UnityEngine.InputSystem;
 public static class PlayerInputDecisionWirer
 {
     private const string ActionsAssetPath = "Assets/Scripts/PlayerAction.inputactions";
-    private const string PlayMap = "PLAY";
+    internal const string PlayMap = "PLAY";
 
     /// <summary>InputProcessType.InProgress. 옛 판정이 전부 inProgress/현재값 기반이었다.</summary>
     private const int InProgress = (int)EnumManager.InputProcessType.InProgress;
@@ -232,8 +232,10 @@ public static class PlayerInputDecisionWirer
     /// 둘 다 같은 액션으로 해석되지만 숨김 사본은 옛 식별자를 살려 두려고 있는 것이라,
     /// 새로 배선할 때 쓰면 안 된다(임포터 버전이 바뀌면 사라질 수 있다).
     /// NotEditable은 양쪽 다 붙으므로 HideInHierarchy 유무로만 갈라야 한다.
+    ///
+    /// StateMachinePacker도 전이의 trigger를 채울 때 같은 표가 필요해서 internal로 열어 둔다.
     /// </summary>
-    private static Dictionary<string, InputActionReference> LoadPlayActionReferences()
+    internal static Dictionary<string, InputActionReference> LoadPlayActionReferences()
     {
         Object[] all = AssetDatabase.LoadAllAssetsAtPath(ActionsAssetPath);
         if (all == null || all.Length == 0)
