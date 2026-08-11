@@ -32,6 +32,7 @@ namespace RouteFinding.Codex
         public event Action<CodexEntry> OnPinRequested;
         public event Action<CodexEntry> OnSuggestionAddRequested;
         public event Action<string> OnKeywordClicked; // 6-4단계 — 키워드 태그 클릭
+        public event Action<string> OnMapRefClicked;  // 첨부물(맵 참조)의 "지도" 버튼 — 인자는 맵 GUID
 
         private TextMeshProUGUI _titleTmp;
         private GameObject _typeBadgeGO;
@@ -50,9 +51,15 @@ namespace RouteFinding.Codex
         private RectTransform _suggestionsRT;
         private GameObject _suggestionsGO;
 
+        private GameObject _attachmentsSectionGO;
+        private RectTransform _attachmentsRT;
+
         private GameObject _commentsSectionGO;
         private RectTransform _commentsRT;
         private readonly List<Coroutine> _typewriterCoroutines = new();
+
+        // 첨부 소리 재생용 — 노트 그래프와 같은 헬퍼를 쓴다(ClueAttachmentAudioPlayer 참고).
+        private ClueAttachmentAudioPlayer _audio;
 
         private TMP_FontAsset _font;
         private CodexEntry _currentEntry;
@@ -62,6 +69,7 @@ namespace RouteFinding.Codex
         [Header("행 템플릿 (선택 — 비워두면 아래 스타일 값으로 기본 템플릿 생성)")]
         [SerializeField] private GameObject _suggestionRowTemplate;
         [SerializeField] private GameObject _commentRowTemplate;
+        [SerializeField] private GameObject _attachmentRowTemplate;
 
         // 추천/코멘트 행은 ShowSuggestions()/RefreshComments()마다 UiRowPool에서 재사용된다 —
         // 커스텀 템플릿을 안 쓸 때의 기본 템플릿 스타일로 쓰인다.
@@ -72,9 +80,14 @@ namespace RouteFinding.Codex
         [SerializeField] private float _dynamicRowFontSize = 7f;
         [SerializeField] private float _suggestionRowHeight = 12f;
         [SerializeField] private float _commentRowHeight = 28f;
+        [Tooltip("첨부물 한 줄(아이콘 + 이름 + 버튼)의 높이 — 사진 첨부는 여기에 미리보기 높이가 더 붙는다")]
+        [SerializeField] private float _attachmentRowHeight = 14f;
+        [Tooltip("사진 첨부의 미리보기 높이(가로는 원본 비율 유지)")]
+        [SerializeField] private float _imagePreviewHeight = 60f;
 
         private UiRowPool _suggestionPool;
         private UiRowPool _commentPool;
+        private UiRowPool _attachmentPool;
 
         public void Init(RectTransform parent, TMP_FontAsset font)
         {
@@ -134,6 +147,7 @@ namespace RouteFinding.Codex
             _keywordLinkHandler.Text = _keywordsTmp;
             _keywordLinkHandler.OnLinkClicked = kw => OnKeywordClicked?.Invoke(kw);
 
+            BuildAttachmentsSection(content, font);
             BuildEditRow(content, font);
             BuildPinRow(content, font);
             BuildSuggestionsArea(content, font);
@@ -177,6 +191,27 @@ namespace RouteFinding.Codex
             // Bind()는 font 인자를 받지 않는다 — 이미 프리팹에 구워진 라벨의 font를 그대로 재사용한다.
             _font = _titleTmp != null ? _titleTmp.font : null;
 
+            // 첨부 영역(2026-08-11 신설)은 그 이전에 저장된 프리팹/씬 패널에는 아예 없다. 패널 전체를
+            // 파괴하고 다시 만들면 작업자가 프리팹에서 손본 디자인이 통째로 날아가므로, 없는 영역만
+            // 제자리에서 만들어 끼워 넣는다(편집 행 바로 앞 = Init()이 만드는 순서와 같은 위치).
+            var attachmentsTF = FindDeepTransform(existingRoot, "AttachmentsSection");
+            if (attachmentsTF == null)
+            {
+                var contentTF = FindDeepTransform(existingRoot, "Content") as RectTransform;
+                if (contentTF != null)
+                {
+                    BuildAttachmentsSection(contentTF, _font);
+                    if (_editRowGO != null)
+                        _attachmentsSectionGO.transform.SetSiblingIndex(_editRowGO.transform.GetSiblingIndex());
+                }
+                else Debug.LogWarning("[CodexCardView] Bind: Content를 찾지 못해 첨부 영역을 만들지 못했습니다.");
+            }
+            else
+            {
+                _attachmentsSectionGO = attachmentsTF.gameObject;
+                _attachmentsRT = attachmentsTF as RectTransform;
+            }
+
             var pinRowTF = FindDeepTransform(existingRoot, "PinRow");
             _pinRowGO = pinRowTF?.gameObject;
             _pinBtn = pinRowTF?.GetComponent<Button>();
@@ -199,6 +234,7 @@ namespace RouteFinding.Codex
         {
             _suggestionPool ??= new UiRowPool(_suggestionRowTemplate, BuildSuggestionRowTemplate);
             _commentPool ??= new UiRowPool(_commentRowTemplate, BuildCommentRowTemplate);
+            _attachmentPool ??= new UiRowPool(_attachmentRowTemplate, BuildAttachmentRowTemplate);
         }
 
         // 카드 내용이 영역보다 길어질 수 있어(코멘트 등) 드래그/휠 스크롤이 되도록 감싼다.
@@ -381,6 +417,241 @@ namespace RouteFinding.Codex
             return row.gameObject;
         }
 
+        // ─── 첨부물 (사진 / 소리 / 맵 아이콘·이름) ─────────────────
+
+        // 첨부 영역 자체(구분선 + "첨부" 헤더)는 정적으로 한 번만 만든다 — 실제 첨부 행만
+        // UiRowPool로 재사용된다(코멘트 영역과 동일한 구조).
+        private void BuildAttachmentsSection(RectTransform parent, TMP_FontAsset font)
+        {
+            var section = NewRect(parent, "AttachmentsSection");
+            _attachmentsSectionGO = section.gameObject;
+            _attachmentsRT = section;
+            var le = section.gameObject.AddComponent<LayoutElement>();
+            le.preferredHeight = 25f;
+            le.flexibleWidth = 1f;
+
+            var vlg = section.gameObject.AddComponent<VerticalLayoutGroup>();
+            vlg.spacing = 2f;
+            vlg.childControlWidth = true;
+            vlg.childControlHeight = false;
+            vlg.childForceExpandWidth = true;
+            vlg.childForceExpandHeight = false;
+
+            MakeSep(section);
+            var header = MakeTMP(section, font, "첨부", 7f, FontStyles.Bold, TextAlignmentOptions.MidlineLeft, height: 12f, id: "AttachmentsHeader");
+            header.color = _colMuted;
+
+            section.gameObject.SetActive(false);
+        }
+
+        // ShowEntry가 카드를 바꿀 때마다 호출. 행 높이가 종류마다 달라(사진은 미리보기가 붙는다)
+        // 각 행이 실제로 쓴 높이를 합산해 영역 높이를 잡는다.
+        private void RefreshAttachments(ClueAttachment[] attachments)
+        {
+            StopAudio(); // 카드를 바꾸면 이전 카드에서 재생 중이던 소리는 멈춘다
+
+            bool hasAny = attachments != null && attachments.Length > 0;
+            _attachmentsSectionGO?.SetActive(hasAny);
+            if (!hasAny || _attachmentsRT == null) { _attachmentPool?.EndPass(); return; }
+
+            float total = 17f; // 구분선(1) + 헤더(12) + spacing*2(4)
+            foreach (var a in attachments)
+            {
+                if (a == null) continue;
+                total += PopulateAttachmentRow(_attachmentPool.Get(_attachmentsRT), a) + 2f;
+            }
+            _attachmentPool.EndPass();
+
+            _attachmentsSectionGO.GetComponent<LayoutElement>().preferredHeight = total;
+        }
+
+        // 한 행을 첨부물 하나로 채우고, 그 행이 차지한 높이를 돌려준다.
+        // 에셋을 못 찾아도(경로 오타 등) 행을 숨기지 않고 "(파일 없음)"으로 표시한다 — 조용히 사라지면
+        // 콘텐츠 작업자가 첨부를 붙였는지조차 확인할 수 없기 때문.
+        private float PopulateAttachmentRow(GameObject row, ClueAttachment a)
+        {
+            var head = row.transform.Find("Head");
+            var iconImg   = head != null ? head.Find("Icon")?.GetComponent<Image>() : null;
+            var labelTmp  = head != null ? head.Find("Text")?.GetComponent<TextMeshProUGUI>() : null;
+            var btnTF     = head != null ? head.Find("BtnAction") : null;
+            var btn       = btnTF != null ? btnTF.GetComponent<Button>() : null;
+            var btnLabel  = btnTF != null ? btnTF.Find("Text")?.GetComponent<TextMeshProUGUI>() : null;
+            var previewTF = row.transform.Find("Preview");
+            var previewImg = previewTF != null ? previewTF.GetComponent<Image>() : null;
+
+            btn?.onClick.RemoveAllListeners();
+
+            string label = ClueAttachmentService.ResolveLabel(a);
+            bool showBtn = false, showPreview = false;
+            Sprite icon = ClueAttachmentService.ResolveIcon(a);
+            bool missing = false;
+
+            switch (a.kind)
+            {
+                case ClueAttachmentKind.Image:
+                {
+                    var sprite = ClueAttachmentService.LoadSprite(a.resourcePath);
+                    missing = sprite == null;
+                    if (!missing && previewImg != null)
+                    {
+                        previewImg.sprite = sprite;
+                        previewImg.color = Color.white;
+                        showPreview = true;
+                    }
+                    break;
+                }
+                case ClueAttachmentKind.Audio:
+                {
+                    var clip = ClueAttachmentService.LoadAudio(a.resourcePath);
+                    missing = clip == null;
+                    showBtn = !missing;
+                    if (showBtn)
+                    {
+                        if (btnLabel != null) btnLabel.text = PlayLabel;
+                        btn?.onClick.AddListener(() => ToggleAudio(a, btnLabel));
+                    }
+                    break;
+                }
+                case ClueAttachmentKind.MapRef:
+                {
+                    var node = ClueAttachmentService.ResolveMapNode(a);
+                    missing = node == null;
+                    showBtn = !missing;
+                    if (showBtn)
+                    {
+                        if (btnLabel != null) btnLabel.text = "지도";
+                        string guid = a.mapGuid;
+                        btn?.onClick.AddListener(() => OnMapRefClicked?.Invoke(guid));
+                    }
+                    break;
+                }
+            }
+
+            if (labelTmp != null)
+            {
+                string kindTag = ClueAttachmentConfig.GetDisplayName(a.kind);
+                labelTmp.text = missing
+                    ? $"[{kindTag}] {label}  <color=#C86A6A>(파일 없음)</color>"
+                    : $"[{kindTag}] {label}";
+            }
+
+            if (iconImg != null)
+            {
+                iconImg.gameObject.SetActive(icon != null);
+                if (icon != null)
+                {
+                    iconImg.sprite = icon;
+                    iconImg.color = Color.white;
+                }
+            }
+            btnTF?.gameObject.SetActive(showBtn);
+            previewTF?.gameObject.SetActive(showPreview);
+
+            // 행 높이는 종류마다 다르다(사진만 미리보기가 붙는다). 바깥 목록이 자식 높이를 제어하든
+            // 안 하든 같은 결과가 나오도록 LayoutElement와 실제 크기를 함께 맞춘다.
+            float height = _attachmentRowHeight + (showPreview ? _imagePreviewHeight + 2f : 0f);
+            var le = row.GetComponent<LayoutElement>();
+            if (le != null) le.preferredHeight = height;
+            var rowRT = row.GetComponent<RectTransform>();
+            if (rowRT != null) rowRT.sizeDelta = new Vector2(rowRT.sizeDelta.x, height);
+            return height;
+        }
+
+        private GameObject BuildAttachmentRowTemplate()
+        {
+            var rowRT = NewRect(null, "AttachmentRow");
+            var le = rowRT.gameObject.AddComponent<LayoutElement>();
+            le.preferredHeight = _attachmentRowHeight;
+            le.flexibleWidth = 1f;
+
+            // 행 안쪽만은 childControlHeight를 켠다 — 한 행이 머리줄(고정 높이)과 사진 미리보기(가변)로
+            // 나뉘고, 사진이 없는 첨부는 미리보기를 통째로 끄기 때문에 자식 높이를 LayoutElement로
+            // 제어할 수 있어야 한다.
+            var vlg = rowRT.gameObject.AddComponent<VerticalLayoutGroup>();
+            vlg.spacing = 2f;
+            vlg.childControlWidth = true;
+            vlg.childControlHeight = true;
+            vlg.childForceExpandWidth = true;
+            vlg.childForceExpandHeight = false;
+
+            var head = NewRect(rowRT, "Head");
+            var headLe = head.gameObject.AddComponent<LayoutElement>();
+            headLe.preferredHeight = _attachmentRowHeight;
+            headLe.flexibleWidth = 1f;
+            var hlg = head.gameObject.AddComponent<HorizontalLayoutGroup>();
+            hlg.spacing = 3f;
+            hlg.childControlWidth = true;
+            hlg.childControlHeight = true;
+            hlg.childForceExpandWidth = false;
+            hlg.childForceExpandHeight = true;
+            hlg.childAlignment = TextAnchor.MiddleLeft;
+
+            var iconRT = NewRect(head, "Icon");
+            var iconLe = iconRT.gameObject.AddComponent<LayoutElement>();
+            iconLe.preferredWidth = _attachmentRowHeight - 2f;
+            iconLe.flexibleWidth = 0f;
+            var iconImg = iconRT.gameObject.AddComponent<Image>();
+            iconImg.preserveAspect = true;
+
+            var textRT = NewRect(head, "Text");
+            var textLe = textRT.gameObject.AddComponent<LayoutElement>();
+            textLe.flexibleWidth = 1f;
+            var tmp = textRT.gameObject.AddComponent<TextMeshProUGUI>();
+            if (_font != null) tmp.font = _font;
+            tmp.fontSize = _dynamicRowFontSize;
+            tmp.color = Color.white;
+            tmp.alignment = TextAlignmentOptions.MidlineLeft;
+            tmp.overflowMode = TextOverflowModes.Ellipsis;
+
+            var btnRT = NewRect(head, "BtnAction");
+            var btnLe = btnRT.gameObject.AddComponent<LayoutElement>();
+            btnLe.preferredWidth = 34f;
+            btnLe.flexibleWidth = 0f;
+            var btnImg = AddImg(btnRT, _colBadge);
+            var btn = btnRT.gameObject.AddComponent<Button>();
+            btn.targetGraphic = btnImg;
+            btn.transition = Selectable.Transition.None;
+
+            var btnTxtRT = NewRect(btnRT, "Text");
+            StretchFull(btnTxtRT);
+            var btnTmp = btnTxtRT.gameObject.AddComponent<TextMeshProUGUI>();
+            if (_font != null) btnTmp.font = _font;
+            btnTmp.fontSize = _dynamicRowFontSize;
+            btnTmp.alignment = TextAlignmentOptions.Center;
+            btnTmp.verticalAlignment = VerticalAlignmentOptions.Middle;
+            btnTmp.color = Color.white;
+
+            var previewRT = NewRect(rowRT, "Preview");
+            var previewLe = previewRT.gameObject.AddComponent<LayoutElement>();
+            previewLe.preferredHeight = _imagePreviewHeight;
+            previewLe.flexibleWidth = 1f;
+            var previewImg = previewRT.gameObject.AddComponent<Image>();
+            previewImg.preserveAspect = true;
+
+            rowRT.gameObject.SetActive(false);
+            return rowRT.gameObject;
+        }
+
+        // ─── 첨부 소리 재생 ────────────────────────────────────────
+
+        private const string PlayLabel = "▶ 재생";
+        private const string StopLabel = "■ 정지";
+
+        private void ToggleAudio(ClueAttachment a, TextMeshProUGUI btnLabel)
+        {
+            var clip = ClueAttachmentService.LoadAudio(a.resourcePath);
+            if (clip == null) return;
+
+            if (_audio == null) _audio = ClueAttachmentAudioPlayer.AttachTo(gameObject);
+            _audio.Toggle(clip, playing =>
+            {
+                if (btnLabel != null) btnLabel.text = playing ? StopLabel : PlayLabel;
+            });
+        }
+
+        // 카드를 바꿀 때·도감을 닫을 때(CodexPanel.CloseWindowContent) 호출.
+        public void StopAudio() => _audio?.Stop();
+
         // ─── 4단계: NPC/시스템 코멘트 (타이프라이터 연출) ─────────
 
         // 코멘트 영역 자체(구분선 + "코멘트" 헤더)는 정적으로 한 번만 만든다 — 실제 코멘트 행만
@@ -482,6 +753,7 @@ namespace RouteFinding.Codex
             _editRowGO.SetActive(false);
             _pinRowGO?.SetActive(false);
             _suggestionsGO?.SetActive(false);
+            RefreshAttachments(null);
             RefreshComments(null);
         }
 
@@ -518,6 +790,7 @@ namespace RouteFinding.Codex
             // 카드를 다른 항목으로 바꾸면 이전 항목의 추천 목록은 의미가 없으므로 접는다.
             _suggestionsGO?.SetActive(false);
 
+            RefreshAttachments(e.attachments);
             RefreshComments(e.comments);
         }
 

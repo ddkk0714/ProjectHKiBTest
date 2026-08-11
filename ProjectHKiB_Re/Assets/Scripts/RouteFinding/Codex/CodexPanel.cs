@@ -142,6 +142,10 @@ namespace RouteFinding.Codex
 
         public void CloseWindowContent()
         {
+            // 첨부 소리를 재생하던 중이면 창을 닫는 순간 명시적으로 멈춘다. 패널 비활성화만으로도
+            // AudioSource는 멈추지만, 그 경로로는 재생 감시 코루틴이 그냥 죽어버려서 버튼 라벨이
+            // "■ 정지"인 채로 굳는다 — 다시 열었을 때 눌러도 아무 소리가 안 나는 것처럼 보인다.
+            _cardView?.StopAudio();
             _panelGO.SetActive(false);
             _inputManager?.PLAYMode();
         }
@@ -251,6 +255,7 @@ namespace RouteFinding.Codex
                 userEntryGuid = "",
                 clueId      = clue.id,
                 comments    = clue.comments ?? Array.Empty<CodexComment>(),
+                attachments = clue.attachments ?? Array.Empty<ClueAttachment>(),
                 isNew       = CodexModule.Instance.IsClueNew(clue.id),
             };
         }
@@ -375,6 +380,7 @@ namespace RouteFinding.Codex
                 _cardView.OnPinRequested += HandlePinRequested;
                 _cardView.OnSuggestionAddRequested += HandleSuggestionAddRequested;
                 _cardView.OnKeywordClicked += HandleKeywordClicked;
+                _cardView.OnMapRefClicked += HandleMapRefClicked;
             }
 
             _memoForm = root.GetComponent<CodexMemoFormView>();
@@ -547,6 +553,7 @@ namespace RouteFinding.Codex
             _cardView.OnPinRequested += HandlePinRequested;
             _cardView.OnSuggestionAddRequested += HandleSuggestionAddRequested;
             _cardView.OnKeywordClicked += HandleKeywordClicked;
+            _cardView.OnMapRefClicked += HandleMapRefClicked;
         }
 
         private void BuildMemoForm(RectTransform root)
@@ -604,6 +611,25 @@ namespace RouteFinding.Codex
             if (string.IsNullOrEmpty(keyword)) return;
             _searchBar.SetFilterModeExternally(CodexFilterMode.ByKeyword);
             _drawerView.FocusCategory(keyword);
+        }
+
+        // ─── 첨부물(맵 참조) 연동 ─────────────────────────────────
+
+        // 카드의 맵 첨부에서 "지도" 버튼을 누르면 도감을 닫고 지도를 열어 그 맵으로 시점을 옮긴다.
+        // MapViewer가 "도감" 툴바 버튼에서 쓰는 것과 정확히 반대 방향의 이동으로, 같은 패턴을 따른다
+        // (상대 패널을 직접 참조하지 않고 씬에서 찾는다).
+        private void HandleMapRefClicked(string mapGuid)
+        {
+            if (string.IsNullOrEmpty(mapGuid)) return;
+
+            var mapViewer = FindObjectOfType<MapView.MapViewer>();
+            if (mapViewer == null)
+            {
+                Debug.LogWarning("[CodexPanel] 씬에서 MapViewer를 찾을 수 없습니다.");
+                return;
+            }
+            Close();
+            mapViewer.OpenFocusedOn(mapGuid);
         }
 
         // ─── 노트 연동 (2단계, 노트 편입 규칙 2 — 도감 → 노트 수동 핀) ─────

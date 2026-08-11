@@ -53,6 +53,7 @@ namespace RouteFinding.Note
         [SerializeField] private GameObject _edgeTemplate;
         [SerializeField] private GameObject _cardTemplate;
         [SerializeField] private GameObject _commentTemplate;
+        [SerializeField] private GameObject _attachmentTemplate;
 
         [Header("기본 템플릿 스타일 (프리팹 미지정 시)")]
         [SerializeField] private Color _colNode = new(0.82f, 0.58f, 0.22f);      // 맵 노드 — 주황색
@@ -92,6 +93,17 @@ namespace RouteFinding.Note
         [SerializeField] private float _commentGapY = 6f;  // 단서 노드 하단 모서리로부터의 세로 간격
         [SerializeField] private float _commentSpacing = 2f; // 코멘트가 여러 개일 때 세로 간격
 
+        // [신설, 2026-08-11] 첨부물(사진/소리/맵) 노드 — 코멘트 노드가 단서 노드 우측 아래에 붙는 것과
+        // 대칭으로 좌측 아래에 붙는다(서로 겹치지 않게 반대편).
+        [Header("첨부물 노드 (단서 노드 좌측 아래)")]
+        [SerializeField] private Color _colAttachmentNode = new(0.20f, 0.28f, 0.34f); // 코멘트(보라)와 구분되는 청록 계열
+        [SerializeField] private float _attachmentFontSize = 6f;
+        [SerializeField] private float _attachmentAreaWidth = 70f;
+        [SerializeField] private float _attachmentGapX = 6f;
+        [SerializeField] private float _attachmentGapY = 6f;
+        [SerializeField] private float _attachmentSpacing = 2f;
+        [SerializeField] private float _attachmentPreviewHeight = 40f; // 사진 첨부의 미리보기 높이
+
         // 맵 노드 하나의 시각 상태 — guid로 영속 관리(파괴하지 않음, MapViewer._nodeViews와 동일한 이유).
         private class NodeVisual
         {
@@ -111,6 +123,7 @@ namespace RouteFinding.Note
             public Button DeleteButton; // [신설] 소속 맵 없이(수동 핀 등) 떠 있는 노드도 여기서 바로 삭제 가능
             public Image Background;    // [신설] 키워드별 색상 구분에 사용
             public RectTransform CommentsContainer; // [신설] 우측 아래에 붙는 코멘트 노드들의 컨테이너
+            public RectTransform AttachmentsContainer; // [신설] 좌측 아래에 붙는 첨부물 노드들의 컨테이너
             public bool UsedThisPass;
         }
 
@@ -139,6 +152,10 @@ namespace RouteFinding.Note
         private UiRowPool _arrowPool;
         private UiRowPool _cardPool;
         private UiRowPool _commentPool;
+        private UiRowPool _attachmentPool;
+
+        // 첨부 소리 재생 — 도감 카드와 같은 헬퍼를 공유한다(ClueAttachmentAudioPlayer 참고).
+        private ClueAttachmentAudioPlayer _audio;
 
         // [요청, 2026-07-21] 노드를 드래그하는 동안 배경 팬(GraphPanZoom)이 동시에 움직이지 않도록 —
         // NotePanel.BuildGraphPanZoom이 이 컴포넌트와 GraphPanZoom을 같은 GameObject(GraphScroll)에
@@ -204,6 +221,7 @@ namespace RouteFinding.Note
             _arrowPool = new UiRowPool(null, BuildArrowProngTemplate);
             _cardPool = new UiRowPool(_cardTemplate, BuildCardTemplate);
             _commentPool = new UiRowPool(_commentTemplate, BuildCommentTemplate);
+            _attachmentPool = new UiRowPool(_attachmentTemplate, BuildAttachmentTemplate);
         }
 
         public void SetData(PathResult route, IReadOnlyList<NoteEntry> entries)
@@ -295,6 +313,7 @@ namespace RouteFinding.Note
             // 여러 단서 노드의 CommentsContainer에 나눠 붙인 코멘트 노드도 전부 다 쓴 뒤 한 번만 정리
             // (카드 풀과 동일한 이유 — 여러 컨테이너가 하나의 전역 풀을 공유).
             _commentPool.EndPass();
+            _attachmentPool.EndPass(); // 첨부물 노드도 같은 이유로 전역 풀 하나를 여러 컨테이너가 공유
 
             RelayoutEdges();
 
@@ -609,6 +628,28 @@ namespace RouteFinding.Note
             var comCsf = commentsContainer.gameObject.AddComponent<ContentSizeFitter>();
             comCsf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
+            // [신설, 2026-08-11] 첨부물 컨테이너 — 코멘트가 우측 아래로 뻗는 것과 대칭으로 좌측 아래로
+            // 뻗는다(anchor를 좌하단 (0,0), pivot을 우상단 (1,1)로 잡아 왼쪽·아래 방향으로 자란다).
+            // 서로 반대편이라 코멘트가 많은 단서에서도 겹치지 않는다.
+            var attachmentsContainer = NewRect(group, "Attachments");
+            attachmentsContainer.anchorMin = attachmentsContainer.anchorMax = new Vector2(0f, 0f);
+            attachmentsContainer.pivot     = new Vector2(1f, 1f);
+            attachmentsContainer.anchoredPosition = new Vector2(-_attachmentGapX, -_attachmentGapY);
+            attachmentsContainer.sizeDelta = new Vector2(_attachmentAreaWidth, 0f);
+
+            var attachmentsIgnore = attachmentsContainer.gameObject.AddComponent<LayoutElement>();
+            attachmentsIgnore.ignoreLayout = true;
+
+            var attVlg = attachmentsContainer.gameObject.AddComponent<VerticalLayoutGroup>();
+            attVlg.spacing = _attachmentSpacing;
+            attVlg.childControlWidth     = true;
+            attVlg.childControlHeight    = true;
+            attVlg.childForceExpandWidth  = true;
+            attVlg.childForceExpandHeight = false;
+
+            var attCsf = attachmentsContainer.gameObject.AddComponent<ContentSizeFitter>();
+            attCsf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
             var visual = new ClueNodeVisual
             {
                 Group = group,
@@ -616,6 +657,7 @@ namespace RouteFinding.Note
                 DeleteButton = deleteBtn,
                 Background = background,
                 CommentsContainer = commentsContainer,
+                AttachmentsContainer = attachmentsContainer,
             };
             _clueVisuals[clueId] = visual;
             return visual;
@@ -669,6 +711,24 @@ namespace RouteFinding.Note
                     {
                         if (string.IsNullOrEmpty(c.text)) continue;
                         PopulateCommentNode(_commentPool.Get(visual.CommentsContainer), c);
+                    }
+                }
+            }
+
+            // [신설, 2026-08-11] 첨부물(사진/소리/맵)을 좌측 아래에 붙는 작은 노드로 표시 — 도감 카드의
+            // "첨부" 영역과 같은 내용을 노트에서도 볼 수 있게 한 것. 코멘트와 마찬가지로 접힌(isCompact)
+            // 상태에서는 감춘다.
+            if (visual.AttachmentsContainer != null)
+            {
+                var attachments = resolved?.Attachments;
+                bool showAttachments = !isCompact && attachments != null && attachments.Length > 0;
+                visual.AttachmentsContainer.gameObject.SetActive(showAttachments);
+                if (showAttachments)
+                {
+                    foreach (var a in attachments)
+                    {
+                        if (a == null) continue;
+                        PopulateAttachmentNode(_attachmentPool.Get(visual.AttachmentsContainer), a);
                     }
                 }
             }
@@ -1112,6 +1172,199 @@ namespace RouteFinding.Note
             tmp.alignment = TextAlignmentOptions.TopLeft;
             tmp.enableWordWrapping = true;
             tmp.raycastTarget = false; // 배경 Image와 동일한 이유
+
+            rt.gameObject.SetActive(false);
+            return rt.gameObject;
+        }
+
+        // ─── 첨부물 노드 (풀링) — 단서 노드 좌측 아래에 붙는 작은 노드 ──────────
+        // 도감 카드(CodexCardView)의 "첨부" 행과 같은 데이터를 노트 문맥에 맞게 다시 그린 것이다.
+        // 사진은 미리보기, 소리는 재생 버튼, 맵은 아이콘+이름(누르면 지도로 이동).
+
+        private void PopulateAttachmentNode(GameObject rowGO, ClueAttachment a)
+        {
+            var iconImg    = rowGO.transform.Find("Head/Icon")?.GetComponent<Image>();
+            var labelTmp   = rowGO.transform.Find("Head/Text")?.GetComponent<TextMeshProUGUI>();
+            var btnTF      = rowGO.transform.Find("Head/BtnAction");
+            var btn        = btnTF != null ? btnTF.GetComponent<Button>() : null;
+            var btnLabel   = btnTF != null ? btnTF.Find("Text")?.GetComponent<TextMeshProUGUI>() : null;
+            var previewTF  = rowGO.transform.Find("Preview");
+            var previewImg = previewTF != null ? previewTF.GetComponent<Image>() : null;
+
+            btn?.onClick.RemoveAllListeners();
+
+            string label = ClueAttachmentService.ResolveLabel(a);
+            var icon = ClueAttachmentService.ResolveIcon(a);
+            bool showBtn = false, showPreview = false, missing = false;
+
+            switch (a.kind)
+            {
+                case ClueAttachmentKind.Image:
+                {
+                    var sprite = ClueAttachmentService.LoadSprite(a.resourcePath);
+                    missing = sprite == null;
+                    if (!missing && previewImg != null)
+                    {
+                        previewImg.sprite = sprite;
+                        previewImg.color = Color.white;
+                        showPreview = true;
+                    }
+                    break;
+                }
+                case ClueAttachmentKind.Audio:
+                {
+                    var clip = ClueAttachmentService.LoadAudio(a.resourcePath);
+                    missing = clip == null;
+                    showBtn = !missing;
+                    if (showBtn)
+                    {
+                        if (btnLabel != null) btnLabel.text = PlayLabel;
+                        btn?.onClick.AddListener(() => ToggleAttachmentAudio(clip, btnLabel));
+                    }
+                    break;
+                }
+                case ClueAttachmentKind.MapRef:
+                {
+                    var node = ClueAttachmentService.ResolveMapNode(a);
+                    missing = node == null;
+                    showBtn = !missing;
+                    if (showBtn)
+                    {
+                        if (btnLabel != null) btnLabel.text = "지도";
+                        string guid = a.mapGuid;
+                        btn?.onClick.AddListener(() => GoToMap(guid));
+                    }
+                    break;
+                }
+            }
+
+            if (labelTmp != null)
+            {
+                string kindTag = ClueAttachmentConfig.GetDisplayName(a.kind);
+                labelTmp.text = missing
+                    ? $"[{kindTag}] {label} <color=#C86A6A>(파일 없음)</color>"
+                    : $"[{kindTag}] {label}";
+            }
+
+            if (iconImg != null)
+            {
+                iconImg.gameObject.SetActive(icon != null);
+                if (icon != null)
+                {
+                    iconImg.sprite = icon;
+                    iconImg.color = Color.white;
+                }
+            }
+            btnTF?.gameObject.SetActive(showBtn);
+            previewTF?.gameObject.SetActive(showPreview);
+        }
+
+        private const string PlayLabel = "▶";
+        private const string StopLabel = "■";
+
+        private void ToggleAttachmentAudio(AudioClip clip, TextMeshProUGUI btnLabel)
+        {
+            if (_audio == null) _audio = ClueAttachmentAudioPlayer.AttachTo(gameObject);
+            _audio.Toggle(clip, playing =>
+            {
+                if (btnLabel != null) btnLabel.text = playing ? StopLabel : PlayLabel;
+            });
+        }
+
+        // 맵 첨부의 "지도" 버튼 — 노트를 닫고 지도를 열어 그 맵으로 시점을 옮긴다.
+        // 도감 카드(CodexPanel.HandleMapRefClicked)와 같은 동작이고, 패널을 직접 참조하지 않고
+        // 씬에서 찾는 것도 MapViewer.GoToNote/GoToCodex와 같은 기존 패턴 그대로다.
+        private void GoToMap(string mapGuid)
+        {
+            if (string.IsNullOrEmpty(mapGuid)) return;
+
+            var mapViewer = FindObjectOfType<MapView.MapViewer>();
+            if (mapViewer == null)
+            {
+                Debug.LogWarning("[NoteRouteGraphView] 씬에서 MapViewer를 찾을 수 없습니다.");
+                return;
+            }
+            FindObjectOfType<NotePanel>()?.Close();
+            mapViewer.OpenFocusedOn(mapGuid);
+        }
+
+        private GameObject BuildAttachmentTemplate()
+        {
+            var rt = NewRect(null, "AttachmentNode");
+            var le = rt.gameObject.AddComponent<LayoutElement>();
+            le.flexibleWidth = 1f;
+            // 코멘트 노드와 같은 이유로 배경/텍스트의 레이캐스트를 끈다 — 다만 재생·지도 버튼은 눌려야
+            // 하므로 버튼 쪽 Image만 raycastTarget을 켜 둔다(아래).
+            AddImg(rt, _colAttachmentNode).raycastTarget = false;
+
+            var vlg = rt.gameObject.AddComponent<VerticalLayoutGroup>();
+            vlg.padding = new RectOffset(3, 3, 2, 2);
+            vlg.spacing = 2f;
+            vlg.childControlWidth     = true;
+            vlg.childControlHeight    = true;
+            vlg.childForceExpandWidth  = true;
+            vlg.childForceExpandHeight = false;
+
+            var csf = rt.gameObject.AddComponent<ContentSizeFitter>();
+            csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            var head = NewRect(rt, "Head");
+            var headLe = head.gameObject.AddComponent<LayoutElement>();
+            headLe.preferredHeight = 10f;
+            headLe.flexibleWidth = 1f;
+            var hlg = head.gameObject.AddComponent<HorizontalLayoutGroup>();
+            hlg.spacing = 2f;
+            hlg.childControlWidth     = true;
+            hlg.childControlHeight    = true;
+            hlg.childForceExpandWidth  = false;
+            hlg.childForceExpandHeight = true;
+            hlg.childAlignment = TextAnchor.MiddleLeft;
+
+            var iconRT = NewRect(head, "Icon");
+            var iconLe = iconRT.gameObject.AddComponent<LayoutElement>();
+            iconLe.preferredWidth = 8f;
+            iconLe.flexibleWidth = 0f;
+            var iconImg = iconRT.gameObject.AddComponent<Image>();
+            iconImg.preserveAspect = true;
+            iconImg.raycastTarget = false;
+
+            var txtRT = NewRect(head, "Text");
+            var txtLe = txtRT.gameObject.AddComponent<LayoutElement>();
+            txtLe.flexibleWidth = 1f;
+            var tmp = txtRT.gameObject.AddComponent<TextMeshProUGUI>();
+            if (_font != null) tmp.font = _font;
+            tmp.fontSize = _attachmentFontSize;
+            tmp.color = Color.white;
+            tmp.alignment = TextAlignmentOptions.MidlineLeft;
+            tmp.overflowMode = TextOverflowModes.Ellipsis;
+            tmp.raycastTarget = false;
+
+            var btnRT = NewRect(head, "BtnAction");
+            var btnLe = btnRT.gameObject.AddComponent<LayoutElement>();
+            btnLe.preferredWidth = 16f;
+            btnLe.flexibleWidth = 0f;
+            var btnImg = AddImg(btnRT, new Color(0.25f, 0.42f, 0.72f)); // 버튼은 눌려야 하므로 raycastTarget 유지
+            var btn = btnRT.gameObject.AddComponent<Button>();
+            btn.targetGraphic = btnImg;
+            btn.transition = Selectable.Transition.None;
+
+            var btnTxtRT = NewRect(btnRT, "Text");
+            StretchFull(btnTxtRT);
+            var btnTmp = btnTxtRT.gameObject.AddComponent<TextMeshProUGUI>();
+            if (_font != null) btnTmp.font = _font;
+            btnTmp.fontSize = _attachmentFontSize;
+            btnTmp.alignment = TextAlignmentOptions.Center;
+            btnTmp.verticalAlignment = VerticalAlignmentOptions.Middle;
+            btnTmp.color = Color.white;
+            btnTmp.raycastTarget = false;
+
+            var previewRT = NewRect(rt, "Preview");
+            var previewLe = previewRT.gameObject.AddComponent<LayoutElement>();
+            previewLe.preferredHeight = _attachmentPreviewHeight;
+            previewLe.flexibleWidth = 1f;
+            var previewImg = previewRT.gameObject.AddComponent<Image>();
+            previewImg.preserveAspect = true;
+            previewImg.raycastTarget = false;
 
             rt.gameObject.SetActive(false);
             return rt.gameObject;

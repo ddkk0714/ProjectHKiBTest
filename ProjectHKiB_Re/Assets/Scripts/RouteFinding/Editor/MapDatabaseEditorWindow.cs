@@ -35,6 +35,7 @@ namespace RouteFinding.Editor
         private bool _foldRequiredGears = true;
         private bool _foldKeywords = true;
         private bool _foldComments = true;
+        private bool _foldAttachments = true;
 
         // ─── 색상 ────────────────────────────────────────────────
         private static readonly Color ColDirty    = new(1.00f, 0.85f, 0.35f);
@@ -71,6 +72,7 @@ namespace RouteFinding.Editor
                 _db.connections = _db.connections ?? Array.Empty<MapConnectionData>();
                 foreach (var m in _db.maps)
                 {
+                    m.iconPath = m.iconPath ?? "";
                     m.events  = m.events  ?? Array.Empty<MapEventFlag>();
                     m.clueIds = m.clueIds ?? Array.Empty<string>();
                     m.wavePaths     = m.wavePaths     ?? Array.Empty<string>();
@@ -91,6 +93,13 @@ namespace RouteFinding.Editor
                     cl.codexMapGuid  = cl.codexMapGuid  ?? "";
                     cl.keywords      = cl.keywords      ?? Array.Empty<string>();
                     cl.comments      = cl.comments      ?? Array.Empty<CodexComment>();
+                    cl.attachments   = cl.attachments   ?? Array.Empty<ClueAttachment>();
+                    foreach (var at in cl.attachments)
+                    {
+                        at.label        = at.label        ?? "";
+                        at.resourcePath = at.resourcePath ?? "";
+                        at.mapGuid      = at.mapGuid      ?? "";
+                    }
                 }
             }
 
@@ -305,6 +314,7 @@ namespace RouteFinding.Editor
             ReadonlyField("GUID", n.guid);
             n.nodeName    = TF("이름",    n.nodeName);
             n.sceneName   = TF("씬 이름", n.sceneName);
+            n.iconPath    = ResourcePathField<Sprite>("아이콘 (선택)", n.iconPath);
             n.description = TA("설명",    n.description);
 
             EditorGUILayout.Space(4f);
@@ -511,6 +521,56 @@ namespace RouteFinding.Editor
                 EditorGUI.indentLevel--;
             }
 
+            // 첨부물(2026-08-11) — 사진/소리/맵 참조. 도감 카드의 "첨부" 영역에 표시된다.
+            EditorGUILayout.Space(4f);
+            _foldAttachments = EditorGUILayout.Foldout(_foldAttachments,
+                $"첨부물 (사진/소리/맵)  ({cl.attachments.Length}개)", true, EditorStyles.foldoutHeader);
+            if (_foldAttachments)
+            {
+                EditorGUI.indentLevel++;
+                EditorGUILayout.HelpBox(
+                    "사진/소리는 Resources 폴더 안의 에셋만 쓸 수 있습니다 — 오브젝트 칸에 끌어다 놓으면 경로가 자동으로 채워집니다.\n" +
+                    "맵 첨부는 그 맵의 아이콘과 이름을 보여주고, 누르면 지도에서 해당 맵으로 이동합니다 (아이콘은 맵 노드 편집 화면에서 지정).",
+                    MessageType.None);
+
+                int removeAttachment = -1;
+                for (int i = 0; i < cl.attachments.Length; i++)
+                {
+                    var at = cl.attachments[i];
+                    EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayout.Label($"[{i}]", GUILayout.Width(28f));
+                    at.kind = (ClueAttachmentKind)EditorGUILayout.EnumPopup(at.kind, GUILayout.Width(90f));
+                    GUILayout.Label(ClueAttachmentConfig.GetDisplayName(at.kind), EditorStyles.miniLabel);
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button("−", GUILayout.Width(22f))) removeAttachment = i;
+                    EditorGUILayout.EndHorizontal();
+
+                    at.label = TF("표시 이름 (비우면 자동)", at.label);
+
+                    switch (at.kind)
+                    {
+                        case ClueAttachmentKind.Image:
+                            at.resourcePath = ResourcePathField<Sprite>("이미지", at.resourcePath);
+                            break;
+                        case ClueAttachmentKind.Audio:
+                            at.resourcePath = ResourcePathField<AudioClip>("오디오", at.resourcePath);
+                            break;
+                        case ClueAttachmentKind.MapRef:
+                            at.mapGuid = NodeGuidPopup("맵", at.mapGuid, allowEmpty: true);
+                            break;
+                    }
+
+                    EditorGUILayout.EndVertical();
+                }
+                if (removeAttachment >= 0) ArrayUtility.RemoveAt(ref cl.attachments, removeAttachment);
+                if (GUILayout.Button("+ 첨부물 추가", GUILayout.ExpandWidth(false)))
+                    ArrayUtility.Add(ref cl.attachments,
+                        new ClueAttachment { kind = ClueAttachmentKind.Image, label = "", resourcePath = "", mapGuid = "" });
+                EditorGUI.indentLevel--;
+            }
+
             // 4단계(2026-07-14) — NPC/시스템 코멘트. 플레이어가 입력하는 게 아니라 콘텐츠 작업자가
             // 여기서 직접 채워 넣는 대사 데이터다(Clue_System.md 1-4장 확정 사항).
             EditorGUILayout.Space(4f);
@@ -557,6 +617,7 @@ namespace RouteFinding.Editor
                         nodeName      = "새 맵",
                         description   = "",
                         sceneName     = "",
+                        iconPath      = "",
                         graphPosition = Vector2.zero,
                         events        = Array.Empty<MapEventFlag>(),
                         clueIds       = Array.Empty<string>(),
@@ -593,6 +654,7 @@ namespace RouteFinding.Editor
                         codexMapGuid         = "",
                         keywords             = Array.Empty<string>(),
                         comments             = Array.Empty<CodexComment>(),
+                        attachments          = Array.Empty<ClueAttachment>(),
                     });
                     _selClue = _clueDb.clues.Length - 1;
                     break;
@@ -634,6 +696,108 @@ namespace RouteFinding.Editor
         {
             EditorGUILayout.LabelField(label);
             return EditorGUILayout.TextArea(value ?? "", GUILayout.MinHeight(54f));
+        }
+
+        // 첨부물로 쓸 에셋을 자동 복사해 넣는 곳. Resources.Load는 Resources 폴더 안의 에셋만 볼 수
+        // 있는데(그게 유니티 규칙이다), 작업자가 쓰고 싶은 사진/소리는 보통 Assets/Images 같은 바깥
+        // 폴더에 있다 — 그래서 밖의 에셋을 끌어다 놓으면 여기로 복사할지 물어보고 경로를 채워 준다.
+        private const string CopyTargetResourcesDir = "Assets/Resources/RouteFinding/Attachments";
+
+        // "Resources 상대 경로" 문자열 필드 + 에셋 오브젝트 칸을 한 줄에 같이 보여준다.
+        // 경로를 직접 칠 수도 있고, 에셋을 끌어다 놓으면 Resources/ 이후 경로(확장자 제외)로 변환해
+        // 넣어준다 — JSON에는 에셋 참조를 담을 수 없어 경로가 유일한 연결 고리라, 손으로 적다 틀리는
+        // 사고(대소문자/확장자 포함 등)를 막는 게 목적이다.
+        private static string ResourcePathField<T>(string label, string path) where T : UnityEngine.Object
+        {
+            EditorGUILayout.BeginHorizontal();
+            string newPath = EditorGUILayout.TextField(label, path ?? "");
+            var current = string.IsNullOrWhiteSpace(newPath) ? null : Resources.Load<T>(newPath);
+            var picked = EditorGUILayout.ObjectField(current, typeof(T), false, GUILayout.Width(120f)) as T;
+            EditorGUILayout.EndHorizontal();
+
+            if (picked != current)
+            {
+                string assetPath = picked == null ? "" : AssetDatabase.GetAssetPath(picked);
+                newPath = ToResourcesPath(assetPath);
+
+                // Resources 밖의 에셋 — 작업자에게 복사할지 물어본다(취소하면 경로를 비운 채로 둔다).
+                if (picked != null && string.IsNullOrEmpty(newPath))
+                    newPath = CopyIntoResources<T>(assetPath);
+            }
+
+            // 경로는 있는데 로드가 안 되면(오타 등) 런타임에도 "(파일 없음)"으로 뜬다 — 미리 알려준다.
+            if (!string.IsNullOrWhiteSpace(newPath) && Resources.Load<T>(newPath) == null)
+                EditorGUILayout.HelpBox($"Resources/{newPath} 을(를) 찾을 수 없습니다.", MessageType.Warning);
+
+            return newPath;
+        }
+
+        // Resources 밖의 에셋을 CopyTargetResourcesDir로 복사하고 그 Resources 상대 경로를 돌려준다.
+        // 원본은 건드리지 않는다 — 다른 곳에서 이미 참조하고 있을 수 있어서 이동이 아니라 복사다.
+        // 실패하거나 작업자가 취소하면 빈 문자열.
+        private static string CopyIntoResources<T>(string assetPath) where T : UnityEngine.Object
+        {
+            string fileName = Path.GetFileName(assetPath);
+            if (!EditorUtility.DisplayDialog(
+                    "Resources 폴더 밖의 에셋",
+                    $"{fileName} 은(는) Resources 폴더 밖에 있어 게임 실행 중에는 불러올 수 없습니다.\n\n" +
+                    $"{CopyTargetResourcesDir}/ 로 복사해서 쓸까요?\n(원본은 그대로 남습니다)",
+                    "복사해서 사용", "취소"))
+                return "";
+
+            EnsureFolder(CopyTargetResourcesDir);
+
+            string dest = AssetDatabase.GenerateUniqueAssetPath($"{CopyTargetResourcesDir}/{fileName}");
+            if (!AssetDatabase.CopyAsset(assetPath, dest))
+            {
+                Debug.LogError($"[맵 DB 편집기] 복사에 실패했습니다: {assetPath} → {dest}");
+                return "";
+            }
+            AssetDatabase.ImportAsset(dest);
+
+            // 사진은 임포트 타입이 Sprite가 아니면 Resources.Load<Sprite>가 못 찾는다(런타임에 Texture2D
+            // 폴백이 있긴 하지만, 여기서 맞춰두면 편집기 미리보기부터 정상적으로 뜬다).
+            if (typeof(T) == typeof(Sprite) &&
+                AssetImporter.GetAtPath(dest) is TextureImporter importer &&
+                importer.textureType != TextureImporterType.Sprite)
+            {
+                importer.textureType = TextureImporterType.Sprite;
+                importer.SaveAndReimport();
+            }
+
+            Debug.Log($"[맵 DB 편집기] 첨부용으로 복사했습니다: {assetPath} → {dest}");
+            return ToResourcesPath(dest);
+        }
+
+        // "Assets/A/B/C"처럼 중간 폴더가 없어도 한 단계씩 만들어 준다(AssetDatabase.CreateFolder는
+        // 부모가 이미 있어야만 동작한다).
+        private static void EnsureFolder(string folderPath)
+        {
+            if (AssetDatabase.IsValidFolder(folderPath)) return;
+
+            var parts = folderPath.Split('/');
+            string cur = parts[0]; // "Assets"
+            for (int i = 1; i < parts.Length; i++)
+            {
+                string next = cur + "/" + parts[i];
+                if (!AssetDatabase.IsValidFolder(next)) AssetDatabase.CreateFolder(cur, parts[i]);
+                cur = next;
+            }
+        }
+
+        // Assets/…/Resources/Foo/bar.png → Foo/bar. Resources 밖이면 빈 문자열
+        // (경고를 여기서 찍지 않는다 — OnGUI는 이벤트마다 다시 도는데 그때마다 콘솔에 쌓인다).
+        private static string ToResourcesPath(string assetPath)
+        {
+            if (string.IsNullOrEmpty(assetPath)) return "";
+
+            const string marker = "/Resources/";
+            int i = assetPath.LastIndexOf(marker, StringComparison.OrdinalIgnoreCase);
+            if (i < 0) return "";
+
+            string rel = assetPath.Substring(i + marker.Length);
+            int dot = rel.LastIndexOf('.');
+            return dot >= 0 ? rel.Substring(0, dot) : rel;
         }
 
         // 노드 이름 드롭다운 → 선택된 GUID 반환

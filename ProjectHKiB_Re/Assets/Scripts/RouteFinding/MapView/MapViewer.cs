@@ -36,6 +36,14 @@ namespace RouteFinding.MapView
         [Header("그래프 레이아웃")]
         [SerializeField] private float _nodeSize     =  8f;
         [SerializeField] private float _nodeHitSizeMultiplier = 2.5f; // 클릭 판정 영역 = 노드 시각 크기 × 이 값 (최소 1배 보장)
+        [Tooltip("줌 아웃했을 때 노드의 호버/클릭 판정 영역을 화면 기준으로 얼마까지 키워 유지할지 (1이면 보정 없음)")]
+        [SerializeField] private float _maxHitAreaZoomCompensation = 3f;
+
+        [Header("툴팁")]
+        [Tooltip("툴팁 최대 폭(화면 픽셀) — 넘으면 줄바꿈된다. 높이는 글 길이에 맞춰 자동")]
+        [SerializeField] private float _tooltipMaxWidth = 150f;
+        [Tooltip("마우스 커서 기준 툴팁 좌하단 모서리 오프셋(화면 픽셀)")]
+        [SerializeField] private Vector2 _tooltipCursorOffset = new(-110f, -110f);
         [SerializeField] private float _graphPadding =  8f;
         [SerializeField] private float _graphWidth   = 230f;
         [SerializeField] private float _graphHeight  = 230f;
@@ -158,6 +166,7 @@ namespace RouteFinding.MapView
             BuildUI();
             var canvas = GetComponentInParent<Canvas>();
             _graphPanZoom?.Init(_graphContainer, _graphViewport, canvas);
+            if (_graphPanZoom != null) _graphPanZoom.OnScaleChanged += ApplyHitAreaZoomCompensation;
 
             // UI_TOGGLE 액션맵은 PLAY/MENU/GRAFFITI 모드 전환과 무관하게 항상 켜져 있어
             // (InputManager 참고) 어느 모드에서든 M키가 먹는다.
@@ -167,6 +176,7 @@ namespace RouteFinding.MapView
         private void OnDestroy()
         {
             if (_inputManager != null) _inputManager.onOpenMap -= HandleOpenMapInput;
+            if (_graphPanZoom != null) _graphPanZoom.OnScaleChanged -= ApplyHitAreaZoomCompensation;
         }
 
         private void HandleOpenMapInput(InputAction.CallbackContext context)
@@ -270,6 +280,17 @@ namespace RouteFinding.MapView
             }
             Close();
             codexPanel.Open();
+        }
+
+        // 도감 카드의 맵 첨부("지도" 버튼)에서 들어오는 진입점 — 지도를 열고 해당 맵으로 시점을 옮긴다.
+        // Open()은 UIManager를 거쳐 OpenWindowContent()까지 동기로 흐르고, 거기서 PopulateGraph/Refresh가
+        // 끝나 _nodePositions가 채워진 뒤라 바로 포커스해도 안전하다. 창이 안 열리면(이동 중 등) 포커스도 건너뛴다.
+        public void OpenFocusedOn(string mapGuid)
+        {
+            Open();
+            if (!_panelGO.activeSelf || _graphPanZoom == null || string.IsNullOrEmpty(mapGuid)) return;
+            if (_nodePositions.TryGetValue(mapGuid, out var pos))
+                _graphPanZoom.FocusOn(pos);
         }
 
         // Editor 스크립트에서 프리팹 저장 시 접근
@@ -379,14 +400,18 @@ namespace RouteFinding.MapView
                 img.raycastTarget = false; // 클릭 판정은 부모(hitImg)가 담당 — 시각 그래픽은 판정에서 제외
 
                 // 레이블: 노드 아래에 위치 (노드가 작아도 텍스트가 충분히 표시됨)
+                // [2026-08-11] 앵커를 노드 하단(0.5,0)에서 중앙(0.5,0.5)으로 옮겼다 — 아래의
+                // ApplyHitAreaZoomCompensation이 줌 아웃 시 판정 영역(= 이 GO의 rect)을 키우는데,
+                // 하단 앵커였다면 이름표가 그만큼 아래로 밀려나 노드에서 떨어져 보였다.
+                // 이제는 판정 영역 크기와 무관하게 항상 시각 노드 바로 아래에 붙는다.
                 var lblGO = new GameObject("Name");
                 lblGO.transform.SetParent(nodeGO.transform, false);
                 var lblRT = lblGO.AddComponent<RectTransform>();
-                lblRT.anchorMin        = new Vector2(0.5f, 0f);
-                lblRT.anchorMax        = new Vector2(0.5f, 0f);
+                lblRT.anchorMin        = new Vector2(0.5f, 0.5f);
+                lblRT.anchorMax        = new Vector2(0.5f, 0.5f);
                 lblRT.pivot            = new Vector2(0.5f, 1f);
                 lblRT.sizeDelta        = new Vector2(44f, 14f);
-                lblRT.anchoredPosition = Vector2.zero;
+                lblRT.anchoredPosition = new Vector2(0f, -(_nodeSize * 0.5f + 1f));
                 var tmp = lblGO.AddComponent<TextMeshProUGUI>();
                 if (_font != null) tmp.font = _font;
                 tmp.text               = node.nodeName;
@@ -422,6 +447,32 @@ namespace RouteFinding.MapView
                 nv.OnHoverEnter += ShowNodeTooltip;
                 nv.OnHoverExit  += _ => HideClueTooltip();
                 _nodeViews[node.guid] = nv;
+            }
+
+            // 노드를 새로 만들었으니 현재 배율에 맞는 판정 영역 보정을 한 번 적용해둔다
+            // (줌 상태를 유지한 채 그래프를 다시 만드는 경로가 있다).
+            ApplyHitAreaZoomCompensation(_graphPanZoom != null ? _graphPanZoom.Scale : 1f);
+        }
+
+        // [버그 수정, 2026-08-11] 줌 아웃하면 노드가 화면에서 작아지는데, 호버/클릭 판정 영역도 노드와
+        // 함께 축소돼(둘 다 _graphContainer의 스케일을 그대로 받는다) 최소 배율(0.25)에서는 판정 영역이
+        // 화면상 5px 남짓밖에 안 됐다 — 마우스를 정확히 올리기도, 올린 채 유지하기도 어려워서 맵 설명
+        // 툴팁이 뜨다 말다 했다. 시각 크기(자식 "Visual")는 그대로 줌을 따라가게 두고, 판정 영역(이 GO의
+        // rect)만 배율의 역수로 키워 화면 기준 크기를 유지한다.
+        //
+        // 무제한으로 키우면 줌 아웃 시 이웃 노드의 판정 영역끼리 겹쳐 엉뚱한 노드가 잡히므로
+        // _maxHitAreaZoomCompensation(기본 3배)까지만 보정한다. 줌 인(scale > 1)일 때는 이미 충분히
+        // 커서 보정하지 않는다.
+        private void ApplyHitAreaZoomCompensation(float scale)
+        {
+            float hitSize = Mathf.Max(_nodeSize, _nodeSize * _nodeHitSizeMultiplier);
+            float factor  = Mathf.Clamp(1f / Mathf.Max(scale, 0.0001f), 1f, Mathf.Max(1f, _maxHitAreaZoomCompensation));
+
+            foreach (var kv in _nodeViews)
+            {
+                if (kv.Value == null) continue;
+                var rt = kv.Value.transform as RectTransform;
+                if (rt != null) rt.sizeDelta = Vector2.one * (hitSize * factor);
             }
         }
 
@@ -593,8 +644,9 @@ namespace RouteFinding.MapView
             go.transform.SetParent(_graphContainer, false);
             _tooltipRT = go.AddComponent<RectTransform>();
             _tooltipRT.pivot     = new Vector2(0f, 0f);
-            _tooltipRT.sizeDelta = new Vector2(80f, 50f);
-            AddImg(_tooltipRT, new Color(0.05f, 0.05f, 0.08f, 0.95f));
+            _tooltipRT.sizeDelta = new Vector2(_tooltipMaxWidth, 50f); // 실제 크기는 SizeTooltipToText가 매번 다시 잡는다
+            var bgImg = AddImg(_tooltipRT, new Color(0.05f, 0.05f, 0.08f, 0.95f));
+            bgImg.raycastTarget = false; // 커서를 따라다니므로 노드 호버를 가로채면 툴팁이 깜빡인다
 
             var txtRT = NewRect(_tooltipRT, "Text");
             StretchFull(txtRT);
@@ -604,8 +656,26 @@ namespace RouteFinding.MapView
             _tooltipTMP.color     = Color.white;
             _tooltipTMP.alignment = TextAlignmentOptions.TopLeft;
             _tooltipTMP.enableWordWrapping = true;
+            _tooltipTMP.margin = new Vector4(TooltipPadding, TooltipPadding, TooltipPadding, TooltipPadding);
+            _tooltipTMP.raycastTarget = false;
 
             go.SetActive(false);
+        }
+
+        private const float TooltipPadding = 3f;
+
+        // [버그 수정, 2026-08-11] 툴팁 박스가 80x50 고정이라, 맵 설명이 조금만 길어도 글자가 배경 밖으로
+        // 흘러넘쳐 지도 위에 그대로 겹쳐 보였다(줌 아웃 상태에서 특히 읽기 어려웠다) — 글 길이에 맞춰
+        // 박스를 다시 잡는다. 가로는 _tooltipMaxWidth에서 잘리고 그 안에서 줄바꿈된다.
+        private void SizeTooltipToText()
+        {
+            if (_tooltipTMP == null || _tooltipRT == null) return;
+
+            float maxTextWidth = Mathf.Max(20f, _tooltipMaxWidth - TooltipPadding * 2f);
+            var preferred = _tooltipTMP.GetPreferredValues(_tooltipTMP.text, maxTextWidth, 0f);
+            _tooltipRT.sizeDelta = new Vector2(
+                Mathf.Min(maxTextWidth, preferred.x) + TooltipPadding * 2f,
+                preferred.y + TooltipPadding * 2f);
         }
 
         private void ShowClueTooltip(ClueMarkerView marker)
@@ -626,10 +696,13 @@ namespace RouteFinding.MapView
             }
 
             _tooltipTMP.text = sb.ToString();
+            SizeTooltipToText();
 
+            float markerScale = Mathf.Max(_graphPanZoom != null ? _graphPanZoom.Scale : 1f, 0.0001f);
             var markerRT = (RectTransform)marker.transform;
-            _tooltipRT.anchoredPosition = markerRT.anchoredPosition + new Vector2(_nodeSize, 0f);
-            _tooltipRT.localScale = Vector3.one / Mathf.Max(_graphPanZoom != null ? _graphPanZoom.Scale : 1f, 0.0001f);
+            _tooltipRT.localScale = Vector3.one / markerScale;
+            _tooltipRT.anchoredPosition = ClampTooltipInsideViewport(
+                markerRT.anchoredPosition + new Vector2(_nodeSize, 0f), markerScale);
             _tooltipRT.gameObject.SetActive(true);
             _tooltipRT.SetAsLastSibling();
         }
@@ -674,6 +747,7 @@ namespace RouteFinding.MapView
             }
 
             _tooltipTMP.text = sb.ToString();
+            SizeTooltipToText();
 
             PositionTooltipAtMouse();
             _tooltipRT.gameObject.SetActive(true);
@@ -695,11 +769,35 @@ namespace RouteFinding.MapView
                 return;
 
             float scale = Mathf.Max(_graphPanZoom != null ? _graphPanZoom.Scale : 1f, 0.0001f);
-            // 기존 (+10,+10)에서 좌측 100px·아래 50px만큼 이동 요청 반영.
-            const float offsetX = 10f - 120f; // -90f
-            const float offsetY = 10f - 120f;  // -40f
-            _tooltipRT.anchoredPosition = local + new Vector2(offsetX, offsetY) / scale;
+            // 커서 기준 오프셋(기본값 -110,-110 = 커서 왼쪽 아래)은 인스펙터에서 조정한다.
+            // 화면 픽셀 기준으로 일정하게 유지되도록 현재 배율로 나눠 컨테이너 로컬 단위로 바꾼다.
             _tooltipRT.localScale = Vector3.one / scale;
+            _tooltipRT.anchoredPosition = ClampTooltipInsideViewport(local + _tooltipCursorOffset / scale, scale);
+        }
+
+        // [버그 수정, 2026-08-11] 툴팁은 마스크(RectMask2D)가 걸린 GraphViewport 안에서만 그려진다 —
+        // 지도 가장자리나 구석의 노드에 호버하면 커서 왼쪽 아래로 펼쳐진 툴팁이 뷰포트 밖으로 나가
+        // 통째로 잘려 나가거나 일부만 보였다. 박스 전체가 뷰포트 안에 들어오도록 되민다.
+        private Vector2 ClampTooltipInsideViewport(Vector2 desired, float scale)
+        {
+            if (_graphViewport == null || _graphContainer == null || _tooltipRT == null) return desired;
+
+            // 뷰포트의 네 모서리를 그래프 컨테이너 로컬 좌표로 옮긴다(툴팁 위치와 같은 공간).
+            var corners = new Vector3[4];
+            _graphViewport.GetWorldCorners(corners);
+            Vector2 min = _graphContainer.InverseTransformPoint(corners[0]); // 좌하단
+            Vector2 max = _graphContainer.InverseTransformPoint(corners[2]); // 우상단
+
+            // 툴팁은 localScale로 1/scale 역보정돼 있으므로 컨테이너 로컬 단위 크기도 그만큼 나눈다.
+            Vector2 size = _tooltipRT.sizeDelta / scale;
+            float margin = 2f / scale;
+
+            // 툴팁이 뷰포트보다 큰 극단적인 경우엔 좌하단에 붙인다(Clamp의 min > max 방지).
+            float maxX = Mathf.Max(min.x + margin, max.x - size.x - margin);
+            float maxY = Mathf.Max(min.y + margin, max.y - size.y - margin);
+            return new Vector2(
+                Mathf.Clamp(desired.x, min.x + margin, maxX),
+                Mathf.Clamp(desired.y, min.y + margin, maxY));
         }
 
         // 단서 툴팁에 표시할 추천 경로 한 줄 요약. 탐색 자체는 모듈(현재 장비·진행 상태 기준)에 위임.

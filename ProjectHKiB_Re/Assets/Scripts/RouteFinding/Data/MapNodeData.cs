@@ -30,6 +30,8 @@ public class MapNodeData
     public bool isStartNode;        // 집(지도 열람/세이브 기준점) 여부
     public bool startsWithClue;     // 초기 단서 보유 여부
     public string sceneName;        // 씬별 로드 시 사용할 씬 이름
+    public string iconPath;         // 이 맵을 나타내는 아이콘 (Resources 상대 경로, Sprite). 비어 있으면 이름만 표시 —
+                                    // 단서 첨부물(ClueAttachmentKind.MapRef)이 아이콘+이름을 뽑아 쓴다
     public MapEventFlag[] events;   // 이벤트 보유 여부 (key-bool 쌍)
     public string[] clueIds;        // 이 맵에서 획득 가능한 단서 ID (clues.json 참조)
 
