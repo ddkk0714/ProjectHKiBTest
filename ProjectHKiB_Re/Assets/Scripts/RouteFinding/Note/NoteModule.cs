@@ -188,11 +188,14 @@ public class NoteModule : MonoBehaviour
         }
 
         int removed = _entries.RemoveAll(e => e.clueId == clueId);
-        if (removed > 0)
-        {
-            _clueLinks.RemoveWhere(p => p.a == clueId || p.b == clueId); // 지운 단서가 걸려있던 연동 간선도 같이 정리
-            OnNoteChanged?.Invoke();
-        }
+        // [버그 수정, 2026-08-17] 예전엔 여기서 그 단서가 걸려 있던 연동 간선(_clueLinks)까지 같이 지웠다 —
+        // 단서를 잠깐 치웠다가 다시 노트에 올리면 손으로 이어둔 관계가 통째로 날아가, 사용자가 만든
+        // 정보(어느 단서끼리 관련 있다고 판단했는지)가 UI 조작 한 번으로 복구 불가능하게 사라졌다.
+        // 이제는 그대로 남겨둔다 — 간선은 양 끝이 전부 화면에 떠 있을 때만 그려지므로(RelayoutEdges의
+        // TryGetLinkableAnchor) 한쪽이 노트에 없는 링크는 조용히 안 그려질 뿐 무해하고, 그 단서가
+        // 돌아오면 곧바로 다시 이어져 보인다("저장한 루트" 불러오기가 안 맞는 링크를 무해하게 무시하는
+        // 것과 같은 규칙). 연결을 진짜로 끊고 싶으면 단서 연동 모드에서 같은 쌍을 다시 클릭하면 된다.
+        if (removed > 0) OnNoteChanged?.Invoke();
         return removed > 0;
     }
 

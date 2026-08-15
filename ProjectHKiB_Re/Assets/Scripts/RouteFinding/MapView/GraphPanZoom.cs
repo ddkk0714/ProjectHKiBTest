@@ -108,6 +108,11 @@ namespace RouteFinding.MapView
             _clampMargin = margin;
         }
 
+        // [신설, 2026-08-16] 줌 감도도 인스턴스별로 덮어쓸 수 있게 한다 — 노트 그래프는 지도보다 콘텐츠가
+        // 작고 노드를 세밀하게 옮기는 화면이라 같은 감도로는 휠 한 칸이 너무 크다는 피드백. 이 메서드를
+        // 부르지 않는 쪽(MapViewer)은 위 _zoomSensitivity 기본값 그대로다.
+        public void ConfigureZoomSensitivity(float sensitivity) => _zoomSensitivity = sensitivity;
+
         private Camera WorldCam =>
             _canvas != null && _canvas.renderMode != RenderMode.ScreenSpaceOverlay
                 ? _canvas.worldCamera : null;

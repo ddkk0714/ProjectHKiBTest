@@ -78,6 +78,13 @@ namespace RouteFinding.Codex
         private void Start()
         {
             CodexModule.Instance.OnCodexChanged += RefreshTree;
+            // [버그 수정, 2026-08-17] 카드의 "노트에 핀" 버튼 상태를 노트 쪽 변경에 직접 물린다.
+            // 예전엔 창을 열 때(OpenWindowContent)만 다시 맞췄는데, 그건 "도감을 닫고 → 노트에서 지우고 →
+            // 도감을 다시 연다"는 순서에서만 성립한다. 도감이 열려 있는 채로 노트 항목이 지워지는 경로
+            // (다른 창에서 지우기, 저장한 루트 불러오기, 세이브 로드 등)에서는 버튼이 "노트에 핀됨"
+            // (interactable=false)으로 굳은 채 남아, 한 번 지운 단서를 도감에서 다시 꺼낼 수 없었다.
+            // 여닫는 타이밍과 무관하게 항상 실제 핀 상태를 따라가도록 이벤트로 갱신한다.
+            NoteModule.Instance.OnNoteChanged += HandleNoteChanged;
             RefreshTree();
             _panelGO.SetActive(false);
         }
@@ -85,8 +92,13 @@ namespace RouteFinding.Codex
         private void OnDestroy()
         {
             if (CodexModule.Instance != null) CodexModule.Instance.OnCodexChanged -= RefreshTree;
+            if (NoteModule.Instance != null) NoteModule.Instance.OnNoteChanged -= HandleNoteChanged;
             if (_inputManager != null) _inputManager.onOpenCodex -= HandleOpenCodexInput;
         }
+
+        // 노트 내용이 바뀌면 지금 카드에 떠 있는 항목의 핀 버튼만 가볍게 다시 맞춘다
+        // (카드 전체 재생성 없음 — CodexCardView.RefreshPinState 주석 참고).
+        private void HandleNoteChanged() => _cardView?.RefreshPinState();
 
         private void HandleOpenCodexInput(InputAction.CallbackContext context)
         {
