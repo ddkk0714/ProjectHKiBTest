@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEditor;
@@ -76,6 +77,10 @@ namespace RouteFinding.Editor
             _clueDb = new ClueDatabase { clues = Array.Empty<ClueData>() };
             _netDb  = new InternetDatabase { sites = Array.Empty<InternetSite>() };
 
+            // 씬 드롭다운 목록도 같이 새로 훑는다 — 데이터를 다시 불러오는 시점이면
+            // 맵 에셋도 그 사이에 바뀌었을 가능성이 크다.
+            MapSceneCatalog.Refresh();
+
             _dbPath   = FindAbsPath("map_database");
             _cluePath = FindAbsPath("clues");
             _netPath  = FindAbsPath("internet");
@@ -87,7 +92,7 @@ namespace RouteFinding.Editor
                 _db.connections = _db.connections ?? Array.Empty<MapConnectionData>();
                 foreach (var m in _db.maps)
                 {
-                    m.iconPath = m.iconPath ?? "";
+                    m.iconAddress = m.iconAddress ?? "";
                     m.events  = m.events  ?? Array.Empty<MapEventFlag>();
                     m.clueIds = m.clueIds ?? Array.Empty<string>();
                     m.wavePaths     = m.wavePaths     ?? Array.Empty<string>();
@@ -112,7 +117,7 @@ namespace RouteFinding.Editor
                     foreach (var at in cl.attachments)
                     {
                         at.label        = at.label        ?? "";
-                        at.resourcePath = at.resourcePath ?? "";
+                        at.address      = at.address      ?? "";
                         at.mapGuid      = at.mapGuid      ?? "";
                     }
                 }
@@ -124,7 +129,7 @@ namespace RouteFinding.Editor
                 _netDb.sites = _netDb.sites ?? Array.Empty<InternetSite>();
                 foreach (var site in _netDb.sites)
                 {
-                    site.iconPath = site.iconPath ?? "";
+                    site.iconAddress = site.iconAddress ?? "";
                     site.unlock   = site.unlock ?? new InternetUnlockCondition();
                     NormalizeUnlock(site.unlock);
                     site.posts    = site.posts ?? Array.Empty<InternetPost>();
@@ -141,7 +146,7 @@ namespace RouteFinding.Editor
                         foreach (var at in post.attachments)
                         {
                             at.label        = at.label        ?? "";
-                            at.resourcePath = at.resourcePath ?? "";
+                            at.address      = at.address      ?? "";
                             at.mapGuid      = at.mapGuid      ?? "";
                         }
                         post.comments = post.comments ?? Array.Empty<CodexComment>();
@@ -235,6 +240,12 @@ namespace RouteFinding.Editor
                 GUILayout.Label("● 미저장", EditorStyles.toolbarButton);
                 GUI.color = c;
             }
+
+            // 주소는 문자열이라 편집기 밖(JSON 직접 편집, 그룹 창에서 엔트리 삭제)에서 얼마든지
+            // 어긋날 수 있다. 어긋나도 런타임엔 "(파일 없음)"으로만 보여서 발견이 늦으므로,
+            // 세 파일의 주소를 한 번에 훑는 버튼을 둔다(MapDataRegistrySOEditor의 검증 버튼과 같은 역할).
+            if (GUILayout.Button("첨부물 주소 검증", EditorStyles.toolbarButton, GUILayout.Width(102f)))
+                ValidateAttachmentAddresses();
 
             if (GUILayout.Button("불러오기", EditorStyles.toolbarButton, GUILayout.Width(64f)))
             {
@@ -390,8 +401,8 @@ namespace RouteFinding.Editor
             // 기본 정보
             ReadonlyField("GUID", n.guid);
             n.nodeName    = TF("이름",    n.nodeName);
-            n.sceneName   = TF("씬 이름", n.sceneName);
-            n.iconPath    = ResourcePathField<Sprite>("아이콘 (선택)", n.iconPath);
+            n.sceneName   = SceneNamePopup("씬 (맵 데이터)", n.sceneName);
+            n.iconAddress = AddressableField<Sprite>("아이콘 (선택)", n.iconAddress);
             n.description = TA("설명",    n.description);
 
             EditorGUILayout.Space(4f);
@@ -641,10 +652,10 @@ namespace RouteFinding.Editor
                 switch (at.kind)
                 {
                     case ClueAttachmentKind.Image:
-                        at.resourcePath = ResourcePathField<Sprite>("이미지", at.resourcePath);
+                        at.address = AddressableField<Sprite>("이미지", at.address);
                         break;
                     case ClueAttachmentKind.Audio:
-                        at.resourcePath = ResourcePathField<AudioClip>("오디오", at.resourcePath);
+                        at.address = AddressableField<AudioClip>("오디오", at.address);
                         break;
                     case ClueAttachmentKind.MapRef:
                         at.mapGuid = NodeGuidPopup("맵", at.mapGuid, allowEmpty: true);
@@ -656,7 +667,7 @@ namespace RouteFinding.Editor
             if (removeAt >= 0) ArrayUtility.RemoveAt(ref arr, removeAt);
             if (GUILayout.Button("+ 첨부물 추가", GUILayout.ExpandWidth(false)))
                 ArrayUtility.Add(ref arr,
-                    new ClueAttachment { kind = ClueAttachmentKind.Image, label = "", resourcePath = "", mapGuid = "" });
+                    new ClueAttachment { kind = ClueAttachmentKind.Image, label = "", address = "", mapGuid = "" });
             EditorGUI.indentLevel--;
         }
 
@@ -700,7 +711,7 @@ namespace RouteFinding.Editor
 
             site.id   = TF("ID", site.id);
             site.name = TF("이름", site.name);
-            site.iconPath = ResourcePathField<Sprite>("아이콘 (선택)", site.iconPath);
+            site.iconAddress = AddressableField<Sprite>("아이콘 (선택)", site.iconAddress);
 
             EditorGUILayout.Space(4f);
             DrawUnlock(site.unlock, ref _foldSiteUnlock, "사이트 잠금 조건",
@@ -906,7 +917,7 @@ namespace RouteFinding.Editor
                         nodeName      = "새 맵",
                         description   = "",
                         sceneName     = "",
-                        iconPath      = "",
+                        iconAddress   = "",
                         graphPosition = Vector2.zero,
                         events        = Array.Empty<MapEventFlag>(),
                         clueIds       = Array.Empty<string>(),
@@ -953,7 +964,7 @@ namespace RouteFinding.Editor
                     {
                         id       = "site-" + NewGuid(),
                         name     = "새 사이트",
-                        iconPath = "",
+                        iconAddress = "",
                         unlock   = new InternetUnlockCondition
                         {
                             requiredClueIds   = Array.Empty<string>(),
@@ -998,112 +1009,170 @@ namespace RouteFinding.Editor
         private static string TF(string label, string value) =>
             EditorGUILayout.TextField(label, value ?? "");
 
+        // 노드가 가리킬 실제 맵을 고르는 드롭다운.
+        //
+        // 예전에는 자유 입력 텍스트였는데, 이 문자열이 MapDataSO.mapAddressableID와 **정확히**
+        // 같아야만 씬이 로드된다(RouteFindingMapBridge). 오타가 나도 화면에는 "지도에서 이동은
+        // 되는데 씬이 안 바뀐다"로만 보여서, 아직 맵을 안 만든 노드와 구별이 되지 않았다.
+        // 목록에서 고르게 하면 그 오류 종류가 통째로 사라지고, "(미제작)"을 명시적으로 고를 수
+        // 있어 둘이 갈린다.
+        //
+        // 손으로 적힌 옛 값이나 이름이 바뀐 맵을 만나면 그 값을 버리지 않는다 — 목록 끝에
+        // 그대로 얹어 선택된 채로 두고 경고만 띄운다. 조용히 비우면 어느 노드가 어디를 가리키고
+        // 있었는지 복구할 수 없다.
+        private static string SceneNamePopup(string label, string current)
+        {
+            current ??= "";
+
+            var entries = MapSceneCatalog.Entries;
+            bool isStale = current.Length > 0 && !MapSceneCatalog.Contains(current);
+
+            // 0번은 항상 "(미제작)". 그 뒤로 알려진 맵, 마지막에(있다면) 깨진 값.
+            var options = new List<string> { "(미제작 — 씬 없음)" };
+            foreach (var e in entries)
+                options.Add(e.Address == e.AssetName ? e.Address : $"{e.Address}   [{e.AssetName}]");
+            if (isStale) options.Add($"⚠ {current}  (대응 맵 없음)");
+
+            int cur = 0;
+            for (int i = 0; i < entries.Count; i++)
+            {
+                if (entries[i].Address == current) { cur = i + 1; break; }
+            }
+            if (isStale) cur = options.Count - 1;
+
+            EditorGUILayout.BeginHorizontal();
+            int sel = EditorGUILayout.Popup(label, cur, options.ToArray());
+            // 맵을 새로 만든 직후엔 캐시에 없다 — 창을 닫았다 열지 않고 여기서 다시 훑게 한다.
+            if (GUILayout.Button("↻", GUILayout.Width(24f))) MapSceneCatalog.Refresh();
+            EditorGUILayout.EndHorizontal();
+
+            if (isStale)
+            {
+                EditorGUILayout.HelpBox(
+                    $"'{current}' 에 대응하는 MapDataSO가 없습니다. 오타이거나 맵이 아직 없는 상태입니다.\n" +
+                    "맵을 방금 만들었다면 ↻ 로 목록을 새로 고치세요. 씬을 만들 계획이 없다면 (미제작)을 고르세요.",
+                    MessageType.Warning);
+            }
+
+            if (sel == 0) return "";
+            if (isStale && sel == options.Count - 1) return current; // 깨진 값 유지
+            return entries[sel - 1].Address;
+        }
+
         private static string TA(string label, string value)
         {
             EditorGUILayout.LabelField(label);
             return EditorGUILayout.TextArea(value ?? "", GUILayout.MinHeight(54f));
         }
 
-        // 첨부물로 쓸 에셋을 자동 복사해 넣는 곳. Resources.Load는 Resources 폴더 안의 에셋만 볼 수
-        // 있는데(그게 유니티 규칙이다), 작업자가 쓰고 싶은 사진/소리는 보통 Assets/Images 같은 바깥
-        // 폴더에 있다 — 그래서 밖의 에셋을 끌어다 놓으면 여기로 복사할지 물어보고 경로를 채워 준다.
-        private const string CopyTargetResourcesDir = "Assets/Resources/RouteFinding/Attachments";
+        // 세 파일(map_database/clues/internet)이 쓰는 Addressable 주소를 전부 훑어 등록 상태를 본다.
+        // 비어 있는 주소는 "아직 안 붙인 첨부물"이라 정상 — 오류로 올리지 않는다. 잡고 싶은 건
+        // 오타이거나 그룹 창에서 지워진 엔트리다.
+        private void ValidateAttachmentAddresses()
+        {
+            var missing = new System.Collections.Generic.List<(string address, bool isAudio, string where)>();
+            int checkedCount = 0;
 
-        // "Resources 상대 경로" 문자열 필드 + 에셋 오브젝트 칸을 한 줄에 같이 보여준다.
-        // 경로를 직접 칠 수도 있고, 에셋을 끌어다 놓으면 Resources/ 이후 경로(확장자 제외)로 변환해
-        // 넣어준다 — JSON에는 에셋 참조를 담을 수 없어 경로가 유일한 연결 고리라, 손으로 적다 틀리는
-        // 사고(대소문자/확장자 포함 등)를 막는 게 목적이다.
-        private static string ResourcePathField<T>(string label, string path) where T : UnityEngine.Object
+            void Check(string address, bool isAudio, string where)
+            {
+                if (string.IsNullOrWhiteSpace(address)) return;
+                checkedCount++;
+                if (!ClueAttachmentAddressables.IsRegistered(address))
+                    missing.Add((address, isAudio, where));
+            }
+
+            if (_db?.maps != null)
+                foreach (var m in _db.maps) Check(m.iconAddress, false, $"맵 '{m.nodeName}' 아이콘");
+
+            if (_clueDb?.clues != null)
+                foreach (var cl in _clueDb.clues)
+                {
+                    if (cl.attachments == null) continue;
+                    foreach (var at in cl.attachments)
+                    {
+                        if (at == null || at.kind == ClueAttachmentKind.MapRef) continue;
+                        Check(at.address, at.kind == ClueAttachmentKind.Audio,
+                              $"단서 '{cl.name}' 첨부({ClueAttachmentConfig.GetDisplayName(at.kind)})");
+                    }
+                }
+
+            if (_netDb?.sites != null)
+                foreach (var site in _netDb.sites)
+                {
+                    Check(site.iconAddress, false, $"사이트 '{site.name}' 아이콘");
+                    if (site.posts == null) continue;
+                    foreach (var post in site.posts)
+                    {
+                        if (post?.attachments == null) continue;
+                        foreach (var at in post.attachments)
+                        {
+                            if (at == null || at.kind == ClueAttachmentKind.MapRef) continue;
+                            Check(at.address, at.kind == ClueAttachmentKind.Audio,
+                                  $"게시글 '{post.title}' 첨부({ClueAttachmentConfig.GetDisplayName(at.kind)})");
+                        }
+                    }
+                }
+
+            if (missing.Count == 0)
+            {
+                Debug.Log($"[맵 DB 편집기] 첨부물 주소 검증 통과 — 주소 {checkedCount}개가 모두 " +
+                          "Addressable 엔트리와 연결됩니다.");
+                return;
+            }
+
+            string report = string.Join("\n", missing.ConvertAll(m => $"- {m.where}: '{m.address}'"));
+
+            // 주소는 대개 파일 이름 그대로다(등록할 때 그렇게 만든다). 그래서 이름이 같은 에셋을
+            // 찾아 자동 등록해 볼 수 있다 — 다만 후보가 여럿이면 고르지 않는다. 잘못 고르면
+            // 엉뚱한 사진이 조용히 붙어서, 못 찾은 것보다 알아채기 어렵다.
+            if (EditorUtility.DisplayDialog(
+                    "등록되지 않은 주소",
+                    $"주소 {checkedCount}개 중 {missing.Count}개가 Addressable에 등록돼 있지 않습니다.\n\n" +
+                    "이름이 같은 에셋을 프로젝트에서 찾아 자동으로 등록할까요?\n" +
+                    "(후보가 여러 개인 주소는 건너뛰고 콘솔에 남깁니다)",
+                    "자동 등록 시도", "보고만 하기"))
+            {
+                int done = 0;
+                foreach (var m in missing)
+                    if (ClueAttachmentAddressables.TryRegisterByName(m.address, m.isAudio)) done++;
+
+                Debug.Log($"[맵 DB 편집기] 자동 등록 {done}/{missing.Count}개 완료.\n[검사한 주소]\n{report}");
+                return;
+            }
+
+            Debug.LogWarning(
+                $"[맵 DB 편집기] 등록되지 않은 Addressable 주소 {missing.Count}개 (주소 {checkedCount}개 검사)\n" +
+                report +
+                $"\n\n에셋 칸에 파일을 끌어다 놓으면 '{ClueAttachmentAddressables.GroupName}' 그룹에 자동으로 " +
+                "등록됩니다. 이미 등록된 에셋이라면 Groups 창에서 주소를 위 문자열과 맞추세요.");
+        }
+
+        // "Addressable 주소" 문자열 필드 + 에셋 오브젝트 칸을 한 줄에 같이 보여준다.
+        // 주소를 직접 칠 수도 있고, 에셋을 끌어다 놓으면 그 에셋의 Addressable 주소를 채워 준다 —
+        // 아직 등록되지 않은 에셋이면 등록할지 물어보고 ClueAttachments 그룹에 넣는다.
+        // JSON에는 에셋 참조를 담을 수 없어 주소가 유일한 연결 고리라, 손으로 적다 틀리는 사고를
+        // 막는 게 목적이다(MapDataSO.mapAddressableID를 손으로 적다 틀리는 것과 같은 문제다 —
+        // 그쪽은 MapDataRegistrySOEditor의 검증 버튼이 사후에 잡는다).
+        private static string AddressableField<T>(string label, string address) where T : UnityEngine.Object
         {
             EditorGUILayout.BeginHorizontal();
-            string newPath = EditorGUILayout.TextField(label, path ?? "");
-            var current = string.IsNullOrWhiteSpace(newPath) ? null : Resources.Load<T>(newPath);
+            string newAddress = EditorGUILayout.TextField(label, address ?? "");
+            var current = ClueAttachmentAddressables.LoadByAddress<T>(newAddress);
             var picked = EditorGUILayout.ObjectField(current, typeof(T), false, GUILayout.Width(120f)) as T;
             EditorGUILayout.EndHorizontal();
 
             if (picked != current)
             {
-                string assetPath = picked == null ? "" : AssetDatabase.GetAssetPath(picked);
-                newPath = ToResourcesPath(assetPath);
-
-                // Resources 밖의 에셋 — 작업자에게 복사할지 물어본다(취소하면 경로를 비운 채로 둔다).
-                if (picked != null && string.IsNullOrEmpty(newPath))
-                    newPath = CopyIntoResources<T>(assetPath);
+                newAddress = picked == null
+                    ? ""
+                    : ClueAttachmentAddressables.EnsureAddressable(picked, typeof(T) == typeof(Sprite));
             }
 
-            // 경로는 있는데 로드가 안 되면(오타 등) 런타임에도 "(파일 없음)"으로 뜬다 — 미리 알려준다.
-            if (!string.IsNullOrWhiteSpace(newPath) && Resources.Load<T>(newPath) == null)
-                EditorGUILayout.HelpBox($"Resources/{newPath} 을(를) 찾을 수 없습니다.", MessageType.Warning);
+            // 주소는 있는데 등록된 엔트리가 없으면(오타 등) 런타임에도 "(파일 없음)"으로 뜬다 — 미리 알려준다.
+            if (!string.IsNullOrWhiteSpace(newAddress) && ClueAttachmentAddressables.LoadByAddress<T>(newAddress) == null)
+                EditorGUILayout.HelpBox($"'{newAddress}' 주소로 등록된 Addressable 엔트리가 없습니다.", MessageType.Warning);
 
-            return newPath;
-        }
-
-        // Resources 밖의 에셋을 CopyTargetResourcesDir로 복사하고 그 Resources 상대 경로를 돌려준다.
-        // 원본은 건드리지 않는다 — 다른 곳에서 이미 참조하고 있을 수 있어서 이동이 아니라 복사다.
-        // 실패하거나 작업자가 취소하면 빈 문자열.
-        private static string CopyIntoResources<T>(string assetPath) where T : UnityEngine.Object
-        {
-            string fileName = Path.GetFileName(assetPath);
-            if (!EditorUtility.DisplayDialog(
-                    "Resources 폴더 밖의 에셋",
-                    $"{fileName} 은(는) Resources 폴더 밖에 있어 게임 실행 중에는 불러올 수 없습니다.\n\n" +
-                    $"{CopyTargetResourcesDir}/ 로 복사해서 쓸까요?\n(원본은 그대로 남습니다)",
-                    "복사해서 사용", "취소"))
-                return "";
-
-            EnsureFolder(CopyTargetResourcesDir);
-
-            string dest = AssetDatabase.GenerateUniqueAssetPath($"{CopyTargetResourcesDir}/{fileName}");
-            if (!AssetDatabase.CopyAsset(assetPath, dest))
-            {
-                Debug.LogError($"[맵 DB 편집기] 복사에 실패했습니다: {assetPath} → {dest}");
-                return "";
-            }
-            AssetDatabase.ImportAsset(dest);
-
-            // 사진은 임포트 타입이 Sprite가 아니면 Resources.Load<Sprite>가 못 찾는다(런타임에 Texture2D
-            // 폴백이 있긴 하지만, 여기서 맞춰두면 편집기 미리보기부터 정상적으로 뜬다).
-            if (typeof(T) == typeof(Sprite) &&
-                AssetImporter.GetAtPath(dest) is TextureImporter importer &&
-                importer.textureType != TextureImporterType.Sprite)
-            {
-                importer.textureType = TextureImporterType.Sprite;
-                importer.SaveAndReimport();
-            }
-
-            Debug.Log($"[맵 DB 편집기] 첨부용으로 복사했습니다: {assetPath} → {dest}");
-            return ToResourcesPath(dest);
-        }
-
-        // "Assets/A/B/C"처럼 중간 폴더가 없어도 한 단계씩 만들어 준다(AssetDatabase.CreateFolder는
-        // 부모가 이미 있어야만 동작한다).
-        private static void EnsureFolder(string folderPath)
-        {
-            if (AssetDatabase.IsValidFolder(folderPath)) return;
-
-            var parts = folderPath.Split('/');
-            string cur = parts[0]; // "Assets"
-            for (int i = 1; i < parts.Length; i++)
-            {
-                string next = cur + "/" + parts[i];
-                if (!AssetDatabase.IsValidFolder(next)) AssetDatabase.CreateFolder(cur, parts[i]);
-                cur = next;
-            }
-        }
-
-        // Assets/…/Resources/Foo/bar.png → Foo/bar. Resources 밖이면 빈 문자열
-        // (경고를 여기서 찍지 않는다 — OnGUI는 이벤트마다 다시 도는데 그때마다 콘솔에 쌓인다).
-        private static string ToResourcesPath(string assetPath)
-        {
-            if (string.IsNullOrEmpty(assetPath)) return "";
-
-            const string marker = "/Resources/";
-            int i = assetPath.LastIndexOf(marker, StringComparison.OrdinalIgnoreCase);
-            if (i < 0) return "";
-
-            string rel = assetPath.Substring(i + marker.Length);
-            int dot = rel.LastIndexOf('.');
-            return dot >= 0 ? rel.Substring(0, dot) : rel;
+            return newAddress;
         }
 
         // 노드 이름 드롭다운 → 선택된 GUID 반환

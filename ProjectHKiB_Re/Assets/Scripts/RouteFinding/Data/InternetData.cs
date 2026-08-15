@@ -53,7 +53,7 @@ public class InternetSite
 {
     public string id;
     public string name;
-    public string iconPath;   // Resources 상대 경로(선택) — 없으면 아이콘 없이 이름만 표시
+    public string iconAddress; // Addressable 주소(선택) — 없으면 아이콘 없이 이름만 표시
     public InternetUnlockCondition unlock;
     public InternetPost[] posts = Array.Empty<InternetPost>();
 }

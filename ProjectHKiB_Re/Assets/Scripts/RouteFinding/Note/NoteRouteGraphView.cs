@@ -1201,7 +1201,7 @@ namespace RouteFinding.Note
             {
                 case ClueAttachmentKind.Image:
                 {
-                    var sprite = ClueAttachmentService.LoadSprite(a.resourcePath);
+                    var sprite = ClueAttachmentService.LoadSprite(a.address);
                     missing = sprite == null;
                     if (!missing && previewImg != null)
                     {
@@ -1213,7 +1213,7 @@ namespace RouteFinding.Note
                 }
                 case ClueAttachmentKind.Audio:
                 {
-                    var clip = ClueAttachmentService.LoadAudio(a.resourcePath);
+                    var clip = ClueAttachmentService.LoadAudio(a.address);
                     missing = clip == null;
                     showBtn = !missing;
                     if (showBtn)

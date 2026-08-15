@@ -28,13 +28,13 @@
                 {
                     "kind": 2,
                     "label": "",
-                    "resourcePath": "",
+                    "address": "",
                     "mapGuid": "map-002"
                 },
                 {
                     "kind": 0,
                     "label": "MapIMage",
-                    "resourcePath": "RouteFinding/Attachments/20250420_164143_2",
+                    "address": "20250420_164143_2",
                     "mapGuid": ""
                 }
             ]
@@ -272,7 +272,7 @@
                 {
                     "kind": 2,
                     "label": "",
-                    "resourcePath": "",
+                    "address": "",
                     "mapGuid": "map-006"
                 }
             ]
@@ -299,7 +299,7 @@
                 {
                     "kind": 0,
                     "label": "블로그에 올라온 사진",
-                    "resourcePath": "RouteFinding/Attachments/20250420_164143_2",
+                    "address": "20250420_164143_2",
                     "mapGuid": ""
                 }
             ]
@@ -326,7 +326,7 @@
                 {
                     "kind": 1,
                     "label": "rec_0340.wav",
-                    "resourcePath": "RouteFinding/Attachments/rec_night_call",
+                    "address": "rec_night_call",
                     "mapGuid": ""
                 }
             ]

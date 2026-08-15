@@ -490,7 +490,7 @@ namespace RouteFinding.Codex
             {
                 case ClueAttachmentKind.Image:
                 {
-                    var sprite = ClueAttachmentService.LoadSprite(a.resourcePath);
+                    var sprite = ClueAttachmentService.LoadSprite(a.address);
                     missing = sprite == null;
                     if (!missing && previewImg != null)
                     {
@@ -502,7 +502,7 @@ namespace RouteFinding.Codex
                 }
                 case ClueAttachmentKind.Audio:
                 {
-                    var clip = ClueAttachmentService.LoadAudio(a.resourcePath);
+                    var clip = ClueAttachmentService.LoadAudio(a.address);
                     missing = clip == null;
                     showBtn = !missing;
                     if (showBtn)
@@ -639,7 +639,7 @@ namespace RouteFinding.Codex
 
         private void ToggleAudio(ClueAttachment a, TextMeshProUGUI btnLabel)
         {
-            var clip = ClueAttachmentService.LoadAudio(a.resourcePath);
+            var clip = ClueAttachmentService.LoadAudio(a.address);
             if (clip == null) return;
 
             if (_audio == null) _audio = ClueAttachmentAudioPlayer.AttachTo(gameObject);

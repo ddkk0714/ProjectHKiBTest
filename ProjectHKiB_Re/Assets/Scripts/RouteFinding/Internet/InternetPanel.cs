@@ -232,8 +232,8 @@ namespace RouteFinding.Internet
             var icon = row.transform.Find("Icon")?.GetComponent<Image>();
             if (icon != null)
             {
-                var sprite = unlocked && !string.IsNullOrWhiteSpace(site.iconPath)
-                    ? ClueAttachmentService.LoadSprite(site.iconPath)
+                var sprite = unlocked && !string.IsNullOrWhiteSpace(site.iconAddress)
+                    ? ClueAttachmentService.LoadSprite(site.iconAddress)
                     : null;
                 icon.gameObject.SetActive(sprite != null);
                 if (sprite != null)

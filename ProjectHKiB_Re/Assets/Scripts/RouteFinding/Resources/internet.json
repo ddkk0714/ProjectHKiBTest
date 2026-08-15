@@ -3,7 +3,7 @@
         {
             "id": "site-local-board",
             "name": "지역 게시판",
-            "iconPath": "",
+            "iconAddress": "",
             "unlock": {},
             "posts": [
                 {
@@ -58,7 +58,7 @@
         {
             "id": "site-photo-blog",
             "name": "발밑의 도시 (개인 블로그)",
-            "iconPath": "",
+            "iconAddress": "",
             "unlock": {
                 "requiredClueIds": [
                     "clue-web-wasteland"
@@ -85,7 +85,7 @@
         {
             "id": "site-station-archive",
             "name": "폐역 기록보관소",
-            "iconPath": "",
+            "iconAddress": "",
             "unlock": {
                 "requiredClueIds": [],
                 "requiredEventKeys": [
