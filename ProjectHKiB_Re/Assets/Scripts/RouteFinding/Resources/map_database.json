@@ -11,7 +11,7 @@
             "isStartNode": true,
             "startsWithClue": true,
             "sceneName": "TestMap1",
-            "iconPath": "",
+            "iconAddress": "",
             "events": [
                 {
                     "key": "hasDiary",
@@ -45,7 +45,7 @@
             "isStartNode": false,
             "startsWithClue": false,
             "sceneName": "TestMap2",
-            "iconPath": "",
+            "iconAddress": "",
             "events": [
                 {
                     "key": "hasDiary",
@@ -88,7 +88,7 @@
             "isStartNode": false,
             "startsWithClue": false,
             "sceneName": "ForestCabin",
-            "iconPath": "",
+            "iconAddress": "",
             "events": [
                 {
                     "key": "hasDiary",
@@ -128,7 +128,7 @@
             "isStartNode": false,
             "startsWithClue": true,
             "sceneName": "Lakeside",
-            "iconPath": "",
+            "iconAddress": "",
             "events": [
                 {
                     "key": "hasDiary",
@@ -173,7 +173,7 @@
             "isStartNode": false,
             "startsWithClue": false,
             "sceneName": "Destination1",
-            "iconPath": "",
+            "iconAddress": "",
             "events": [
                 {
                     "key": "hasDiary",
@@ -232,7 +232,7 @@
             "isStartNode": false,
             "startsWithClue": false,
             "sceneName": "Wasteland",
-            "iconPath": "",
+            "iconAddress": "",
             "events": [
                 {
                     "key": "hasDiary",
@@ -276,7 +276,7 @@
             "isStartNode": false,
             "startsWithClue": false,
             "sceneName": "AbandonedStation",
-            "iconPath": "",
+            "iconAddress": "",
             "events": [
                 {
                     "key": "hasDiary",
@@ -321,7 +321,7 @@
             "isStartNode": false,
             "startsWithClue": false,
             "sceneName": "FogValley",
-            "iconPath": "",
+            "iconAddress": "",
             "events": [
                 {
                     "key": "hasDiary",
@@ -370,7 +370,7 @@
             "isStartNode": false,
             "startsWithClue": false,
             "sceneName": "Plateau",
-            "iconPath": "",
+            "iconAddress": "",
             "events": [
                 {
                     "key": "hasDiary",
@@ -440,7 +440,7 @@
             "isStartNode": false,
             "startsWithClue": false,
             "sceneName": "Destination2",
-            "iconPath": "",
+            "iconAddress": "",
             "events": [
                 {
                     "key": "hasDiary",
@@ -494,7 +494,7 @@
             "isStartNode": false,
             "startsWithClue": false,
             "sceneName": "UndergroundPassage",
-            "iconPath": "",
+            "iconAddress": "",
             "events": [
                 {
                     "key": "hasDiary",
@@ -531,7 +531,7 @@
             "isStartNode": false,
             "startsWithClue": false,
             "sceneName": "GlassGreenhouse",
-            "iconPath": "",
+            "iconAddress": "",
             "events": [
                 {
                     "key": "hasDiary",
@@ -586,7 +586,7 @@
             "isStartNode": false,
             "startsWithClue": false,
             "sceneName": "Destination3",
-            "iconPath": "",
+            "iconAddress": "",
             "events": [
                 {
                     "key": "hasDiary",

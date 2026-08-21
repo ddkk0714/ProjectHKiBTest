@@ -27,7 +27,13 @@ namespace RouteFinding.Note
     // 딕셔너리(_nodeVisuals/_clueVisuals, guid·clueId 기준)로 관리한다 — 그래야 사용자가 드래그로 옮긴
     // 위치가 노트를 새로고침해도 유지된다. 반면 간선·카드는 그 자체로 상태가 없으므로(매번 다시 계산)
     // 기존처럼 UiRowPool로 재사용한다.
-    public class NoteRouteGraphView : MonoBehaviour
+    //
+    // [2026-08-15] 이 컴포넌트는 GraphPanZoom과 같은 GameObject(GraphScroll)에 붙는다 — 그래서 빈 배경
+    // 위의 포인터 이벤트를 그쪽과 함께 받을 수 있고, 별도 컴포넌트를 새로 추가하지 않고도(= 이미 만들어둔
+    // NotePanel 프리팹을 재사용하는 경로에서 컴포넌트가 없어 조용히 죽는 일 없이) 마퀴 선택을 여기서
+    // 직접 구현한다. 좌드래그 = 마퀴 선택, 가운데/오른쪽 드래그(또는 Alt+좌드래그) = 기존 배경 팬.
+    public class NoteRouteGraphView : MonoBehaviour,
+        IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
     {
         // [신설, 2026-07-21] SaveModule이 F5/F9 일반 세이브에서 그래프 위치/펼침 상태를 저장·복원하려면
         // 이 인스턴스에 접근해야 하는데, NoteModule과 달리 씬 오브젝트라 자동 생성 싱글턴으로 만들 순
@@ -67,7 +73,11 @@ namespace RouteFinding.Note
         [SerializeField] private Color _nodeTextColor = Color.black; // NodeBox 안 맵 이름 글자색
         [SerializeField] private float _nodeBoxWidth = 60f;
         [SerializeField] private float _nodeBoxHeight = 16f; // 노드 박스 높이(= 최소 행 높이)
-        [SerializeField] private float _nodeStartX = 80f;    // 노드가 처음 생성될 때의 기본 가로 위치(우측으로 밀고 싶으면 키움)
+        [SerializeField] private float _nodeStartX = 80f;    // 노드가 처음 생성될 때의 기본 가로 위치의 최소값(가운데 정렬 결과가 이보다 왼쪽이면 이 값을 쓴다)
+        // [요청, 2026-08-16] 정가운데 정렬만으로는 여전히 화면 왼쪽에 붙어 보인다 — 맵 노드 박스 옆의
+        // 카드 영역(_cardsAreaWidth)까지 한 덩어리로 잡아 가운데를 맞추다 보니 박스 자체는 그만큼
+        // 왼쪽으로 치우치기 때문. 그 보정 겸, 노드가 생기는 자리를 이 값만큼 오른쪽으로 민다.
+        [SerializeField] private float _routeOriginOffsetX = 100f;
         [SerializeField] private float _nodeSpacingY = 26f;  // 노드가 처음 생성될 때의 기본 세로 간격
         [SerializeField] private float _edgeThickness = 2f;
         // [신설] 맵-맵 체인 간선에만 진행 방향 화살촉을 그린다(맵-단서/단서-단서 간선은 방향 개념이
@@ -103,6 +113,13 @@ namespace RouteFinding.Note
         [SerializeField] private float _attachmentGapY = 6f;
         [SerializeField] private float _attachmentSpacing = 2f;
         [SerializeField] private float _attachmentPreviewHeight = 40f; // 사진 첨부의 미리보기 높이
+
+        // [신설, 2026-08-15] 다중 선택 — 빈 배경을 드래그(마퀴)하거나 Ctrl+클릭으로 여러 노드를 고르고,
+        // 그중 하나를 끌면 고른 것 전부가 같은 델타로 함께 움직인다(NoteNodeDragHandle 참고).
+        [Header("다중 선택")]
+        [SerializeField] private Color _colSelection = new(1f, 0.85f, 0.25f);      // 선택된 노드 테두리
+        [SerializeField] private Color _colMarquee = new(0.35f, 0.65f, 1f, 0.22f); // 드래그 중 그려지는 선택 사각형
+        [SerializeField] private float _selectionOutlineWidth = 2f;
 
         // 맵 노드 하나의 시각 상태 — guid로 영속 관리(파괴하지 않음, MapViewer._nodeViews와 동일한 이유).
         private class NodeVisual
@@ -147,6 +164,29 @@ namespace RouteFinding.Note
         // 이번 SetData 패스에 실제로 화면에 보이는 단서 노드 — 간선 계산용(맵-단서, 단서-단서 둘 다).
         // mapGuid는 소속 맵이 있으면 그 guid, 없으면(도감 수동 핀 등) null.
         private readonly Dictionary<string, (ClueNodeVisual visual, string mapGuid)> _visibleClueVisuals = new();
+
+        // [신설, 2026-08-15] 다중 선택/그룹 이동 대상 — 맵 노드와 단서 노드는 만들어지는 경로도 크기
+        // 규칙도 다르지만(고정 크기 vs ContentSizeFitter), 선택과 이동 입장에서는 "Group 하나 + 클램프에
+        // 필요한 여백"일 뿐이라 여기서 한 자료구조로 합쳐 다룬다. Group(RectTransform)을 키로 쓰는 이유는
+        // 드래그 핸들이 들고 있는 것도, 마퀴가 위치·크기를 읽는 것도 결국 그 Group이기 때문.
+        private class SelectableNode
+        {
+            public RectTransform Group;
+            public Outline Outline;    // 선택 강조 테두리 — 꺼둔 채로 만들어 두고 선택 시에만 켠다
+            public float Width;        // 마퀴 교차 판정용 폭
+            public float FixedHeight;  // 0이면 내용에 따라 높이가 변하는 노드(= Group.rect.height를 읽는다)
+            public float RightMargin;  // 드래그 클램프 시 오른쪽에 남겨야 하는 폭(카드 영역까지 포함)
+        }
+
+        private readonly Dictionary<RectTransform, SelectableNode> _selectables = new();
+        private readonly HashSet<RectTransform> _selected = new();
+
+        private RectTransform _marqueeRT;
+        private bool _marqueeActive;
+        private Vector2 _marqueeStart;
+
+        // 맨 처음 한 번은 경로가 없어도 작업 공간 가운데로 시점을 맞춘다 — SetData 참고.
+        private bool _viewCentered;
 
         private UiRowPool _edgePool;
         private UiRowPool _arrowPool;
@@ -194,6 +234,12 @@ namespace RouteFinding.Note
             _nodeVisuals.Clear();
             _orderedVisuals.Clear();
             _clueVisuals.Clear();
+            // 위에서 자식을 전부 파괴했으므로 선택/마퀴가 들고 있던 RectTransform 참조도 같이 버린다.
+            _selectables.Clear();
+            _selected.Clear();
+            _marqueeRT = null;
+            _marqueeActive = false;
+            _viewCentered = false;
 
             _graphArea = NewRect(_content, "GraphArea");
             _graphArea.anchorMin = new Vector2(0f, 1f);
@@ -239,6 +285,15 @@ namespace RouteFinding.Note
             foreach (var v in _clueVisuals.Values) v.UsedThisPass = false;
 
             bool hasRoute = route != null && route.IsValid && graph != null;
+            int routeNodeCount = hasRoute ? route.Nodes.Count : 0;
+
+            // [요청, 2026-08-15] 경로 체인의 기본 배치 원점 — 예전엔 무조건 좌상단(_nodeStartX, -4)이라
+            // 넓어진 작업 공간의 한쪽 구석에 처박혔다. 이제 공간(_content = GraphContainer, 고정 크기)의
+            // 정가운데에 체인이 오도록 원점을 계산한다. 이미 만들어진 노드는 사용자가 옮겨둔 위치를
+            // 그대로 쓰므로(GetOrCreateNodeVisual은 기존 것을 찾으면 위치를 안 건드린다) 영향이 없다.
+            Vector2 chainOrigin = ComputeRouteOrigin(routeNodeCount);
+            int createdMapNodes = 0;
+
             if (hasRoute)
             {
                 for (int i = 0; i < route.Nodes.Count; i++)
@@ -251,7 +306,8 @@ namespace RouteFinding.Note
                     }).ToList();
                     foreach (var e in nodeEntries) matchedClueIds.Add(e.clueId);
 
-                    var visual = GetOrCreateNodeVisual(node.guid, i);
+                    if (!_nodeVisuals.ContainsKey(node.guid)) createdMapNodes++;
+                    var visual = GetOrCreateNodeVisual(node.guid, chainOrigin + new Vector2(0f, -i * _nodeSpacingY));
                     visual.UsedThisPass = true;
                     visual.Group.gameObject.SetActive(true);
                     visual.Label.text  = $"{node.nodeName}\n<size=70%>{(i == 0 ? "출발" : i == route.Nodes.Count - 1 ? "목적지" : "경로")}</size>";
@@ -293,11 +349,18 @@ namespace RouteFinding.Note
             // 현재 경로의 어떤 맵과도 연관되지 않은 항목(도감에서 수동으로 핀한 단서 등)은 애초에
             // "카드"로 붙을 자리가 없으므로 처음부터 항상 단서 노드로 표시한다.
             var others = entries.Where(e => !matchedClueIds.Contains(e.clueId)).ToList();
-            float othersBaseY = -(Mathf.Max(_orderedVisuals.Count, 1) * _nodeSpacingY + _clueNodeSpacingY + 4f);
+            // 체인 아래쪽에 이어 붙인다 — 체인 원점이 가운데로 옮겨졌으므로 그 기준도 같이 따라간다.
+            float othersBaseY = chainOrigin.y - (Mathf.Max(_orderedVisuals.Count, 1) * _nodeSpacingY + _clueNodeSpacingY);
+            // 세로로만 쌓으면 개수가 늘었을 때 작업 공간 아래로 넘어가 손이 닿지 않는 자리에 생긴다
+            // (드래그·팬 둘 다 공간 안으로 제한돼 있다) — 바닥에 닿으면 오른쪽에 새 열로 이어 쌓는다.
+            float spaceH = _content != null ? _content.rect.height : 0f;
+            int perColumn = Mathf.Max(1, Mathf.FloorToInt((spaceH + othersBaseY) / _clueNodeSpacingY));
             for (int i = 0; i < others.Count; i++)
             {
                 var e = others[i];
-                var defaultPos = new Vector2(_nodeStartX, othersBaseY - i * _clueNodeSpacingY);
+                var defaultPos = new Vector2(
+                    chainOrigin.x + (i / perColumn) * (_clueNodeWidth + 12f),
+                    othersBaseY - (i % perColumn) * _clueNodeSpacingY);
                 var clueVisual = GetOrCreateClueVisual(e.clueId, defaultPos);
                 clueVisual.UsedThisPass = true;
                 clueVisual.Group.gameObject.SetActive(true);
@@ -315,12 +378,61 @@ namespace RouteFinding.Note
             _commentPool.EndPass();
             _attachmentPool.EndPass(); // 첨부물 노드도 같은 이유로 전역 풀 하나를 여러 컨테이너가 공유
 
+            // 이번 패스에서 꺼진(카드로 접힌 등) 노드는 선택에서도 빼준다 — 안 그러면 보이지도 않는 노드가
+            // 그룹 이동에 딸려 다닌다.
+            PruneSelection();
+
             RelayoutEdges();
 
             if (!hasRoute && others.Count == 0)
                 BuildEmptyHint();
 
             UpdateContentSize();
+
+            // [요청, 2026-08-15] 경로를 새로 반영한 직후에는 그 체인이 화면 정가운데 보이게 시점을 옮긴다.
+            // "체인 전체가 이번에 처음 만들어졌을 때"로만 제한하는 이유 — 경로 일부만 바뀌어 노드 하나가
+            // 새로 생기는 경우까지 시점을 끌어당기면, 사용자가 맞춰둔 팬·줌이 예고 없이 튄다.
+            // 맨 처음 한 번(_viewCentered)은 경로가 없어도 맞춘다 — 작업 공간이 뷰포트보다 훨씬 커서
+            // 팬 위치 기본값(좌하단 구석)으로 두면 가운데 놓인 노드가 화면 밖에 있게 된다.
+            bool freshChain = createdMapNodes > 0 && createdMapNodes == routeNodeCount;
+            if (freshChain || !_viewCentered)
+                _viewCentered |= FocusOnRoute(chainOrigin, routeNodeCount);
+        }
+
+        // 경로 체인이 작업 공간(_content = GraphContainer, 고정 크기) 정가운데 오도록 첫 노드의 좌상단
+        // 좌표를 계산한다. 노드 좌표계는 _graphArea 좌상단 기준(y는 아래로 갈수록 음수)이고, _graphArea는
+        // _content의 위쪽 모서리에 앵커돼 있으므로 여기서 나온 y를 그대로 쓰면 된다.
+        private Vector2 ComputeRouteOrigin(int nodeCount)
+        {
+            float spaceW = _content != null ? _content.rect.width : 0f;
+            float spaceH = _content != null ? _content.rect.height : 0f;
+            float blockW = RouteBlockWidth;
+            float chainH = Mathf.Max(0, nodeCount - 1) * _nodeSpacingY + _nodeBoxHeight;
+
+            float x = Mathf.Max(_nodeStartX, (spaceW - blockW) * 0.5f) + _routeOriginOffsetX;
+            float y = -Mathf.Max(4f, (spaceH - chainH) * 0.5f);
+            return new Vector2(x, y);
+        }
+
+        // 맵 노드 박스 + 그 옆에 붙는 카드 목록까지가 체인 한 줄의 실제 가로 폭이다(가운데 정렬 기준).
+        private float RouteBlockWidth => _nodeBoxWidth + _cardsGapX + _cardsAreaWidth;
+
+        // 실제로 시점을 옮겼으면 true — GraphPanZoom.Init(NotePanel.Awake)이 아직 안 끝났으면 조용히
+        // 아무 일도 안 하므로, 호출부가 "다음 기회에 다시 시도"할 수 있도록 결과를 돌려준다.
+        private bool FocusOnRoute(Vector2 origin, int nodeCount)
+        {
+            if (_panZoom == null || _content == null) return false;
+
+            float chainH = Mathf.Max(0, nodeCount - 1) * _nodeSpacingY + _nodeBoxHeight;
+            // 시점은 _routeOriginOffsetX를 빼고 잡는다 — 시점까지 같이 밀면 노드가 화면에서는 제자리라
+            // "오른쪽으로 옮겼다"가 눈에 보이지 않는다. 시점은 공간 정가운데에 두고 노드만 민다.
+            var center = new Vector2(
+                origin.x - _routeOriginOffsetX + RouteBlockWidth * 0.5f,
+                origin.y - chainH * 0.5f);
+            // GraphPanZoom.FocusOn은 _content 좌하단(pivot=(0,0)) 기준 좌표를 받는데, 노드 좌표는
+            // 좌상단 기준(y ≤ 0)이라 세로만 변환해준다.
+            _panZoom.FocusOn(new Vector2(center.x, _content.rect.height + center.y));
+            return true;
         }
 
         // 단서 서랍(ClueDrawerView)에서 드래그해 놓았을 때 NotePanel이 호출한다. screenPosition은
@@ -339,7 +451,13 @@ namespace RouteFinding.Note
             // 는 BuildGraphPanZoom이 준 고정 크기(900x300)라 패널 어디에 놓아도 넉넉히 포함한다 —
             // 판정 범위만 바꾸는 것이고, 실제 배치 좌표 계산은 여전히 아래에서 _graphArea 기준으로 한다
             // (노드 anchoredPosition이 그 좌표계를 쓰므로, 판정 범위와 좌표계는 별개로 둬야 한다).
-            if (!RectTransformUtility.RectangleContainsScreenPoint(_content, screenPosition, cam)) return;
+            // [2026-08-15] 판정 기준을 _content에서 그 부모(GraphViewport)로 한 번 더 좁혔다 — 작업 공간을
+            // 크게 키우면서 _content가 화면 밖(우측 단서 서랍 아래까지)으로 한참 뻗게 됐고, 그 상태에서
+            // _content 기준으로 판정하면 "서랍 위에 도로 놓아 취소"하려는 드롭까지 배치로 처리된다.
+            // GraphViewport는 RectMask2D로 실제로 보이는 그래프 영역과 정확히 같아서, 위 문단이 말하는
+            // "눈에 보이는 패널 안이면 성공" 조건을 그대로 표현한다.
+            var dropBounds = (_content.parent as RectTransform) ?? _content;
+            if (!RectTransformUtility.RectangleContainsScreenPoint(dropBounds, screenPosition, cam)) return;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(_graphArea, screenPosition, cam, out var localPos);
 
             // [버그 수정, 2026-07-21] ScreenPointToLocalPointInRectangle이 반환하는 좌표는 _graphArea의
@@ -350,15 +468,25 @@ namespace RouteFinding.Note
             // (참고: 세로는 _graphArea.pivot.y=1이 자식 anchor.y=1과 이미 일치해 보정이 필요 없다.)
             localPos.x += _graphArea.rect.width * _graphArea.pivot.x;
 
-            // 이미 그래프 위에 노드로 떠 있으면(재배치) 곧바로 옮기고 끝 — 새로 핀할 필요가 없다.
-            if (_clueVisuals.TryGetValue(clueId, out var existingVisual))
+            bool alreadyPinned = NoteModule.Instance.IsPinned(clueId);
+
+            // 이미 노트에 있고 그래프 위에 노드로도 떠 있으면(재배치) 곧바로 옮기고 끝 — 새로 핀할 필요가 없다.
+            // [버그 수정, 2026-08-17] 판정에 "노트에 핀돼 있고 지금 실제로 보이는 노드"라는 조건을 더했다.
+            // _clueVisuals는 사용자가 드래그해둔 위치를 지키려고 노드를 파괴하지 않고 SetActive(false)로만
+            // 재우는 영속 딕셔너리(클래스 상단 주석 참고)라, 한 번 펼쳤던 단서를 노트에서 지우면 항목만
+            // 사라지고 딕셔너리에는 꺼진 노드가 그대로 남는다. 예전 조건("노드가 있으면")은 그 꺼진 노드에
+            // 걸려, 서랍에서 다시 끌어다 놓아도 보이지 않는 노드의 좌표만 바꾸고 조용히 끝났다 —
+            // "지운 단서는 서랍에서 다시 못 꺼낸다"의 원인. 카드로 접어둔 단서(노드는 꺼져 있고 핀은 살아
+            // 있음)도 같은 이유로 여기서 걸리면 안 되고, 아래 alreadyPinned 경로가 다시 펼쳐줘야 한다.
+            if (alreadyPinned
+                && _clueVisuals.TryGetValue(clueId, out var existingVisual)
+                && existingVisual.Group.gameObject.activeSelf)
             {
                 existingVisual.Group.anchoredPosition = localPos;
                 HandleNodeMoved();
                 return;
             }
 
-            bool alreadyPinned = NoteModule.Instance.IsPinned(clueId);
             if (!alreadyPinned && !NoteModule.Instance.CanEdit)
             {
                 Debug.LogWarning("[NoteRouteGraphView] 이동 중에는 서랍에서 단서를 배치할 수 없습니다.");
@@ -450,14 +578,14 @@ namespace RouteFinding.Note
 
         // ─── 맵 노드 (영속 — guid로 관리, 파괴하지 않음) ─────────────
 
-        private NodeVisual GetOrCreateNodeVisual(string guid, int indexForDefaultLayout)
+        private NodeVisual GetOrCreateNodeVisual(string guid, Vector2 defaultPos)
         {
             if (_nodeVisuals.TryGetValue(guid, out var existing)) return existing;
 
             var group = NewRect(_graphArea, "NodeGroup_" + guid);
             group.anchorMin = group.anchorMax = new Vector2(0f, 1f);
             group.pivot     = new Vector2(0f, 1f);
-            group.anchoredPosition = new Vector2(_nodeStartX, -(indexForDefaultLayout * _nodeSpacingY + 4f));
+            group.anchoredPosition = defaultPos;
 
             var box = _nodeBoxTemplate != null ? Instantiate(_nodeBoxTemplate, group, false) : BuildNodeBoxDefault(group);
             box.name = "NodeBox";
@@ -472,12 +600,15 @@ namespace RouteFinding.Note
 
             var drag = box.GetComponent<NoteNodeDragHandle>();
             if (drag == null) drag = box.gameObject.AddComponent<NoteNodeDragHandle>();
-            drag.Group       = group;
-            drag.Bounds       = _graphArea;
-            drag.RightMargin  = _nodeBoxWidth + _cardsGapX + _cardsAreaWidth;
-            drag.OnMoved      = HandleNodeMoved;
-            drag.PanZoom      = _panZoom;
+            drag.Group          = group;
+            drag.Bounds         = _graphArea;
+            drag.RightMargin    = RouteBlockWidth;
+            drag.OnMoved        = HandleNodeMoved;
+            drag.PanZoom        = _panZoom;
+            drag.ResolveTargets = CollectDragTargets; // 다중 선택 상태면 고른 노드 전부가 같이 움직인다
             drag.SetCanvas(_canvas);
+
+            RegisterSelectable(group, background, _nodeBoxWidth, _nodeBoxHeight, RouteBlockWidth);
 
             // [신설, 2026-07-21] 요청 — 단서 연동을 단서-단서뿐 아니라 단서-맵 노드 간에도 가능하게 한다.
             // 맵 노드는 원래 클릭 인터랙션이 없었으므로(드래그만 있었음) 새로 추가 — 링크 모드가 아닐 때는
@@ -489,6 +620,8 @@ namespace RouteFinding.Note
                 if (!LinkModeActive) return;
                 HandleLinkModeNodeClicked(guid);
             };
+            // [신설, 2026-08-15] Ctrl+클릭은 링크 모드/접기 같은 원래 동작 대신 선택 토글로만 쓴다.
+            toggle.OnCtrlClick = () => ToggleSelection(group);
 
             var cardsContainer = NewRect(group, "Cards");
             cardsContainer.anchorMin = cardsContainer.anchorMax = new Vector2(0f, 1f);
@@ -538,7 +671,18 @@ namespace RouteFinding.Note
 
         private ClueNodeVisual GetOrCreateClueVisual(string clueId, Vector2 defaultPos)
         {
-            if (_clueVisuals.TryGetValue(clueId, out var existing)) return existing;
+            if (_clueVisuals.TryGetValue(clueId, out var existing))
+            {
+                // [버그 수정, 2026-08-17] 예전엔 여기서 그냥 돌려줘, 노드가 한 번이라도 만들어진 적 있는
+                // 단서는 서랍에서 다시 끌어다 놓아도 큐에 넣어둔 드롭 위치가 영영 소비되지 않았다 —
+                // 지웠다 다시 놓은 단서가 놓은 자리가 아니라 예전 자리에서 되살아나는 원인.
+                if (_pendingCluePositions.TryGetValue(clueId, out var pendingForExisting))
+                {
+                    existing.Group.anchoredPosition = pendingForExisting;
+                    _pendingCluePositions.Remove(clueId);
+                }
+                return existing;
+            }
 
             // 서랍에서 방금 드래그해 놓은 위치가 있으면 그 자리를 기본 위치로 쓴다(PlaceClueAt 참고).
             if (_pendingCluePositions.TryGetValue(clueId, out var pending))
@@ -596,14 +740,21 @@ namespace RouteFinding.Note
             deleteTmp.color = Color.white;
 
             var drag = group.gameObject.AddComponent<NoteNodeDragHandle>();
-            drag.Group       = group;
-            drag.Bounds      = _graphArea;
-            drag.RightMargin = _clueNodeWidth;
-            drag.OnMoved     = HandleNodeMoved;
-            drag.PanZoom     = _panZoom;
+            drag.Group          = group;
+            drag.Bounds         = _graphArea;
+            drag.RightMargin    = _clueNodeWidth;
+            drag.OnMoved        = HandleNodeMoved;
+            drag.PanZoom        = _panZoom;
+            drag.ResolveTargets = CollectDragTargets;
             drag.SetCanvas(_canvas);
 
-            group.gameObject.AddComponent<NoteClickToToggle>();
+            // 단서 노드는 ContentSizeFitter로 높이가 바뀌므로 FixedHeight를 0으로 둬 실시간 높이를 읽게 한다.
+            RegisterSelectable(group, background, _clueNodeWidth, 0f, _clueNodeWidth);
+
+            var clueToggle = group.gameObject.AddComponent<NoteClickToToggle>();
+            // OnClick(접기/펼치기·링크 모드)은 PopulateClueNode가 패스마다 다시 배선하지만, Ctrl+클릭은
+            // 노드가 무슨 상태든 늘 선택 토글이라 여기서 한 번만 걸어두면 된다.
+            clueToggle.OnCtrlClick = () => ToggleSelection(group);
 
             // [신설] 코멘트 노드 컨테이너 — group의 VerticalLayoutGroup(Text/DeleteBtn을 세로로 쌓는 용도)
             // 대상에서 LayoutElement.ignoreLayout으로 제외하고, 대신 group 자신의 우측 하단 모서리에
@@ -811,6 +962,225 @@ namespace RouteFinding.Note
             _linkModeSelectedId = null;
         }
 
+        // ─── 다중 선택 (빈 배경 마퀴 드래그 / Ctrl+클릭) + 그룹 이동 ─────────────
+        // [신설, 2026-08-15, 요청] 노드를 하나씩만 옮길 수 있어 배치를 정리하는 비용이 컸다. 이제
+        //   - 빈 배경을 좌드래그하면 사각형 안에 걸친 노드가 전부 선택되고(Ctrl을 누른 채 드래그하면 추가 선택),
+        //   - Ctrl+클릭으로 노드를 하나씩 넣고 뺄 수 있으며,
+        //   - 선택된 노드 중 하나를 끌면 선택된 전부가 같은 델타로 함께 움직인다.
+        // 배경 팬은 가운데/오른쪽 버튼 드래그 또는 Alt+좌드래그로 옮겼다 — 좌드래그가 마퀴에 쓰이므로.
+        // 선택 강조는 노드 배경 Image에 Outline을 하나씩 달아두고 켜고 끄는 방식이다(배경색 자체를 바꾸면
+        // 키워드별 색 구분·링크 모드 강조색과 서로 덮어써서 어느 쪽도 믿을 수 없게 된다).
+
+        private void RegisterSelectable(RectTransform group, Image background, float width, float fixedHeight, float rightMargin)
+        {
+            if (group == null) return;
+
+            Outline outline = null;
+            if (background != null)
+            {
+                outline = background.GetComponent<Outline>();
+                if (outline == null) outline = background.gameObject.AddComponent<Outline>();
+                outline.effectColor    = _colSelection;
+                outline.effectDistance = new Vector2(_selectionOutlineWidth, -_selectionOutlineWidth);
+                outline.useGraphicAlpha = false;
+                outline.enabled = false;
+            }
+
+            _selectables[group] = new SelectableNode
+            {
+                Group = group,
+                Outline = outline,
+                Width = width,
+                FixedHeight = fixedHeight,
+                RightMargin = rightMargin,
+            };
+        }
+
+        private void ToggleSelection(RectTransform group)
+        {
+            if (group == null) return;
+            if (!_selected.Remove(group)) _selected.Add(group);
+            ApplySelectionVisual(group);
+        }
+
+        private void ClearSelection()
+        {
+            if (_selected.Count == 0) return;
+            var previous = _selected.ToList();
+            _selected.Clear();
+            foreach (var g in previous) ApplySelectionVisual(g);
+        }
+
+        // 카드로 접히거나 경로에서 빠져 화면에서 사라진 노드는 선택에서도 빼준다 — 안 그러면 보이지도
+        // 않는 노드가 그룹 이동에 딸려 다닌다.
+        private void PruneSelection()
+        {
+            if (_selected.Count == 0) return;
+            var stale = _selected.Where(g => g == null || !g.gameObject.activeSelf).ToList();
+            foreach (var g in stale)
+            {
+                _selected.Remove(g);
+                ApplySelectionVisual(g);
+            }
+        }
+
+        private void ApplySelectionVisual(RectTransform group)
+        {
+            if (group == null) return;
+            if (_selectables.TryGetValue(group, out var node) && node.Outline != null)
+                node.Outline.enabled = _selected.Contains(group);
+        }
+
+        // NoteNodeDragHandle이 드래그를 시작할 때 호출한다 — 끌린 노드가 현재 선택에 포함돼 있으면
+        // 선택된 전부를, 아니면 그 노드 하나만 돌려준다(선택 밖의 노드를 끌었다고 선택을 지우지는 않는다.
+        // 여러 개를 골라둔 채 다른 노드를 잠깐 옮기는 일이 흔해서, 그때마다 선택이 날아가면 더 번거롭다).
+        public List<NoteDragTarget> CollectDragTargets(RectTransform group)
+        {
+            var targets = new List<NoteDragTarget>();
+            if (group == null) return targets;
+
+            if (_selected.Count > 1 && _selected.Contains(group))
+            {
+                foreach (var g in _selected)
+                    if (g != null && g.gameObject.activeSelf) targets.Add(MakeDragTarget(g));
+            }
+            else
+            {
+                targets.Add(MakeDragTarget(group));
+            }
+            return targets;
+        }
+
+        private NoteDragTarget MakeDragTarget(RectTransform group)
+        {
+            float rightMargin = 0f;
+            float height = _nodeBoxHeight;
+            if (_selectables.TryGetValue(group, out var node))
+            {
+                rightMargin = node.RightMargin;
+                height = node.FixedHeight > 0f ? node.FixedHeight : node.Group.rect.height;
+            }
+
+            // 작업 공간(_content) 아래로 빠져나가지 못하게 하한을 같이 넘긴다 — 팬 범위가 콘텐츠 기준으로
+            // 제한돼 있어(GraphPanZoom.ConfigureBounds), 공간 밖으로 내려간 노드는 다시 볼 방법이 없다.
+            float spaceH = _content != null ? _content.rect.height : 0f;
+            return new NoteDragTarget
+            {
+                Group = group,
+                RightMargin = rightMargin,
+                MinY = Mathf.Min(0f, -(spaceH - height)),
+            };
+        }
+
+        // ─── 마퀴(선택 사각형) — 이 컴포넌트가 GraphScroll의 포인터 이벤트를 GraphPanZoom과 같이 받는다 ──
+
+        public static bool IsCtrlHeld() => Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+        private static bool IsAltHeld() => Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
+
+        // GraphPanZoom과 동일한 이유 — PointerDown을 수락해야 BeginDrag가 이 오브젝트로 전달된다.
+        public void OnPointerDown(PointerEventData e) { }
+
+        public void OnBeginDrag(PointerEventData e)
+        {
+            if (_graphArea == null) return;
+            // 가운데/오른쪽 드래그와 Alt+좌드래그는 예전처럼 배경 팬으로 남겨둔다(GraphPanZoom이 그대로 처리).
+            if (e.button != PointerEventData.InputButton.Left || IsAltHeld()) return;
+
+            _marqueeActive = true;
+            if (!IsCtrlHeld()) ClearSelection(); // Ctrl을 누른 채 시작하면 기존 선택에 더한다
+            _marqueeStart = ScreenToGraph(e.position);
+
+            // 마퀴가 도는 동안은 배경이 같이 밀리면 안 된다 — NoteNodeDragHandle과 동일한 이중 잠금.
+            if (_panZoom != null)
+            {
+                _panZoom.SuppressDrag = true;
+                _panZoom.LockPosition();
+            }
+
+            DrawMarquee(_marqueeStart, _marqueeStart);
+        }
+
+        public void OnDrag(PointerEventData e)
+        {
+            if (!_marqueeActive) return;
+            DrawMarquee(_marqueeStart, ScreenToGraph(e.position));
+        }
+
+        public void OnEndDrag(PointerEventData e)
+        {
+            if (!_marqueeActive) return;
+            _marqueeActive = false;
+
+            SelectWithin(MakeRect(_marqueeStart, ScreenToGraph(e.position)));
+            if (_marqueeRT != null) _marqueeRT.gameObject.SetActive(false);
+
+            if (_panZoom != null)
+            {
+                _panZoom.SuppressDrag = false;
+                _panZoom.UnlockPosition();
+            }
+        }
+
+        // 빈 배경을 그냥 클릭하면 선택 해제 — 드래그를 동반한 클릭은 위 마퀴가 이미 처리했다.
+        public void OnPointerClick(PointerEventData e)
+        {
+            if (e.dragging || e.button != PointerEventData.InputButton.Left) return;
+            if (IsCtrlHeld()) return;
+            ClearSelection();
+        }
+
+        // 스크린 좌표 → 노드들이 쓰는 좌표계(_graphArea 좌상단 기준). PlaceClueAt과 동일한 피벗 보정이
+        // 필요하다 — 자세한 이유는 그쪽 주석 참고.
+        private Vector2 ScreenToGraph(Vector2 screenPosition)
+        {
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                _graphArea, screenPosition, GetEventCamera(), out var local);
+            local.x += _graphArea.rect.width * _graphArea.pivot.x;
+            return local;
+        }
+
+        private static Rect MakeRect(Vector2 a, Vector2 b) => Rect.MinMaxRect(
+            Mathf.Min(a.x, b.x), Mathf.Min(a.y, b.y), Mathf.Max(a.x, b.x), Mathf.Max(a.y, b.y));
+
+        private void DrawMarquee(Vector2 a, Vector2 b)
+        {
+            EnsureMarquee();
+            var r = MakeRect(a, b);
+            _marqueeRT.anchoredPosition = new Vector2(r.xMin, r.yMax); // pivot=(0,1) — 좌상단 기준
+            _marqueeRT.sizeDelta = new Vector2(r.width, r.height);
+            _marqueeRT.gameObject.SetActive(true);
+            _marqueeRT.SetAsLastSibling(); // 노드·간선보다 위에 그린다
+        }
+
+        private void EnsureMarquee()
+        {
+            if (_marqueeRT != null) return;
+
+            _marqueeRT = NewRect(_graphArea, "SelectionMarquee");
+            _marqueeRT.anchorMin = _marqueeRT.anchorMax = new Vector2(0f, 1f);
+            _marqueeRT.pivot     = new Vector2(0f, 1f);
+            // 간선/코멘트 노드와 동일한 이유 — 순수 장식이라 클릭을 가로채면 안 된다.
+            AddImg(_marqueeRT, _colMarquee).raycastTarget = false;
+            _marqueeRT.gameObject.SetActive(false);
+        }
+
+        private void SelectWithin(Rect area)
+        {
+            foreach (var kv in _selectables)
+            {
+                var node = kv.Value;
+                if (node.Group == null || !node.Group.gameObject.activeSelf) continue;
+
+                float h = node.FixedHeight > 0f ? node.FixedHeight : node.Group.rect.height;
+                var pos = node.Group.anchoredPosition;
+                // 노드 좌표는 아래로 갈수록 y가 음수 — Rect의 yMin(아래쪽)은 pos.y - h가 된다.
+                var nodeRect = new Rect(pos.x, pos.y - h, node.Width, h);
+                if (!area.Overlaps(nodeRect)) continue;
+
+                if (_selected.Add(node.Group)) ApplySelectionVisual(node.Group);
+            }
+        }
+
         // ─── 간선 (상태 없음 — 매번 현재 위치로 다시 계산, 풀링) ─────
         //   1) 맵-맵 체인  2) 맵-단서 노드  3) 단서-단서(키워드 공유)
 
@@ -924,7 +1294,10 @@ namespace RouteFinding.Note
                 anchor = ClueNodeAnchor(clueVisual.visual.Group);
                 return true;
             }
-            if (_nodeVisuals.TryGetValue(id, out var nodeVisual))
+            // _nodeVisuals는 _clueVisuals와 마찬가지로 파괴하지 않고 Show/Hide만 하는 영속 딕셔너리라,
+            // 지금 경로에 없는 맵도 (꺼진 채로) 남아 있다 — 꺼진 노드로 간선을 그으면 허공에 선이
+            // 남으므로 실제로 보이는 것만 앵커로 인정한다.
+            if (_nodeVisuals.TryGetValue(id, out var nodeVisual) && nodeVisual.Group.gameObject.activeSelf)
             {
                 anchor = NodeAnchor(nodeVisual.Group, _nodeBoxWidth, _nodeBoxHeight);
                 return true;
@@ -1201,7 +1574,7 @@ namespace RouteFinding.Note
             {
                 case ClueAttachmentKind.Image:
                 {
-                    var sprite = ClueAttachmentService.LoadSprite(a.resourcePath);
+                    var sprite = ClueAttachmentService.LoadSprite(a.address);
                     missing = sprite == null;
                     if (!missing && previewImg != null)
                     {
@@ -1213,7 +1586,7 @@ namespace RouteFinding.Note
                 }
                 case ClueAttachmentKind.Audio:
                 {
-                    var clip = ClueAttachmentService.LoadAudio(a.resourcePath);
+                    var clip = ClueAttachmentService.LoadAudio(a.address);
                     missing = clip == null;
                     showBtn = !missing;
                     if (showBtn)
@@ -1384,6 +1757,34 @@ namespace RouteFinding.Note
             }
         }
 
+        // ─── 범례(NotePanel 상단) ─────────────────────────────────
+        // [신설, 2026-08-17] 노드/간선 색이 무슨 뜻인지 화면에서 바로 알 수 있게, 실제로 그리는 데 쓰는
+        // 색 필드를 그대로 넘겨준다 — 범례를 NotePanel에서 색을 따로 적어 만들면 인스펙터에서 색을
+        // 바꿨을 때 그래프와 범례가 어긋나므로, 색의 단일 출처는 항상 이 컴포넌트다.
+        public struct LegendItem
+        {
+            public string Label;
+            public Color Color;
+            public bool IsEdge; // true = 선(가는 막대) 견본, false = 노드(네모) 견본
+        }
+
+        public List<LegendItem> GetLegendItems() => new()
+        {
+            new LegendItem { Label = "맵",              Color = _colNode },
+            new LegendItem { Label = "단서 카드",        Color = _colCard },
+            // 단서 노드는 고정색이 아니라 "주 키워드(keywords[0]) 문자열 해시 → Hue"로 자동 배색된다
+            // (ColorForKeyword). 견본은 키워드가 없을 때 쓰는 기본색이고, 라벨로 그 규칙을 알린다.
+            new LegendItem { Label = "단서(색=주 키워드)", Color = _colClueNode },
+            new LegendItem { Label = "코멘트",           Color = _colCommentNode },
+            new LegendItem { Label = "첨부",             Color = _colAttachmentNode },
+            new LegendItem { Label = "연동 선택",         Color = _colLinkModeSelected },
+
+            new LegendItem { Label = "경로",             Color = _colEdge,           IsEdge = true },
+            new LegendItem { Label = "맵-단서",          Color = _colClueEdge,       IsEdge = true },
+            new LegendItem { Label = "키워드 자동",       Color = _colKeywordEdge,    IsEdge = true },
+            new LegendItem { Label = "직접 연동",         Color = _colManualLinkEdge, IsEdge = true },
+        };
+
         private static string ReasonLabel(NotePinReason reason) => reason switch
         {
             NotePinReason.RouteLinked => "경로연동",
@@ -1441,13 +1842,20 @@ namespace RouteFinding.Note
         public RectTransform Bounds;   // 좌표 변환 기준 + 드래그 가능 범위(= GraphArea)
         public float RightMargin;      // Bounds 오른쪽에서 남겨둘 여유(이 안으로만 드래그 허용)
         public Action OnMoved;
+        // [신설, 2026-08-15] 다중 선택 지원 — 드래그 시작 시 "이번에 같이 움직여야 할 노드"를 뷰에 물어본다.
+        // 비워두면(null) 예전처럼 자기 Group 하나만 움직인다.
+        public Func<RectTransform, List<NoteDragTarget>> ResolveTargets;
         // [요청, 2026-07-21] 노드를 드래그하는 동안 배경 팬(GraphPanZoom)이 동시에 움직이는 문제 방지용 —
         // 드래그 시작~종료 구간에만 배경 패닝을 잠근다. null이면(팬·줌 없이 쓰는 그래프) 그냥 무시된다.
         public GraphPanZoom PanZoom;
 
         private Camera _worldCam;
         private Vector2 _dragStartLocal;
-        private Vector2 _dragStartAnchor;
+
+        // 이번 드래그로 같이 움직이는 노드들과 각자의 시작 위치 — 단일 선택이면 원소가 하나뿐이라
+        // 예전 동작과 완전히 같다.
+        private readonly List<NoteDragTarget> _targets = new();
+        private readonly List<Vector2> _startAnchors = new();
 
         public void SetCanvas(Canvas canvas)
         {
@@ -1462,7 +1870,14 @@ namespace RouteFinding.Note
         {
             if (Group == null || Bounds == null) return;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(Bounds, e.position, _worldCam, out _dragStartLocal);
-            _dragStartAnchor = Group.anchoredPosition;
+
+            _targets.Clear();
+            _startAnchors.Clear();
+            var resolved = ResolveTargets?.Invoke(Group);
+            if (resolved != null && resolved.Count > 0) _targets.AddRange(resolved);
+            else _targets.Add(new NoteDragTarget { Group = Group, RightMargin = RightMargin, MinY = float.NegativeInfinity });
+            foreach (var t in _targets) _startAnchors.Add(t.Group != null ? t.Group.anchoredPosition : Vector2.zero);
+
             if (PanZoom != null)
             {
                 PanZoom.SuppressDrag = true;
@@ -1472,15 +1887,34 @@ namespace RouteFinding.Note
 
         public void OnDrag(PointerEventData e)
         {
-            if (Group == null || Bounds == null) return;
+            if (Group == null || Bounds == null || _targets.Count == 0) return;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(Bounds, e.position, _worldCam, out Vector2 cur);
-            Vector2 pos = _dragStartAnchor + (cur - _dragStartLocal);
+            Vector2 delta = cur - _dragStartLocal;
 
-            float maxX = Mathf.Max(0f, Bounds.rect.width - RightMargin);
-            pos.x = Mathf.Clamp(pos.x, 0f, maxX);
-            pos.y = Mathf.Min(pos.y, 0f); // 그래프 영역 위 경계(0) 밖으로는 못 나가게
+            // 여러 개를 같이 옮길 때는 노드마다 따로 클램프하면 서로의 상대 위치가 뭉개진다 — 대신
+            // "모든 노드가 허용 범위 안에 남는 델타"로 한 번만 제한해 무리 전체가 같은 만큼 움직이게 한다.
+            float dxMin = float.NegativeInfinity, dxMax = float.PositiveInfinity;
+            float dyMin = float.NegativeInfinity, dyMax = float.PositiveInfinity;
+            for (int i = 0; i < _targets.Count; i++)
+            {
+                if (_targets[i].Group == null) continue;
+                var start = _startAnchors[i];
+                float maxX = Mathf.Max(0f, Bounds.rect.width - _targets[i].RightMargin);
+                dxMin = Mathf.Max(dxMin, 0f - start.x);
+                dxMax = Mathf.Min(dxMax, maxX - start.x);
+                dyMax = Mathf.Min(dyMax, 0f - start.y);           // 그래프 영역 위 경계(0) 밖으로는 못 나가게
+                dyMin = Mathf.Max(dyMin, _targets[i].MinY - start.y); // 작업 공간 아래로도 못 빠져나가게
+            }
+            if (dxMin > dxMax) dxMax = dxMin;
+            if (dyMin > dyMax) dyMin = dyMax;
+            delta.x = Mathf.Clamp(delta.x, dxMin, dxMax);
+            delta.y = Mathf.Clamp(delta.y, dyMin, dyMax);
 
-            Group.anchoredPosition = pos;
+            for (int i = 0; i < _targets.Count; i++)
+            {
+                if (_targets[i].Group == null) continue;
+                _targets[i].Group.anchoredPosition = _startAnchors[i] + delta;
+            }
             OnMoved?.Invoke();
         }
 
@@ -1522,12 +1956,30 @@ namespace RouteFinding.Note
     public class NoteClickToToggle : MonoBehaviour, IPointerDownHandler, IPointerClickHandler
     {
         public Action OnClick;
+        // [신설, 2026-08-15] Ctrl+클릭 — 다중 선택 토글. 배선돼 있으면 Ctrl을 누른 클릭은 OnClick(접기/
+        // 펼치기, 링크 모드 선택)까지 가지 않고 여기서 끝난다.
+        public Action OnCtrlClick;
+
         public void OnPointerDown(PointerEventData e) { }
 
         public void OnPointerClick(PointerEventData e)
         {
             if (e.dragging) return; // 드래그를 동반한 클릭은 토글하지 않는다 — 위 (2) 참고
+            if (OnCtrlClick != null && NoteRouteGraphView.IsCtrlHeld())
+            {
+                OnCtrlClick();
+                return;
+            }
             OnClick?.Invoke();
         }
+    }
+
+    // 드래그로 같이 움직일 노드 하나 — NoteRouteGraphView가 선택 상태를 보고 채워 NoteNodeDragHandle에
+    // 넘긴다. 각 노드마다 폭(RightMargin)과 아래 한계(MinY)가 달라서 위치만으로는 클램프할 수 없다.
+    public struct NoteDragTarget
+    {
+        public RectTransform Group;
+        public float RightMargin;
+        public float MinY;
     }
 }

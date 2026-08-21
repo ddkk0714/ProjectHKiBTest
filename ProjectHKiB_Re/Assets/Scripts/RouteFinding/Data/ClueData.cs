@@ -42,7 +42,7 @@ public class ClueData
     public CodexComment[] comments = Array.Empty<CodexComment>();
 
     // 첨부물(2026-08-11) — 사진/소리/맵 참조를 여러 개 붙일 수 있다. 실제 에셋은 JSON에 담을 수
-    // 없어 Resources 상대 경로(또는 맵 GUID)로 참조하며, 로딩은 ClueAttachmentService가 맡는다.
+    // 없어 Addressable 주소(또는 맵 GUID)로 참조하며, 로딩은 ClueAttachmentService가 맡는다.
     // 도감 카드(CodexCardView)의 "첨부" 영역에 표시된다.
     public ClueAttachment[] attachments = Array.Empty<ClueAttachment>();
 }

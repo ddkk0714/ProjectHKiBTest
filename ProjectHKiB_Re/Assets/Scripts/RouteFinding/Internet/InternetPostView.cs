@@ -238,7 +238,7 @@ namespace RouteFinding.Internet
             {
                 case ClueAttachmentKind.Image:
                 {
-                    var sprite = ClueAttachmentService.LoadSprite(a.resourcePath);
+                    var sprite = ClueAttachmentService.LoadSprite(a.address);
                     missing = sprite == null;
                     if (!missing && previewImg != null)
                     {
@@ -250,7 +250,7 @@ namespace RouteFinding.Internet
                 }
                 case ClueAttachmentKind.Audio:
                 {
-                    missing = ClueAttachmentService.LoadAudio(a.resourcePath) == null;
+                    missing = ClueAttachmentService.LoadAudio(a.address) == null;
                     showBtn = !missing;
                     if (showBtn)
                     {
@@ -371,7 +371,7 @@ namespace RouteFinding.Internet
 
         private void ToggleAudio(ClueAttachment a, TextMeshProUGUI btnLabel)
         {
-            var clip = ClueAttachmentService.LoadAudio(a.resourcePath);
+            var clip = ClueAttachmentService.LoadAudio(a.address);
             if (clip == null) return;
 
             if (_audio == null) _audio = ClueAttachmentAudioPlayer.AttachTo(gameObject);

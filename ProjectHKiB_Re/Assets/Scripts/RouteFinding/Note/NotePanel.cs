@@ -35,6 +35,10 @@ namespace RouteFinding.Note
 
         [Header("레이아웃")]
         [SerializeField] private float _topBarHeight = 12f;
+        // [신설, 2026-08-17] 상단 툴바 바로 아래 범례 줄(노드 색 / 간선 색이 무슨 뜻인지). 0 이하로 두면
+        // 범례를 아예 만들지 않는다 — 화면이 좁아 세로를 아끼고 싶을 때의 탈출구.
+        [Tooltip("상단 툴바 아래 범례 줄의 높이(2줄 기준). 0 이하면 범례를 표시하지 않는다")]
+        [SerializeField] private float _legendHeight = 18f;
         [Tooltip("스프라이트를 지정 안 했을 때 쓰는 단색 배경(패널 전체 바깥 배경)")]
         [SerializeField] private Color _rootBgColor = new(0.04f, 0.04f, 0.08f, 0.96f);
         [Tooltip("패널 전체 바깥 배경 이미지 — 지정하면 도트풍 이미지로 대체(9슬라이스 테두리 있는 스프라이트도 지원), 비워두면 위 단색 사용")]
@@ -49,6 +53,17 @@ namespace RouteFinding.Note
         // 표현하기 어려워서(비율은 항상 화면 크기에 상대적이라 "접었을 때 12px" 같은 절대값을 못 담는다).
         [SerializeField] private float _drawerAreaWidth = 140f;      // 서랍이 열렸을 때의 폭
         [SerializeField] private float _drawerCollapsedWidth = 12f;  // 접었을 때 남는 재오픈용 탭 폭
+
+        // [요청, 2026-08-15] 노드를 둘 수 있는 작업 공간 크기 — 900x300으로는 단서가 조금만 늘어도
+        // 자리가 없어 노드가 서로 겹쳤다. 인스펙터에서 조정할 수 있게 필드로 뺀다(예전엔 코드 상수).
+        // 이 값이 곧 NoteNodeDragHandle의 드래그 클램프 범위이자 GraphPanZoom의 팬 제한 범위다.
+        [Tooltip("노드를 배치할 수 있는 그래프 작업 공간(GraphContainer)의 크기")]
+        [SerializeField] private Vector2 _graphSpaceSize = new(2400f, 1600f);
+
+        // [요청, 2026-08-16] 노트 그래프의 휠 줌이 너무 예민하다 — GraphPanZoom 기본값(0.02, 지도와 공용)의
+        // 절반으로 이 인스턴스에만 덮어쓴다(MapViewer 쪽 감도는 그대로).
+        [Tooltip("그래프 휠 줌 감도 — 휠 한 칸당 배율 변화량(GraphPanZoom 기본값 0.02의 절반)")]
+        [SerializeField] private float _graphZoomSensitivity = 0.01f;
 
         [Header("프리팹 (선택 — 비워두면 런타임 자동 생성)")]
         [SerializeField] private GameObject _panelPrefab;
@@ -336,7 +351,8 @@ namespace RouteFinding.Note
             PanelBackground.Apply(root, _rootBgColor, _rootBgSprite);
 
             BuildTopBar(root);
-            BuildList(root);
+            BuildList(root); // _graphView가 여기서 만들어진다 — 범례가 그 색을 받아 쓰므로 순서 유지
+            EnsureLegend(root);
             BuildBoardWindow(root);
             BuildKeywordFilterWindow(root);
             BuildClueCreateWindow(root);
@@ -362,14 +378,23 @@ namespace RouteFinding.Note
             _graphAreaRT = graphScrollTF as RectTransform;
             PanelBackground.Apply(_graphAreaRT, _listBgColor, _listBgSprite);
             _graphPanZoom = graphScrollTF?.GetComponent<GraphPanZoom>();
-            _graphPanZoom?.ConfigureBounds(true, 120f); // BuildGraphPanZoom과 동일 — 재사용 경로에서도 팬 범위 제한 적용
+            // BuildGraphPanZoom과 동일 — 재사용 경로에서도 팬 범위 제한/줌 감도를 다시 적용한다
+            // (프리팹에 구워진 GraphPanZoom의 직렬화 값이 그대로 살아있기 때문).
+            _graphPanZoom?.ConfigureBounds(true, 120f);
+            _graphPanZoom?.ConfigureZoomSensitivity(_graphZoomSensitivity);
             _graphView = graphScrollTF?.GetComponent<NoteRouteGraphView>();
             if (_graphView != null)
             {
                 _graphViewportRT = FindDeepTransform(graphScrollTF, "GraphViewport") as RectTransform;
                 _graphContainerRT = FindDeepTransform(graphScrollTF, "GraphContainer") as RectTransform;
                 if (_graphContainerRT != null)
+                {
+                    // 프리팹/씬에 구워진 예전 크기(900x300)를 쓰지 않도록 재사용 경로에서도 다시 적용한다 —
+                    // 이 크기가 노드 배치 좌표(정가운데 계산)와 드래그 클램프의 기준이라, 여기서 빠지면
+                    // 프리팹을 쓰는 빌드에서만 노드가 좁은 공간에 몰리는 차이가 생긴다.
+                    _graphContainerRT.sizeDelta = _graphSpaceSize;
                     _graphView.Init(_graphContainerRT, _font); // 위젯을 새로 만들지 않고 참조만 저장하므로 재호출해도 안전
+                }
                 _graphView.OnDeleteRequested += HandleDeleteRequested;
             }
 
@@ -425,6 +450,11 @@ namespace RouteFinding.Note
                 _clueCreateWindow.Bind(root, _font);
                 _clueCreateWindow.OnCreateRequested += HandleClueCreateRequested;
             }
+
+            // 범례(2026-08-17 신설)는 그 이전에 저장된 프리팹/씬 패널엔 없다 — 없으면 여기서 만들어
+            // 끼워 넣는다(EnsureLegend 주석 참고). _graphView 바인딩 뒤에 호출해야 색을 받아올 수 있다.
+            EnsureLegend(root);
+            UpdateDrawerLayout(); // 범례 높이만큼 그래프/서랍의 위쪽 오프셋을 다시 맞춘다
         }
 
         private void BuildTopBar(RectTransform root)
@@ -538,6 +568,114 @@ namespace RouteFinding.Note
             closeTmp.color = Color.white;
         }
 
+        // ─── 범례 (상단 툴바 바로 아래) ───────────────────────────
+        // [요청, 2026-08-17] "노드/간선 색이 무슨 기준인지 모르겠다" — 그래프에서 실제로 쓰는 색
+        // (NoteRouteGraphView.GetLegendItems)을 그대로 받아 툴바 아래 두 줄로 깔아준다.
+        //
+        // 마커(ClueCreateOverlay) 방식이 아니라 Ensure~로 만드는 이유: 마커를 이 범례로 갱신하면
+        // 이미 저장돼 있는 NotePanelRoot 프리팹/씬 인스턴스가 통째로 "구버전"으로 판정돼 파괴·재생성되고,
+        // 작업자가 프리팹에서 손봐둔 디자인이 전부 날아간다(인터넷 패널에서 같은 함정을 겪었다).
+        // 없는 것만 제자리에서 만들고, 내용은 매번 다시 채워 인스펙터 색 변경도 바로 반영한다.
+        private void EnsureLegend(RectTransform root)
+        {
+            if (root == null) return;
+
+            var existing = FindDeepTransform(root, "LegendBar") as RectTransform;
+            if (_legendHeight <= 0f)
+            {
+                if (existing != null) existing.gameObject.SetActive(false);
+                return;
+            }
+
+            var bar = existing;
+            if (bar == null)
+            {
+                bar = NewRect(root, "LegendBar");
+                // 툴바 바로 아래에 그려지도록 형제 순서도 툴바 다음으로 — 배경이 그래프 영역을 가리지
+                // 않게(둘은 영역이 겹치지 않지만, 오버레이 창들보다는 확실히 뒤에 있어야 한다).
+                var topBar = FindDeepTransform(root, "TopBar");
+                if (topBar != null) bar.SetSiblingIndex(topBar.GetSiblingIndex() + 1);
+            }
+            bar.gameObject.SetActive(true);
+            bar.anchorMin = new Vector2(0f, 1f);
+            bar.anchorMax = Vector2.one;
+            bar.pivot     = new Vector2(0.5f, 1f);
+            bar.sizeDelta = new Vector2(0f, _legendHeight);
+            bar.anchoredPosition = new Vector2(0f, -_topBarHeight);
+            PanelBackground.Apply(bar, _listBgColor, _listBgSprite);
+
+            // 내용은 매번 통째로 다시 짓는다 — 항목 수·색이 바뀌어도 낡은 행이 남지 않게(그래프 뷰의
+            // 카드/간선 풀과 달리 여기는 패널당 한 번, 열 때마다도 아닌 빈도라 재생성 비용이 무의미하다).
+            for (int i = bar.childCount - 1; i >= 0; i--)
+            {
+                var child = bar.GetChild(i).gameObject;
+                child.SetActive(false);
+                Destroy(child);
+            }
+
+            var vlg = bar.gameObject.GetComponent<VerticalLayoutGroup>();
+            if (vlg == null) vlg = bar.gameObject.AddComponent<VerticalLayoutGroup>();
+            vlg.padding = new RectOffset(6, 6, 1, 1);
+            vlg.spacing = 0f;
+            vlg.childControlWidth      = true;
+            vlg.childControlHeight     = true;
+            vlg.childForceExpandWidth  = true;
+            vlg.childForceExpandHeight = true;
+
+            var items = _graphView != null ? _graphView.GetLegendItems() : new List<NoteRouteGraphView.LegendItem>();
+            BuildLegendRow(bar, "노드", items.Where(i => !i.IsEdge));
+            BuildLegendRow(bar, "선",   items.Where(i => i.IsEdge));
+        }
+
+        private void BuildLegendRow(RectTransform bar, string prefix, IEnumerable<NoteRouteGraphView.LegendItem> items)
+        {
+            var row = NewRect(bar, "LegendRow_" + prefix);
+            var hlg = row.gameObject.AddComponent<HorizontalLayoutGroup>();
+            hlg.spacing = 5f;
+            hlg.childControlWidth      = true;
+            hlg.childControlHeight     = true;
+            hlg.childForceExpandWidth  = false;
+            hlg.childForceExpandHeight = false;
+            hlg.childAlignment = TextAnchor.MiddleLeft;
+
+            MakeLegendText(row, prefix + ":", new Color(0.65f, 0.68f, 0.75f));
+
+            foreach (var item in items)
+            {
+                var chip = NewRect(row, "Chip");
+                var chlg = chip.gameObject.AddComponent<HorizontalLayoutGroup>();
+                chlg.spacing = 2f;
+                chlg.childControlWidth      = true;
+                chlg.childControlHeight     = true;
+                chlg.childForceExpandWidth  = false;
+                chlg.childForceExpandHeight = false;
+                chlg.childAlignment = TextAnchor.MiddleLeft;
+
+                // 노드는 네모, 간선은 가는 가로 막대 — 그래프에서 실제로 보이는 모양을 그대로 축소한 것.
+                var swatch = NewRect(chip, "Swatch");
+                AddImg(swatch, item.Color);
+                var sle = swatch.gameObject.AddComponent<LayoutElement>();
+                sle.preferredWidth  = item.IsEdge ? 8f : 5f;
+                sle.preferredHeight = item.IsEdge ? 2f : 5f;
+                sle.flexibleWidth = sle.flexibleHeight = 0f;
+
+                MakeLegendText(chip, item.Label, Color.white);
+            }
+        }
+
+        private void MakeLegendText(RectTransform parent, string text, Color color)
+        {
+            var rt = NewRect(parent, "Text");
+            var tmp = rt.gameObject.AddComponent<TextMeshProUGUI>();
+            if (_font != null) tmp.font = _font;
+            tmp.text = text;
+            tmp.fontSize = 6f;
+            tmp.color = color;
+            tmp.alignment = TextAlignmentOptions.MidlineLeft;
+            tmp.enableWordWrapping = false;
+            tmp.raycastTarget = false;
+        }
+
         // 좌측: 노트 항목(경로 체인 + 카드, NoteRouteGraphView) — [2026-07-21, 요청으로 추가] 맵(MapViewer)
         // 처럼 휠 줌 + 좌클릭 드래그 패닝 가능. 우측: 단서 서랍(ClueDrawerView) — 현재 획득한 단서를
         // 검색/키워드 필터로 훑어보고 드래그해서 좌측 그래프에 배치하며, [2026-07-21, 요청으로 추가]
@@ -550,7 +688,7 @@ namespace RouteFinding.Note
             graphArea.anchorMin = Vector2.zero;
             graphArea.anchorMax = Vector2.one;
             graphArea.offsetMin = Vector2.zero;
-            graphArea.offsetMax = new Vector2(-drawerW, -_topBarHeight);
+            graphArea.offsetMax = new Vector2(-drawerW, -ContentTopOffset);
             _graphAreaRT = graphArea;
             BuildGraphPanZoom(graphArea);
 
@@ -560,7 +698,7 @@ namespace RouteFinding.Note
             drawerArea.anchorMin = new Vector2(1f, 0f);
             drawerArea.anchorMax = Vector2.one;
             drawerArea.offsetMin = new Vector2(-drawerW, 0f);
-            drawerArea.offsetMax = new Vector2(0f, -_topBarHeight);
+            drawerArea.offsetMax = new Vector2(0f, -ContentTopOffset);
             PanelBackground.Apply(drawerArea, drawerColor, _listBgSprite);
             _drawerAreaRT = drawerArea;
 
@@ -587,6 +725,7 @@ namespace RouteFinding.Note
             // 세로만 SetData 때마다 재계산)이라 무제한 팬을 허용하면 빈 허공으로 한없이 밀려날 수 있다 —
             // 이 인스턴스에 한해 팬 범위를 제한한다(MapViewer의 GraphPanZoom은 건드리지 않아 그대로 무제한).
             _graphPanZoom.ConfigureBounds(true, 120f);
+            _graphPanZoom.ConfigureZoomSensitivity(_graphZoomSensitivity);
 
             var viewport = NewRect(graphArea, "GraphViewport");
             StretchFull(viewport);
@@ -604,8 +743,9 @@ namespace RouteFinding.Note
             // 좌하단은 고정된 채 위쪽 모서리가 밀려 올라가고, 그 모서리에 앵커된 그래프 내용(노드 전체)이
             // 통째로 같이 떠밀려 올라가는 버그(노드를 위/아래로 드래그하면 배경까지 같이 팬되는 것처럼
             // 보임)로 이어졌다 — 자세한 원인은 NoteRouteGraphView.UpdateContentSize 주석 참고. 지금은
-            // 고정 크기로 두고 절대 변경하지 않는다.
-            container.sizeDelta = new Vector2(900f, 300f);
+            // 고정 크기로 두고 절대 변경하지 않는다. [2026-08-15] 그 "고정 크기"만 인스펙터에서 조정할 수
+            // 있게 _graphSpaceSize로 뺐다 — 런타임에 내용에 맞춰 바꾸지 않는다는 규칙 자체는 그대로다.
+            container.sizeDelta = _graphSpaceSize;
             _graphContainerRT = container;
 
             _graphView = graphArea.gameObject.AddComponent<NoteRouteGraphView>();
@@ -627,10 +767,18 @@ namespace RouteFinding.Note
         private void UpdateDrawerLayout()
         {
             float w = _drawerOpen ? _drawerAreaWidth : _drawerCollapsedWidth;
-            if (_drawerAreaRT != null) _drawerAreaRT.offsetMin = new Vector2(-w, 0f);
-            if (_graphAreaRT != null) _graphAreaRT.offsetMax = new Vector2(-w, -_topBarHeight);
+            if (_drawerAreaRT != null)
+            {
+                _drawerAreaRT.offsetMin = new Vector2(-w, 0f);
+                _drawerAreaRT.offsetMax = new Vector2(0f, -ContentTopOffset);
+            }
+            if (_graphAreaRT != null) _graphAreaRT.offsetMax = new Vector2(-w, -ContentTopOffset);
             _drawerViewportRT?.gameObject.SetActive(_drawerOpen);
         }
+
+        // 툴바 + 범례가 차지하는 위쪽 높이 — 그래프/서랍이 시작되는 지점. 범례를 나중에 끼워 넣어도
+        // (프리팹 재사용 경로 포함) 두 영역이 같은 값을 쓰도록 한 군데서만 계산한다.
+        private float ContentTopOffset => _topBarHeight + (_legendHeight > 0f ? _legendHeight : 0f);
 
         // 서랍 좌측 가장자리에 항상 떠 있는 재오픈/접기 탭 — MapViewer.BuildSidePanelToggleTab과 동일한
         // 이유로 Viewport(스크롤뷰)와 별개 오브젝트에 둬서, 서랍이 접혀 Viewport가 비활성화돼도 계속

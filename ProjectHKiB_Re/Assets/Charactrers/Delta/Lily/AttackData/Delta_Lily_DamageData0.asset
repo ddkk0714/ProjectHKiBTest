@@ -18,12 +18,13 @@ MonoBehaviour:
   damageLayer:
     serializedVersion: 2
     m_Bits: 10240
-  initialSound: {fileID: 0}
-  hitSound: {fileID: 0}
+  initialSound: {fileID: 11400000, guid: f7965faf5a9e441f80a726d677c332a7, type: 2}
+  hitSound: {fileID: 11400000, guid: 63c04f67ef064f3f93c37ca3be0223e0, type: 2}
   camShake: 0
   DLRUDamageEffects:
     _serializedList: []
   effectAnimationClipName: NormalAttack0
+  animPlayerNumber: 0
   attatchParticleToBody: 0
   downwardDamageArea:
     offset: {x: 0, y: -1}

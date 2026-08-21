@@ -66,10 +66,21 @@ public class RouteFindingMapBridge : MonoBehaviour
             // 대응 맵이 아직 없는 노드다. 씬 전환만 생략하고 그래프상 이동은 그대로 진행한다 —
             // 경로 탐색은 그래프 전체를 쓰는데 실제 맵은 일부만 만들어져 있어서, 여기서 막으면
             // 프로토타입 진행 자체가 불가능해진다.
-            if (warnOnMissingMap && _warnedNodeGuids.Add(node.guid))
+            //
+            // 다만 두 경우를 갈라서 알린다. sceneName이 비어 있으면 "아직 안 만든 맵"이라
+            // 의도된 상태이지만, **이름이 적혀 있는데 못 찾으면 오타이거나 맵이 지워진 것**이다.
+            // 화면에는 둘 다 "지도에서 이동은 되는데 씬이 안 바뀐다"로만 보여서, 후자를 조용히
+            // 넘기면 원인을 찾을 단서가 없다. 그래서 후자는 warnOnMissingMap과 무관하게 항상 알린다
+            // (맵 DB 편집기의 씬 드롭다운이 앞단에서 같은 구분을 한다 — "(미제작)" 대 "⚠ 대응 맵 없음").
+            bool named = !string.IsNullOrEmpty(node.sceneName);
+            if ((named || warnOnMissingMap) && _warnedNodeGuids.Add(node.guid))
             {
-                Debug.LogWarning($"[RouteFindingMapBridge] '{node.nodeName}'(sceneName='{node.sceneName}')에 " +
-                                 $"대응하는 맵이 없어 씬 전환을 생략합니다.");
+                Debug.LogWarning(named
+                    ? $"[RouteFindingMapBridge] '{node.nodeName}'의 씬 '{node.sceneName}'에 대응하는 " +
+                      $"MapDataSO를 찾지 못해 씬 전환을 생략합니다. 오타이거나 맵이 지워졌을 수 있습니다 — " +
+                      $"맵 DB 편집기에서 씬을 다시 고르거나, 만들 계획이 없다면 (미제작)으로 두세요."
+                    : $"[RouteFindingMapBridge] '{node.nodeName}'은(는) 아직 씬이 없는 노드라 " +
+                      $"씬 전환을 생략합니다.");
             }
             return;
         }

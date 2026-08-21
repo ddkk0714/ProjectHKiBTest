@@ -21,7 +21,7 @@ MonoBehaviour:
   canStack: 0
   itemUseEvent: {fileID: 0}
   gearType: 1
-  stateMachine: {fileID: 11400000, guid: 1d95a8fa0bc3e7b40973736148392837, type: 2}
+  stateMachine: {fileID: 11400000, guid: f9cdd2d789dc5d943a524ac8d9284653, type: 2}
   startStateName: Idle
   transformTime: 0
   baseBuff: {fileID: 0}

@@ -18,8 +18,8 @@ MonoBehaviour:
   damageLayer:
     serializedVersion: 2
     m_Bits: 10240
-  initialSound: {fileID: 0}
-  hitSound: {fileID: 0}
+  initialSound: {fileID: 11400000, guid: 41098b473d154b57b55321b1d8ca39f8, type: 2}
+  hitSound: {fileID: 11400000, guid: 63c04f67ef064f3f93c37ca3be0223e0, type: 2}
   camShake: 0
   DLRUDamageEffects:
     _serializedList: []

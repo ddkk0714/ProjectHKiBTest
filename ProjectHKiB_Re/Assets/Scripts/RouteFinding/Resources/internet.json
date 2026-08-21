@@ -3,8 +3,12 @@
         {
             "id": "site-local-board",
             "name": "지역 게시판",
-            "iconPath": "",
-            "unlock": {},
+            "iconAddress": "",
+            "unlock": {
+                "requiredClueIds": [],
+                "requiredEventKeys": [],
+                "minGameTime": 0.0
+            },
             "posts": [
                 {
                     "id": "post-wasteland-detour",
@@ -15,7 +19,11 @@
                     "grantClueIds": [
                         "clue-web-wasteland"
                     ],
-                    "unlock": {},
+                    "unlock": {
+                        "requiredClueIds": [],
+                        "requiredEventKeys": [],
+                        "minGameTime": 0.0
+                    },
                     "attachments": [],
                     "comments": [
                         {
@@ -42,7 +50,7 @@
                     "unlock": {
                         "requiredClueIds": [],
                         "requiredEventKeys": [],
-                        "minGameTime": 60
+                        "minGameTime": 60.0
                     },
                     "attachments": [],
                     "comments": [
@@ -58,13 +66,13 @@
         {
             "id": "site-photo-blog",
             "name": "발밑의 도시 (개인 블로그)",
-            "iconPath": "",
+            "iconAddress": "",
             "unlock": {
                 "requiredClueIds": [
                     "clue-web-wasteland"
                 ],
                 "requiredEventKeys": [],
-                "minGameTime": 0
+                "minGameTime": 0.0
             },
             "posts": [
                 {
@@ -76,7 +84,11 @@
                     "grantClueIds": [
                         "clue-web-graffiti-photo"
                     ],
-                    "unlock": {},
+                    "unlock": {
+                        "requiredClueIds": [],
+                        "requiredEventKeys": [],
+                        "minGameTime": 0.0
+                    },
                     "attachments": [],
                     "comments": []
                 }
@@ -85,13 +97,13 @@
         {
             "id": "site-station-archive",
             "name": "폐역 기록보관소",
-            "iconPath": "",
+            "iconAddress": "",
             "unlock": {
                 "requiredClueIds": [],
                 "requiredEventKeys": [
                     "map-002:metStranger"
                 ],
-                "minGameTime": 0
+                "minGameTime": 0.0
             },
             "posts": [
                 {
@@ -103,7 +115,11 @@
                     "grantClueIds": [
                         "clue-underground-passage"
                     ],
-                    "unlock": {},
+                    "unlock": {
+                        "requiredClueIds": [],
+                        "requiredEventKeys": [],
+                        "minGameTime": 0.0
+                    },
                     "attachments": [],
                     "comments": []
                 }
