@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -89,6 +90,10 @@ namespace RouteFinding.MapView
 
         public float Scale => _scale;
 
+        // [신설, 2026-08-11] 배율이 바뀔 때마다 알린다 — 지도(MapViewer)가 노드의 호버/클릭 판정 영역을
+        // 역보정하는 데 쓴다(줌 아웃하면 노드가 작아져 마우스를 올리기 어려워지는 문제).
+        public event Action<float> OnScaleChanged;
+
         public void Init(RectTransform target, RectTransform viewport, Canvas canvas)
         {
             _target   = target;
@@ -133,6 +138,7 @@ namespace RouteFinding.MapView
             _target.anchoredPosition = mouseInAnchorSpace + (_target.anchoredPosition - mouseInAnchorSpace) * ratio;
             _target.localScale = Vector3.one * _scale;
             ClampToContentBounds();
+            OnScaleChanged?.Invoke(_scale);
         }
 
         // PointerDown을 수락해야 배경 드래그 시 BeginDrag가 이 핸들러로 전달된다.
@@ -200,6 +206,7 @@ namespace RouteFinding.MapView
             _scale = 1f;
             _target.localScale = Vector3.one;
             _target.anchoredPosition = Vector2.zero;
+            OnScaleChanged?.Invoke(_scale);
         }
     }
 }

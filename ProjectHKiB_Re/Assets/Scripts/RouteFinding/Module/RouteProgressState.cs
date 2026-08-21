@@ -35,6 +35,11 @@ using UnityEngine;
 //   사용 예시 (전투 시스템에서 보스를 처치했을 때):
 //     RouteModule.Instance.Progress.SetEventFlag(bossMapGuid, "kill_boss01");
 //
+// ▸ 보조 훅 — 맵과 무관하게 단서를 직접 주기
+//     RouteModule.Instance.Progress.AcquireClueById(clueId);
+//   "그 맵에 가야 준다"는 규칙 밖에서 단서를 주는 콘텐츠 표면(인터넷 게시글 열람 등)이 쓴다.
+//   MapNodeData.clueIds 등록이 필요 없고, 획득 이후 파급(지도 공개·도감·세이브)은 맵 경로와 동일하다.
+//
 // ▸ 그 외 조회용 공개 API (주로 UI/디버그용, 필요하면 다른 시스템도 사용 가능)
 //   IsNodeVisited(node) / IsNodeCleared(node) / HasNodeClue(node) / HasConnectionClue(conn)
 //   IsClueAcquired(clueId) / HasEventFlag(mapGuid, eventKey) / AcquiredClueIds / AcquisitionOrder
@@ -147,6 +152,31 @@ public class RouteProgressState
             bool eventOk = string.IsNullOrEmpty(clue.requiredEventKey) || HasEventFlag(mapGuid, clue.requiredEventKey);
             if (eventOk) AcquireClue(clue);
         }
+    }
+
+    // 맵 방문과 무관하게 단서 하나를 직접 획득시킨다 — 인터넷(게시글 열람)처럼 "그 맵에 가야
+    // 준다"는 규칙 밖에서 단서를 주는 콘텐츠 표면을 위한 공개 훅이다(Internet_System_Plan.md 3.2 안 B).
+    // MapNodeData.clueIds에 등록되지 않은 단서도 이 경로로는 획득할 수 있고, 획득 이후의 파급
+    // (지도 공개·OnClueAcquired 발행·도감 등록·세이브)은 맵 경로와 완전히 같다.
+    //
+    // 반환값: 이번 호출로 새로 획득했으면 true. 이미 갖고 있었거나 그래프에 없는 ID면 false —
+    // 호출자가 "새로 얻었을 때만" 획득 연출을 띄우는 데 쓴다.
+    public bool AcquireClueById(string clueId)
+    {
+        if (string.IsNullOrEmpty(clueId)) return false;
+        if (_acquiredClueIds.Contains(clueId)) return false;
+
+        var clue = _graph?.GetClue(clueId);
+        if (clue == null)
+        {
+            // 콘텐츠 쪽 오타(예: 게시글의 grantClueIds가 clues.json에 없는 ID를 가리킴)는 조용히
+            // 넘어가면 "글을 읽었는데 아무 일도 안 일어난다"로만 보여서 원인을 찾기 어렵다.
+            Debug.LogWarning($"[RouteProgressState] AcquireClueById: 단서를 찾을 수 없습니다 — {clueId}");
+            return false;
+        }
+
+        AcquireClue(clue);
+        return true;
     }
 
     // 단서 획득 — 단서가 가리키는 맵·연결을 지도에 공개한다.

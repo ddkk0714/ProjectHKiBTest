@@ -71,3 +71,12 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 ProjectHKiB_Re/Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset
+
+# 이 저장소가 담는 Unity 프로젝트는 ProjectHKiB_Re 하나다.
+# Sound_Test는 저장소 루트에 같이 놓여 있을 뿐인 별개 프로젝트라(자체 Assets/Packages/
+# ProjectSettings를 갖고 있다) 여기서는 추적하지 않는다. 추적된 적도 없다.
+# 버전 관리가 필요해지면 별도 저장소로 두는 편이 맞다.
+/Sound_Test/
+
+# 아직 확정 전인 기획서 초안 — 내용이 굳으면 이 줄을 지우고 커밋한다.
+/ProjectHKiB_Re/Docs/Internet_System_Plan.md

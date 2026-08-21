@@ -12,12 +12,30 @@
             "content": "인터넷에 올라온 게시글. 숲 입구의 분위기와 등장하는 존재들에 대한 내용이 담겨 있다.",
             "source": "",
             "codexMapGuid": "map-002",
-            "keywords": ["숲", "입구", "소문"],
+            "keywords": [
+                "숲",
+                "입구",
+                "소문"
+            ],
             "comments": [
                 {
                     "author": "델타",
                     "text": "이 소문, 꽤 흥미롭네요. 조심하는 게 좋겠어요.",
                     "createdAt": "00:02"
+                }
+            ],
+            "attachments": [
+                {
+                    "kind": 2,
+                    "label": "",
+                    "resourcePath": "",
+                    "mapGuid": "map-002"
+                },
+                {
+                    "kind": 0,
+                    "label": "MapIMage",
+                    "resourcePath": "RouteFinding/Attachments/20250420_164143_2",
+                    "mapGuid": ""
                 }
             ]
         },
@@ -33,7 +51,11 @@
             "content": "오래된 문서에서 발견된 기록. 호수 근처에서 목격된 이상한 현상들을 묘사하고 있다.",
             "source": "",
             "codexMapGuid": "map-004",
-            "keywords": ["호수", "전설", "기록"],
+            "keywords": [
+                "호수",
+                "전설",
+                "기록"
+            ],
             "comments": [
                 {
                     "author": "델타",
@@ -45,7 +67,8 @@
                     "text": "새로운 단서가 도감에 등록되었습니다.",
                     "createdAt": ""
                 }
-            ]
+            ],
+            "attachments": []
         },
         {
             "id": "clue-forest-cabin",
@@ -59,8 +82,13 @@
             "content": "숲 입구 부근에서 수집한 이야기. 나무 사이에 낡은 오두막이 있고 침대가 있다고 한다.",
             "source": "",
             "codexMapGuid": "map-003",
-            "keywords": ["숲", "오두막", "침대"],
-            "comments": []
+            "keywords": [
+                "숲",
+                "오두막",
+                "침대"
+            ],
+            "comments": [],
+            "attachments": []
         },
         {
             "id": "clue-fog-valley",
@@ -74,8 +102,13 @@
             "content": "호수 근처에서 발견한 낡은 일지. 안개가 짙게 깔린 계곡과 그 너머 목적지에 대한 기록이 있다.",
             "source": "",
             "codexMapGuid": "map-008",
-            "keywords": ["안개", "계곡", "기록"],
-            "comments": []
+            "keywords": [
+                "안개",
+                "계곡",
+                "기록"
+            ],
+            "comments": [],
+            "attachments": []
         },
         {
             "id": "clue-plateau",
@@ -89,8 +122,13 @@
             "content": "오두막 벽에 붙어 있던 손으로 그린 지도. 안개 계곡을 지나면 높은 고원이 있다고 적혀 있다.",
             "source": "",
             "codexMapGuid": "map-009",
-            "keywords": ["고원", "지도", "안개"],
-            "comments": []
+            "keywords": [
+                "고원",
+                "지도",
+                "안개"
+            ],
+            "comments": [],
+            "attachments": []
         },
         {
             "id": "clue-abandoned-station",
@@ -104,8 +142,13 @@
             "content": "황무지 방향으로 가면 멈춰버린 열차가 있는 역이 있다는 이야기. 침대가 있어 쉬어갈 수 있다고 한다.",
             "source": "",
             "codexMapGuid": "map-007",
-            "keywords": ["폐역", "침대", "소문"],
-            "comments": []
+            "keywords": [
+                "폐역",
+                "침대",
+                "소문"
+            ],
+            "comments": [],
+            "attachments": []
         },
         {
             "id": "clue-underground-passage",
@@ -119,8 +162,13 @@
             "content": "폐역 역사 바닥에 적힌 낙서. 지하로 이어지는 터널이 있고 그 끝에 밝은 빛이 있다고 한다.",
             "source": "",
             "codexMapGuid": "map-011",
-            "keywords": ["지하", "터널", "폐역"],
-            "comments": []
+            "keywords": [
+                "지하",
+                "터널",
+                "폐역"
+            ],
+            "comments": [],
+            "attachments": []
         },
         {
             "id": "clue-greenhouse",
@@ -134,8 +182,13 @@
             "content": "고원에서 내려다보이는 빛나는 구조물에 대한 기록. 안에 이상한 식물들이 자라고 있다.",
             "source": "",
             "codexMapGuid": "map-012",
-            "keywords": ["온실", "고원", "목격담"],
-            "comments": []
+            "keywords": [
+                "온실",
+                "고원",
+                "목격담"
+            ],
+            "comments": [],
+            "attachments": []
         },
         {
             "id": "clue-destination-1",
@@ -149,8 +202,13 @@
             "content": "인터넷 게시판의 오래된 글. 여러 경로가 교차하는 장소가 있다는 내용이다.",
             "source": "",
             "codexMapGuid": "map-005",
-            "keywords": ["목적지", "인터넷", "소문"],
-            "comments": []
+            "keywords": [
+                "목적지",
+                "인터넷",
+                "소문"
+            ],
+            "comments": [],
+            "attachments": []
         },
         {
             "id": "clue-destination-2",
@@ -164,8 +222,13 @@
             "content": "인터넷에서 발견한 단편적인 정보. 절벽과 안개 사이의 고립된 공간에 대한 이야기다.",
             "source": "",
             "codexMapGuid": "map-010",
-            "keywords": ["목적지", "인터넷", "안개"],
-            "comments": []
+            "keywords": [
+                "목적지",
+                "인터넷",
+                "안개"
+            ],
+            "comments": [],
+            "attachments": []
         },
         {
             "id": "clue-destination-3",
@@ -179,8 +242,94 @@
             "content": "유리 온실 안에서 찾은 쪽지. 지하 깊은 곳에 최후의 공간이 있다고 적혀 있다.",
             "source": "",
             "codexMapGuid": "map-013",
-            "keywords": ["목적지", "지하", "온실"],
-            "comments": []
+            "keywords": [
+                "목적지",
+                "지하",
+                "온실"
+            ],
+            "comments": [],
+            "attachments": []
+        },
+        {
+            "id": "clue-web-wasteland",
+            "name": "황무지 우회로 제보",
+            "description": "지역 게시판에서 읽은 글. 황무지를 가로지르는 길이 실제로 있다고 한다.",
+            "targetMapGuid": "map-006",
+            "targetConnectionGuid": "",
+            "requiredEventKey": "",
+            "type": 1,
+            "timestamp": "",
+            "content": "\"거기 아무것도 없다고들 하는데, 실제로 가 보면 길이 있다. 밟고 지나간 자국이 남아 있으니까.\" — 어느 게시글에서 옮겨 적음.",
+            "source": "지역 게시판",
+            "codexMapGuid": "map-006",
+            "keywords": [
+                "황무지",
+                "우회로",
+                "인터넷"
+            ],
+            "comments": [],
+            "attachments": [
+                {
+                    "kind": 2,
+                    "label": "",
+                    "resourcePath": "",
+                    "mapGuid": "map-006"
+                }
+            ]
+        },
+        {
+            "id": "clue-web-graffiti-photo",
+            "name": "벽에 그려진 표식 사진",
+            "description": "개인 블로그에 올라온 사진. 같은 표식이 여러 곳에서 발견된다.",
+            "targetMapGuid": "",
+            "targetConnectionGuid": "",
+            "requiredEventKey": "",
+            "type": 2,
+            "timestamp": "",
+            "content": "누가 언제 그렸는지 아무도 모른다는 표식. 사진 속 벽의 재질이 황무지 쪽 구조물과 닮았다.",
+            "source": "개인 블로그 '발밑의 도시'",
+            "codexMapGuid": "map-006",
+            "keywords": [
+                "표식",
+                "사진",
+                "인터넷"
+            ],
+            "comments": [],
+            "attachments": [
+                {
+                    "kind": 0,
+                    "label": "블로그에 올라온 사진",
+                    "resourcePath": "RouteFinding/Attachments/20250420_164143_2",
+                    "mapGuid": ""
+                }
+            ]
+        },
+        {
+            "id": "clue-web-night-sound",
+            "name": "새벽에 녹음된 소리",
+            "description": "게시글에 첨부된 녹음 파일. 폐기된 역 근처에서 녹음됐다고 한다.",
+            "targetMapGuid": "",
+            "targetConnectionGuid": "",
+            "requiredEventKey": "",
+            "type": 0,
+            "timestamp": "03:40",
+            "content": "짧은 잡음 뒤에 무언가 규칙적으로 긁히는 소리가 이어진다. 작성자는 열차 소리라고 했지만, 그 역에는 오래전부터 열차가 다니지 않는다.",
+            "source": "지역 게시판",
+            "codexMapGuid": "map-007",
+            "keywords": [
+                "소리",
+                "폐역",
+                "인터넷"
+            ],
+            "comments": [],
+            "attachments": [
+                {
+                    "kind": 1,
+                    "label": "rec_0340.wav",
+                    "resourcePath": "RouteFinding/Attachments/rec_night_call",
+                    "mapGuid": ""
+                }
+            ]
         }
     ]
 }

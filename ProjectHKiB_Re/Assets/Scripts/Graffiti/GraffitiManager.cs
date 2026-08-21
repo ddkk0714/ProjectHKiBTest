@@ -68,10 +68,17 @@ public class GraffitiManager : MonoBehaviour
         _GPRecoverTimer.StartTimer(GPRecovertime, RecoverGP);
     }
 
+    // graffitiMoveCount는 방문한 칸 수만큼 상한 없이 늘어나지만 tinkers는 고정 길이다.
+    // 경계 검사가 있는 곳은 PlayNormalTinkerAnimation 하나뿐이었다.
+    private int TinkerCount => Mathf.Min(graffitiMoveCount, tinkers.Length);
+
     public void StartGraffiti(int targetSlot, Vector2 startPos)
     {
-        if (!CanGraffiti) return;
-        if (GameManager.instance.gearManager.GetCardData(targetSlot) == null) return;
+        if (!CanGraffiti || GameManager.instance.gearManager.GetCardData(targetSlot) == null)
+        {
+            AbortGraffiti();
+            return;
+        }
         _currentTargetSlot = targetSlot;
 
         inputManager.GRAFFITIMode();
@@ -94,6 +101,33 @@ public class GraffitiManager : MonoBehaviour
         ProcessGraffiti(Vector2Int.zero);
     }
     public void TimeOutGraffiti() => ExitGraffiti(_currentTargetSlot);
+
+    /// <summary>
+    /// 낙서가 시작되지 못했을 때 변신 상태에서 빠져나온다.
+    ///
+    /// StartGraffiti는 State의 EnterActions에서 불린다(StartGraffitiAction). 여기서 조기 반환하면
+    /// GRAFFITIMode()가 실행되지 않아 GRAFFITI 입력 맵이 꺼진 채로 남고, 낙서 타이머도 돌지 않는다.
+    /// 그런데 TransformStart/Transforming을 빠져나가는 길은 (a) GraffitiManager가 ChangeState로
+    /// 꺼내주거나 (b) OnGraffitiCancel 전이뿐인데, 그 전이는 trigger가 비어 있어 죽어 있고 애초에
+    /// 꺼진 입력 맵에 속한다. 되돌리지 않으면 플레이어는 변신 도중에 영구히 멈춘다.
+    /// </summary>
+    private void AbortGraffiti() => StartCoroutine(AbortGraffitiCoroutine());
+
+    private IEnumerator AbortGraffitiCoroutine()
+    {
+        // EnterState가 끝난 다음에 상태를 바꾼다. 도중에 바꾸면 떠나는 State의 ReserveTransitions가
+        // 새 State 위에 덮여서 엉뚱한 전이 조건이 켜진다.
+        yield return null;
+
+        inputManager.PLAYMode();
+        ChangeToInitialStateOfCurrentMachine();
+    }
+
+    private void ChangeToInitialStateOfCurrentMachine()
+    {
+        if (player.StateMachine != null && player.StateMachine.initialState)
+            player.ChangeState(player.StateMachine.initialState);
+    }
 
     /// <summary>
     /// called everytime when moved in graffiti
@@ -127,47 +161,74 @@ public class GraffitiManager : MonoBehaviour
 
     public void ExitGraffiti(int targetSlot)
     {
-        StartTinker();
         _graffitiTimer.CancelTimer();
 
-        if (sequence != null && sequence.active) sequence.Complete();
+        int result = CheckCompleted(targetSlot);
+        bool comp = result >= 0;
 
-        bool comp = CheckCompleted(targetSlot) >= 0;
-        for (int i = 0; i < graffitiMoveCount; i++)
+        // 팅커 연출은 실패해도 되지만 상태 복구는 반드시 해야 한다. 변신 상태에는 동작하는 탈출
+        // 전이가 없어서(AbortGraffiti 주석 참고) 아래가 한 번 건너뛰어지면 되돌아올 길이 없다.
+        try
         {
-            tinkers[i].ClearReservation();
-            if (comp)
+            StartTinker();
+
+            if (sequence != null && sequence.active) sequence.Complete();
+
+            for (int i = 0; i < TinkerCount; i++)
             {
-                tinkers[i].Reserve("BiggerStart");
-                tinkers[i].Reserve("BiggerIdle");
-                tinkers[i].Reserve("BiggerExit");
+                tinkers[i].ClearReservation();
+                if (comp)
+                {
+                    tinkers[i].Reserve("BiggerStart");
+                    tinkers[i].Reserve("BiggerIdle");
+                    tinkers[i].Reserve("BiggerExit");
+                }
+                else tinkers[i].Reserve("NormalExit");
+                tinkers[i].Reserve("Stop");
             }
-            else tinkers[i].Reserve("NormalExit");
-            tinkers[i].Reserve("Stop");
         }
+        finally
+        {
+            if (comp) gearManager.ActivateGear(targetSlot);
+            // BaseData는 기어를 켜도 갱신되지 않으므로(SetGear를 부르는 GearMergeManagerSO가 죽어 있다)
+            // 그쪽 StateMachine은 기본형 기계다. 지금 돌고 있는 기계의 초기 상태로 보내야 한다.
+            else ChangeToInitialStateOfCurrentMachine();
 
-        if (comp) gearManager.ActivateGear(targetSlot);
-        else player.ChangeState(player.BaseData.StateMachine.initialState);
+            graffitiProgress.Clear();
+            inputManager.PLAYMode();
 
-        graffitiProgress.Clear();
-        inputManager.PLAYMode();
+            if (result == 1) StartCoroutine(GraffitiEndSkillCoroutine());
+            else if (result == 0) StartCoroutine(GraffitiEndAttackCoroutine());
+        }
+    }
 
-        if (CheckCompleted(targetSlot) == 1) StartCoroutine(GraffitiEndSkillCoroutine());
-        else if (CheckCompleted(targetSlot) == 0) StartCoroutine(GraffitiEndAttackCoroutine());
+    /// <summary>
+    /// PlayerData가 물고 있는 State는 원본 .asset이고, 새 형식 기계는 그것의 복제본을 서브에셋으로
+    /// 갖고 있다. 원본 객체를 그대로 ChangeState에 넘기면 이 기계에 없는 State가 CurrentState가 되어
+    /// StateMachineSO._commandPairs의 conditionState와 아무것도 맞지 않는다 - 입력 전이가 전부 죽어
+    /// 캐릭터가 멈춘 것처럼 보인다. 이름은 변환해도 그대로라, 지금 기계 안에서 같은 이름으로 찾는다.
+    /// (서브에셋 fileID는 재변환마다 바뀌므로 PlayerData가 직접 가리키게 두면 안 된다.)
+    /// </summary>
+    private void ChangeToStateInCurrentMachine(StateSO stateFromBaseData)
+    {
+        if (stateFromBaseData == null) return;
+
+        if (player.StateMachine != null && player.StateMachine.allStates.Exists(a => a.name == stateFromBaseData.name))
+            player.ChangeState(stateFromBaseData.name);
+        else
+            Debug.LogWarning($"[GraffitiManager] 지금 기계에 '{stateFromBaseData.name}'이 없어 상태를 바꾸지 못했습니다.");
     }
 
     private IEnumerator GraffitiEndAttackCoroutine()
     {
         yield return null;
-        if (player.BaseData.GraffitiAttackState != null)
-            player.ChangeState(player.BaseData.GraffitiAttackState);
+        ChangeToStateInCurrentMachine(player.BaseData.GraffitiAttackState);
     }
     private IEnumerator GraffitiEndSkillCoroutine()
     {
         GP = 0;
         yield return null;
-        if (player.BaseData.GraffitiSkillState != null)
-            player.ChangeState(player.BaseData.GraffitiSkillState);
+        ChangeToStateInCurrentMachine(player.BaseData.GraffitiSkillState);
     }
 
     private bool ValidateProgress(int targetSlot)
@@ -204,7 +265,7 @@ public class GraffitiManager : MonoBehaviour
     {
         if (canGraffitiTinker) return;
         canGraffitiTinker = true;
-        for (int i = 0; i < graffitiMoveCount; i++)
+        for (int i = 0; i < TinkerCount; i++)
             PlayNormalTinkerAnimation(i, _graffitiWorldStartPos + graffitiProgress[i]);
         if (CheckCompleted(_currentTargetSlot) >= 0)
             PlayBiggerTinkerAnimation();
@@ -226,7 +287,7 @@ public class GraffitiManager : MonoBehaviour
         if (!canGraffitiTinker) return;
         // SetUpdate(true): 그래피티 입력 UI 연출이므로 TimeManager 일시정지의 영향을 받지 않는다.
         sequence = DOTween.Sequence().SetUpdate(true);
-        for (int i = 0; i < graffitiMoveCount; i++)
+        for (int i = 0; i < TinkerCount; i++)
         {
             sequence.AppendCallback(BiggerTinkerCallback);
             sequence.AppendInterval(0.05f);
@@ -237,6 +298,8 @@ public class GraffitiManager : MonoBehaviour
     }
     private void BiggerTinkerCallback()
     {
+        if (tempTinkerIndex >= tinkers.Length) return;
+
         tinkers[tempTinkerIndex].Play("NormalExit");
         tinkers[tempTinkerIndex].Reserve("BiggerStart");
         tinkers[tempTinkerIndex].Reserve("BiggerIdle");
@@ -246,7 +309,7 @@ public class GraffitiManager : MonoBehaviour
     public void CancelBiggerTinkerAnimation()
     {
         if (!canGraffitiTinker || !biggerTinkerPresent) return;
-        for (int i = 0; i < graffitiMoveCount; i++)
+        for (int i = 0; i < TinkerCount; i++)
         {
             tinkers[i].Play("BiggerExit");
             tinkers[i].Reserve("NormalStart");
@@ -258,7 +321,7 @@ public class GraffitiManager : MonoBehaviour
     public void CancelAllTinkerAnimation()
     {
         if (!canGraffitiTinker) return;
-        for (int i = 0; i < graffitiMoveCount; i++)
+        for (int i = 0; i < TinkerCount; i++)
         {
             tinkers[i].Play("NormalExit");
             tinkers[i].Reserve("Stop");

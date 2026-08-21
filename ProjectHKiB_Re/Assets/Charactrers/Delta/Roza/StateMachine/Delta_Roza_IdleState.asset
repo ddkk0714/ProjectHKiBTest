@@ -19,120 +19,117 @@ MonoBehaviour:
   transitions:
   - name: 
     activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
     availableTime: 0
     disableTime: 0
     decisions:
-    - decision: {fileID: 11400000, guid: 35a37da16a3d9df4189d1ba8142bdbc6, type: 2}
-      Decision:
+    - Decision:
         rid: 8642958643451396701
       negate: 0
     trueState: {fileID: 11400000, guid: cde19cdd37735d7408d033a391c4fc1e, type: 2}
     falseState: {fileID: 0}
-    action: {fileID: 0}
     Action:
       rid: -2
     showTrueStatePort: 1
     showFalseStatePort: 1
   - name: 
     activationInput: 2
+    trigger: {fileID: 0}
+    type: 0
     availableTime: 0
     disableTime: 0
     decisions: []
     trueState: {fileID: 11400000, guid: 70ce19e7fc1c9c04fa078dc65a2ed083, type: 2}
     falseState: {fileID: 0}
-    action: {fileID: 0}
     Action:
       rid: -2
     showTrueStatePort: 1
     showFalseStatePort: 1
   - name: 
     activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
     availableTime: 0
     disableTime: 0
     decisions:
-    - decision: {fileID: 11400000, guid: af28755f24b9a564da14f64bdd3a7f40, type: 2}
-      Decision:
+    - Decision:
         rid: 8642958643451396702
       negate: 0
     trueState: {fileID: 11400000, guid: cc4bdcdcb162f684aa4182056b09d1ac, type: 2}
     falseState: {fileID: 0}
-    action: {fileID: 0}
     Action:
       rid: -2
     showTrueStatePort: 1
     showFalseStatePort: 1
   - name: 
     activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
     availableTime: 0
     disableTime: 0
     decisions:
-    - decision: {fileID: 11400000, guid: 5080e5686af385f43ba3c3c0a486210c, type: 2}
-      Decision:
+    - Decision:
         rid: 8642958643451396703
       negate: 0
     trueState: {fileID: 11400000, guid: 3e9e252439afd3f4688d00ad06d06ef5, type: 2}
     falseState: {fileID: 0}
-    action: {fileID: 0}
     Action:
       rid: -2
     showTrueStatePort: 1
     showFalseStatePort: 1
   - name: 
     activationInput: 13
+    trigger: {fileID: 0}
+    type: 0
     availableTime: 0
     disableTime: 0
     decisions:
-    - decision: {fileID: 11400000, guid: 53320624076daab44995584c81b2539a, type: 2}
-      Decision:
+    - Decision:
         rid: 8642958643451396704
       negate: 0
     trueState: {fileID: 11400000, guid: 0ef79efe3c752334593e6fe0a7e5e44f, type: 2}
     falseState: {fileID: 0}
-    action: {fileID: 0}
     Action:
       rid: -2
     showTrueStatePort: 1
     showFalseStatePort: 1
   - name: 
     activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
     availableTime: 0
     disableTime: 0
     decisions:
-    - decision: {fileID: 11400000, guid: 69473423be5d34647b0a1e7e15d1103a, type: 2}
-      Decision:
+    - Decision:
         rid: 8642958643451396705
       negate: 0
     trueState: {fileID: 11400000, guid: ab16ee19d54fa1745abd5ca0184a6658, type: 2}
     falseState: {fileID: 0}
-    action: {fileID: 0}
     Action:
       rid: -2
     showTrueStatePort: 1
     showFalseStatePort: 1
   - name: 
     activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
     availableTime: 0
     disableTime: 0
     decisions:
-    - decision: {fileID: 11400000, guid: 32f2c5ff068557b43becca29f5d19726, type: 2}
-      Decision:
+    - Decision:
         rid: 8642958643451396706
       negate: 0
     trueState: {fileID: 11400000, guid: cc077b86e10558c4c9190a6558ba854a, type: 2}
     falseState: {fileID: 0}
-    action: {fileID: 0}
     Action:
       rid: -2
     showTrueStatePort: 1
     showFalseStatePort: 1
   additionalTransitions: []
-  enterActions: []
   EnterActions: []
-  updateActions:
-  - {fileID: 0}
   UpdateActions:
   - rid: -2
-  exitActions: []
   ExitActions: []
   actionSequence: []
   loopActionSequence: 0
@@ -148,6 +145,8 @@ MonoBehaviour:
     - rid: 8642958643451396701
       type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
+        _trigger: {fileID: 6923667502783770647, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
         _inputType: 0
     - rid: 8642958643451396702
       type: {class: KnockbackMoveDecision, ns: StateMachine, asm: Assembly-CSharp}

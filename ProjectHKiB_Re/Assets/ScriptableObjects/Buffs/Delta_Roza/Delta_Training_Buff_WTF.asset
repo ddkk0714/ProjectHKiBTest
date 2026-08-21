@@ -11,16 +11,19 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d404a4644b4e68d40a814bdcf9d0d820, type: 3}
   m_Name: Delta_Training_Buff_WTF
-  m_EditorClassIdentifier: 
-  <Description>k__BackingField: "\uADF9\uD55C\uD68C\uD53C \uC131\uACF5\uC2DC \uC601\uC6D0\uD788
-    HP\uCD5C\uB300\uCE58\uAC00 10% \uC0C1\uC2B9\uD55C\uB2E4. \n\uC911\uBCF5\uC2DC
-    \uC911\uCCA9\uB41C\uB2E4."
+  m_EditorClassIdentifier:
+  saveId: ff1b189b945f1be4eaf5b6151f65353d
+  <Description>k__BackingField: "\uADF9\uD55C\uD68C\uD53C \uC131\uACF5\uC2DC \uC601\uC6D0\uD788 HP\uCD5C\uB300\uCE58\uAC00 10% \uC0C1\uC2B9\uD55C\uB2E4. \n\uC911\uBCF5\uC2DC \uC911\uCCA9\uB41C\uB2E4."
   <IsBuffTimeInfinite>k__BackingField: 1
   <BuffTime>k__BackingField: 0
-  <IsDebuff>k__BackingField: 0
-  <Value>k__BackingField: 0.1
-  <IsValuePropositional>k__BackingField: 1
-  <BuffType>k__BackingField: {fileID: 11400000, guid: a398ffb3a9ad33d4081eb667ff17ef1d, type: 2}
+  isEmotionBuff: 0
+  emotionColor: 0
+  maxStack: 200
   <TimeStackType>k__BackingField: 0
   <BuffStackType>k__BackingField: 1
   <BuffRemoveType>k__BackingField: 2
+  <Effects>k__BackingField:
+  - <BuffType>k__BackingField: {fileID: 11400000, guid: a398ffb3a9ad33d4081eb667ff17ef1d, type: 2}
+    <IsDebuff>k__BackingField: 0
+    <Value>k__BackingField: 0.1
+    <IsValuePropositional>k__BackingField: 1

@@ -31,6 +31,10 @@ public class CodexEntry
     // 4단계 — NPC/시스템 코멘트(ClueData.comments/CodexUserEntry.comments를 그대로 옮겨온 것).
     public CodexComment[] comments = Array.Empty<CodexComment>();
 
+    // 첨부물(2026-08-11) — ClueData.attachments를 그대로 옮겨온 것. 유저 메모/미발견 슬롯은 항상 비어 있다
+    // (유저는 파일을 고를 수 없고, 미발견 슬롯은 내용 자체가 스포일러라 첨부도 감춰야 한다).
+    public ClueAttachment[] attachments = Array.Empty<ClueAttachment>();
+
     // 6-2단계(Clue_System.md) — 아직 획득하지 않은 단서의 "???" 빈칸 슬롯. true면 title/content가
     // 이미 "??? (미발견)"/고정 문구로 채워져 있고, clueId/typeLabel/timestamp/source/keywords는
     // 전부 비어있다 — CodexCardView/CodexDrawerTreeView가 별도 분기 없이 그대로 표시해도 스포일러가

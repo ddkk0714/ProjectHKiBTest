@@ -19,126 +19,110 @@ MonoBehaviour:
   transitions:
   - name: 
     activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
     availableTime: 0
     disableTime: 0
     decisions:
-    - decision: {fileID: 11400000, guid: 051ddedcb5368054dbdce9cfc73c190a, type: 2}
-      Decision:
+    - Decision:
         rid: 8642958643451396489
       negate: 0
-    - decision: {fileID: 11400000, guid: e0cf4cc32ccc02a468f21e9caa6b837d, type: 2}
-      Decision:
+    - Decision:
         rid: 8642958643451396490
       negate: 0
     trueState: {fileID: 11400000, guid: e82fc40f27281234d94a26b5aa76e831, type: 2}
     falseState: {fileID: 0}
-    action: {fileID: 0}
     Action:
       rid: -2
     showTrueStatePort: 1
     showFalseStatePort: 1
   - name: 
     activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
     availableTime: 0
     disableTime: 0
     decisions:
-    - decision: {fileID: 11400000, guid: 051ddedcb5368054dbdce9cfc73c190a, type: 2}
-      Decision:
+    - Decision:
         rid: 8642958643451396491
       negate: 1
-    - decision: {fileID: 11400000, guid: e0cf4cc32ccc02a468f21e9caa6b837d, type: 2}
-      Decision:
+    - Decision:
         rid: 8642958643451396492
       negate: 0
-    - decision: {fileID: 11400000, guid: 12744be93fd2f334891269c161c19fc3, type: 2}
-      Decision:
+    - Decision:
         rid: 8642958643451396493
       negate: 0
     trueState: {fileID: 11400000, guid: f947b045de4f1ae4580310148f9ff10c, type: 2}
     falseState: {fileID: 0}
-    action: {fileID: 0}
     Action:
       rid: -2
     showTrueStatePort: 1
     showFalseStatePort: 1
   - name: 
     activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
     availableTime: 0
     disableTime: 0
     decisions:
-    - decision: {fileID: 11400000, guid: af28755f24b9a564da14f64bdd3a7f40, type: 2}
-      Decision:
+    - Decision:
         rid: 8642958643451396494
       negate: 0
     trueState: {fileID: 11400000, guid: cc4bdcdcb162f684aa4182056b09d1ac, type: 2}
     falseState: {fileID: 0}
-    action: {fileID: 0}
     Action:
       rid: -2
     showTrueStatePort: 1
     showFalseStatePort: 1
   - name: 
     activationInput: 3
+    trigger: {fileID: 0}
+    type: 0
     availableTime: 0
     disableTime: 0
     decisions:
-    - decision: {fileID: 11400000, guid: 5080e5686af385f43ba3c3c0a486210c, type: 2}
-      Decision:
+    - Decision:
         rid: 8642958643451396495
       negate: 0
     trueState: {fileID: 11400000, guid: 3e9e252439afd3f4688d00ad06d06ef5, type: 2}
     falseState: {fileID: 0}
-    action: {fileID: 0}
     Action:
       rid: -2
     showTrueStatePort: 1
     showFalseStatePort: 1
   - name: 
     activationInput: 2
+    trigger: {fileID: 0}
+    type: 0
     availableTime: 0
     disableTime: 0
     decisions: []
     trueState: {fileID: 0}
     falseState: {fileID: 0}
-    action: {fileID: 11400000, guid: 5b80fe0ce3d6747408d78514aac16602, type: 2}
     Action:
       rid: 8642958643451396496
     showTrueStatePort: 1
     showFalseStatePort: 1
   additionalTransitions: []
-  enterActions:
-  - {fileID: 11400000, guid: 9d29c5b17685af144aaabb51ca64e9ad, type: 2}
-  - {fileID: 11400000, guid: 2c576fa108eac8344a0e22d0909847fb, type: 2}
-  - {fileID: 11400000, guid: 0dcef09597733ae42a8158bb76010c23, type: 2}
-  - {fileID: 11400000, guid: eae65f2d6a38b2f4cb44dd59ca5a19ff, type: 2}
   EnterActions:
   - rid: 8642958643451396497
   - rid: 8642958643451396498
   - rid: 8642958643451396499
   - rid: 8642958643451396500
-  updateActions:
-  - {fileID: 0}
   UpdateActions:
   - rid: -2
-  exitActions:
-  - {fileID: 11400000, guid: 2d2ede8c60ae88540b1236d23e2593bb, type: 2}
-  - {fileID: 11400000, guid: 1f1221b5f26007c4889cbea05af64771, type: 2}
-  - {fileID: 11400000, guid: f6965e0eaa3b13e4196f346eff01ca0f, type: 2}
   ExitActions:
   - rid: 8642958643451396501
   - rid: 8642958643451396502
   - rid: 8642958643451396503
   actionSequence:
   - time: 0.1
-    action: {fileID: 11400000, guid: 6f31d4110f1af4641baeb5989f3e88f0, type: 2}
     Action:
       rid: 8642958643451396504
   - time: 0.1
-    action: {fileID: 11400000, guid: b858f92dbe65dc24aad92d5e2442ce86, type: 2}
     Action:
       rid: 8642958643451396505
   - time: 0.1
-    action: {fileID: 11400000, guid: 03710fb441c78374d9eed2e431948e9e, type: 2}
     Action:
       rid: 8642958643451396506
   loopActionSequence: 0
@@ -154,6 +138,8 @@ MonoBehaviour:
     - rid: 8642958643451396489
       type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
+        _trigger: {fileID: 52644548763046838, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
         _inputType: 23
     - rid: 8642958643451396490
       type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
@@ -161,6 +147,8 @@ MonoBehaviour:
     - rid: 8642958643451396491
       type: {class: PlayerInputDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
+        _trigger: {fileID: 52644548763046838, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+        _type: 0
         _inputType: 23
     - rid: 8642958643451396492
       type: {class: AnimationEndedDecision, ns: StateMachine, asm: Assembly-CSharp}

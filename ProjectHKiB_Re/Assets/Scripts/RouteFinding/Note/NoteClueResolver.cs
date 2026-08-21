@@ -13,12 +13,18 @@ namespace RouteFinding.Note
         public readonly string[] Keywords;
         public readonly CodexComment[] Comments;
 
-        public ResolvedClue(string name, string description, string[] keywords, CodexComment[] comments)
+        // 첨부물(사진/소리/맵). 유저가 노트·도감에서 직접 만든 단서(CodexUserEntry)는 파일을 고를
+        // 수단이 없어 항상 비어 있다 — 호출부는 둘을 구분하지 않고 그냥 개수만 보면 된다.
+        public readonly ClueAttachment[] Attachments;
+
+        public ResolvedClue(string name, string description, string[] keywords, CodexComment[] comments,
+            ClueAttachment[] attachments = null)
         {
             Name = name;
             Description = description;
             Keywords = keywords;
             Comments = comments;
+            Attachments = attachments ?? System.Array.Empty<ClueAttachment>();
         }
     }
 
@@ -32,7 +38,7 @@ namespace RouteFinding.Note
 
             var clue = MapGraph.Instance?.GetClue(id);
             if (clue != null)
-                return new ResolvedClue(clue.name, clue.description, clue.keywords, clue.comments);
+                return new ResolvedClue(clue.name, clue.description, clue.keywords, clue.comments, clue.attachments);
 
             var userEntry = CodexModule.Instance?.UserEntries.FirstOrDefault(u => u.guid == id);
             if (userEntry != null)

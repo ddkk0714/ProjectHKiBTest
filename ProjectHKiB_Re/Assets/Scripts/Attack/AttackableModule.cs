@@ -27,6 +27,7 @@ public interface IAttackable : IAttackableBase, IInitializable
     public void SetAttacker();
     public void StartAttackCooltime();
     public void SetAttackData(int attackNumber);
+    public void ApplyEffectAnimationData();
 
     public void Attack(int damageNumber);
 
@@ -114,6 +115,16 @@ public class AttackableModule : InterfaceModule, IAttackable
         ResetAccuracyDebuffAttackState();
         ResetSelfDamageState();
 
+        ApplyEffectAnimationData();
+    }
+
+    // EffectAnimationData를 damager의 이펙트 플레이어로 밀어 넣는다. 프로퍼티에 값만 넣는 건
+    // 아무 일도 하지 않으므로, 기어를 바꿀 때 이걸 불러 주지 않으면 새 기어가 이전 기어의
+    // 이펙트를 그대로 쓴다.
+    //
+    // Initialize에서 떼어낸 이유: Initialize를 다시 돌리면 버프 컨테이너까지 전부 초기화된다.
+    public void ApplyEffectAnimationData()
+    {
         if (damager != null)
             damager.SetAnimationData(EffectAnimationData, EffectSpriteLibrary);
     }
@@ -142,6 +153,22 @@ public class AttackableModule : InterfaceModule, IAttackable
 
     public void StartAttackCooltime()
     {
+        // 플래그를 세우기 전에 검사한다 — IsAttackCooltime을 내리는 건 타이머 콜백뿐이라,
+        // 플래그만 세워 놓고 아래에서 빠져나가면 영영 쿨타임이 안 풀린다.
+        if (AttackDatas == null || AttackDatas.Length == 0)
+        {
+            Debug.LogError("ERROR: AttackDatas is missing!!!");
+            return;
+        }
+
+        // AttackNumber는 캐릭터가 바뀌어도 남아 있는데 AttackDatas 길이는 캐릭터마다 다르다.
+        // SetAttackData가 인자를 다루는 방식과 똑같이 0으로 되돌린다.
+        if (AttackNumber < 0 || AttackNumber >= AttackDatas.Length)
+        {
+            Debug.LogError($"ERROR: AttackData[{AttackNumber}] is missing!!! Falling back to 0.");
+            AttackNumber = 0;
+        }
+
         IsAttackCooltime = true;
 
         _currentBaseAttackCooltime = AttackDatas[AttackNumber].coolTime;
@@ -233,8 +260,14 @@ public class AttackableModule : InterfaceModule, IAttackable
         damager.Damage();
     }
 
+    // Attack과 같은 가드가 필요하다. 이건 StopAttackEffectAction을 통해 State의 ExitActions에서도
+    // 불리는데(Delta_Roza_TransformStartState), StateController.ChangeState는 ExitState를 먼저 부르고
+    // 그 다음에 CurrentState를 바꾼다. 여기서 예외가 나면 상태 전환이 통째로 취소되어 떠나려던
+    // State에 영구히 갇힌다.
     public void StopEffect(int animPlayerNum)
     {
+        if (!damager) return;
+
         damager.StopEffect(animPlayerNum);
     }
 }

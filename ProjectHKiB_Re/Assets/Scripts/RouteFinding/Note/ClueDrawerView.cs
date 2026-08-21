@@ -160,6 +160,7 @@ namespace RouteFinding.Note
             content = string.IsNullOrEmpty(clue.content) ? clue.description : clue.content,
             keywords = clue.keywords,
             clueId  = clue.id,
+            attachments = clue.attachments ?? System.Array.Empty<ClueAttachment>(),
         };
 
         // [신설, 2026-07-21] 유저가 노트에서 직접 만든 단서 — clueId 자리에 CodexUserEntry.guid를 그대로
@@ -269,7 +270,15 @@ namespace RouteFinding.Note
         private void PopulateClueRow(GameObject rowGO, CodexEntry entry)
         {
             var tmp = rowGO.transform.Find("Text")?.GetComponent<TextMeshProUGUI>();
-            if (tmp != null) tmp.text = entry.title;
+            if (tmp != null)
+            {
+                // 첨부물이 있는 단서는 개수를 꼬리표로 붙인다 — 그래프에 놓기 전에도 "이 단서엔 사진/소리가
+                // 딸려 있다"는 걸 서랍에서 바로 알 수 있게(실제 내용은 노드로 펼쳐야 보인다).
+                int attachmentCount = entry.attachments?.Length ?? 0;
+                tmp.text = attachmentCount > 0
+                    ? $"{entry.title} <size=80%><color=#7FB2C8>[첨부 {attachmentCount}]</color></size>"
+                    : entry.title;
+            }
 
             var drag = rowGO.GetComponent<NoteClueDragHandle>();
             if (drag == null) drag = rowGO.AddComponent<NoteClueDragHandle>();

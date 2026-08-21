@@ -20,8 +20,9 @@ MonoBehaviour:
   description: 
   canStack: 0
   itemUseEvent: {fileID: 0}
+  playerBaseData: {fileID: 11400000, guid: 82fbca22083bfce408012b5521d2da73, type: 2}
   gearType: 1
-  stateMachine: {fileID: 11400000, guid: 47609f3cd80fb7a4baf9d1efb58ff385, type: 2}
+  stateMachine: {fileID: 11400000, guid: 52c9a2a4460fa1d4dbbd57f738f17f9a, type: 2}
   startStateName: Idle
   transformTime: 5
   baseBuff: {fileID: 0}

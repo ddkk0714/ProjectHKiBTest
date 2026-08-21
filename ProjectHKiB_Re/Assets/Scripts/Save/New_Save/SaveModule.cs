@@ -172,6 +172,10 @@ public class SaveModule : InterfaceModule, IInitializable
         var eventManager = GameManager.instance != null ? GameManager.instance.eventManager : null;
         if (eventManager != null) providers.Add(eventManager);
 
+        // 인터넷(읽은 게시글) — NoteModule/CodexModule처럼 자동 생성 싱글턴이라 주입 없이 붙는다.
+        // 획득한 단서는 RouteModule provider가 저장하므로 여기서는 읽음 상태만 다룬다.
+        if (InternetModule.Instance != null) providers.Add(InternetModule.Instance);
+
         return providers;
     }
 
