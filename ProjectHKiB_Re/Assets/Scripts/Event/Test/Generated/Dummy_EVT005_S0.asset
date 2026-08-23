@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: Dummy_EVT005_S0
+  m_EditorClassIdentifier: 
+  isPacked: 0
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0.17345227
+  transitions:
+  - name: "\uC870\uAC74 0"
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 6174889726336565361
+      negate: 0
+    trueState: {fileID: 11400000, guid: 90d78073be512634d9a29749a90f5c56, type: 2}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: "\uD0C0\uC784\uC544\uC6C3"
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 6174889726336565362
+      negate: 0
+    trueState: {fileID: 11400000, guid: 90d78073be512634d9a29749a90f5c56, type: 2}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 6174889726336565363
+  - rid: 6174889726336565364
+  - rid: 6174889726336565365
+  - rid: 6174889726336565366
+  UpdateActions: []
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 6174889726336565361
+      type: {class: DialogueLineEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 6174889726336565362
+      type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        key: Dummy_EVT005_S0_mark
+        seconds: 15
+    - rid: 6174889726336565363
+      type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        key: Dummy_EVT005_S0_mark
+    - rid: 6174889726336565364
+      type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mode: 3
+    - rid: 6174889726336565365
+      type: {class: DialogueStartAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 6174889726336565366
+      type: {class: DialogueShowLineAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        line:
+          name: "\uAE08\uBC1C"
+          characterName: "\uAE08\uBC1C"
+          sublines:
+          - "\u2026\uB0B4\uAC00 \uB108\uBB34 \uBA40\uB9AC \uC640 \uBC84\uB838\uC5B4.
+            \uC800 \uBA38\uB9AC\uCE74\uB77D\uC744 \uBA48\uCDB0\uC57C \uD574."
+          BG: {fileID: 0}
+          isChoice: 0
+          choices: []

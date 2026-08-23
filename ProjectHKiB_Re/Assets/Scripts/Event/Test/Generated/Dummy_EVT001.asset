@@ -157,11 +157,23 @@ MonoBehaviour:
               m_Calls: []
       - Key: Dummy_EVT001_S1_mark
         Value:
-          value: 0
+          value: 13335
           OnValueChanged:
             m_PersistentCalls:
               m_Calls: []
       - Key: Dummy_EVT002_S0_mark
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+      - Key: Dummy_EVT001_S2_mark
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+      - Key: Dummy_EVT001_S3_mark
         Value:
           value: 0
           OnValueChanged:
@@ -175,6 +187,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 43f1e6dfa53631c4aa039f6243fb8d5b, type: 2}
   - {fileID: 11400000, guid: a6f8f6c93c24135479d9c8f87b594d4f, type: 2}
   - {fileID: 11400000, guid: 9bcdfcb442ff618499bb762275223590, type: 2}
+  - {fileID: 11400000, guid: 33417e268270ff24786772fef92fd4a5, type: 2}
+  - {fileID: 11400000, guid: 7a8f3e5c9d2b4a16b7c8d9e0f1a2b3c4, type: 2}
   _commandPairs: []
   involvedEventTargets:
   - ID: Player
@@ -182,4 +196,6 @@ MonoBehaviour:
   - ID: NPC_A
     targetSearchType: 1
   - ID: NPC_B
+    targetSearchType: 1
+  - ID: CLIPPED_HAIR
     targetSearchType: 1

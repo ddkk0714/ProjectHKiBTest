@@ -15,11 +15,29 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.2761443
-  transitions: []
+  temporaryID: 0.1935716
+  transitions:
+  - name: "\uC870\uAC74 0"
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 6174889725805462513
+      negate: 0
+    trueState: {fileID: 11400000, guid: eded3c34a51fd0f4cb8d55606d45c398, type: 2}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889722702725264
+  - rid: 6174889725805462514
+  - rid: 6174889725805462515
+  - rid: 6174889725805462516
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -30,10 +48,25 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 6174889722702725264
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 6174889725805462513
+      type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: EVT004_BattleCleared
+    - rid: 6174889725805462514
+      type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: EVT004_BattleCleared
+        value: 0
+    - rid: 6174889725805462515
+      type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mode: 0
+    - rid: 6174889725805462516
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
-        label: "EVT-004 \uC9C4\uC785 \u2014 \uC5EC\uAE30\uBD80\uD130 \uC804\uD22C.
-          \uC804\uD22C \uAE30\uBBF9(\uD328\uB9C1/\uBC18\uC0AC/\uADF8\uB85C\uAE30/\uAC01\uC131)\uC740
+        label: "EVT-004 \uC9C4\uC785 \u2014 \uC804\uD22C \uB2F4\uB2F9\uC740 EventManager.SetBoolParameterTrue(\"EVT004_BattleCleared\")\uB85C
+          \uC644\uB8CC\uB97C \uC54C\uB824 \uC8FC\uC138\uC694. \uD328\uB9C1/\uBC18\uC0AC/\uADF8\uB85C\uAE30/\uAC01\uC131\uC740
           \uBCC4\uB3C4 \uB2F4\uB2F9"
         completeBoolName: 

@@ -16,6 +16,9 @@ using UnityEngine;
 /// </summary>
 public class EventSystemTestbed : MonoBehaviour
 {
+    private const string Evt004BattleCleared = "EVT004_BattleCleared";
+    private const string Evt006BattleCleared = "EVT006_BattleCleared";
+
     [Header("진행도 플래그")]
     [SerializeField] private EventFlagSO _doodFlag;
     [SerializeField] private int _doodValue;
@@ -94,6 +97,45 @@ public class EventSystemTestbed : MonoBehaviour
         Debug.Log("[Testbed] 플레이 모드 — 조작과 UI 토글이 모두 복구되어야 정상입니다.");
     }
 
+    // ─── 전투 완료 신호 ───────────────────────────────────────────
+
+    [Button("EVT-004: 전투 승리 완료 신호")]
+    private void CompleteEvt004Battle() => SignalBattleCleared(Evt004BattleCleared, "EVT-004");
+
+    [Button("EVT-006: 전투 승리 완료 신호")]
+    private void CompleteEvt006Battle() => SignalBattleCleared(Evt006BattleCleared, "EVT-006");
+
+    private void SignalBattleCleared(string parameterName, string eventName)
+    {
+        if (!Application.isPlaying)
+        {
+            Debug.LogWarning("[Testbed] 플레이 모드에서만 전투 완료 신호를 보낼 수 있습니다.");
+            return;
+        }
+
+        EventManager eventManager = GameManager.instance ? GameManager.instance.eventManager : null;
+        if (eventManager == null)
+        {
+            Debug.LogWarning("[Testbed] EventManager가 없어 전투 완료 신호를 보낼 수 없습니다.");
+            return;
+        }
+
+        if (!eventManager.IsEventRunning)
+        {
+            Debug.LogWarning($"[Testbed] 진행 중인 이벤트가 없습니다. {eventName}이 전투 완료를 기다리는 동안에만 누르세요.");
+            return;
+        }
+
+        if (!eventManager.customVariables.boolVariables.ContainsKey(parameterName))
+        {
+            Debug.LogWarning($"[Testbed] 현재 이벤트는 {eventName} 전투 완료 신호를 기다리지 않습니다.");
+            return;
+        }
+
+        eventManager.SetBoolParameterTrue(parameterName);
+        Debug.Log($"[Testbed] {eventName} 전투 승리 완료 신호를 보냈습니다.");
+    }
+
     // ─── 진행도 플래그 ───────────────────────────────────────────
 
     [Button("플래그: 지정 값으로 세팅")]
@@ -153,6 +195,59 @@ public class EventSystemTestbed : MonoBehaviour
         var sb = new StringBuilder($"[Testbed] 획득 단서 {acquired.Count}개\n");
         foreach (string id in acquired) sb.AppendLine("  " + id);
         Debug.Log(sb.ToString());
+    }
+
+    // ─── 기어 ────────────────────────────────────────────────────
+
+    [Button("기어: 전부 잃어버리기")]
+    private void ClearAllGears()
+    {
+        if (!Application.isPlaying)
+        {
+            Debug.LogWarning("[Testbed] 플레이 모드에서만 기어를 초기화할 수 있습니다.");
+            return;
+        }
+
+        InventoryManager inventory = GameManager.instance ? GameManager.instance.inventoryManager : null;
+        if (inventory == null)
+        {
+            Debug.LogWarning("[Testbed] InventoryManager가 없어 기어를 초기화할 수 없습니다.");
+            return;
+        }
+
+        GearManager gearManager = GameManager.instance.gearManager;
+        int unequipped = 0;
+        if (gearManager != null)
+        {
+            if (gearManager.activeGear != null && gearManager.activeGear.Count > 0)
+                gearManager.DeactivateAllGears();
+
+            if (gearManager.playerCardEquipData != null)
+            {
+                for (int cardIndex = 0; cardIndex < gearManager.playerCardEquipData.Count; cardIndex++)
+                {
+                    Card card = gearManager.playerCardEquipData[cardIndex];
+                    if (card == null || card.GearList == null) continue;
+
+                    for (int slotIndex = 0; slotIndex < card.GearList.Length; slotIndex++)
+                    {
+                        Gear gear = card.GearList[slotIndex];
+                        if (gear != null && gear.data != null)
+                        {
+                            gear.UnequipTo(cardIndex);
+                            unequipped++;
+                        }
+                        card.GearList[slotIndex] = new Gear(null);
+                    }
+                }
+                gearManager.OnSetCardData?.Invoke();
+            }
+        }
+
+        int removed = inventory.playerGearInventory.Count;
+        inventory.playerGearInventory.Clear();
+        inventory.OnGearInventoryChanged?.Invoke();
+        Debug.Log($"[Testbed] 기어 {removed}개를 전부 잃었습니다. 장착 슬롯 {unequipped}개도 비웠습니다.");
     }
 
     // ─── 해몽 ────────────────────────────────────────────────────

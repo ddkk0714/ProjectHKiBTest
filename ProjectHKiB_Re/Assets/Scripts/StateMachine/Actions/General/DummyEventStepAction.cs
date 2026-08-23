@@ -23,7 +23,10 @@ namespace StateMachine
             string elapsed = stateController is EventManager eventManager
                 ? $" [+{Time.unscaledTime - eventManager.EventStartedAtUnscaled:0.00}s]"
                 : "";
-            Debug.LogWarning($"[더미 연출]{elapsed} {label} — 아직 구현되지 않은 단계입니다. 즉시 완료 처리합니다.");
+            string completion = string.IsNullOrEmpty(completeBoolName)
+                ? "완료 신호를 기다립니다."
+                : $"'{completeBoolName}'를 true로 설정해 즉시 완료 처리합니다.";
+            Debug.LogWarning($"[더미 연출]{elapsed} {label} — 아직 구현되지 않은 단계입니다. {completion}");
 
             if (!string.IsNullOrEmpty(completeBoolName))
                 stateController.SetBoolParameterTrue(completeBoolName);

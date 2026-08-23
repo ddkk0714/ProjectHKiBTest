@@ -1,6 +1,13 @@
 using UnityEngine;
 namespace StateMachine
 {
+    public enum MapEntryPlacementMode
+    {
+        Automatic,
+        NamedEntry,
+        CustomPosition,
+    }
+
     // 이벤트 연출 도중 맵을 갈아끼운다 — 꿈↔현실 전환, 사망 시 강제 복귀 등.
     // 이 액션이 생기기 전까지 MapManager.LoadMap()을 부르는 곳은 RouteFindingMapBridge/SaveModule/
     // MapChangeManager뿐이라, 상태 기계에서는 맵을 바꿀 방법이 아예 없었다.
@@ -17,6 +24,11 @@ namespace StateMachine
         public MapDataSO mapData;
         public MapDataRegistrySO registry;
         public string mapAddressableID;
+        public MapEntryPlacementMode entryPlacement = MapEntryPlacementMode.Automatic;
+        public string entryPointId;
+        public Vector3 customEntryPosition;
+        public bool overrideEntryDirection;
+        public EnumManager.AnimDir entryDirection;
 
         public override void Act(StateController stateController)
         {
@@ -27,6 +39,30 @@ namespace StateMachine
             {
                 Debug.LogError($"ERROR: ChangeMapAction - 목적지 맵을 찾을 수 없습니다 (mapAddressableID: '{mapAddressableID}').");
                 return;
+            }
+
+            if (GameManager.instance == null || GameManager.instance.mapManager == null)
+            {
+                Debug.LogError("ERROR: ChangeMapAction - MapManager is missing.");
+                return;
+            }
+
+            if (entryPlacement != MapEntryPlacementMode.Automatic)
+            {
+                MapStartPosPlacer placer = MapStartPosPlacer.Instance;
+                if (placer == null)
+                {
+                    Debug.LogWarning("[ChangeMapAction] MapStartPosPlacer is missing; using the default map entry.");
+                }
+                else
+                {
+                    placer.RequestNextPlacement(
+                        entryPlacement,
+                        entryPointId,
+                        customEntryPosition,
+                        overrideEntryDirection,
+                        entryDirection);
+                }
             }
 
             GameManager.instance.mapManager.LoadMap(target);

@@ -15,9 +15,9 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.12587
+  temporaryID: 0.6346883
   transitions:
-  - name: "\uD0C0\uC784\uC544\uC6C3"
+  - name: "\uC870\uAC74 0"
     activationInput: 10
     trigger: {fileID: 0}
     type: 0
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889722702725196
+        rid: 6174889725805462482
       negate: 0
     trueState: {fileID: 11400000, guid: 9bcdfcb442ff618499bb762275223590, type: 2}
     falseState: {fileID: 0}
@@ -35,9 +35,9 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889722702725197
-  - rid: 6174889722702725198
-  - rid: 6174889722702725199
+  - rid: 6174889725805462483
+  - rid: 6174889725805462484
+  - rid: 6174889725805462485
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -50,23 +50,30 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889722702725196
-      type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
+    - rid: 6174889725805462482
+      type: {class: TargetProximityInputDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
-        key: Dummy_EVT001_S1_mark
-        seconds: 1.5
-    - rid: 6174889722702725197
-      type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
-      data:
-        key: Dummy_EVT001_S1_mark
-    - rid: 6174889722702725198
+        targetID: CLIPPED_HAIR
+        radius: 0.85
+        inputType: 9
+    - rid: 6174889725805462483
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
-        label: "EVT-001 S1 \uBA38\uB9AC\uCE74\uB77D \uD30C\uD2F0\uD074 (\uC544\uD2B8
-          \uC5C6\uC74C) + \uB2E8\uC11C \uD68D\uB4DD"
+        label: "EVT-001 S1 \uC798\uB824 \uB098\uAC04 \uBA38\uB9AC\uCE74\uB77D \uC0DD\uC131
+          \u2014 \uAC00\uAE4C\uC774 \uAC00\uC11C \uD655\uC778 \uD0A4\uB97C \uB204\uB974\uBA74
+          \uB2E8\uC11C\uB97C \uC2B5\uB4DD\uD569\uB2C8\uB2E4"
         completeBoolName: 
-    - rid: 6174889722702725199
-      type: {class: AcquireClueAction, ns: StateMachine, asm: Assembly-CSharp}
+    - rid: 6174889725805462484
+      type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
-        clueId: dummy-clue-wing
-        openCodexImmediately: 0
+        targetID: CLIPPED_HAIR
+        targetAction:
+          rid: 6174889725805462486
+    - rid: 6174889725805462485
+      type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mode: 0
+    - rid: 6174889725805462486
+      type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        active: 1

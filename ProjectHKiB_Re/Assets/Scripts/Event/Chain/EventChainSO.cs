@@ -59,6 +59,7 @@ public class EventDefinition
     // 위 preconditionDesc가 "dood == 1"이라고 서술하면 여기에 그 판정을 실제로 걸어야 발동한다 —
     // 서술은 사람이 읽는 것, 이 배열은 게임이 판정하는 것이라 둘은 손으로 맞춰야 한다.
     public GameStateEvent.EventFlagCondition[] preconditions = Array.Empty<GameStateEvent.EventFlagCondition>();
+    public string[] requiredClueIds = Array.Empty<string>();
 
     // 위 startTriggerDesc(서술)를 실제로 판정하는 콜라이더 트리거. None이면 프리팹에 GameStateEvent만
     // 있고, 씬에서 EventSystemTestbed처럼 코드로 TriggerEvent()를 직접 불러야 한다 — 예전엔 이게

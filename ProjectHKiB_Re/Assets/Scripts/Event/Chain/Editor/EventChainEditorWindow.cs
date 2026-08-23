@@ -24,19 +24,23 @@ public class EventChainEditorWindow : EditorWindow
 {
     private const string OutputFolder = "Assets/Scripts/Event/Test/Generated";
     private const string FlagFolder = "Assets/ScriptableObjects/EventFlags";
+    private const string GearFolder = "Assets/Resources/Items/Gears";
     private const float DialogueTimeout = 15f;
 
-    // 샘플 데이터(EVT-001~004)가 쓰는 대상 ID/단서 ID. 실제 콘텐츠를 만들 때는 이 창에서
+    // 샘플 데이터(EVT-001~006)가 쓰는 대상 ID/단서 ID. 실제 콘텐츠를 만들 때는 이 창에서
     // targets/enterActions를 직접 편집하면 되고, 이 상수들은 "샘플 채우기" 전용이다.
     private const string PlayerTargetID = "Player";
     private const string NpcATargetID = "NPC_A";
     private const string NpcBTargetID = "NPC_B";
+    private const string ExitDoorTargetID = "EXIT_DOOR";
+    private const string HairClueTargetID = "CLIPPED_HAIR";
+    private const string Evt004BattleCleared = "EVT004_BattleCleared";
+    private const string Evt006BattleCleared = "EVT006_BattleCleared";
     // clues.json 전용 더미 항목(dummy-clue-*) — 실제 맵/이벤트키에 매이지 않고 순수하게
     // 이벤트 체인 + 해몽 판정을 테스트하기 위한 것. reading_dummy_test(DreamReadings.asset)의
     // requiredClueIds와 짝을 맞춰야 한다.
     private const string DummyClueWingId = "dummy-clue-wing";
     private const string DummyClueEyeId = "dummy-clue-eye";
-
     // 플레이어 body 스프라이트가 쓰는 정렬 레이어. 더미 NPC도 같은 값이라야 캐릭터와 같은 깊이에 선다.
     private const string EntitySortingLayer = "Entity";
 
@@ -117,7 +121,7 @@ public class EventChainEditorWindow : EditorWindow
             }
         }
 
-        if (GUILayout.Button("샘플(EVT-001~004) 채우기", EditorStyles.toolbarButton, GUILayout.Width(190f)))
+        if (GUILayout.Button("샘플(EVT-001~006) 채우기", EditorStyles.toolbarButton, GUILayout.Width(190f)))
             FillSampleChain();
 
         if (GUILayout.Button("빌드", EditorStyles.toolbarButton, GUILayout.Width(60f)))
@@ -188,6 +192,7 @@ public class EventChainEditorWindow : EditorWindow
             added.FindPropertyRelative("narrativeContent").stringValue = "";
             added.FindPropertyRelative("targets").ClearArray();
             added.FindPropertyRelative("preconditions").ClearArray();
+            added.FindPropertyRelative("requiredClueIds").ClearArray();
             added.FindPropertyRelative("triggerKind").enumValueIndex = (int)EventTriggerKind.None;
             added.FindPropertyRelative("triggerRadius").floatValue = 1.5f;
             added.FindPropertyRelative("triggerInputType").enumValueIndex = (int)EnumManager.InputType.OnConfirm;
@@ -241,21 +246,24 @@ public class EventChainEditorWindow : EditorWindow
     }
 
     private static bool IsSampleEventId(string eventId) =>
-        eventId is "Dummy_EVT001" or "Dummy_EVT002" or "Dummy_EVT003" or "Dummy_EVT004";
+        eventId is "Dummy_EVT001" or "Dummy_EVT002" or "Dummy_EVT003" or "Dummy_EVT004"
+            or "Dummy_EVT005" or "Dummy_EVT006";
 
     // "샘플로 채우기"가 통째로 4개를 다 덮어쓰는 것과 달리, 실수로 값을 고쳤을 때 그 이벤트
     // 하나만 원래대로 되돌리는 안전장치 — 다른 이벤트에 이미 해 둔 편집은 건드리지 않는다.
     private void ResetSelectedEventToSample(string eventId)
     {
         EventFlagSO dood = LoadFlag("Dood");
-        EventFlagSO emotionMerge = LoadFlag("FLAG_EMOTION_MERGE");
+        GearDataSO lilyGear = LoadGear("Lily GearData");
 
         EventDefinition sample = eventId switch
         {
             "Dummy_EVT001" => BuildEvt001Sample(dood),
             "Dummy_EVT002" => BuildEvt002Sample(dood, EnsureBossMachine()),
             "Dummy_EVT003" => BuildEvt003Sample(dood),
-            "Dummy_EVT004" => BuildEvt004Sample(dood, emotionMerge),
+            "Dummy_EVT004" => BuildEvt004Sample(dood),
+            "Dummy_EVT005" => BuildEvt005Sample(dood, lilyGear),
+            "Dummy_EVT006" => BuildEvt006Sample(dood, lilyGear),
             _ => null,
         };
         if (sample == null) return;
@@ -304,6 +312,7 @@ public class EventChainEditorWindow : EditorWindow
         EditorGUILayout.BeginVertical(GUI.skin.box);
 
         EditorGUILayout.PropertyField(eventProp.FindPropertyRelative("preconditions"), new GUIContent("발동 조건 (플래그)"), true);
+        EditorGUILayout.PropertyField(eventProp.FindPropertyRelative("requiredClueIds"), new GUIContent("발동 조건 (획득 단서)"), true);
         EditorGUILayout.PropertyField(eventProp.FindPropertyRelative("targets"), new GUIContent("이벤트 대상"), true);
 
         EditorGUILayout.Space(4f);
@@ -513,11 +522,17 @@ public class EventChainEditorWindow : EditorWindow
         // MarkUnscaledTimeAction이 쓰는 커스텀 int 이름들. 미리 선언해 두지 않으면 실행 중
         // StateController.SetIntParameter가 "Generated missing variable" 경고를 매번 찍는다.
         var markKeys = new List<string>();
+        // 전투 담당이 EventManager에 세우는 완료 bool도 생성 에셋에 미리 선언한다. StateController는
+        // customVariables를 SO에서 참조로 가져가므로, 이 값을 이벤트 시작 State에서 false로 되돌려야
+        // 이전 플레이의 true가 다음 실행을 즉시 통과시키지 않는다.
+        var boolKeys = new HashSet<string>();
 
         for (int i = 0; i < slots.Count; i++)
         {
             BuildSlot slot = slots[i];
             StateSO state = states[i];
+
+            CollectCustomBoolKeys(slot.actions, slot.advance, boolKeys);
 
             state.EnterActions = slot.actions.ToArray();
             state.UpdateActions = Array.Empty<StateAction>();
@@ -570,6 +585,7 @@ public class EventChainEditorWindow : EditorWindow
         evt.initialState = states[0];
         evt.involvedEventTargets = def.targets ?? Array.Empty<EventTargetSearchInfo>();
         DeclareMarkVariables(evt, markKeys);
+        DeclareBoolVariables(evt, boolKeys);
         evt.UpdateStateMachine();
         EditorUtility.SetDirty(evt);
 
@@ -651,6 +667,35 @@ public class EventChainEditorWindow : EditorWindow
             evt.customVariables.intVariables[key] = new CustomVariable<int>();
     }
 
+    // 샘플/저작 데이터 안에서 쓰는 CustomBool을 찾아 빌드 결과의 StateMachineSO에 기본 false로
+    // 기록한다. 따로 선언하지 않아도 런타임이 생성해 주지만, 그 경우 경고가 남고 플레이 중 true가
+    // 에셋에 잔류하기도 한다.
+    private static void CollectCustomBoolKeys(IEnumerable<StateAction> actions, IEnumerable<StateDecision> decisions,
+        ISet<string> keys)
+    {
+        foreach (StateAction action in actions ?? Array.Empty<StateAction>())
+        {
+            if (action is SetCustomBoolAction customAction && !string.IsNullOrWhiteSpace(customAction.boolName))
+                keys.Add(customAction.boolName);
+            else if (action is DummyEventStepAction dummyAction && !string.IsNullOrWhiteSpace(dummyAction.completeBoolName))
+                keys.Add(dummyAction.completeBoolName);
+        }
+
+        foreach (StateDecision decision in decisions ?? Array.Empty<StateDecision>())
+            if (decision is CustomBoolDecision customDecision && !string.IsNullOrWhiteSpace(customDecision.boolName))
+                keys.Add(customDecision.boolName);
+    }
+
+    private static void DeclareBoolVariables(EventSO evt, IEnumerable<string> boolKeys)
+    {
+        evt.customVariables ??= new CustomVariableSets();
+        evt.customVariables.boolVariables ??=
+            new AYellowpaper.SerializedCollections.SerializedDictionary<string, CustomVariable<bool>>();
+
+        foreach (string key in boolKeys)
+            evt.customVariables.boolVariables[key] = new CustomVariable<bool> { Value = false };
+    }
+
     private static StateTransition Transition(string name, StateDecision decision, StateSO trueState)
     {
         return new StateTransition
@@ -720,6 +765,15 @@ public class EventChainEditorWindow : EditorWindow
             element.FindPropertyRelative("flag").objectReferenceValue = valid[i].flag;
             element.FindPropertyRelative("value").intValue = valid[i].value;
         }
+
+        string[] clueIds = (def.requiredClueIds ?? Array.Empty<string>())
+            .Where(id => !string.IsNullOrWhiteSpace(id))
+            .Distinct()
+            .ToArray();
+        SerializedProperty clueIdsProp = serialized.FindProperty("_requiredClueIds");
+        clueIdsProp.arraySize = clueIds.Length;
+        for (int i = 0; i < clueIds.Length; i++)
+            clueIdsProp.GetArrayElementAtIndex(i).stringValue = clueIds[i];
 
         GameEventTrigger trigger = ConfigureSceneTrigger(root, def);
         serialized.FindProperty("_trigger").objectReferenceValue = trigger;
@@ -831,6 +885,7 @@ public class EventChainEditorWindow : EditorWindow
         }
         Scene mapScene = mapLocal.gameObject.scene;
 
+        RemoveObsoleteDemoObjects(mapScene);
         EnsureFolderFor($"{OutputFolder}/_");
         Sprite box = EnsureDummyBoxSprite();
 
@@ -847,6 +902,20 @@ public class EventChainEditorWindow : EditorWindow
         // 금발=노란빛, 백발=흰빛 — 실제 캐릭터가 들어오기 전까지 구분용.
         EnsureDummyNpc(NpcATargetID, "DummyNPC_NPC_A", box, new Color(0.85f, 0.75f, 0.25f), center + new Vector3(-0.75f, 0f, 0f), mapScene);
         EnsureDummyNpc(NpcBTargetID, "DummyNPC_NPC_B", box, new Color(0.92f, 0.92f, 0.92f), center + new Vector3(0.75f, 0f, 0f), mapScene);
+        // EVT-006이 완료될 때만 켜는 탈출문. EventControllableEntity로 만들어야 이벤트 액션이
+        // 활성/비활성을 직접 바꿀 수 있다. AutoFind 전에만 잠시 켜서 MapLocalManager의 대상
+        // 목록에 등록하고, 아래에서 다시 꺼 둔다.
+        GameObject exitDoor = EnsureDummyNpc(ExitDoorTargetID, "DummyProp_ExitDoor", box,
+            new Color(0.7f, 0.85f, 1f), center + new Vector3(0f, 2.5f, 0f), mapScene);
+        exitDoor.transform.localScale = new Vector3(2f, 3f, 1f);
+        exitDoor.SetActive(true);
+
+        // EVT-001의 가위질이 끝날 때만 켜지는 상호작용 대상. AutoFind 전에만 잠시 켜서
+        // MapLocalManager의 이벤트 대상 목록에 등록하고, 아래에서 다시 꺼 둔다.
+        GameObject hair = EnsureDummyNpc(HairClueTargetID, "DummyProp_ClippedHair", box,
+            new Color(0.72f, 0.53f, 0.26f), center + new Vector3(0f, -0.85f, 0f), mapScene);
+        hair.transform.localScale = new Vector3(0.9f, 0.3f, 1f);
+        hair.SetActive(true);
 
         // 트리거끼리 정확히 겹쳐 놓으면 씬 뷰에서 하나씩 집어 옮기기가 어렵다 — 조금씩 어긋나게 둔다.
         // EVT-001/002는 꿈 맵에 둔다(금발/백발과 만나는 곳).
@@ -856,6 +925,14 @@ public class EventChainEditorWindow : EditorWindow
         // EVT-004(전투)는 기획서상 "중앙 집터로 재진입" — 꿈에서 벌어지므로 꿈 맵에 둔다.
         // EVT-003이 해몽을 마치고 꿈으로 되돌려 보내면 그때 이 트리거가 받는다.
         EnsureTriggerInstance("Dummy_EVT004_Trigger", center + new Vector3(0f, -2.4f, 0f), mapScene);
+
+        // EVT-005 최초 대화와 재대화는 동일한 금발 위치에 Input 트리거를 겹친다. Dood 조건이
+        // 서로 배타적(2 / 3)이므로 확인 키 한 번에 둘 다 시작되지 않는다.
+        Vector3 blondePosition = center + new Vector3(-0.75f, 0f, 0f);
+        EnsureTriggerInstance("Dummy_EVT005_Trigger", blondePosition, mapScene);
+
+        // EVT-006은 백발과 대화 시도에서 시작한다.
+        EnsureTriggerInstance("Dummy_EVT006_Trigger", center + new Vector3(0.75f, 0f, 0f), mapScene);
 
         // EVT-003은 **현실 맵**에 둔다 — "현실의 방 침대 옆 책상 위에 놓인 노트와 상호작용".
         // 눈에 보이는 책상 프롭을 하나 세우고 트리거를 그 자리에 겹쳐 둬서, 뭘 향해 확인 키를
@@ -881,6 +958,10 @@ public class EventChainEditorWindow : EditorWindow
         WriteExitInitInfos(mapLocal);
 
         mapLocal.AutoFindEventTargets();
+        exitDoor.SetActive(false);
+        EditorUtility.SetDirty(exitDoor);
+        hair.SetActive(false);
+        EditorUtility.SetDirty(hair);
         EditorUtility.SetDirty(mapLocal);
         Debug.Log($"[EventChainEditorWindow] '{mapScene.name}'의 MapLocalManager.allEventTargets에 " +
                   $"더미 NPC를 등록했습니다: [{string.Join(", ", mapLocal.allEventTargets.targetEntities.Keys)}]");
@@ -889,16 +970,20 @@ public class EventChainEditorWindow : EditorWindow
         {
             ["DummyNPC_NPC_A"] = mapScene,
             ["DummyNPC_NPC_B"] = mapScene,
+            ["DummyProp_ClippedHair"] = mapScene,
             ["Dummy_EVT001_Trigger"] = mapScene,
             ["Dummy_EVT002_Trigger"] = mapScene,
             ["Dummy_EVT004_Trigger"] = mapScene,
+            ["Dummy_EVT005_Trigger"] = mapScene,
+            ["Dummy_EVT006_Trigger"] = mapScene,
+            ["DummyProp_ExitDoor"] = mapScene,
             ["Dummy_EVT003_Trigger"] = realScene,
             ["DummyProp_Desk"] = realScene,
         };
         WarnAboutStraysInOtherScenes(expected);
 
         EditorSceneManager.MarkSceneDirty(mapScene);
-        Debug.Log($"[EventChainEditorWindow] 꿈 맵 '{mapScene.name}' {center} 근처에 더미 NPC 2개 + EVT-001/002 트리거를 " +
+        Debug.Log($"[EventChainEditorWindow] 꿈 맵 '{mapScene.name}' {center} 근처에 더미 NPC 2개 + EVT-001~006 트리거와 비활성 탈출문을 " +
                   "배치했습니다(Hierarchy에서 DummyNPC_* 를 더블클릭하면 그 위치로 이동합니다). Ctrl+S로 저장하세요.\n" +
                   "플레이는 System 씬에서 시작해야 합니다(GameManager/EventManager/대화 패널이 거기 있고, " +
                   "맵 씬은 MapManager가 Addressables로 얹습니다). 다시 눌러도 같은 오브젝트를 재사용합니다.");
@@ -909,7 +994,8 @@ public class EventChainEditorWindow : EditorWindow
     // 맵 복원 정보(MapDataSO.allEntityInitInfos)에 남긴다.
     //
     // dood 값마다 항목을 따로 넣는 이유: EventManager.HasEventFlag가 정확히 일치하는 값만 참이라,
-    // "1 이상"을 한 항목으로 표현할 수 없다. 퇴장 이후에 나올 수 있는 값들을 나열해 둔다.
+    // "1 이상"을 한 항목으로 표현할 수 없다. EVT-004 완료 뒤 금발과 재대화해야 하므로 1/2에서만
+    // 감추고, 3 이후의 예전 비활성 복원값은 지워 맵 재진입 때 기본 활성 상태로 복원한다.
     private static void WriteExitInitInfos(MapLocalManager mapLocal)
     {
         if (mapLocal.mapData == null) return;
@@ -924,7 +1010,7 @@ public class EventChainEditorWindow : EditorWindow
             mapLocal.mapData.allEntityInitInfos[NpcATargetID] = infos;
         }
 
-        for (int doodValue = 1; doodValue <= 5; doodValue++)
+        for (int doodValue = 1; doodValue <= 2; doodValue++)
         {
             int existing = infos.FindIndex(a => a.eventFlag == dood && a.eventFlagCondition == doodValue);
             var info = new EntityInitializeInfo
@@ -938,9 +1024,11 @@ public class EventChainEditorWindow : EditorWindow
             else infos.Add(info);
         }
 
+        infos.RemoveAll(a => a.eventFlag == dood && a.eventFlagCondition >= 3);
+
         EditorUtility.SetDirty(mapLocal.mapData);
         Debug.Log($"[EventChainEditorWindow] '{mapLocal.mapData.name}'에 금발(NPC_A) 퇴장 복원 정보를 " +
-                  "기록했습니다(dood 1~5에서 비활성) — 현실에 갔다 돌아와도 다시 나타나지 않습니다.");
+                  "기록했습니다(dood 1~2에서 비활성, dood 3+에서 재대화 가능) — 현실에 갔다 돌아온 뒤에도 진행도와 맞춥니다.");
     }
 
     // 이벤트 대상이 아니라 "여기서 상호작용하라"를 보여주기만 하는 눈에 보이는 표식.
@@ -1001,37 +1089,108 @@ public class EventChainEditorWindow : EditorWindow
 
     // 트리거 프리팹을 씬 인스턴스로 놓는다 — PrefabUtility.InstantiatePrefab을 써야 "빌드"로 프리팹
     // 내용이 갱신될 때 씬의 인스턴스도 같이 따라간다(일반 Instantiate는 그 연결이 끊긴다).
-    private static void EnsureTriggerInstance(string prefabName, Vector3 position, Scene scene)
+    private static GameObject EnsureTriggerInstance(string prefabName, Vector3 position, Scene scene)
     {
         string path = $"{OutputFolder}/{prefabName}.prefab";
         GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
         if (prefab == null)
         {
             Debug.LogWarning($"[EventChainEditorWindow] '{path}'가 아직 없습니다 — 먼저 '빌드'를 누르세요.");
-            return;
+            return null;
         }
 
         GameObject existing = FindInScene(prefabName, scene);
         if (existing != null)
         {
             existing.transform.position = position;
-            return;
+            return existing;
         }
 
         GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, scene);
         instance.name = prefabName;
         instance.transform.position = position;
         Undo.RegisterCreatedObjectUndo(instance, "더미 트리거 배치");
+        return instance;
+    }
+
+    private static void AttachTriggerToTarget(GameObject trigger, Transform target)
+    {
+        if (trigger == null || target == null) return;
+
+        trigger.transform.SetParent(target, true);
+        trigger.transform.localPosition = Vector3.zero;
     }
 
     // GameObject.Find는 열려 있는 모든 씬을 뒤진다 — System 씬에 잘못 놔둔 예전 오브젝트를 집어
-    // 그걸 옮겨버리면, 정작 맵 씬엔 아무것도 안 생기고 같은 문제가 반복된다. 씬을 좁혀서 찾는다.
+    // 그걸 옮겨버리면, 정작 맵 씬엔 아무것도 안 생기고 같은 문제가 반복된다. 씬을 좁혀서 찾되,
+    // EVT-006 탈출 트리거처럼 비활성 부모(탈출문) 아래에 둔 자식도 재배치 시 재사용할 수 있게
+    // 하위 계층까지 포함한다.
     private static GameObject FindInScene(string name, Scene scene)
     {
         if (!scene.IsValid()) return null;
         foreach (GameObject root in scene.GetRootGameObjects())
+        {
             if (root.name == name) return root;
+            foreach (Transform child in root.GetComponentsInChildren<Transform>(true))
+                if (child.name == name) return child.gameObject;
+        }
         return null;
+    }
+
+    private static void RemoveObsoleteDemoObjects(Scene scene)
+    {
+        string[] obsoleteNames =
+        {
+            "Dummy_EVT001_Hair01_Trigger",
+            "Dummy_EVT001_Hair02_Trigger",
+            "Dummy_EVT001_Hair03_Trigger",
+            "DummyProp_ClippedHair_01",
+            "DummyProp_ClippedHair_02",
+            "DummyProp_ClippedHair_03",
+            "Dummy_EVT005_ReTalk_Trigger",
+            "Dummy_EVT006_Exit_Trigger",
+        };
+
+        foreach (string objectName in obsoleteNames)
+        {
+            GameObject obsolete = FindInScene(objectName, scene);
+            if (obsolete != null) Undo.DestroyObjectImmediate(obsolete);
+        }
+    }
+
+    private static void RemoveObsoleteGeneratedAssets()
+    {
+        string[] obsoleteAssetNames =
+        {
+            "Dummy_EVT001_Hair01.asset",
+            "Dummy_EVT001_Hair01_S0.asset",
+            "Dummy_EVT001_Hair01_S1.asset",
+            "Dummy_EVT001_Hair01_Trigger.prefab",
+            "Dummy_EVT001_Hair02.asset",
+            "Dummy_EVT001_Hair02_S0.asset",
+            "Dummy_EVT001_Hair02_S1.asset",
+            "Dummy_EVT001_Hair02_Trigger.prefab",
+            "Dummy_EVT001_Hair03.asset",
+            "Dummy_EVT001_Hair03_S0.asset",
+            "Dummy_EVT001_Hair03_S1.asset",
+            "Dummy_EVT001_Hair03_Trigger.prefab",
+            "Dummy_EVT005_ReTalk.asset",
+            "Dummy_EVT005_ReTalk_S0.asset",
+            "Dummy_EVT005_ReTalk_S1.asset",
+            "Dummy_EVT005_ReTalk_S2.asset",
+            "Dummy_EVT005_ReTalk_Trigger.prefab",
+            "Dummy_EVT006_Exit.asset",
+            "Dummy_EVT006_Exit_S0.asset",
+            "Dummy_EVT006_Exit_S1.asset",
+            "Dummy_EVT006_Exit_Trigger.prefab",
+        };
+
+        foreach (string assetName in obsoleteAssetNames)
+        {
+            string assetPath = $"{OutputFolder}/{assetName}";
+            if (AssetDatabase.LoadMainAssetAtPath(assetPath) != null)
+                AssetDatabase.DeleteAsset(assetPath);
+        }
     }
 
     // 다른 씬(주로 System)에 같은 이름으로 남아 있는 예전 배치본을 알린다 — 그대로 두면 트리거가
@@ -1087,7 +1246,7 @@ public class EventChainEditorWindow : EditorWindow
         return AssetDatabase.LoadAssetAtPath<Sprite>(path);
     }
 
-    // ─── 샘플 데이터(EVT-001~004) 채우기 ───────────────────────────
+    // ─── 샘플 데이터(EVT-001~006) 채우기 ───────────────────────────
     // EventDummyGenerator.cs(폐기)가 하드코딩하던 것을 데이터로 옮긴 것. 빈 체인에서 시작하는
     // 대신 참고용으로 눌러볼 수 있게 남겨뒀다 — 다음부터 이 창이 실제 이벤트 저작 경로다.
 
@@ -1096,8 +1255,9 @@ public class EventChainEditorWindow : EditorWindow
         if (_chain == null) return;
 
         EnsureFolderFor($"{OutputFolder}/_");
+        RemoveObsoleteGeneratedAssets();
         EventFlagSO dood = LoadFlag("Dood");
-        EventFlagSO emotionMerge = LoadFlag("FLAG_EMOTION_MERGE");
+        GearDataSO lilyGear = LoadGear("Lily GearData");
         StateMachineSO bossMachine = EnsureBossMachine();
 
         _chain.events = new List<EventDefinition>
@@ -1105,7 +1265,9 @@ public class EventChainEditorWindow : EditorWindow
             BuildEvt001Sample(dood),
             BuildEvt002Sample(dood, bossMachine),
             BuildEvt003Sample(dood),
-            BuildEvt004Sample(dood, emotionMerge),
+            BuildEvt004Sample(dood),
+            BuildEvt005Sample(dood, lilyGear),
+            BuildEvt006Sample(dood, lilyGear),
         };
 
         EditorUtility.SetDirty(_chain);
@@ -1113,7 +1275,7 @@ public class EventChainEditorWindow : EditorWindow
         _so.Update();
         _selectedEvent = 0;
 
-        Debug.Log("[EventChainEditorWindow] 샘플 데이터(EVT-001~004)를 채웠습니다. '빌드'를 눌러 실행 가능한 이벤트로 만드세요.");
+        Debug.Log("[EventChainEditorWindow] 샘플 데이터(EVT-001~006)를 채웠습니다. 분리되었던 머리카락/재대화/탈출 이벤트는 정리되었습니다. '빌드'를 눌러 실행 가능한 이벤트로 만드세요.");
     }
 
     private static EventTargetSearchInfo[] DefaultTargets() => new[]
@@ -1122,6 +1284,24 @@ public class EventChainEditorWindow : EditorWindow
         new EventTargetSearchInfo { ID = NpcATargetID, targetSearchType = EventManager.TargetSearchType.FromMap },
         new EventTargetSearchInfo { ID = NpcBTargetID, targetSearchType = EventManager.TargetSearchType.FromMap },
     };
+
+    // EVT-006만 탈출문을 직접 켜고 끈다. 앞선 이벤트까지 이 대상을 찾게 하면, 아직 데모 문을
+    // 배치하지 않은 기존 씬에서도 불필요한 FromMap 대상 누락 경고가 매번 난다.
+    private static EventTargetSearchInfo[] TargetsWithExitDoor()
+        => DefaultTargets().Concat(new[]
+        {
+            new EventTargetSearchInfo { ID = ExitDoorTargetID, targetSearchType = EventManager.TargetSearchType.FromMap },
+        }).ToArray();
+
+    // 머리카락 하나를 집어도 나머지 잔해를 함께 치워야 같은 단서를 반복 습득하지 않는다.
+    // 그래서 세 잔해 모두를 이 소형 이벤트의 대상에 등록한다.
+    // EVT-001은 잔해를 생성(활성화)하는 쪽이고, 각 잔해 이벤트는 습득 후 제거하는 쪽이다.
+    // 양쪽 모두 같은 세 엔티티를 대상 목록에서 찾아야 한다.
+    private static EventTargetSearchInfo[] TargetsWithHairClue()
+        => DefaultTargets().Concat(new[]
+        {
+            new EventTargetSearchInfo { ID = HairClueTargetID, targetSearchType = EventManager.TargetSearchType.FromMap },
+        }).ToArray();
 
     private static EventDefinition BuildEvt001Sample(EventFlagSO dood)
     {
@@ -1138,9 +1318,9 @@ public class EventChainEditorWindow : EditorWindow
             narrativeContent =
                 "금발이 백발의 트윈테일 끝을 가위로 자름. 이때 화면에 기괴한 가위질 소리(ASMR)가 크게 " +
                 "증폭되며 노이즈 발생. 잘려 나간 머리카락이 바닥에서 새의 날개처럼 파르르 떨다가 가루가 " +
-                "되어 소멸함. [잘려 나간 머리카락] 몇 개가 남아 습득할 수 있는 [단서]로 기능. 연출 종료 후 " +
+                "되어 소멸함. [잘려 나간 머리카락] 한 덩어리가 남아 습득할 수 있는 [단서]로 기능. 연출 종료 후 " +
                 "dood = 1로 변경. 금발 아이의 퇴장",
-            targets = DefaultTargets(),
+            targets = TargetsWithHairClue(),
             preconditions = dood != null
                 ? new[] { new GameStateEvent.EventFlagCondition { flag = dood, value = 0 } }
                 : Array.Empty<GameStateEvent.EventFlagCondition>(),
@@ -1169,14 +1349,41 @@ public class EventChainEditorWindow : EditorWindow
 
         def.steps.Add(new EventStepData
         {
+            label = "잘려 나간 머리카락 생성",
+            enterActions = new EventStepAction[]
+            {
+                new DummyEventStepAction { label = "EVT-001 S1 잘려 나간 머리카락 생성 — 가까이 가서 확인 키를 누르면 단서를 습득합니다" },
+                // 이 단계에서는 단서를 지급하지 않고, 같은 이벤트의 다음 상태에서 지급과 알림을 처리한다.
+                new TargetEntityManipulateAction { targetID = HairClueTargetID, targetAction = new SetEntityActiveAction { active = true } },
+                new SetInputModeAction { mode = EnumManager.InputMode.Play },
+            },
+            advanceWhenAny = new StateDecision[]
+            {
+                new TargetProximityInputDecision { targetID = HairClueTargetID, radius = 0.85f },
+            },
+        });
+
+        def.steps.Add(new EventStepData
+        {
             label = "단서 획득",
             enterActions = new EventStepAction[]
             {
-                new DummyEventStepAction { label = "EVT-001 S1 머리카락 파티클 (아트 없음) + 단서 획득" },
-                // 꿈속에서는 단서를 볼 수 없다(현실 전용 창) — 조용히 획득만 하고 도감은 열지 않는다.
+                new SetInputModeAction { mode = EnumManager.InputMode.Cutscene },
+                new TargetEntityManipulateAction { targetID = HairClueTargetID, targetAction = new SetEntityActiveAction { active = false } },
                 new AcquireClueAction { clueId = DummyClueWingId, openCodexImmediately = false },
+                new DialogueStartAction(),
+                new DialogueShowLineAction { line = DummyLine("안내", "잘려 나간 머리카락 단서를 획득했다.") },
             },
-            timeoutSeconds = 1.5f,
+            advanceWhenAny = new StateDecision[] { new DialogueLineEndedDecision() },
+            timeoutSeconds = DialogueTimeout,
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "단서 획득 대사 종료",
+            enterActions = new EventStepAction[] { new DialogueExitAction() },
+            advanceWhenAny = new StateDecision[] { new DialogueEndedDecision() },
+            timeoutSeconds = DialogueTimeout,
         });
 
         var endActions = new List<StateAction>
@@ -1189,6 +1396,57 @@ public class EventChainEditorWindow : EditorWindow
         if (dood != null) endActions.Add(new SetEventFlagAction { flag = dood, flagValue = 1 });
         endActions.Add(new SetInputModeAction { mode = EnumManager.InputMode.Play });
         def.steps.Add(new EventStepData { label = "금발 퇴장", enterActions = ToStepActions(endActions) });
+
+        return def;
+    }
+
+    private static EventDefinition BuildEvt001HairPickupSample(EventFlagSO dood, string hairTargetID, int number)
+    {
+        var def = new EventDefinition
+        {
+            eventId = $"Dummy_EVT001_Hair{number:00}",
+            eventName = $"잘려 나간 머리카락 {number} 습득",
+            purpose = "가위질 뒤 남은 잔해를 상호작용해 단서를 획득",
+            startTriggerDesc = "잘려 나간 머리카락 곁에서 확인 키를 누른다",
+            preconditionDesc = "dood == 1; 단서를 아직 습득하지 않음",
+            interruptCondition = "없음. 획득 알림은 1초 동안 표시",
+            retryPolicy = "세 잔해 중 하나를 습득하면 공유 단서가 지급되고 잔해 전체가 사라짐",
+            linkedEvents = "EVT-001 → EVT-002",
+            narrativeContent =
+                "가위질 뒤 남은 [잘려 나간 머리카락] 하나를 조사한다. 공유 단서를 지급한 뒤 " +
+                "더미 아트가 포함된 획득 문구가 1초 동안 표시된다.",
+            targets = TargetsWithHairClue(),
+            preconditions = dood != null
+                ? new[] { new GameStateEvent.EventFlagCondition { flag = dood, value = 1 } }
+                : Array.Empty<GameStateEvent.EventFlagCondition>(),
+            triggerKind = EventTriggerKind.Input,
+            triggerRadius = 0.85f,
+        };
+
+        def.steps.Add(new EventStepData
+        {
+            label = "단서 획득 알림",
+            enterActions = new EventStepAction[]
+            {
+                new SetInputModeAction { mode = EnumManager.InputMode.Cutscene },
+                new TargetEntityManipulateAction { targetID = hairTargetID, targetAction = new SetEntityActiveAction { active = false } },
+                new AcquireClueAction { clueId = DummyClueWingId, openCodexImmediately = false },
+                new DialogueStartAction(),
+                new DialogueShowLineAction { line = DummyLine("안내", "잘려 나간 머리카락 단서를 획득했다.") },
+            },
+            advanceWhenAny = new StateDecision[] { new DialogueLineEndedDecision() },
+            timeoutSeconds = DialogueTimeout,
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "획득 완료",
+            enterActions = new EventStepAction[]
+            {
+                new DummyEventStepAction { label = "EVT-001 잘려 나간 머리카락 단서 습득 완료" },
+                new SetInputModeAction { mode = EnumManager.InputMode.Play },
+            },
+        });
 
         return def;
     }
@@ -1218,6 +1476,7 @@ public class EventChainEditorWindow : EditorWindow
             preconditions = dood != null
                 ? new[] { new GameStateEvent.EventFlagCondition { flag = dood, value = 1 } }
                 : Array.Empty<GameStateEvent.EventFlagCondition>(),
+            requiredClueIds = new[] { DummyClueWingId },
             // "백발의 아이에게 말을 건다" — 근처에서 확인 입력을 눌러야 발동.
             triggerKind = EventTriggerKind.Input,
             triggerRadius = 1.5f,
@@ -1309,7 +1568,18 @@ public class EventChainEditorWindow : EditorWindow
                 // 밀려나는 건 플레이어이므로 카메라를 되돌린다 — 되돌리지 않으면 백발만 계속 비춘다.
                 new SetCameraFollowAction { returnToDefault = true },
                 new CameraZoomAction { returnToOriginal = true, blendTime = 0.3f },
-                new TargetEntityManipulateAction { targetID = PlayerTargetID, targetAction = new KnockBackAction() },
+                // EVT-004의 집터는 아래쪽 고정 위치에 두었다. 플레이어의 마지막 바라보는 방향에
+                // 따라 경로가 매번 바뀌면 "밀려났던 방향 그대로"라는 유도가 깨지므로 월드 아래쪽으로
+                // 못 박는다(집터 트리거도 PlaceDemoInScene에서 center + (0, -2.4)에 고정).
+                new TargetEntityManipulateAction
+                {
+                    targetID = PlayerTargetID,
+                    targetAction = new KnockBackAction
+                    {
+                        directionMode = KnockbackDirectionMode.Fixed,
+                        fixedDirection = Vector3.down,
+                    },
+                },
                 // 지금 있는 클립은 반복 하나뿐이라(Default_AnimationBase의 Knockback: isLoop) 이걸
                 // 그대로 틀어 두면 밀려나는 내내 유지되고, 아래 "넉백 — 종료" 단계가 걷어낸다.
                 new TargetEntityManipulateAction { targetID = PlayerTargetID, targetAction = new PlayAnimationAction { animationName = "Knockback" } },
@@ -1384,15 +1654,43 @@ public class EventChainEditorWindow : EditorWindow
 
         var wakeActions = new List<StateAction>
         {
+            new SetInputModeAction { mode = EnumManager.InputMode.Cutscene },
             new DummyEventStepAction { label = "EVT-002 S6 기상 — dood = 2" },
             new ScreenFadeAction { targetColor = new Color(0f, 0f, 0f, 0f), duration = 1f },
             // EVT-003이 노트를 열었을 때 두 단서가 이미 다 있도록 여기서 두 번째 더미 단서를 지급한다 —
             // 그래야 플레이어가 노트에서 잇기만 하면 되고, 테스트베드로 따로 넣어줄 필요가 없다.
             new AcquireClueAction { clueId = DummyClueEyeId, openCodexImmediately = false },
+            new DialogueStartAction(),
+            new DialogueShowLineAction { line = DummyLine("안내", "낯선 눈동자 단서를 획득했다.") },
         };
         if (dood != null) wakeActions.Add(new SetEventFlagAction { flag = dood, flagValue = 2 });
-        wakeActions.Add(new SetInputModeAction { mode = EnumManager.InputMode.Play });
-        def.steps.Add(new EventStepData { label = "기상", enterActions = ToStepActions(wakeActions) });
+        def.steps.Add(new EventStepData
+        {
+            label = "기상 및 단서 획득",
+            enterActions = ToStepActions(wakeActions),
+            advanceWhenAny = new StateDecision[] { new DialogueLineEndedDecision() },
+            timeoutSeconds = DialogueTimeout,
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "단서 획득 대사 종료",
+            enterActions = new EventStepAction[]
+            {
+                new DialogueExitAction(),
+            },
+            advanceWhenAny = new StateDecision[] { new DialogueEndedDecision() },
+            timeoutSeconds = DialogueTimeout,
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "기상 완료",
+            enterActions = new EventStepAction[]
+            {
+                new SetInputModeAction { mode = EnumManager.InputMode.Play },
+            },
+        });
 
         return def;
     }
@@ -1461,14 +1759,32 @@ public class EventChainEditorWindow : EditorWindow
         // 기획서의 "침대에 다시 누워 잠들기를 선택하면 꿈의 세계 맵 중앙에서 눈을 뜨며 복귀".
         // 침대 상호작용은 아직 없어 노트를 닫는 시점을 그 자리로 삼았다.
         MapDataSO dreamMap = FindDreamMap();
+        // 맵 전환과 암전을 같은 State에서 시작하면, Addressables 로드가 첫 프레임을 점유해
+        // 노트를 닫은 뒤 한 박자 늦게 암전이 보인다. EVT-002처럼 암전을 끝낸 뒤에만 맵을 로드한다.
+        def.steps.Add(new EventStepData
+        {
+            label = "노트 닫힘 — 암전",
+            enterActions = new EventStepAction[]
+            {
+                new DummyEventStepAction { label = "EVT-003 S2 노트를 덮었습니다 — 꿈으로 돌아가기 전에 암전합니다" },
+                new SetInputModeAction { mode = EnumManager.InputMode.Cutscene },
+                new ScreenFadeAction { targetColor = new Color(0f, 0f, 0f, 1f), duration = 0.6f },
+            },
+            advanceWhenAny = new StateDecision[] { new ScreenEffectEndedDecision() },
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "암전 유지",
+            enterActions = new EventStepAction[] { new EventStepAction { waitAfter = 0.8f } },
+        });
+
         def.steps.Add(new EventStepData
         {
             label = "꿈으로 복귀",
             enterActions = new EventStepAction[]
             {
-                new DummyEventStepAction { label = "EVT-003 S2 노트를 덮었습니다 — 꿈으로 돌아갑니다" },
-                new SetInputModeAction { mode = EnumManager.InputMode.Cutscene },
-                new ScreenFadeAction { targetColor = new Color(0f, 0f, 0f, 1f), duration = 0.6f },
+                new DummyEventStepAction { label = "EVT-003 S3 암전 상태에서 꿈으로 이동" },
                 new ChangeMapAction { mapData = dreamMap },
             },
             advanceWhenAny = new StateDecision[]
@@ -1482,7 +1798,7 @@ public class EventChainEditorWindow : EditorWindow
             label = "꿈에서 기상",
             enterActions = new EventStepAction[]
             {
-                new DummyEventStepAction { label = "EVT-003 S3 꿈으로 복귀 완료 — 중앙 집터로 가면 EVT-004가 시작됩니다" },
+                new DummyEventStepAction { label = "EVT-003 S4 꿈으로 복귀 완료 — 중앙 집터로 가면 EVT-004가 시작됩니다" },
                 new ScreenFadeAction { targetColor = new Color(0f, 0f, 0f, 0f), duration = 0.6f },
                 new SetInputModeAction { mode = EnumManager.InputMode.Play },
             },
@@ -1491,11 +1807,10 @@ public class EventChainEditorWindow : EditorWindow
         return def;
     }
 
-    private static EventDefinition BuildEvt004Sample(EventFlagSO dood, EventFlagSO emotionMerge)
+    private static EventDefinition BuildEvt004Sample(EventFlagSO dood)
     {
         var conditions = new List<GameStateEvent.EventFlagCondition>();
         if (dood != null) conditions.Add(new GameStateEvent.EventFlagCondition { flag = dood, value = 2 });
-        if (emotionMerge != null) conditions.Add(new GameStateEvent.EventFlagCondition { flag = emotionMerge, value = 1 });
 
         var def = new EventDefinition
         {
@@ -1503,15 +1818,15 @@ public class EventChainEditorWindow : EditorWindow
             eventName = "분노한 금발과 전투",
             purpose = "감정 합성 및 패링 매커니즘이 있는 퍼즐 풀이로 긴장감 부여",
             startTriggerDesc = "중앙 집터로 재진입하기",
-            preconditionDesc = "Dood == 2, 현실에서 꿈 해몽 완료 후 꿈 복귀",
+            preconditionDesc = "Dood == 2, 현실에서 꿈 해몽 완료 후 꿈 복귀 (해몽 규칙은 현재 안내 로그만 출력하므로 별도 플래그 게이팅 없음)",
             interruptCondition =
                 "플레이어 캐릭터 사망 시 → 소름 돋는 사운드(불협화음?)와 함께 [EVT-003(현실의 방)]으로 " +
                 "강제 복귀 리스폰 (2026-08-22: 침대 복귀는 미구현으로 보류, 현실의 방 강제 복귀만 우선 구현)",
             retryPolicy = "클리어 전까지 실패 시 계속 재시작",
             linkedEvents = "EVT-005",
             narrativeContent =
-                "플레이어가 현실→꿈으로 재진입하면 주변은 완전 검은색. 밀려났던 방향 그대로 쭉 나아가보면 " +
-                "하얀 낙서 공간이 나옴, 집터. 근처로 가면 이벤트 시작. 화면 전체가 붉은색 낙서로 뒤덮이며 " +
+                "플레이어가 현실→꿈으로 재진입하면 주변은 완전 검은색. EVT-002에서 아래쪽으로 고정 넉백된 " +
+                "방향 그대로 쭉 나아가보면 하얀 낙서 공간이 나옴, 집터. 근처로 가면 이벤트 시작. 화면 전체가 붉은색 낙서로 뒤덮이며 " +
                 "금발이 붉은색 [분노] 탄막 폭격을 시작함(기괴한 사운드 노이즈 배경음 재생). 플레이어는 " +
                 "본인의 감정을 [분노(적색)]로 전환해 탄막을 튕겨 낼 수 있음(패링). 이를 주변의 백발이 " +
                 "폭주해 뻗친 머리카락(날개?)에 반사해 금발의 분노를 폭주시켜야 함. 폭주 패턴 시, 플레이어는 " +
@@ -1529,10 +1844,312 @@ public class EventChainEditorWindow : EditorWindow
 
         def.steps.Add(new EventStepData
         {
-            label = "전투 진입",
+            label = "전투 진입 — 전투 클리어 대기",
             enterActions = new EventStepAction[]
             {
-                new DummyEventStepAction { label = "EVT-004 진입 — 여기부터 전투. 전투 기믹(패링/반사/그로기/각성)은 별도 담당" },
+                // StateController.customVariables가 SO를 참조로 공유하므로, 지난 플레이/이벤트에서
+                // 남은 true가 즉시 통과시키지 않게 이벤트를 시작할 때마다 명시적으로 초기화한다.
+                new SetCustomBoolAction { boolName = Evt004BattleCleared, value = false },
+                new SetInputModeAction { mode = EnumManager.InputMode.Play },
+                new DummyEventStepAction
+                {
+                    label = "EVT-004 진입 — 전투 담당은 EventManager.SetBoolParameterTrue(\"EVT004_BattleCleared\")로 완료를 알려 주세요. 패링/반사/그로기/각성은 별도 담당",
+                },
+            },
+            advanceWhenAny = new StateDecision[] { new CustomBoolDecision { boolName = Evt004BattleCleared } },
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "전투 완료 — 금발 대화 가능",
+            enterActions = new EventStepAction[]
+            {
+                // EVT-001/맵 재진입에서 꺼져 있던 금발을 다시 등장시킨다. Dood는 여기서 올리지
+                // 않는다 — EVT-005가 가위 대화와 함께 3으로 올리는 것이 진행도의 단일 지점이다.
+                new TargetEntityManipulateAction { targetID = NpcATargetID, targetAction = new SetEntityActiveAction { active = true } },
+                new DummyEventStepAction { label = "EVT-004 완료 — 금발이 진정되어 말을 걸 수 있습니다. 금발에게 확인 키를 누르면 EVT-005가 시작됩니다" },
+                new SetInputModeAction { mode = EnumManager.InputMode.Play },
+            },
+        });
+
+        return def;
+    }
+
+    private static EventDefinition BuildEvt005Sample(EventFlagSO dood, GearDataSO lilyGear)
+    {
+        var def = new EventDefinition
+        {
+            eventId = "Dummy_EVT005",
+            eventName = "진정한 금발 대화 / Lily 기어 지급",
+            purpose = "메인 시나리오 이해 및 다음 전투 준비",
+            startTriggerDesc = "전투 후 진정한 금발에게 확인 키로 말을 건다",
+            preconditionDesc = "Dood == 2 (대화 완료 시 즉시 Dood = 3)",
+            interruptCondition = "이탈 또는 대화 UI 누락 시 타임아웃으로 종료",
+            retryPolicy = "최초 대화 1회",
+            linkedEvents = "EVT-006",
+            narrativeContent =
+                "진정한 금발을 설득해 백발의 머리카락을 함께 멈추기로 한다. 금발이 가위를 넘겨주며, " +
+                "수령 즉시 dood = 3. 가위 아트가 없으므로 현재는 Lily GearData를 대역으로 지급하고 " +
+                "획득 사실은 로그로 안내한다.",
+            targets = DefaultTargets(),
+            preconditions = dood != null
+                ? new[] { new GameStateEvent.EventFlagCondition { flag = dood, value = 2 } }
+                : Array.Empty<GameStateEvent.EventFlagCondition>(),
+            triggerKind = EventTriggerKind.Input,
+            triggerRadius = 1.5f,
+        };
+
+        def.steps.Add(new EventStepData
+        {
+            label = "대화 시작",
+            enterActions = new EventStepAction[]
+            {
+                new SetInputModeAction { mode = EnumManager.InputMode.Cutscene },
+                new DialogueStartAction(),
+                new DialogueShowLineAction { line = DummyLine("금발", "…내가 너무 멀리 와 버렸어. 저 머리카락을 멈춰야 해.") },
+            },
+            advanceWhenAny = new StateDecision[] { new DialogueLineEndedDecision() },
+            timeoutSeconds = DialogueTimeout,
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "설득",
+            enterActions = new EventStepAction[]
+            {
+                new DialogueShowLineAction { line = DummyLine("플레이어", "같이 방법을 찾자. 우선 이 가위가 필요해.") },
+            },
+            advanceWhenAny = new StateDecision[] { new DialogueLineEndedDecision() },
+            timeoutSeconds = DialogueTimeout,
+        });
+
+        var grantActions = new List<StateAction>
+        {
+            new DialogueShowLineAction { line = DummyLine("금발", "가져가. 아직 끝난 일은 아니야.") },
+            new DummyEventStepAction { label = "EVT-005 가위 획득 — 현재는 Lily GearData를 가위 대역으로 지급합니다" },
+        };
+        if (lilyGear != null) grantActions.Add(new GrantGearAction { gear = lilyGear });
+        if (dood != null) grantActions.Add(new SetEventFlagAction { flag = dood, flagValue = 3 });
+        def.steps.Add(new EventStepData
+        {
+            label = "Lily 기어 지급 — dood = 3",
+            enterActions = ToStepActions(grantActions),
+            advanceWhenAny = new StateDecision[] { new DialogueLineEndedDecision() },
+            timeoutSeconds = DialogueTimeout,
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "대화 종료",
+            enterActions = new EventStepAction[] { new DialogueExitAction() },
+            advanceWhenAny = new StateDecision[] { new DialogueEndedDecision() },
+            timeoutSeconds = DialogueTimeout,
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "조작 복귀",
+            enterActions = new EventStepAction[]
+            {
+                new DummyEventStepAction { label = "EVT-005 완료 — 백발에게 확인 키를 누르면 EVT-006이 시작됩니다" },
+                new SetInputModeAction { mode = EnumManager.InputMode.Play },
+            },
+        });
+
+        return def;
+    }
+
+    // Dood가 3이 된 뒤에도 NPC와 다시 이야기할 수 있어야 한다. GameStateEvent의 플래그 조건은
+    // 정확히 같은 값만 지원하므로, 최초 지급 이벤트(Dood 2)와 대사 전용 이벤트(Dood 3)를 분리한다.
+    private static EventDefinition BuildEvt005ReTalkSample(EventFlagSO dood)
+    {
+        var def = new EventDefinition
+        {
+            eventId = "Dummy_EVT005_ReTalk",
+            eventName = "진정한 금발 재대화",
+            purpose = "가위 지급 후 메인 시나리오 대사를 다시 확인",
+            startTriggerDesc = "진정한 금발에게 다시 확인 키로 말을 건다",
+            preconditionDesc = "Dood == 3",
+            interruptCondition = "이탈 또는 대화 UI 누락 시 타임아웃으로 종료",
+            retryPolicy = "언제든 처음부터 재대화 가능 (장비/진행도 재지급 없음)",
+            linkedEvents = "EVT-006",
+            narrativeContent = "가위 지급 후 금발에게 다시 말을 걸면 상황과 백발을 막아야 한다는 대사를 반복한다. 진행도는 바꾸지 않는다.",
+            targets = DefaultTargets(),
+            preconditions = dood != null
+                ? new[] { new GameStateEvent.EventFlagCondition { flag = dood, value = 3 } }
+                : Array.Empty<GameStateEvent.EventFlagCondition>(),
+            triggerKind = EventTriggerKind.Input,
+            triggerRadius = 1.5f,
+        };
+
+        def.steps.Add(new EventStepData
+        {
+            label = "재대화 시작",
+            enterActions = new EventStepAction[]
+            {
+                new SetInputModeAction { mode = EnumManager.InputMode.Cutscene },
+                new DialogueStartAction(),
+                new DialogueShowLineAction { line = DummyLine("금발", "백발은 아직 중앙에 있어. 가위를 잊지 마.") },
+            },
+            advanceWhenAny = new StateDecision[] { new DialogueLineEndedDecision() },
+            timeoutSeconds = DialogueTimeout,
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "재대화 종료",
+            enterActions = new EventStepAction[] { new DialogueExitAction() },
+            advanceWhenAny = new StateDecision[] { new DialogueEndedDecision() },
+            timeoutSeconds = DialogueTimeout,
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "조작 복귀",
+            enterActions = new EventStepAction[] { new SetInputModeAction { mode = EnumManager.InputMode.Play } },
+        });
+
+        return def;
+    }
+
+    private static EventDefinition BuildEvt006Sample(EventFlagSO dood, GearDataSO scissorsGear)
+    {
+        var def = new EventDefinition
+        {
+            eventId = "Dummy_EVT006",
+            eventName = "백발과의 전투",
+            purpose = "최종 전투 진입부터 탈출 연출까지",
+            startTriggerDesc = "백발에게 확인 키로 말을 건다",
+            preconditionDesc = "Dood == 3",
+            interruptCondition = "플레이어 사망은 전투 담당이 현실 복귀로 처리. 이벤트는 전투 클리어 신호까지 대기",
+            retryPolicy = "전투 클리어 전까지 재시작",
+            linkedEvents = "데모 종료",
+            narrativeContent =
+                "백발이 날개 형태의 머리카락으로 공격한다. 실제 패링·날개 절단·각성 게이지는 전투 담당 범위이며, " +
+                "여기서는 전투 완료 신호를 기다린 뒤 중앙의 탈출문을 활성화하고, 같은 이벤트 안에서 탈출까지 진행한다.",
+            targets = TargetsWithExitDoor(),
+            preconditions = dood != null
+                ? new[] { new GameStateEvent.EventFlagCondition { flag = dood, value = 3 } }
+                : Array.Empty<GameStateEvent.EventFlagCondition>(),
+            triggerKind = EventTriggerKind.Input,
+            triggerRadius = 1.5f,
+        };
+
+        def.steps.Add(new EventStepData
+        {
+            label = "전투 진입 — 전투 클리어 대기",
+            enterActions = new EventStepAction[]
+            {
+                new SetCustomBoolAction { boolName = Evt006BattleCleared, value = false },
+                new SetInputModeAction { mode = EnumManager.InputMode.Play },
+                new DummyEventStepAction
+                {
+                    label = "EVT-006 진입 — 전투 담당은 EventManager.SetBoolParameterTrue(\"EVT006_BattleCleared\")로 완료를 알려 주세요. 날개 절단/각성 게이지는 별도 담당",
+                },
+            },
+            advanceWhenAny = new StateDecision[] { new CustomBoolDecision { boolName = Evt006BattleCleared } },
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "전투 완료 — 탈출문 생성",
+            enterActions = new EventStepAction[]
+            {
+                new SetInputModeAction { mode = EnumManager.InputMode.Cutscene },
+                new TargetEntityManipulateAction { targetID = ExitDoorTargetID, targetAction = new SetEntityActiveAction { active = true } },
+                new ScreenFlashAction { color = Color.white, duration = 0.35f },
+                new DummyEventStepAction { label = "EVT-006 완료 — 탈출문으로 가서 확인 키를 누르세요" },
+                new SetInputModeAction { mode = EnumManager.InputMode.Play },
+            },
+            advanceWhenAny = new StateDecision[]
+            {
+                new TargetProximityInputDecision { targetID = ExitDoorTargetID, radius = 2f },
+            },
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "가위 사용 대기",
+            enterActions = new EventStepAction[]
+            {
+                new SetInputModeAction { mode = EnumManager.InputMode.Play },
+                new DummyEventStepAction { label = "EVT-006 탈출 — 탈출문 앞에서 가위(Lily Form)를 사용하세요" },
+            },
+            advanceWhenAny = new StateDecision[] { new GearActiveDecision { gear = scissorsGear } },
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "탈출문 가르기",
+            enterActions = new EventStepAction[]
+            {
+                new SetInputModeAction { mode = EnumManager.InputMode.Cutscene },
+                new DummyEventStepAction { label = "EVT-006 탈출 — 가위(Lily Form) 사용을 확인해 문을 가릅니다" },
+                new ScreenTearAction { duration = 1f },
+            },
+            advanceWhenAny = new StateDecision[] { new ScreenEffectEndedDecision() },
+            timeoutSeconds = 2f,
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "데모 종료",
+            enterActions = new EventStepAction[]
+            {
+                new TargetEntityManipulateAction { targetID = ExitDoorTargetID, targetAction = new SetEntityActiveAction { active = false } },
+                new DummyEventStepAction { label = "EVT-006 탈출 연출 완료 — 데모 종료" },
+                new SetInputModeAction { mode = EnumManager.InputMode.Play },
+            },
+        });
+
+        return def;
+    }
+
+    // 탈출문 트리거는 문 GameObject의 자식으로 배치된다. 문은 EVT-006 완료 전까지 비활성이므로,
+    // Dood == 3만으로는 전투 이전에 이 이벤트를 발동할 수 없다.
+    private static EventDefinition BuildEvt006ExitSample(EventFlagSO dood)
+    {
+        var def = new EventDefinition
+        {
+            eventId = "Dummy_EVT006_Exit",
+            eventName = "최종 탈출",
+            purpose = "가위 대역 상호작용 후 데모 종료 연출",
+            startTriggerDesc = "활성화된 중앙 탈출문에서 확인 키를 누른다",
+            preconditionDesc = "Dood == 3, EVT-006 클리어 후 탈출문이 활성 상태일 것",
+            interruptCondition = "없음",
+            retryPolicy = "데모 종료 전까지 재시도 가능",
+            linkedEvents = "데모 종료",
+            narrativeContent =
+                "현재 가위와 [즐거움]은 안내 로그 단계이므로 장비 보유 검증은 하지 않는다. 탈출문 상호작용 시 화면이 종이처럼 찢어지며 데모를 마친다.",
+            targets = TargetsWithExitDoor(),
+            preconditions = dood != null
+                ? new[] { new GameStateEvent.EventFlagCondition { flag = dood, value = 3 } }
+                : Array.Empty<GameStateEvent.EventFlagCondition>(),
+            triggerKind = EventTriggerKind.Input,
+            triggerRadius = 2f,
+        };
+
+        def.steps.Add(new EventStepData
+        {
+            label = "탈출문 상호작용",
+            enterActions = new EventStepAction[]
+            {
+                new SetInputModeAction { mode = EnumManager.InputMode.Cutscene },
+                new DummyEventStepAction { label = "EVT-006 탈출 — 가위(Lily GearData 대역)로 문을 가릅니다" },
+                new ScreenTearAction { duration = 1f },
+            },
+            advanceWhenAny = new StateDecision[] { new ScreenEffectEndedDecision() },
+            timeoutSeconds = 2f,
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "데모 종료",
+            enterActions = new EventStepAction[]
+            {
+                new TargetEntityManipulateAction { targetID = ExitDoorTargetID, targetAction = new SetEntityActiveAction { active = false } },
+                new DummyEventStepAction { label = "EVT-006 탈출 완료 — 데모 종료" },
+                new SetInputModeAction { mode = EnumManager.InputMode.Play },
             },
         });
 
@@ -1613,5 +2230,13 @@ public class EventChainEditorWindow : EditorWindow
         if (flag == null)
             Debug.LogWarning($"[EventChainEditorWindow] {FlagFolder}/{name}.asset을 찾지 못했습니다 — 관련 조건/갱신이 빠집니다.");
         return flag;
+    }
+
+    private static GearDataSO LoadGear(string assetName)
+    {
+        var gear = AssetDatabase.LoadAssetAtPath<GearDataSO>($"{GearFolder}/{assetName}.asset");
+        if (gear == null)
+            Debug.LogWarning($"[EventChainEditorWindow] {GearFolder}/{assetName}.asset을 찾지 못했습니다 — EVT-005의 Lily 기어 지급이 로그만 남습니다.");
+        return gear;
     }
 }

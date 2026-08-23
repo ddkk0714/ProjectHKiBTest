@@ -13,6 +13,7 @@ namespace StateMachine
         public StateMachineSO stateMachine;
         // 비워두면 상태 기계에 정의된 initialState에서 시작한다.
         public StateSO startState;
+        [SerializeReference, SubclassSelector] public StateAction[] followUpActions;
 
         public override void Act(StateController stateController)
         {
@@ -36,6 +37,10 @@ namespace StateMachine
 
             stateController.Initialize(stateMachine);
             if (startState) stateController.ChangeState(startState);
+
+            if (followUpActions == null) return;
+            for (int i = 0; i < followUpActions.Length; i++)
+                followUpActions[i]?.Act(stateController);
         }
     }
 }

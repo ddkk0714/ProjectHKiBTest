@@ -18,10 +18,18 @@ namespace StateMachine
         // 블렌딩 곡선. 예전엔 EaseInOut으로 코드에 박혀 있어 연출마다 조절할 수 없었다.
         public CinemachineBlendDefinition.Style blendStyle = CinemachineBlendDefinition.Style.EaseInOut;
         public bool warnMissingIllustration;
+        [Header("Optional illustration overlay")]
+        public Sprite illustration;
+        public Color illustrationColor = Color.white;
+        [Min(0f)] public float illustrationFadeTime = 0.15f;
+        public Vector2 illustrationAnchor = new(0.5f, 0.5f);
+        public Vector2 illustrationSize = new(1200f, 675f);
+        public bool preserveIllustrationAspect = true;
+        public bool hideIllustrationOnReturn = true;
 
         public override void Act(StateController stateController)
         {
-            if (warnMissingIllustration)
+            if (warnMissingIllustration && illustration == null)
                 Debug.LogWarning("[CameraZoomAction] 클로즈업 일러스트가 없어 카메라 줌으로 대체합니다.");
 
             CameraManager camera = CameraManager.instance;
@@ -31,8 +39,25 @@ namespace StateMachine
                 return;
             }
 
-            if (returnToOriginal) camera.ReturntoOrigRes(blendTime, blendStyle);
-            else camera.ZoomViaOrig(sizeMultiplier, blendTime, blendStyle);
+            if (returnToOriginal)
+            {
+                camera.ReturntoOrigRes(blendTime, blendStyle);
+                if (hideIllustrationOnReturn)
+                    ScreenEffectManager.Instance.HideIllustration(illustrationFadeTime);
+                return;
+            }
+
+            camera.ZoomViaOrig(sizeMultiplier, blendTime, blendStyle);
+            if (illustration != null)
+            {
+                ScreenEffectManager.Instance.ShowIllustration(
+                    illustration,
+                    illustrationColor,
+                    illustrationAnchor,
+                    illustrationSize,
+                    preserveIllustrationAspect,
+                    illustrationFadeTime);
+            }
         }
     }
 }

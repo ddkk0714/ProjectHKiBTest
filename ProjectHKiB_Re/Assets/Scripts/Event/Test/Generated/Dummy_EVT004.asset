@@ -14,7 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   customVariables:
     boolVariables:
-      _serializedList: []
+      _serializedList:
+      - Key: EVT004_BattleCleared
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
     intVariables:
       _serializedList: []
     floatVariables:
@@ -23,6 +29,7 @@ MonoBehaviour:
   graph: {fileID: 0}
   allStates:
   - {fileID: 11400000, guid: 24dec775dbf089b468b72594e1db49de, type: 2}
+  - {fileID: 11400000, guid: eded3c34a51fd0f4cb8d55606d45c398, type: 2}
   _commandPairs: []
   involvedEventTargets:
   - ID: Player

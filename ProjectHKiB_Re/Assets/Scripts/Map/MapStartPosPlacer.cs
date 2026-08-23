@@ -12,10 +12,54 @@ using UnityEngine;
 /// </summary>
 public class MapStartPosPlacer : MonoBehaviour
 {
+    private struct PlacementRequest
+    {
+        public bool pending;
+        public StateMachine.MapEntryPlacementMode mode;
+        public string entryPointId;
+        public Vector3 position;
+        public bool overrideDirection;
+        public EnumManager.AnimDir direction;
+    }
+
+    private static MapStartPosPlacer _instance;
+    public static MapStartPosPlacer Instance
+    {
+        get
+        {
+            if (_instance == null) _instance = FindObjectOfType<MapStartPosPlacer>();
+            return _instance;
+        }
+    }
+
     [SerializeField] private MapManager mapManager;
 
     private string _previousMapID = "";
     private bool _skipNextPlacement;
+    private PlacementRequest _nextPlacement;
+
+    private void Awake()
+    {
+        if (_instance == null) _instance = this;
+    }
+
+    public void RequestNextPlacement(
+        StateMachine.MapEntryPlacementMode mode,
+        string entryPointId,
+        Vector3 position,
+        bool overrideDirection,
+        EnumManager.AnimDir direction)
+    {
+        _nextPlacement = new PlacementRequest
+        {
+            pending = true,
+            mode = mode,
+            entryPointId = entryPointId,
+            position = position,
+            overrideDirection = overrideDirection,
+            direction = direction,
+        };
+    }
 
     /// <summary>
     /// 다음 한 번의 맵 로드에서 배치를 건너뛴다.
@@ -40,12 +84,68 @@ public class MapStartPosPlacer : MonoBehaviour
     private void OnDestroy()
     {
         if (mapManager != null) mapManager.OnMapLoaded -= HandleMapLoaded;
+        if (_instance == this) _instance = null;
+    }
+
+    private bool TryApplyRequestedPlacement(PlacementRequest request)
+    {
+        if (request.mode == StateMachine.MapEntryPlacementMode.CustomPosition)
+        {
+            bool placed = PlacePlayerAt(request.position, request.overrideDirection, request.direction);
+            if (!placed)
+                Debug.LogWarning("[MapStartPosPlacer] Could not place the player at the requested custom position.");
+            return placed;
+        }
+
+        if (request.mode != StateMachine.MapEntryPlacementMode.NamedEntry || string.IsNullOrWhiteSpace(request.entryPointId))
+            return false;
+
+        MapStartPos[] startPoses = FindObjectsOfType<MapStartPos>();
+        for (int i = 0; i < startPoses.Length; i++)
+        {
+            if (startPoses[i].EntryPointId != request.entryPointId) continue;
+
+            EnumManager.AnimDir? direction = request.overrideDirection
+                ? request.direction
+                : (EnumManager.AnimDir?)null;
+            startPoses[i].SetPlayerToStartPos(direction);
+            return true;
+        }
+
+        Debug.LogWarning($"[MapStartPosPlacer] Entry point ID '{request.entryPointId}' was not found; using the normal entry rules.");
+        return false;
+    }
+
+    private static bool PlacePlayerAt(Vector3 position, bool overrideDirection, EnumManager.AnimDir direction)
+    {
+        if (GameManager.instance == null || GameManager.instance.player == null) return false;
+
+        PhysicsManager physicsManager = FindObjectOfType<PhysicsManager>();
+        if (physicsManager == null) return false;
+
+        IPhysics physics = GameManager.instance.player.GetInterface<IPhysics>();
+        if (physics == null) return false;
+
+        physicsManager.RealTeleport(physics, position);
+        if (!overrideDirection) return true;
+
+        IDirAnimatable dirAnimatable = GameManager.instance.player.GetInterface<IDirAnimatable>();
+        if (dirAnimatable == null) return true;
+
+        dirAnimatable.SetAnimationDirection(direction);
+        SimpleAnimationPlayer animationPlayer = dirAnimatable.AnimationPlayer;
+        if (animationPlayer != null) animationPlayer.Play(animationPlayer.CurrentAnimationName);
+        return true;
     }
 
     private void HandleMapLoaded(MapDataSO mapData)
     {
         string previousMapID = _previousMapID;
         _previousMapID = mapData != null ? mapData.mapAddressableID : "";
+
+        PlacementRequest request = _nextPlacement;
+        _nextPlacement = default;
+        if (request.pending && TryApplyRequestedPlacement(request)) return;
 
         // 건너뛰더라도 직전 맵 기록은 위에서 갱신해둔다 — 안 그러면 그다음 전환에서 엉뚱한
         // MapStartPos가 선택된다.

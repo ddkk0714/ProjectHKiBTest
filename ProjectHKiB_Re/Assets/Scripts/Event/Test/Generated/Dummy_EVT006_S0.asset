@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: Dummy_EVT006_S0
+  m_EditorClassIdentifier: 
+  isPacked: 0
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0.71179515
+  transitions:
+  - name: "\uC870\uAC74 0"
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 6174889725805462505
+      negate: 0
+    trueState: {fileID: 11400000, guid: edef7acd68dca1d42b2c7ff67893b91d, type: 2}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 6174889725805462506
+  - rid: 6174889725805462507
+  - rid: 6174889725805462508
+  UpdateActions: []
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 6174889725805462505
+      type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: EVT006_BattleCleared
+    - rid: 6174889725805462506
+      type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        boolName: EVT006_BattleCleared
+        value: 0
+    - rid: 6174889725805462507
+      type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mode: 0
+    - rid: 6174889725805462508
+      type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        label: "EVT-006 \uC9C4\uC785 \u2014 \uC804\uD22C \uB2F4\uB2F9\uC740 EventManager.SetBoolParameterTrue(\"EVT006_BattleCleared\")\uB85C
+          \uC644\uB8CC\uB97C \uC54C\uB824 \uC8FC\uC138\uC694. \uB0A0\uAC1C \uC808\uB2E8/\uAC01\uC131
+          \uAC8C\uC774\uC9C0\uB294 \uBCC4\uB3C4 \uB2F4\uB2F9"
+        completeBoolName: 

@@ -22,20 +22,42 @@ public class GameStateEvent : GameEvent
     [SerializeField] private EventSO _event;
     [SerializeField] private EventTargets _manualTargets;
     [SerializeField] private EventFlagCondition[] _preconditions;
+    [SerializeField] private string[] _requiredClueIds;
 
     public bool CanTrigger()
     {
-        if (_preconditions == null || _preconditions.Length == 0) return true;
-
-        EventManager eventManager = GameManager.instance.eventManager;
-        if (!eventManager) return false;
-
-        for (int i = 0; i < _preconditions.Length; i++)
+        if (_preconditions != null && _preconditions.Length > 0)
         {
-            EventFlagCondition condition = _preconditions[i];
-            if (condition == null || !condition.flag) continue; // 비어 있는 줄은 조건 없음으로 본다
+            EventManager eventManager = GameManager.instance.eventManager;
+            if (!eventManager) return false;
 
-            if (!eventManager.HasEventFlag(condition.flag, condition.value)) return false;
+            for (int i = 0; i < _preconditions.Length; i++)
+            {
+                EventFlagCondition condition = _preconditions[i];
+                if (condition == null || !condition.flag) continue;
+
+                if (!eventManager.HasEventFlag(condition.flag, condition.value)) return false;
+            }
+        }
+
+        if (_requiredClueIds == null || _requiredClueIds.Length == 0) return true;
+
+        RouteModule route = RouteModule.Instance;
+        if (route == null || route.Progress == null) return false;
+
+        foreach (string clueId in _requiredClueIds)
+        {
+            if (string.IsNullOrWhiteSpace(clueId)) continue;
+
+            bool acquired = false;
+            foreach (string acquiredId in route.Progress.AcquiredClueIds)
+            {
+                if (acquiredId != clueId) continue;
+                acquired = true;
+                break;
+            }
+
+            if (!acquired) return false;
         }
 
         return true;

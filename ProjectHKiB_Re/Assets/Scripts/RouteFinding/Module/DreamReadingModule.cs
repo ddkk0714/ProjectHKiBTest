@@ -50,6 +50,27 @@ public class DreamReadingModule : MonoBehaviour
     public IReadOnlyCollection<string> ResolvedIds => _resolvedIds;
     public bool IsResolved(string id) => !string.IsNullOrEmpty(id) && _resolvedIds.Contains(id);
 
+    /// <summary>
+    /// Returns whether this clue is required by any dream-reading combination.
+    /// Dream-reading clues use only player-created links, never automatic keyword links.
+    /// </summary>
+    public bool IsDreamReadingClue(string clueId)
+    {
+        if (string.IsNullOrEmpty(clueId) || _catalog == null) return false;
+
+        var readings = _catalog.Readings;
+        for (int i = 0; i < readings.Count; i++)
+        {
+            string[] required = readings[i]?.requiredClueIds;
+            if (required == null) continue;
+
+            for (int j = 0; j < required.Length; j++)
+                if (required[j] == clueId) return true;
+        }
+
+        return false;
+    }
+
     // 해몽이 성립한 순간 발행. 해석 카드를 띄우는 UI가 이걸 구독한다.
     public event Action<DreamReading> OnReadingResolved;
 
