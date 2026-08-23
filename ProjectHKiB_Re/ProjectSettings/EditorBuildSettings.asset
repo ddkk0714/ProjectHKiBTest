@@ -26,6 +26,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TestMap/TestMap3.unity
     guid: 9c4972d4fc22247488840ef4a492efeb
+  - enabled: 1
+    path: Assets/Scenes/Enemy_Test.unity
+    guid: ebf32a84cb5087f4da59bc7806d5faf2
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 4d3ee4000f73cea479cb179661e8d622, type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: 41ea949fad2e49946b0b8cf125531113, type: 2}

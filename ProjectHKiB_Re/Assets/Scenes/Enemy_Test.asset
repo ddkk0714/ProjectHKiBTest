@@ -9,10 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dea69d41f90c6ea4fa55c27c1d60c145, type: 3}
-  m_Name: AddressableAssetGroupSortSettings
+  m_Script: {fileID: 11500000, guid: 910e29ddc9d4a7f46b5d9ca1cd3457a0, type: 3}
+  m_Name: Enemy_Test
   m_EditorClassIdentifier: 
-  sortOrder:
-  - 4c1af1c09241f4b46948ee402f987f71
-  - e1b6dbfb411814f4e8ca7e55431cedc2
-  - ec261c7596ac2114d9ff95f659354183
+  mapAddressableID: Enemy_Test
+  bgmID: 
+  allEntityInitInfos:
+    _serializedList: []
+  allAnimInitInfos:
+    _serializedList: []
