@@ -1,6 +1,7 @@
-using System.Collections;
+using System;
 using System.Text;
 using NaughtyAttributes;
+using StateMachine;
 using UnityEngine;
 
 /// <summary>
@@ -35,50 +36,97 @@ public class EventSystemTestbed : MonoBehaviour
     [Tooltip("Dummy_EVT001~004_Trigger.prefab을 씬에 놓고 순서대로 연결한다. 사전 조건 게이팅까지 실제 경로로 확인된다.")]
     [SerializeField] private GameStateEvent[] _chainTriggers;
 
-    [Header("EVT-002 더미 시퀀스")]
-    [Tooltip("비워두면 맵 전환 단계를 건너뛴다 — 현실 침실 맵이 아직 없어도 나머지를 확인할 수 있다.")]
-    [SerializeField] private MapDataSO _dreamExitMap;
-    [SerializeField] private float _stepInterval = 1.2f;
+    [Header("Built Event Effects")]
+    [Tooltip("Event Chain Editor updates this list after every build. Inspector test buttons always use these generated actions.")]
+    [SerializeField] private EventSO[] _builtEvents = Array.Empty<EventSO>();
 
     // ─── 화면 연출 ───────────────────────────────────────────────
 
     [Button("연출: 암전")]
-    private void FadeOut() => ScreenEffectManager.Instance.FadeToBlack(1f);
+    private void FadeOut() => PlayBuiltAction<ScreenFadeAction>(action => action.targetColor.a > 0f, "fade out", action => action.Play());
 
     [Button("연출: 암전 해제")]
-    private void FadeIn() => ScreenEffectManager.Instance.FadeFromBlack(1f);
+    private void FadeIn() => PlayBuiltAction<ScreenFadeAction>(action => action.targetColor.a <= 0f, "fade in", action => action.Play());
 
     [Button("연출: 노이즈 3초")]
-    private void Noise() => ScreenEffectManager.Instance.SetNoise(0.6f, 3f);
+    private void Noise() => PlayBuiltAction<ScreenNoiseAction>(action => !action.stop, "noise", action => action.Play());
 
     [Button("연출: 노이즈 정지")]
-    private void NoiseStop() => ScreenEffectManager.Instance.StopNoise();
+    private void NoiseStop() => PlayBuiltAction<ScreenNoiseAction>(action => action.stop, "noise stop", action => action.Play());
 
     [Button("연출: 흰 섬광")]
-    private void Flash() => ScreenEffectManager.Instance.Flash(Color.white, 0.3f);
+    private void Flash() => PlayBuiltAction<ScreenFlashAction>(action => true, "flash", action => action.Play());
 
     [Button("연출: 화면 찢김(더미)")]
-    private void Tear() => ScreenEffectManager.Instance.ScreenTear(1f);
+    private void Tear() => PlayBuiltAction<ScreenTearAction>(action => true, "screen tear", action => action.Play());
 
     [Button("연출: 클로즈업 줌")]
-    private void ZoomIn()
-    {
-        if (!CameraManager.instance) { Debug.LogWarning("[Testbed] CameraManager가 없습니다."); return; }
-        CameraManager.instance.ZoomViaOrig(0.4f, 0.5f);
-    }
+    private void ZoomIn() => PlayBuiltAction<CameraZoomAction>(action => !action.returnToOriginal, "zoom in", action => action.Play());
 
     [Button("연출: 줌 복귀")]
-    private void ZoomOut()
-    {
-        if (!CameraManager.instance) { Debug.LogWarning("[Testbed] CameraManager가 없습니다."); return; }
-        CameraManager.instance.ReturntoOrigRes(0.5f);
-    }
+    private void ZoomOut() => PlayBuiltAction<CameraZoomAction>(action => action.returnToOriginal, "zoom out", action => action.Play());
 
     [Button("연출: 카메라 흔들기")]
-    private void Shake()
+    private void Shake() => PlayBuiltAction<CameraShakeAction>(action => true, "camera shake", action => action.Play());
+
+    public void SetBuiltEvents(EventSO[] builtEvents)
     {
-        if (!CameraManager.instance) { Debug.LogWarning("[Testbed] CameraManager가 없습니다."); return; }
-        CameraManager.instance.Shake();
+        _builtEvents = builtEvents ?? Array.Empty<EventSO>();
+    }
+
+    private void PlayBuiltAction<TAction>(Func<TAction, bool> matches, string effectName, Action<TAction> play)
+        where TAction : StateAction
+    {
+        if (!Application.isPlaying)
+        {
+            Debug.LogWarning("[Testbed] Enter Play Mode before previewing built effects.");
+            return;
+        }
+
+        TAction action = FindBuiltAction(matches);
+        if (action == null)
+        {
+            Debug.LogWarning($"[Testbed] No built {effectName} action was found. Build the Event Chain while this testbed scene is open.");
+            return;
+        }
+
+        play(action);
+    }
+
+    private TAction FindBuiltAction<TAction>(Func<TAction, bool> matches)
+        where TAction : StateAction
+    {
+        foreach (EventSO eventData in _builtEvents)
+        {
+            if (eventData == null || eventData.allStates == null) continue;
+
+            foreach (StateSO state in eventData.allStates)
+            {
+                TAction found = FindBuiltActionInActions(state != null ? state.EnterActions : null, matches);
+                if (found != null) return found;
+            }
+        }
+
+        return null;
+    }
+
+    private static TAction FindBuiltActionInActions<TAction>(StateAction[] actions, Func<TAction, bool> matches)
+        where TAction : StateAction
+    {
+        if (actions == null) return null;
+
+        foreach (StateAction action in actions)
+        {
+            if (action is TAction typed && matches(typed)) return typed;
+
+            if (action is ChangeStateMachineAction changeMachine)
+            {
+                TAction nested = FindBuiltActionInActions(changeMachine.followUpActions, matches);
+                if (nested != null) return nested;
+            }
+        }
+
+        return null;
     }
 
     // ─── 입력 모드 ───────────────────────────────────────────────
@@ -392,99 +440,4 @@ public class EventSystemTestbed : MonoBehaviour
         Debug.Log(sb.ToString());
     }
 
-    // ─── EVT-002 전체 흐름 (아트 없이) ───────────────────────────
-
-    [Button("EVT-002 더미 시퀀스 재생")]
-    private void PlayEvt002()
-    {
-        if (!Application.isPlaying)
-        {
-            Debug.LogWarning("[Testbed] 플레이 모드에서만 실행할 수 있습니다.");
-            return;
-        }
-
-        StopAllCoroutines();
-        StartCoroutine(Evt002Routine());
-    }
-
-    // 기획서 EVT-002의 연출 순서를 그대로 따라가되, 실제 NPC·일러스트·현실 침실 맵이 없어도
-    // 끝까지 돌도록 각 단계를 로그와 단색 연출로 대신한다. 여기서 부르는 API는 실제 배선에서
-    // 각 StateAction이 부르는 것과 같은 것들이라, 이 시퀀스가 돌면 배선해도 돈다.
-    private IEnumerator Evt002Routine()
-    {
-        ScreenEffectManager screen = ScreenEffectManager.Instance;
-
-        Debug.Log("[EVT-002] S0 대화 — 조작 잠금");
-        GameManager.instance.inputManager.SetInputMode(EnumManager.InputMode.Cutscene);
-        yield return new WaitForSecondsRealtime(_stepInterval);
-
-        Debug.Log("[EVT-002] S1 클로즈업 + 눈동자 노이즈 — 2D 일러스트가 없어 카메라 줌으로 대체");
-        if (CameraManager.instance) CameraManager.instance.ZoomViaOrig(0.4f, 0.5f);
-        screen.SetNoise(0.6f, _stepInterval * 2f);
-        yield return new WaitForSecondsRealtime(_stepInterval * 2f);
-
-        Debug.Log("[EVT-002] S2 보스화 — NPC가 없어 상태 기계 교체 대신 로그만 남깁니다");
-        if (CameraManager.instance) CameraManager.instance.Shake();
-        screen.Flash(Color.white, 0.3f);
-        yield return new WaitForSecondsRealtime(_stepInterval);
-
-        Debug.Log("[EVT-002] S3 플레이어 강제 넉백");
-        KnockbackPlayer();
-        yield return new WaitForSecondsRealtime(_stepInterval);
-
-        Debug.Log("[EVT-002] S4 암전");
-        if (CameraManager.instance) CameraManager.instance.ReturntoOrigRes(0.3f);
-        screen.FadeToBlack(1f);
-        while (screen.IsPlaying) yield return null;
-
-        yield return Evt002ChangeMap();
-
-        Debug.Log("[EVT-002] S6 기상 — 암전 해제 · 진행도 갱신 · 조작 복구");
-        screen.FadeFromBlack(1f);
-        if (_doodFlag) GameManager.instance.eventManager.SetEventFlag(_doodFlag, 2);
-        while (screen.IsPlaying) yield return null;
-
-        GameManager.instance.inputManager.SetInputMode(EnumManager.InputMode.Play);
-        Debug.Log("[EVT-002] 시퀀스 종료 — 조작이 돌아왔는지 직접 움직여 확인하세요");
-    }
-
-    private IEnumerator Evt002ChangeMap()
-    {
-        if (!_dreamExitMap)
-        {
-            Debug.Log("[EVT-002] S5 맵 전환 건너뜀 — 현실 침실 맵(_dreamExitMap)이 지정되지 않았습니다");
-            yield break;
-        }
-
-        Debug.Log($"[EVT-002] S5 맵 전환 시작 — {_dreamExitMap.name}");
-        MapManager mapManager = GameManager.instance.mapManager;
-        mapManager.LoadMap(_dreamExitMap);
-
-        // 로드는 Addressables 비동기라 완료를 기다려야 한다 — 실제 배선에서 MapLoadedDecision이
-        // 하는 일과 같다. 맵이 영영 안 뜨는 경우에 코루틴이 멈춰 있지 않도록 시간 제한을 둔다.
-        float timeout = Time.unscaledTime + 10f;
-        while (mapManager.CurrentMapData != _dreamExitMap && Time.unscaledTime < timeout)
-            yield return null;
-
-        Debug.Log(mapManager.CurrentMapData == _dreamExitMap
-            ? "[EVT-002] S5 맵 전환 완료"
-            : "[EVT-002] S5 맵 전환 시간 초과 — 그대로 진행합니다");
-    }
-
-    private void KnockbackPlayer()
-    {
-        Player player = GameManager.instance.player;
-        if (!player) { Debug.LogWarning("[EVT-002] 플레이어가 없어 넉백을 건너뜁니다."); return; }
-
-        if (player.TryGetInterface(out IPhysics physics))
-        {
-            // KnockBackAction과 같은 규칙 — 바라보는 반대쪽으로, 짧은 가속 + 완만한 감쇠.
-            Vector3 facing = player.TryGetInterface(out IDirAnimatable dirAnimatable)
-                             && dirAnimatable.LastSetAnimationDir8 != Vector2.zero
-                ? (Vector3)dirAnimatable.LastSetAnimationDir8.normalized
-                : Vector3.down;
-            physics.KnockBack(-facing, 110f, 0.12f, 0.95f);
-        }
-        else Debug.LogWarning("[EVT-002] 플레이어에서 IPhysics를 찾을 수 없습니다.");
-    }
 }

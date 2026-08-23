@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.13307978
+  temporaryID: 0.9849777
   transitions:
   - name: "\uB300\uAE30"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889725805462497
+        rid: 6174889727348703578
       negate: 0
     trueState: {fileID: 11400000, guid: 0be53177452db594585fb9526dd7e2fb, type: 2}
     falseState: {fileID: 0}
@@ -35,7 +35,7 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889725805462498
+  - rid: 6174889727348703579
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -48,12 +48,12 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889725805462497
+    - rid: 6174889727348703578
       type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT003_S3_mark
         seconds: 0.8
-    - rid: 6174889725805462498
+    - rid: 6174889727348703579
       type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT003_S3_mark

@@ -19,7 +19,10 @@ namespace StateMachine
         [Header("Tear detail")]
         public Color innerColor = new(0.02f, 0.01f, 0.04f, 0.95f);
         public Color shadowEdgeColor = new(0.18f, 0.03f, 0.08f, 0.9f);
-        [Range(2, 24)] public int segmentCount = 10;
+        [Range(1, 4)] public int lineCount = 1;
+        [Min(0f)] public float lineSpacing;
+        [Range(0f, 90f)] public float lineAngleRandomness;
+        [Range(1, 64)] public int segmentCount = 10;
         [Range(0f, 0.25f)] public float jaggedness = 0.06f;
         [Min(0f)] public float opening = 56f;
         [Min(1f)] public float edgeThickness = 5f;
@@ -30,7 +33,21 @@ namespace StateMachine
 
         public override void Act(StateController stateController)
         {
-            ScreenEffectManager.Instance.ScreenTear(new ScreenTearSettings
+            Play();
+        }
+
+        /// <summary>
+        /// Sends the serialized inspector values to the screen effect manager.
+        /// Both event chains and the testbed use this same path.
+        /// </summary>
+        public void Play()
+        {
+            ScreenEffectManager.Instance.ScreenTear(CreateSettings());
+        }
+
+        public ScreenTearSettings CreateSettings()
+        {
+            return new ScreenTearSettings
             {
                 duration = duration,
                 flashRatio = flashRatio,
@@ -43,6 +60,9 @@ namespace StateMachine
                 tearColor = tearColor,
                 innerColor = innerColor,
                 shadowEdgeColor = shadowEdgeColor,
+                lineCount = lineCount,
+                lineSpacing = lineSpacing,
+                lineAngleRandomness = lineAngleRandomness,
                 segmentCount = segmentCount,
                 jaggedness = jaggedness,
                 opening = opening,
@@ -51,7 +71,7 @@ namespace StateMachine
                 shardSize = shardSize,
                 shardSpread = shardSpread,
                 randomSeed = randomSeed,
-            });
+            };
         }
     }
 }

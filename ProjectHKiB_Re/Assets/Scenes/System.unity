@@ -79429,8 +79429,13 @@ MonoBehaviour:
   - {fileID: 5641469510271594099, guid: 450ba67e8a9856d469d3495ec4550f12, type: 3}
   - {fileID: 6340638777498452742, guid: 3e977ba7b46275f4d94afe20fd8be80c, type: 3}
   - {fileID: 6544885131358697005, guid: 03bea3095f8c90d499d50f39dbef44c9, type: 3}
-  _dreamExitMap: {fileID: 11400000, guid: ae962f631543bce4fad467668f09d265, type: 2}
-  _stepInterval: 2
+  _builtEvents:
+  - {fileID: 11400000, guid: aededc717c6e9e24db507d926d28d6a0, type: 2}
+  - {fileID: 11400000, guid: 390c439a92a0c3e4a94697982e12f210, type: 2}
+  - {fileID: 11400000, guid: 243286ed2ddc26941a8eda762c8d6c2a, type: 2}
+  - {fileID: 11400000, guid: 08a9976efdf2a9f498d6c06a046051b8, type: 2}
+  - {fileID: 11400000, guid: 988c00e7929364d43981a86bf89f5f04, type: 2}
+  - {fileID: 11400000, guid: 2c896fdf02ae5374dad98648de0dd5fd, type: 2}
 --- !u!1 &1607588521
 GameObject:
   m_ObjectHideFlags: 0

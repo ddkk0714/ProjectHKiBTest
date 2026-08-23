@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.17345227
+  temporaryID: 0.6846979
   transitions:
   - name: "\uC870\uAC74 0"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889726336565361
+        rid: 6174889727348703722
       negate: 0
     trueState: {fileID: 11400000, guid: 90d78073be512634d9a29749a90f5c56, type: 2}
     falseState: {fileID: 0}
@@ -41,7 +41,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889726336565362
+        rid: 6174889727348703723
       negate: 0
     trueState: {fileID: 11400000, guid: 90d78073be512634d9a29749a90f5c56, type: 2}
     falseState: {fileID: 0}
@@ -51,10 +51,10 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889726336565363
-  - rid: 6174889726336565364
-  - rid: 6174889726336565365
-  - rid: 6174889726336565366
+  - rid: 6174889727348703724
+  - rid: 6174889727348703725
+  - rid: 6174889727348703726
+  - rid: 6174889727348703727
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -67,26 +67,26 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889726336565361
+    - rid: 6174889727348703722
       type: {class: DialogueLineEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889726336565362
+    - rid: 6174889727348703723
       type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT005_S0_mark
         seconds: 15
-    - rid: 6174889726336565363
+    - rid: 6174889727348703724
       type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT005_S0_mark
-    - rid: 6174889726336565364
+    - rid: 6174889727348703725
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889726336565365
+    - rid: 6174889727348703726
       type: {class: DialogueStartAction, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889726336565366
+    - rid: 6174889727348703727
       type: {class: DialogueShowLineAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         line:

@@ -10,6 +10,11 @@ namespace StateMachine
 
         public override void Act(StateController stateController)
         {
+            Play();
+        }
+
+        public void Play()
+        {
             ScreenEffectManager.Instance.Flash(color, duration);
         }
     }

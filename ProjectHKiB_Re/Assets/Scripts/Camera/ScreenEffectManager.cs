@@ -17,6 +17,9 @@ public struct ScreenTearSettings
     public Color tearColor;
     public Color innerColor;
     public Color shadowEdgeColor;
+    public int lineCount;
+    public float lineSpacing;
+    public float lineAngleRandomness;
     public int segmentCount;
     public float jaggedness;
     public float opening;
@@ -76,14 +79,19 @@ public class ScreenEffectManager : MonoBehaviour
     private Vector2[] _tearShardVelocities = new Vector2[0];
     private float[] _tearShardRotations = new float[0];
     private float[] _tearShardScales = new float[0];
+    private Vector2[] _tearLineDirections = new Vector2[0];
+    private Vector2[] _tearLineNormals = new Vector2[0];
+    private int _tearLineCount;
+    private int _segmentsPerTearLine;
     private int _activeTearSegments;
     private int _activeTearShards;
     private int _tearSeed;
     private RawImage _noiseImage;
-    private Texture2D _noiseTexture;
+    private Material _noiseMaterial;
+    private int _noiseRequestVersion;
     private int _illustrationRequestVersion;
 
-    private const int NoiseTextureSize = 64;
+    private const string ProceduralNoiseShaderPath = "ScreenEffects/ProceduralScreenNoise";
     // 오버레이가 다른 UI(대화창·메뉴) 위에 확실히 올라오도록. 대화 위에 암전이 덮여야 하는 연출이 있다.
     private const int OverlaySortingOrder = 32000;
     private const float DefaultNoiseTiling = 16f;
@@ -100,7 +108,7 @@ public class ScreenEffectManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (_noiseTexture != null) Destroy(_noiseTexture);
+        if (_noiseMaterial != null) Destroy(_noiseMaterial);
     }
 
     // ─── 공개 API ────────────────────────────────────────────────
@@ -124,31 +132,63 @@ public class ScreenEffectManager : MonoBehaviour
     }
 
     /// <summary>
-    /// TV 노이즈. intensity는 0~1(오버레이 알파), duration 초 동안 유지된 뒤 사라진다.
+    /// GPU 절차형 TV 노이즈. 화면 해상도 기반의 미세 입자·아날로그 뭉침·수평 간섭을 합성하며,
+    /// intensity는 노이즈 강도, alpha는 투명도이며 각각 0~1이다. duration 초 동안 유지된 뒤 사라진다.
     /// duration이 0 이하면 <see cref="StopNoise"/>를 부를 때까지 계속된다.
     /// </summary>
     /// <param name="tiling">
-    /// 화면을 몇 칸으로 잘라 노이즈를 반복할지. 클수록 알갱이가 잘아진다. 0 이하면 기본값(16).
-    /// 예전엔 이 값이 코드에 박혀 있어 연출마다 거칠기를 못 바꿨다.
+    /// 노이즈 밀도. 클수록 보조 입자가 잘아진다. 0 이하면 기본값(16).
     /// </param>
+    /// <param name="alpha">최종 노이즈 투명도. 1이면 원본 화면을 완전히 가리고, 0이면 완전히 투명하다.</param>
+    /// <param name="shakeStrength">노이즈와 함께 재생할 카메라 흔들림의 임펄스 강도. 0이면 흔들지 않는다.</param>
+    /// <param name="shakeDuration">반복 흔들림 전체 시간(초).</param>
+    /// <param name="shakeCount">shakeDuration 동안 발생할 흔들림 횟수.</param>
+    // 기존 3인자 호출은 이전 구현처럼 intensity를 화면 투명도로도 사용한다.
     public void SetNoise(float intensity, float duration, float tiling = 0f)
-    {
-        if (_noiseImage != null && tiling > 0f)
-            _noiseImage.uvRect = new Rect(0f, 0f, tiling, tiling);
+        => SetNoise(intensity, duration, tiling, Mathf.Clamp01(intensity), 0f, 0f, 0);
 
-        StartEffect(NoiseRoutine(Mathf.Clamp01(intensity), duration));
+    public void SetNoise(float intensity, float duration, float tiling, float alpha)
+        => SetNoise(intensity, duration, tiling, alpha, 0f, 0f, 0);
+
+    public void SetNoise(
+        float intensity,
+        float duration,
+        float tiling,
+        float alpha,
+        float shakeStrength,
+        float shakeDuration,
+        int shakeCount)
+    {
+        if (_noiseImage == null || _noiseMaterial == null)
+        {
+            Debug.LogError("[ScreenEffectManager] 노이즈 셰이더를 준비하지 못해 효과를 재생할 수 없습니다.");
+            return;
+        }
+
+        float noiseTiling = tiling > 0f ? tiling : DefaultNoiseTiling;
+        int requestVersion = ++_noiseRequestVersion;
+        StartEffect(NoiseRoutine(
+            Mathf.Clamp01(intensity),
+            Mathf.Clamp01(alpha),
+            duration,
+            noiseTiling,
+            requestVersion));
+
+        if (shakeStrength > 0f && shakeDuration > 0f && shakeCount > 0)
+            StartEffect(NoiseShakeRoutine(shakeStrength, shakeDuration, shakeCount, requestVersion));
     }
 
     public void StopNoise()
     {
+        _noiseRequestVersion++;
         if (_noiseImage != null) _noiseImage.enabled = false;
     }
 
     /// <summary>
-    /// ?붾㈃??醫낆씠泥섎읆 諛섏쑝濡?李?뼱吏???곗텧(EVT-006 理쒖쥌 ?덉텧).
+    /// 화면이 종이처럼 반으로 찢어지는 연출(EVT-006 최종 탈출).
     ///
-    /// 李?뼱吏?醫낆씠 ?띿뒪泥섍? ?놁뼱 吏湲덉? ???ш킅 + ?붿쟾?쇰줈 ?泥댄븳?? ?꾪듃媛 ?ㅼ뼱?ㅻ㈃
-    /// ??硫붿꽌??蹂몃Ц留?援먯껜?섎㈃ ?섍퀬, ?몄텧遺(ScreenTearAction)??洹몃?濡??щ룄 ?쒕떎.
+    /// 찢어진 종이 텍스처가 없어 지금은 흰 섬광 + 암전으로 대체한다. 아트가 들어오면
+    /// 이 메서드 본문만 교체하면 되고, 호출부(ScreenTearAction)는 그대로 둬도 된다.
     /// </summary>
     public void ScreenTear(float duration)
     {
@@ -157,7 +197,7 @@ public class ScreenEffectManager : MonoBehaviour
             new Vector2(0.5f, 0.5f), 0f, 1800f, 18f, Color.white);
     }
 
-    // ??? ?대? ????????????????????????????????????????????????????
+    // ─── 내부 ────────────────────────────────────────────────────
 
     public void ScreenTear(
         float duration,
@@ -183,6 +223,9 @@ public class ScreenEffectManager : MonoBehaviour
             tearColor = tearColor,
             innerColor = new Color(0.02f, 0.01f, 0.04f, 0.95f),
             shadowEdgeColor = new Color(0.18f, 0.03f, 0.08f, 0.9f),
+            lineCount = 1,
+            lineSpacing = 0f,
+            lineAngleRandomness = 0f,
             segmentCount = 10,
             jaggedness = 0.06f,
             opening = 56f,
@@ -279,30 +322,54 @@ public class ScreenEffectManager : MonoBehaviour
         yield return FadeRoutine(original, half);
     }
 
-    private IEnumerator NoiseRoutine(float intensity, float duration)
+    private IEnumerator NoiseRoutine(float intensity, float alpha, float duration, float tiling, int requestVersion)
     {
         _noiseImage.enabled = true;
-        _noiseImage.color = new Color(1f, 1f, 1f, intensity);
+        _noiseMaterial.SetFloat("_Intensity", intensity);
+        _noiseMaterial.SetFloat("_Opacity", alpha);
+        _noiseMaterial.SetFloat("_GrainTiling", tiling);
+        _noiseMaterial.SetFloat("_Seed", Random.value * 4096f);
 
         float elapsed = 0f;
-        while (duration <= 0f || elapsed < duration)
+        while (requestVersion == _noiseRequestVersion && (duration <= 0f || elapsed < duration))
         {
-            RegenerateNoise();
+            // 셰이더 시간도 unscaled time으로 넣는다. 컷신에서 게임 시간이 멈춰도 노이즈는 계속 흐른다.
+            _noiseMaterial.SetFloat("_NoiseTime", Time.unscaledTime);
             elapsed += Time.unscaledDeltaTime;
             yield return null;
-
-            // duration이 0 이하인 "수동 정지" 모드에서 StopNoise가 불리면 여기서 빠져나온다.
-            if (duration <= 0f && !_noiseImage.enabled) yield break;
         }
 
-        _noiseImage.enabled = false;
+        // 새 요청이 이미 시작됐다면 그 요청의 화면을 끄면 안 된다.
+        if (requestVersion == _noiseRequestVersion)
+            _noiseImage.enabled = false;
     }
 
-    private IEnumerator ScreenTearRoutine(float duration)
+    private IEnumerator NoiseShakeRoutine(float strength, float duration, int count, int requestVersion)
     {
-        float slice = Mathf.Max(duration, 0.01f) * 0.5f;
-        yield return FlashRoutine(Color.white, slice);
-        yield return FadeRoutine(new Color(0f, 0f, 0f, 1f), slice);
+        CameraManager camera = CameraManager.instance;
+        if (!camera)
+        {
+            Debug.LogWarning("[ScreenEffectManager] CameraManager가 없어 노이즈 흔들림을 재생할 수 없습니다.");
+            yield break;
+        }
+
+        float interval = duration / count;
+        for (int i = 0; i < count && requestVersion == _noiseRequestVersion; i++)
+        {
+            // 매 임펄스마다 방향을 바꿔 기계적으로 한쪽만 튀는 느낌을 피한다.
+            Vector2 randomDirection = Random.insideUnitCircle;
+            if (randomDirection.sqrMagnitude < 0.01f)
+                randomDirection = Vector2.right;
+
+            camera.Shake(new Vector3(randomDirection.x, randomDirection.y, 0f), strength);
+
+            float elapsed = 0f;
+            while (requestVersion == _noiseRequestVersion && elapsed < interval)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                yield return null;
+            }
+        }
     }
 
     private IEnumerator FadeIllustrationRoutine(Color from, Color target, float duration, int requestVersion, bool disableWhenDone)
@@ -385,6 +452,9 @@ public class ScreenEffectManager : MonoBehaviour
             if (settings.tearColor.a <= 0f) settings.tearColor = Color.white;
             settings.innerColor = new Color(0.02f, 0.01f, 0.04f, 0.95f);
             settings.shadowEdgeColor = new Color(0.18f, 0.03f, 0.08f, 0.9f);
+            settings.lineCount = 1;
+            settings.lineSpacing = 0f;
+            settings.lineAngleRandomness = 0f;
             settings.segmentCount = 10;
             settings.jaggedness = 0.06f;
             settings.opening = 56f;
@@ -401,7 +471,10 @@ public class ScreenEffectManager : MonoBehaviour
         settings.length = Mathf.Max(1f, settings.length);
         settings.thickness = Mathf.Max(1f, settings.thickness);
         settings.edgeThickness = Mathf.Max(1f, settings.edgeThickness);
-        settings.segmentCount = Mathf.Clamp(settings.segmentCount, 2, 24);
+        settings.lineCount = Mathf.Clamp(settings.lineCount <= 0 ? 1 : settings.lineCount, 1, 4);
+        settings.lineSpacing = Mathf.Max(0f, settings.lineSpacing);
+        settings.lineAngleRandomness = Mathf.Clamp(settings.lineAngleRandomness, 0f, 90f);
+        settings.segmentCount = Mathf.Clamp(settings.segmentCount, 1, 64);
         settings.jaggedness = Mathf.Clamp(settings.jaggedness, 0f, 0.25f);
         settings.opening = Mathf.Max(0f, settings.opening);
         settings.shardCount = Mathf.Clamp(settings.shardCount, 0, 40);
@@ -411,18 +484,22 @@ public class ScreenEffectManager : MonoBehaviour
 
     private void PrepareTearVisual(ScreenTearSettings settings)
     {
-        _activeTearSegments = settings.segmentCount;
+        _tearLineCount = settings.lineCount;
+        _segmentsPerTearLine = settings.segmentCount;
+        _activeTearSegments = _tearLineCount * _segmentsPerTearLine;
         _activeTearShards = settings.shardCount;
         EnsureTearImagePool(_tearGapSegments, _activeTearSegments, "TearGap");
         EnsureTearImagePool(_tearLightEdges, _activeTearSegments, "TearLightEdge");
         EnsureTearImagePool(_tearShadowEdges, _activeTearSegments, "TearShadowEdge");
         EnsureTearImagePool(_tearShards, _activeTearShards, "TearShard");
 
-        _tearPoints = new Vector2[_activeTearSegments + 1];
+        _tearPoints = new Vector2[_tearLineCount * (_segmentsPerTearLine + 1)];
         _tearShardOrigins = new Vector2[_activeTearShards];
         _tearShardVelocities = new Vector2[_activeTearShards];
         _tearShardRotations = new float[_activeTearShards];
         _tearShardScales = new float[_activeTearShards];
+        _tearLineDirections = new Vector2[_tearLineCount];
+        _tearLineNormals = new Vector2[_tearLineCount];
 
         RectTransform rect = (RectTransform)_tearImage.transform;
         Vector2 canvasSize = rect.rect.size;
@@ -438,23 +515,37 @@ public class ScreenEffectManager : MonoBehaviour
         int seed = settings.randomSeed != 0 ? settings.randomSeed : Time.frameCount * 7919;
         _tearSeed = seed;
 
-        for (int i = 0; i <= _activeTearSegments; i++)
+        for (int lineIndex = 0; lineIndex < _tearLineCount; lineIndex++)
         {
-            float t = i / (float)_activeTearSegments;
-            float offset = i == 0 || i == _activeTearSegments
-                ? 0f
-                : (TearNoise01(seed, i) * 2f - 1f) * settings.length * settings.jaggedness;
-            _tearPoints[i] = center + direction * ((t - 0.5f) * settings.length) + normal * offset;
+            float centeredLineIndex = lineIndex - (_tearLineCount - 1) * 0.5f;
+            Vector2 lineCenter = center + normal * centeredLineIndex * settings.lineSpacing;
+            float lineAngle = settings.angle + (TearNoise01(seed, 700 + lineIndex) * 2f - 1f) * settings.lineAngleRandomness;
+            float lineRadians = lineAngle * Mathf.Deg2Rad;
+            Vector2 lineDirection = new Vector2(Mathf.Cos(lineRadians), Mathf.Sin(lineRadians));
+            Vector2 lineNormal = new Vector2(-lineDirection.y, lineDirection.x);
+            int pointOffset = lineIndex * (_segmentsPerTearLine + 1);
+            _tearLineDirections[lineIndex] = lineDirection;
+            _tearLineNormals[lineIndex] = lineNormal;
+            for (int pointIndex = 0; pointIndex <= _segmentsPerTearLine; pointIndex++)
+            {
+                float t = pointIndex / (float)_segmentsPerTearLine;
+                float offset = pointIndex == 0 || pointIndex == _segmentsPerTearLine
+                    ? 0f
+                    : (TearNoise01(seed, lineIndex * 1000 + pointIndex) * 2f - 1f) * settings.length * settings.jaggedness;
+                _tearPoints[pointOffset + pointIndex] = lineCenter + lineDirection * ((t - 0.5f) * settings.length) + lineNormal * offset;
+            }
         }
 
         for (int i = 0; i < _activeTearShards; i++)
         {
             float along = TearNoise01(seed, 100 + i);
             float side = TearNoise01(seed, 200 + i) * 2f - 1f;
-            int segment = Mathf.Min(_activeTearSegments - 1, Mathf.FloorToInt(along * _activeTearSegments));
-            float segmentT = along * _activeTearSegments - segment;
-            Vector2 origin = Vector2.Lerp(_tearPoints[segment], _tearPoints[segment + 1], segmentT);
-            Vector2 spread = normal * side * settings.shardSpread + direction * (TearNoise01(seed, 300 + i) - 0.25f) * settings.shardSpread * 0.35f;
+            int lineIndex = i % _tearLineCount;
+            int segment = Mathf.Min(_segmentsPerTearLine - 1, Mathf.FloorToInt(along * _segmentsPerTearLine));
+            float segmentT = along * _segmentsPerTearLine - segment;
+            int pointOffset = lineIndex * (_segmentsPerTearLine + 1);
+            Vector2 origin = Vector2.Lerp(_tearPoints[pointOffset + segment], _tearPoints[pointOffset + segment + 1], segmentT);
+            Vector2 spread = _tearLineNormals[lineIndex] * side * settings.shardSpread + _tearLineDirections[lineIndex] * (TearNoise01(seed, 300 + i) - 0.25f) * settings.shardSpread * 0.35f;
 
             _tearShardOrigins[i] = origin;
             _tearShardVelocities[i] = spread;
@@ -470,36 +561,43 @@ public class ScreenEffectManager : MonoBehaviour
         float fadeOut = progress < 0.88f ? 1f : 1f - (progress - 0.88f) / 0.12f;
         float opening = settings.opening * Mathf.SmoothStep(0f, 1f, progress);
 
-        for (int i = 0; i < _activeTearSegments; i++)
+        for (int lineIndex = 0; lineIndex < _tearLineCount; lineIndex++)
         {
-            float segmentDelay = i / (float)_activeTearSegments * 0.58f;
-            float localProgress = Mathf.Clamp01((progress - segmentDelay) / 0.42f);
-            if (localProgress <= 0f)
+            float lineDelay = _tearLineCount <= 1 ? 0f : lineIndex / (float)(_tearLineCount - 1) * 0.16f;
+            int pointOffset = lineIndex * (_segmentsPerTearLine + 1);
+            int imageOffset = lineIndex * _segmentsPerTearLine;
+            for (int segmentIndex = 0; segmentIndex < _segmentsPerTearLine; segmentIndex++)
             {
-                _tearGapSegments[i].enabled = false;
-                _tearLightEdges[i].enabled = false;
-                _tearShadowEdges[i].enabled = false;
-                continue;
+                int imageIndex = imageOffset + segmentIndex;
+                float segmentDelay = lineDelay + segmentIndex / (float)_segmentsPerTearLine * 0.46f;
+                float localProgress = Mathf.Clamp01((progress - segmentDelay) / 0.36f);
+                if (localProgress <= 0f)
+                {
+                    _tearGapSegments[imageIndex].enabled = false;
+                    _tearLightEdges[imageIndex].enabled = false;
+                    _tearShadowEdges[imageIndex].enabled = false;
+                    continue;
+                }
+
+                Vector2 start = _tearPoints[pointOffset + segmentIndex];
+                Vector2 end = Vector2.Lerp(start, _tearPoints[pointOffset + segmentIndex + 1], Mathf.SmoothStep(0f, 1f, localProgress));
+                Vector2 line = end - start;
+                if (line.sqrMagnitude < 0.01f) continue;
+
+                Vector2 normal = new Vector2(-line.y, line.x).normalized;
+                float localOpening = opening * localProgress;
+                float gapWidth = settings.thickness + localOpening;
+                Color inner = settings.innerColor;
+                inner.a *= fadeOut;
+                Color light = settings.tearColor;
+                light.a *= fadeOut;
+                Color shadow = settings.shadowEdgeColor;
+                shadow.a *= fadeOut;
+
+                SetTearLine(_tearGapSegments[imageIndex], start, end, gapWidth, inner);
+                SetTearLine(_tearLightEdges[imageIndex], start + normal * (gapWidth * 0.5f), end + normal * (gapWidth * 0.5f), settings.edgeThickness, light);
+                SetTearLine(_tearShadowEdges[imageIndex], start - normal * (gapWidth * 0.5f), end - normal * (gapWidth * 0.5f), settings.edgeThickness, shadow);
             }
-
-            Vector2 start = _tearPoints[i];
-            Vector2 end = Vector2.Lerp(start, _tearPoints[i + 1], Mathf.SmoothStep(0f, 1f, localProgress));
-            Vector2 line = end - start;
-            if (line.sqrMagnitude < 0.01f) continue;
-
-            Vector2 normal = new Vector2(-line.y, line.x).normalized;
-            float localOpening = opening * localProgress;
-            float gapWidth = settings.thickness + localOpening;
-            Color inner = settings.innerColor;
-            inner.a *= fadeOut;
-            Color light = settings.tearColor;
-            light.a *= fadeOut;
-            Color shadow = settings.shadowEdgeColor;
-            shadow.a *= fadeOut;
-
-            SetTearLine(_tearGapSegments[i], start, end, gapWidth, inner);
-            SetTearLine(_tearLightEdges[i], start + normal * (gapWidth * 0.5f), end + normal * (gapWidth * 0.5f), settings.edgeThickness, light);
-            SetTearLine(_tearShadowEdges[i], start - normal * (gapWidth * 0.5f), end - normal * (gapWidth * 0.5f), settings.edgeThickness, shadow);
         }
 
         for (int i = 0; i < _activeTearShards; i++)
@@ -574,18 +672,6 @@ public class ScreenEffectManager : MonoBehaviour
         return value - Mathf.Floor(value);
     }
 
-    private void RegenerateNoise()
-    {
-        Color32[] pixels = new Color32[NoiseTextureSize * NoiseTextureSize];
-        for (int i = 0; i < pixels.Length; i++)
-        {
-            byte v = (byte)Random.Range(0, 256);
-            pixels[i] = new Color32(v, v, v, 255);
-        }
-        _noiseTexture.SetPixels32(pixels);
-        _noiseTexture.Apply(false);
-    }
-
     private void BuildOverlay()
     {
         _canvas = gameObject.AddComponent<Canvas>();
@@ -593,27 +679,32 @@ public class ScreenEffectManager : MonoBehaviour
         _canvas.sortingOrder = OverlaySortingOrder;
         gameObject.AddComponent<CanvasScaler>();
 
+        // 노이즈가 페이드보다 아래에 있어야 "노이즈 낀 화면이 서서히 어두워지는" 순서가 된다.
         _illustrationImage = CreateFullScreenChild<Image>("Illustration");
         _illustrationImage.preserveAspect = true;
         _illustrationImage.enabled = false;
-        // 노이즈가 페이드보다 아래에 있어야 "노이즈 낀 화면이 서서히 어두워지는" 순서가 된다.
+
         _noiseImage = CreateFullScreenChild<RawImage>("Noise");
-        _noiseTexture = new Texture2D(NoiseTextureSize, NoiseTextureSize, TextureFormat.RGBA32, false)
+        Shader noiseShader = Resources.Load<Shader>(ProceduralNoiseShaderPath);
+        if (noiseShader == null)
         {
-            filterMode = FilterMode.Point,
-            wrapMode = TextureWrapMode.Repeat,
-        };
-        _noiseImage.texture = _noiseTexture;
-        // 화면을 잘게 채워야 TV 노이즈처럼 보인다 — 텍스처를 그대로 늘리면 뭉개진 얼룩이 된다.
-        // 연출별로 바꾸고 싶으면 SetNoise의 tiling 인자를 준다(ScreenNoiseAction에 노출돼 있다).
-        _noiseImage.uvRect = new Rect(0f, 0f, DefaultNoiseTiling, DefaultNoiseTiling);
+            Debug.LogError($"[ScreenEffectManager] Resources/{ProceduralNoiseShaderPath}.shader를 찾을 수 없습니다.");
+        }
+        else
+        {
+            _noiseMaterial = new Material(noiseShader) { hideFlags = HideFlags.DontSave };
+            _noiseImage.material = _noiseMaterial;
+            _noiseImage.texture = Texture2D.whiteTexture;
+        }
         _noiseImage.enabled = false;
 
         _fadeImage = CreateFullScreenChild<Image>("Fade");
         _fadeImage.color = new Color(0f, 0f, 0f, 0f);
 
         _tearImage = CreateFullScreenChild<Image>("TearLine");
-        _tearImage.enabled = false;    }
+        _tearImage.enabled = false;
+
+    }
 
     private T CreateFullScreenChild<T>(string name) where T : Graphic
     {

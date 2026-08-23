@@ -29,6 +29,11 @@ namespace StateMachine
 
         public override void Act(StateController stateController)
         {
+            Play();
+        }
+
+        public void Play()
+        {
             if (warnMissingIllustration && illustration == null)
                 Debug.LogWarning("[CameraZoomAction] 클로즈업 일러스트가 없어 카메라 줌으로 대체합니다.");
 

@@ -12,6 +12,11 @@ namespace StateMachine
 
         public override void Act(StateController stateController)
         {
+            Play();
+        }
+
+        public void Play()
+        {
             CameraManager camera = CameraManager.instance;
             if (!camera)
             {

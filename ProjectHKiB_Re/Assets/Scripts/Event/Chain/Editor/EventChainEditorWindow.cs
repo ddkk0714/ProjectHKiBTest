@@ -457,9 +457,30 @@ public class EventChainEditorWindow : EditorWindow
         for (int i = 0; i < _chain.events.Count; i++)
             BuildEventDefinition(_chain.events[i], Mathf.Max(0.1f, _chain.stepTimeoutMultiplier));
 
+        SyncBuiltEventsToOpenTestbeds();
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         Debug.Log($"[EventChainEditorWindow] 빌드 완료 — {OutputFolder}에 이벤트 {_chain.events.Count}개를 생성/갱신했습니다.");
+    }
+
+    private void SyncBuiltEventsToOpenTestbeds()
+    {
+        EventSO[] builtEvents = _chain.events
+            .Where(def => def != null && !string.IsNullOrWhiteSpace(def.eventId))
+            .Select(def => AssetDatabase.LoadAssetAtPath<EventSO>($"{OutputFolder}/{def.eventId}.asset"))
+            .Where(evt => evt != null)
+            .ToArray();
+
+        EventSystemTestbed[] testbeds = UnityEngine.Object.FindObjectsOfType<EventSystemTestbed>(true);
+        for (int i = 0; i < testbeds.Length; i++)
+        {
+            EventSystemTestbed testbed = testbeds[i];
+            if (testbed == null || !testbed.gameObject.scene.IsValid()) continue;
+
+            Undo.RecordObject(testbed, "Sync Built Event Effects");
+            testbed.SetBuiltEvents(builtEvents);
+            EditorUtility.SetDirty(testbed);
+        }
     }
 
     private static void BuildEventDefinition(EventDefinition def, float timeoutMultiplier)
@@ -2085,7 +2106,7 @@ public class EventChainEditorWindow : EditorWindow
             {
                 new SetInputModeAction { mode = EnumManager.InputMode.Cutscene },
                 new DummyEventStepAction { label = "EVT-006 탈출 — 가위(Lily Form) 사용을 확인해 문을 가릅니다" },
-                new ScreenTearAction { duration = 1f },
+                CreateVerticalMultiTearAction(),
             },
             advanceWhenAny = new StateDecision[] { new ScreenEffectEndedDecision() },
             timeoutSeconds = 2f,
@@ -2107,6 +2128,35 @@ public class EventChainEditorWindow : EditorWindow
 
     // 탈출문 트리거는 문 GameObject의 자식으로 배치된다. 문은 EVT-006 완료 전까지 비활성이므로,
     // Dood == 3만으로는 전투 이전에 이 이벤트를 발동할 수 없다.
+    private static ScreenTearAction CreateVerticalMultiTearAction()
+    {
+        return new ScreenTearAction
+        {
+            duration = 1.35f,
+            flashRatio = 0.12f,
+            flashColor = new Color(1f, 0.75f, 0.82f, 1f),
+            endColor = new Color(0.015f, 0.005f, 0.02f, 1f),
+            origin = new Vector2(0.5f, 0.5f),
+            angle = 90f,
+            length = 2400f,
+            thickness = 10f,
+            tearColor = new Color(1f, 0.24f, 0.42f, 1f),
+            innerColor = new Color(0.08f, 0.005f, 0.025f, 0.96f),
+            shadowEdgeColor = new Color(0.12f, 0.01f, 0.05f, 0.95f),
+            lineCount = 4,
+            lineSpacing = 150f,
+            lineAngleRandomness = 28f,
+            segmentCount = 32,
+            jaggedness = 0.13f,
+            opening = 84f,
+            edgeThickness = 6f,
+            shardCount = 28,
+            shardSize = 26f,
+            shardSpread = 340f,
+            randomSeed = 6006,
+        };
+    }
+
     private static EventDefinition BuildEvt006ExitSample(EventFlagSO dood)
     {
         var def = new EventDefinition
@@ -2136,7 +2186,7 @@ public class EventChainEditorWindow : EditorWindow
             {
                 new SetInputModeAction { mode = EnumManager.InputMode.Cutscene },
                 new DummyEventStepAction { label = "EVT-006 탈출 — 가위(Lily GearData 대역)로 문을 가릅니다" },
-                new ScreenTearAction { duration = 1f },
+                CreateVerticalMultiTearAction(),
             },
             advanceWhenAny = new StateDecision[] { new ScreenEffectEndedDecision() },
             timeoutSeconds = 2f,

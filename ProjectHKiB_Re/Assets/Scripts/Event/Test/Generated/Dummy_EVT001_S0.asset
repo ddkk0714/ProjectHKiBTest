@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.19870976
+  temporaryID: 0.43567544
   transitions:
   - name: "\uD0C0\uC784\uC544\uC6C3"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889726336565322
+        rid: 6174889727348703683
       negate: 0
     trueState: {fileID: 11400000, guid: a6f8f6c93c24135479d9c8f87b594d4f, type: 2}
     falseState: {fileID: 0}
@@ -35,13 +35,13 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889726336565323
-  - rid: 6174889726336565324
-  - rid: 6174889726336565325
-  - rid: 6174889726336565326
-  - rid: 6174889726336565327
-  - rid: 6174889726336565328
-  - rid: 6174889726336565329
+  - rid: 6174889727348703684
+  - rid: 6174889727348703685
+  - rid: 6174889727348703686
+  - rid: 6174889727348703687
+  - rid: 6174889727348703688
+  - rid: 6174889727348703689
+  - rid: 6174889727348703690
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -54,38 +54,38 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889726336565322
+    - rid: 6174889727348703683
       type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT001_S0_mark
         seconds: 1.5
-    - rid: 6174889726336565323
+    - rid: 6174889727348703684
       type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT001_S0_mark
-    - rid: 6174889726336565324
+    - rid: 6174889727348703685
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889726336565325
+    - rid: 6174889727348703686
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-001 S0 \uAE08\uBC1C\uC774 \uBC31\uBC1C\uC758 \uD2B8\uC708\uD14C\uC77C\uC744
           \uC790\uB984 (\uC560\uB2C8\uBA54\uC774\uC158\xB7\uC0AC\uC6B4\uB4DC \uC5C6\uC74C)"
         completeBoolName: 
-    - rid: 6174889726336565326
+    - rid: 6174889727348703687
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_A
         targetAction:
-          rid: 6174889726336565330
-    - rid: 6174889726336565327
+          rid: 6174889727348703691
+    - rid: 6174889727348703688
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_B
         targetAction:
-          rid: 6174889726336565331
-    - rid: 6174889726336565328
+          rid: 6174889727348703692
+    - rid: 6174889727348703689
       type: {class: ScreenNoiseAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         intensity: 0.5
@@ -96,16 +96,16 @@ MonoBehaviour:
         shakeDuration: 0
         shakeCount: 0
         stop: 0
-    - rid: 6174889726336565329
+    - rid: 6174889727348703690
       type: {class: CameraShakeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         strength: 0
         direction: {x: 1, y: 1, z: 1}
-    - rid: 6174889726336565330
+    - rid: 6174889727348703691
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: 
-    - rid: 6174889726336565331
+    - rid: 6174889727348703692
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: 
