@@ -37,26 +37,5 @@ MonoBehaviour:
         stateMachine: {fileID: 0}
         state: {fileID: 0}
         startsInactive: 1
-      - eventFlag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
-        eventFlagCondition: 3
-        position: {x: 0, y: 0, z: 0}
-        dir: 0
-        stateMachine: {fileID: 0}
-        state: {fileID: 0}
-        startsInactive: 1
-      - eventFlag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
-        eventFlagCondition: 4
-        position: {x: 0, y: 0, z: 0}
-        dir: 0
-        stateMachine: {fileID: 0}
-        state: {fileID: 0}
-        startsInactive: 1
-      - eventFlag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
-        eventFlagCondition: 5
-        position: {x: 0, y: 0, z: 0}
-        dir: 0
-        stateMachine: {fileID: 0}
-        state: {fileID: 0}
-        startsInactive: 1
   allAnimInitInfos:
     _serializedList: []

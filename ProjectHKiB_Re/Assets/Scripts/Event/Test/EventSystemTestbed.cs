@@ -38,6 +38,9 @@ public class EventSystemTestbed : MonoBehaviour
 
     [Header("Built Event Effects")]
     [Tooltip("Event Chain Editor updates this list after every build. Inspector test buttons always use these generated actions.")]
+    [Header("글리치 미리보기 (값을 맞춘 뒤 이벤트 체인에 옮겨 적는다)")]
+    [SerializeField] private ScreenGlitchAction _glitchPreview = new() { duration = 1.5f };
+
     [SerializeField] private EventSO[] _builtEvents = Array.Empty<EventSO>();
 
     // ─── 화면 연출 ───────────────────────────────────────────────
@@ -53,6 +56,28 @@ public class EventSystemTestbed : MonoBehaviour
 
     [Button("연출: 노이즈 정지")]
     private void NoiseStop() => PlayBuiltAction<ScreenNoiseAction>(action => action.stop, "noise stop", action => action.Play());
+
+    // 글리치는 아직 어느 이벤트에도 배선돼 있지 않아 PlayBuiltAction으로는 찾을 수 없다.
+    // 값을 만져 가며 맞춰 보라고 인스펙터에 그대로 노출한 인스턴스를 쓴다 - 여기서 정한 값을
+    // 그대로 이벤트 체인 편집기의 ScreenGlitchAction에 옮겨 적으면 된다.
+    [Button("연출: 글리치")]
+    private void Glitch()
+    {
+        if (!Application.isPlaying)
+        {
+            Debug.LogWarning("[Testbed] 플레이 모드에서만 화면 연출을 미리 볼 수 있습니다.");
+            return;
+        }
+        _glitchPreview.stop = false;
+        _glitchPreview.Play();
+    }
+
+    [Button("연출: 글리치 정지")]
+    private void GlitchStop()
+    {
+        if (!Application.isPlaying) return;
+        ScreenEffectManager.Instance.StopGlitch();
+    }
 
     [Button("연출: 흰 섬광")]
     private void Flash() => PlayBuiltAction<ScreenFlashAction>(action => true, "flash", action => action.Play());

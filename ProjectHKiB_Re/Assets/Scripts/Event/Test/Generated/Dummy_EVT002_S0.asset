@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.3541241
+  temporaryID: 0.031967763
   transitions:
   - name: "\uC870\uAC74 0"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889727348703618
+        rid: 6174889728934674959
       negate: 0
     trueState: {fileID: 11400000, guid: 8e6f8b79901278341bbd0a6eea61c0ad, type: 2}
     falseState: {fileID: 0}
@@ -41,7 +41,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889727348703619
+        rid: 6174889728934674960
       negate: 0
     trueState: {fileID: 11400000, guid: 8e6f8b79901278341bbd0a6eea61c0ad, type: 2}
     falseState: {fileID: 0}
@@ -51,12 +51,12 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889727348703620
-  - rid: 6174889727348703621
-  - rid: 6174889727348703622
-  - rid: 6174889727348703623
-  - rid: 6174889727348703624
-  - rid: 6174889727348703625
+  - rid: 6174889728934674961
+  - rid: 6174889728934674962
+  - rid: 6174889728934674963
+  - rid: 6174889728934674964
+  - rid: 6174889728934674965
+  - rid: 6174889728934674966
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -69,38 +69,38 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889727348703618
+    - rid: 6174889728934674959
       type: {class: DialogueLineEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727348703619
+    - rid: 6174889728934674960
       type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT002_S0_mark
         seconds: 15
-    - rid: 6174889727348703620
+    - rid: 6174889728934674961
       type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT002_S0_mark
-    - rid: 6174889727348703621
+    - rid: 6174889728934674962
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889727348703622
+    - rid: 6174889728934674963
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-002 S0 \uB300\uD654 \uC2DC\uC791 \u2014 Submit \uD0A4\uB85C \uB300\uC0AC\uB97C
           \uB118\uAE30\uC138\uC694"
         completeBoolName: 
-    - rid: 6174889727348703623
+    - rid: 6174889728934674964
       type: {class: DialogueStartAction, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727348703624
+    - rid: 6174889728934674965
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_B
         targetAction:
-          rid: 6174889727348703626
-    - rid: 6174889727348703625
+          rid: 6174889728934674967
+    - rid: 6174889728934674966
       type: {class: DialogueShowLineAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         line:
@@ -111,7 +111,7 @@ MonoBehaviour:
           BG: {fileID: 0}
           isChoice: 0
           choices: []
-    - rid: 6174889727348703626
+    - rid: 6174889728934674967
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: 

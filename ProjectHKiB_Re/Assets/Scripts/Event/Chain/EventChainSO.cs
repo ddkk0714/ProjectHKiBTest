@@ -67,6 +67,15 @@ public class EventDefinition
     // 놓기만 하면 실제로 반경 안에 들어오는 순간(Stay) 또는 반경 안에서 확인 키를 누르는 순간(Input)
     // 발동한다. ConfirmDir(방향 확인)은 이 프로젝트 이벤트 어디서도 아직 쓰인 적이 없어 자동 배선
     // 대상에서 뺐다 — 필요해지면 씬에서 손으로 EventConfirmDirTrigger를 붙이면 된다.
+    // "현실일 것" / "꿈일 것". 진행도 플래그로 대신하지 말 것 — 진행도가 더 올라가면 근사가 깨져
+    // 이벤트가 조용히 안 뜬다(EVT-003이 dood == 2로 대신하다가 정확히 그 사고를 냈다).
+    public WorldRequirement worldRequirement = WorldRequirement.Any;
+
+    // 진행 중인 이벤트를 끊고 시작할지. 사망 복귀처럼 "하던 걸 무르고 반드시 끼어들어야" 하는
+    // 이벤트만 켠다. 평상시엔 꺼두는 게 맞다 — EventManager의 재진입 가드가 "트리거가 겹쳐
+    // 이벤트가 처음부터 되감기는" 사고를 잡아주는데, 이걸 켜면 그 보호가 사라진다.
+    public bool interruptRunningEvent;
+
     public EventTriggerKind triggerKind = EventTriggerKind.None;
     [Min(0.1f)] public float triggerRadius = 1.5f;
     // Input 트리거가 반응할 입력. "말을 건다/상호작용"류는 대개 OnConfirm.
@@ -75,11 +84,23 @@ public class EventDefinition
     public List<EventStepData> steps = new();
 }
 
+// 이벤트가 성립하려면 어느 세계에 있어야 하는가. MapDataSO.isRealWorld를 직접 본다.
+public enum WorldRequirement
+{
+    Any,        // 어디서든
+    RealWorld,  // 현실 맵에서만 (해몽/노트처럼 현실 전용인 것)
+    Dream,      // 꿈 맵에서만
+}
+
 public enum EventTriggerKind
 {
     None,   // 콜라이더 없음 — 코드에서 TriggerEvent()를 직접 불러야 한다.
     Stay,   // 반경 안에 들어오면 즉시 발동(EventStayTrigger). "접근하면"류.
     Input,  // 반경 안에서 지정 입력을 누르면 발동(EventInputTrigger). "말을 건다/상호작용"류.
+
+    // 플레이어가 죽는 순간 발동(EntityDeathEventTrigger). 콜라이더를 쓰지 않는다 - 사망은 겹침이
+    // 아니라 순수 콜백 사건이라서다. 사망 복귀 이벤트가 이걸 쓴다.
+    PlayerDeath,
 }
 
 // 진입 액션 하나와, 그 뒤에 쉬는 시간.

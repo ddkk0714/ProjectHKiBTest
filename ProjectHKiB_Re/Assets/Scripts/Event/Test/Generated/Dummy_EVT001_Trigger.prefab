@@ -57,6 +57,8 @@ MonoBehaviour:
   _preconditions:
   - flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
     value: 0
+  _worldRequirement: 0
+  _interruptRunningEvent: 0
   _requiredClueIds: []
 --- !u!58 &832651060566675091
 CircleCollider2D:

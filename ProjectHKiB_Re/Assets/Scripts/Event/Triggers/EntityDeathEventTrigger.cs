@@ -19,10 +19,24 @@ public class EntityDeathEventTrigger : MonoBehaviour
     [SerializeField] private GameEvent _event;
     [SerializeField] private InterfaceRegister _owner;
 
+    // 켜면 _owner를 무시하고 **플레이어**의 사망을 지켜본다.
+    //
+    // 사망 복귀 이벤트는 이 오브젝트(트리거 프리팹)가 아니라 플레이어가 죽었을 때 떠야 하는데,
+    // 플레이어는 System 씬에 상주하고 트리거 프리팹은 맵 씬에 놓이므로 인스펙터에서 서로를
+    // 참조하도록 끌어다 놓을 수가 없다(씬을 넘는 참조는 저장되지 않는다). 그래서 이름으로 찾는
+    // 대신 GameManager를 통해 플레이를 시작한 뒤 스스로 묶는다.
+    [SerializeField] private bool _watchPlayer;
+
     private IDamagable _damagable;
 
     private void Start()
     {
+        if (_watchPlayer)
+        {
+            StartCoroutine(BindPlayerWhenReady());
+            return;
+        }
+
         if (!_owner) _owner = GetComponent<InterfaceRegister>();
         if (!_owner || !_owner.TryGetInterface(out _damagable))
         {
@@ -31,6 +45,30 @@ public class EntityDeathEventTrigger : MonoBehaviour
         }
 
         _damagable.OnDie += HandleDeath;
+    }
+
+    // 맵 씬이 System 씬보다 먼저 뜰 수도 있어 Start 시점에 플레이어가 없을 수 있다.
+    // 준비될 때까지 기다렸다가 묶는다.
+    private System.Collections.IEnumerator BindPlayerWhenReady()
+    {
+        const float timeoutSeconds = 10f;
+        float waited = 0f;
+
+        while (waited < timeoutSeconds)
+        {
+            Player player = GameManager.instance != null ? GameManager.instance.player : null;
+            if (player != null && player.TryGetInterface(out _damagable))
+            {
+                _damagable.OnDie += HandleDeath;
+                yield break;
+            }
+
+            waited += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        Debug.LogError($"ERROR: EntityDeathEventTrigger - '{name}'이 플레이어의 IDamagable을 찾지 못했습니다. " +
+                       "사망해도 이 이벤트가 발동하지 않습니다.");
     }
 
     private void OnDestroy()

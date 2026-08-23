@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.2517623
+  temporaryID: 0.4979661
   transitions:
   - name: "\uC870\uAC74 0"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889727348703614
+        rid: 6174889728934674986
       negate: 0
     trueState: {fileID: 11400000, guid: 090e741dd4f98604cb985c9b40b84426, type: 2}
     falseState: {fileID: 0}
@@ -35,9 +35,9 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889727348703615
-  - rid: 6174889727348703616
-  - rid: 6174889727348703617
+  - rid: 6174889728934674987
+  - rid: 6174889728934674988
+  - rid: 6174889728934674989
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -50,20 +50,20 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889727348703614
+    - rid: 6174889728934674986
       type: {class: ScreenEffectEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727348703615
+    - rid: 6174889728934674987
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-003 S2 \uB178\uD2B8\uB97C \uB36E\uC5C8\uC2B5\uB2C8\uB2E4 \u2014
           \uAFC8\uC73C\uB85C \uB3CC\uC544\uAC00\uAE30 \uC804\uC5D0 \uC554\uC804\uD569\uB2C8\uB2E4"
         completeBoolName: 
-    - rid: 6174889727348703616
+    - rid: 6174889728934674988
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889727348703617
+    - rid: 6174889728934674989
       type: {class: ScreenFadeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetColor: {r: 0, g: 0, b: 0, a: 1}

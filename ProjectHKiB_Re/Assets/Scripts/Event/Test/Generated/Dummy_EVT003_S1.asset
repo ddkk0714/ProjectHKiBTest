@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.4149912
+  temporaryID: 0.25748208
   transitions:
   - name: "\uC870\uAC74 0"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889727348703583
+        rid: 6174889728934674993
       negate: 0
     trueState: {fileID: 11400000, guid: 6d118c04778c6ed4198917bb06d9aeba, type: 2}
     falseState: {fileID: 0}
@@ -35,8 +35,8 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889727348703584
-  - rid: 6174889727348703585
+  - rid: 6174889728934674994
+  - rid: 6174889728934674995
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -49,17 +49,17 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889727348703583
+    - rid: 6174889728934674993
       type: {class: WindowClosedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         windowName: Note
-    - rid: 6174889727348703584
+    - rid: 6174889728934674994
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-003 S1 \uD574\uBABD \uC131\uB9BD \u2014 \uC2DC\uC2A4\uD15C \uADDC\uCE59\uC774
           \uD574\uAE08\uB418\uC5C8\uC2B5\uB2C8\uB2E4 (FLAG_USE_SCISSORS / FLAG_EMOTION_MERGE)"
         completeBoolName: 
-    - rid: 6174889727348703585
+    - rid: 6174889728934674995
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "\uB178\uD2B8\uB97C \uB2EB\uC73C\uBA74 \uAFC8\uC73C\uB85C \uB3CC\uC544\uAC11\uB2C8\uB2E4"

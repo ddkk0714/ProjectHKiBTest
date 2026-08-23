@@ -264,6 +264,7 @@ public class EventChainEditorWindow : EditorWindow
             "Dummy_EVT004" => BuildEvt004Sample(dood),
             "Dummy_EVT005" => BuildEvt005Sample(dood, lilyGear),
             "Dummy_EVT006" => BuildEvt006Sample(dood, lilyGear),
+            "Dummy_DEATH" => BuildDeathRecoverySample(),
             _ => null,
         };
         if (sample == null) return;
@@ -316,9 +317,18 @@ public class EventChainEditorWindow : EditorWindow
         EditorGUILayout.PropertyField(eventProp.FindPropertyRelative("targets"), new GUIContent("이벤트 대상"), true);
 
         EditorGUILayout.Space(4f);
+        EditorGUILayout.PropertyField(eventProp.FindPropertyRelative("worldRequirement"),
+            new GUIContent("세계 조건", "현실/꿈 중 어디서만 성립하는지. 진행도 플래그로 대신하지 말 것 — " +
+                                   "진행도가 올라가면 근사가 깨져 이벤트가 조용히 안 뜬다."));
+
+        EditorGUILayout.PropertyField(eventProp.FindPropertyRelative("interruptRunningEvent"),
+            new GUIContent("진행 중 이벤트 끊고 시작", "사망 복귀처럼 반드시 끼어들어야 하는 이벤트만 켤 것. " +
+                                             "평상시엔 꺼둬야 트리거 중복으로 이벤트가 되감기는 사고를 가드가 잡아준다."));
+
         SerializedProperty triggerKindProp = eventProp.FindPropertyRelative("triggerKind");
         EditorGUILayout.PropertyField(triggerKindProp, new GUIContent("씬 트리거"));
-        if ((EventTriggerKind)triggerKindProp.enumValueIndex != EventTriggerKind.None)
+        EventTriggerKind kind = (EventTriggerKind)triggerKindProp.enumValueIndex;
+        if (kind == EventTriggerKind.Stay || kind == EventTriggerKind.Input)
         {
             EditorGUI.indentLevel++;
             EditorGUILayout.PropertyField(eventProp.FindPropertyRelative("triggerRadius"), new GUIContent("반경"));
@@ -796,6 +806,9 @@ public class EventChainEditorWindow : EditorWindow
         for (int i = 0; i < clueIds.Length; i++)
             clueIdsProp.GetArrayElementAtIndex(i).stringValue = clueIds[i];
 
+        serialized.FindProperty("_worldRequirement").enumValueIndex = (int)def.worldRequirement;
+        serialized.FindProperty("_interruptRunningEvent").boolValue = def.interruptRunningEvent;
+
         GameEventTrigger trigger = ConfigureSceneTrigger(root, def);
         serialized.FindProperty("_trigger").objectReferenceValue = trigger;
 
@@ -820,12 +833,32 @@ public class EventChainEditorWindow : EditorWindow
             if (!keep) UnityEngine.Object.DestroyImmediate(old, true);
         }
 
-        if (def.triggerKind == EventTriggerKind.None)
+        // 사망 트리거는 GameEventTrigger 계열이 아니다(콜라이더를 안 쓴다). 종류를 바꿨을 때
+        // 남아 있지 않도록 여기서 정리하고, PlayerDeath일 때만 다시 붙인다.
+        EntityDeathEventTrigger deathTrigger = root.GetComponent<EntityDeathEventTrigger>();
+        if (def.triggerKind != EventTriggerKind.PlayerDeath && deathTrigger != null)
+            UnityEngine.Object.DestroyImmediate(deathTrigger, true);
+
+        if (def.triggerKind == EventTriggerKind.None || def.triggerKind == EventTriggerKind.PlayerDeath)
         {
             ZCircleCollider2D staleCollider = root.GetComponent<ZCircleCollider2D>();
             if (staleCollider != null) UnityEngine.Object.DestroyImmediate(staleCollider, true);
             CircleCollider2D staleCircle = root.GetComponent<CircleCollider2D>();
             if (staleCircle != null) UnityEngine.Object.DestroyImmediate(staleCircle, true);
+
+            if (def.triggerKind == EventTriggerKind.PlayerDeath)
+            {
+                if (deathTrigger == null) deathTrigger = root.AddComponent<EntityDeathEventTrigger>();
+                var serializedDeath = new SerializedObject(deathTrigger);
+                serializedDeath.FindProperty("_event").objectReferenceValue = root.GetComponent<GameStateEvent>();
+                // 이 프리팹이 아니라 플레이어의 사망을 지켜봐야 한다(씬을 넘는 참조는 저장되지 않으므로
+                // 인스펙터로 끌어다 놓을 수 없고, 트리거가 스스로 GameManager를 통해 묶는다).
+                serializedDeath.FindProperty("_watchPlayer").boolValue = true;
+                serializedDeath.ApplyModifiedPropertiesWithoutUndo();
+            }
+
+            // GameEvent._trigger에 넣을 수 있는 건 GameEventTrigger뿐이라 사망 트리거는 여기 안 들어간다.
+            // 참조 방향이 반대다 - EntityDeathEventTrigger가 GameEvent를 들고 직접 부른다.
             return null;
         }
 
@@ -1289,6 +1322,7 @@ public class EventChainEditorWindow : EditorWindow
             BuildEvt004Sample(dood),
             BuildEvt005Sample(dood, lilyGear),
             BuildEvt006Sample(dood, lilyGear),
+            BuildDeathRecoverySample(),
         };
 
         EditorUtility.SetDirty(_chain);
@@ -1362,7 +1396,20 @@ public class EventChainEditorWindow : EditorWindow
                 new TargetEntityManipulateAction { targetID = NpcATargetID, targetAction = new PlayAnimationAction { animationName = "" } },
                 // [애니메이션 빈칸] 머리카락이 잘리는 백발 쪽 반응.
                 new TargetEntityManipulateAction { targetID = NpcBTargetID, targetAction = new PlayAnimationAction { animationName = "" } },
+                // 노이즈는 화면을 덮고, 글리치는 원본을 어긋나게 한다. 두 레이어를 함께 켠다.
                 new ScreenNoiseAction { intensity = 0.5f, duration = 1.5f },
+                new ScreenGlitchAction
+                {
+                    intensity = 1f,
+                    duration = 1.5f,
+                    blockShift = 0.441f,
+                    blockDensity = 22.7f,
+                    blockCoverage = 1f,
+                    rgbSplit = 0.0031f,
+                    splitAngle = 5.34f,
+                    scanline = 1f,
+                    jitter = 0.197f,
+                },
                 new CameraShakeAction(),
             },
             timeoutSeconds = 1.5f,
@@ -1724,9 +1771,9 @@ public class EventChainEditorWindow : EditorWindow
             eventName = "해몽",
             purpose = "플레이 흐름 환기, 공략서 변환 플레이로 전환, 전투 대비",
             startTriggerDesc = "현실의 방 침대 옆 책상 위에 놓인 '노트(공략서)'와 상호작용.",
-            preconditionDesc = "현실일 것 (GameStateEvent는 맵이 아니라 플래그만 판정하므로, 구현에서는 " +
-                "dood == 2를 대리 조건으로 쓴다 — EVT-002가 끝나야 dood가 2가 되고 그 시점엔 항상 현실에 " +
-                "있으므로 근사가 맞아떨어진다. 맵 자체를 보는 조건이 생기면 이 근사를 걷어낼 것.)",
+            preconditionDesc = "현실일 것 (2026-08-24: WorldRequirement.RealWorld로 맵을 직접 본다. " +
+                "예전엔 dood == 2를 대리 조건으로 썼는데, EVT-005에서 가위를 받아 dood가 3이 되면 " +
+                "그 근사가 깨져 현실로 돌아와 노트를 읽어도 꿈으로 못 가는 버그가 났다.)",
             interruptCondition = "플레이어가 노트를 덮거나 UI를 닫을 때",
             retryPolicy = "해몽 완료 전까지 반복 확인 가능. 해몽 완료 후에는 완성된 규칙 상시 표기",
             linkedEvents = "메뉴 UI",
@@ -1741,9 +1788,10 @@ public class EventChainEditorWindow : EditorWindow
                 "(FLAG_EMOTION_MERGE = True). 플레이어가 침대에 다시 누워 잠들기를 선택하면 변형된 꿈의 " +
                 "세계 [검은 낙서의 심연] 맵 중앙에서 눈을 뜨며 복귀",
             targets = DefaultTargets(),
-            preconditions = dood != null
-                ? new[] { new GameStateEvent.EventFlagCondition { flag = dood, value = 2 } }
-                : Array.Empty<GameStateEvent.EventFlagCondition>(),
+            // 기획서의 사전 조건은 "현실일 것" 하나뿐이다. 진행도는 보지 않는다 — 그래야 EVT-006에서
+            // 죽고 현실로 돌아온 뒤(dood == 3)에도 노트를 읽어 다시 꿈으로 들어갈 수 있다.
+            worldRequirement = WorldRequirement.RealWorld,
+            preconditions = Array.Empty<GameStateEvent.EventFlagCondition>(),
             // "책상 위에 놓인 '노트(공략서)'와 상호작용" — 근처에서 확인 입력을 눌러야 발동.
             triggerKind = EventTriggerKind.Input,
             triggerRadius = 1.5f,
@@ -1823,6 +1871,107 @@ public class EventChainEditorWindow : EditorWindow
                 new ScreenFadeAction { targetColor = new Color(0f, 0f, 0f, 0f), duration = 0.6f },
                 new SetInputModeAction { mode = EnumManager.InputMode.Play },
             },
+        });
+
+        return def;
+    }
+
+    // 사망 복귀 — 되살리고, 이벤트 플래그를 마지막 세이브 시점으로 되돌리고, 현실의 방으로 보낸다.
+    //
+    // [다른 이벤트와 다른 점 셋]
+    //  1. 씬 트리거가 없다(None). 플레이어에 붙인 EntityDeathEventTrigger가 사망 콜백에서 직접
+    //     TriggerEvent를 부른다 — 사망은 콜라이더 겹침이 아니라 순수 콜백 사건이라서다.
+    //  2. interruptRunningEvent가 켜져 있다. 죽는 순간은 대개 전투 이벤트가 진행 중이라,
+    //     끊지 않으면 EventManager의 재진입 가드에 막혀 이 이벤트가 아예 못 뜬다.
+    //  3. 사전 조건이 없다. 언제 죽든 항상 떠야 한다.
+    //
+    // [순서가 곧 설계다] 되살리기 → 플래그 되돌리기 → 맵 다시 열기. 플래그만 되돌려서는 이미
+    // 배치가 끝난 월드 오브젝트가 되돌아가지 않으므로(RevertEventFlagsToSaveAction 주석 참고)
+    // 맵을 다시 여는 단계가 반드시 뒤에 와야 한다.
+    private static EventDefinition BuildDeathRecoverySample()
+    {
+        MapDataSO realWorldMap = FindRealWorldMap();
+
+        var def = new EventDefinition
+        {
+            eventId = "Dummy_DEATH",
+            eventName = "사망 복귀",
+            purpose = "사망 시 진행 중이던 이벤트를 무르고 마지막 세이브 시점으로 되돌린다",
+            startTriggerDesc = "플레이어 사망(EntityDeathEventTrigger가 호출)",
+            preconditionDesc = "없음 - 언제 죽든 항상 발동",
+            interruptCondition = "없음",
+            retryPolicy = "죽을 때마다 매번",
+            linkedEvents = "EVT-003(현실의 방)",
+            narrativeContent =
+                "기획서 EVT-004/006의 중단 조건: 플레이어 사망 시 소름 돋는 사운드와 함께 " +
+                "[EVT-003(현실의 방)]으로 강제 복귀 리스폰.\n" +
+                "침대 복귀는 아직 미구현이라(2026-08-22 결정) 현실의 방 복귀만 우선 구현한다.",
+            targets = DefaultTargets(),
+            preconditions = Array.Empty<GameStateEvent.EventFlagCondition>(),
+            // 죽는 순간 대개 전투 이벤트가 돌고 있다. 끊지 않으면 이 이벤트가 못 뜬다.
+            interruptRunningEvent = true,
+            // 콜라이더가 아니라 사망 콜백으로 뜬다. 빌드가 EntityDeathEventTrigger를 붙여 주고,
+            // 그 트리거가 플레이 시작 뒤 플레이어의 IDamagable에 스스로 묶인다.
+            triggerKind = EventTriggerKind.PlayerDeath,
+        };
+
+        def.steps.Add(new EventStepData
+        {
+            label = "암전",
+            enterActions = new EventStepAction[]
+            {
+                new DummyEventStepAction { label = "사망 - 복귀 연출 시작" },
+                // 죽자마자 조작을 잠근다. 끊긴 이벤트가 걸어둔 잠금은 저절로 풀리지 않으므로
+                // 여기서 다시 우리 것으로 덮어쓰는 셈이다.
+                new SetInputModeAction { mode = EnumManager.InputMode.Cutscene },
+                // 신호가 끊기는 인상 - 기획서의 "소름 돋는" 연출 자리다. 사운드가 생기면 여기에 얹는다.
+                new ScreenGlitchAction { intensity = 1f, duration = 0.5f, blockShift = 0.18f, blockCoverage = 0.7f, rgbSplit = 0.02f },
+                new ScreenNoiseAction { intensity = 0.7f, alpha = 0.5f, duration = 0.6f },
+                new ScreenFadeAction { targetColor = new Color(0f, 0f, 0f, 1f), duration = 0.8f },
+            },
+            advanceWhenAny = new StateDecision[] { new ScreenEffectEndedDecision() },
+            timeoutSeconds = 3f,
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "되살리기 + 진행도 되돌리기",
+            enterActions = new EventStepAction[]
+            {
+                new DummyEventStepAction { label = "사망 - 되살리고 이벤트 플래그를 마지막 세이브로" },
+                // Die()가 게임오브젝트를 꺼버렸으므로 먼저 켠다. 이게 앞서지 않으면 아래가 다 헛돈다.
+                new TargetEntityManipulateAction { targetID = PlayerTargetID, targetAction = new ReviveEntityAction { healToFull = true } },
+                new RevertEventFlagsToSaveAction(),
+                new ScreenNoiseAction { stop = true },
+                new ScreenGlitchAction { stop = true },
+            },
+            timeoutSeconds = 0.3f,
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "현실의 방으로",
+            enterActions = new EventStepAction[]
+            {
+                new ChangeMapAction { mapData = realWorldMap },
+            },
+            advanceWhenAny = new StateDecision[]
+            {
+                new MapLoadedDecision { mapAddressableID = realWorldMap != null ? realWorldMap.mapAddressableID : "" },
+            },
+            timeoutSeconds = 10f,
+        });
+
+        def.steps.Add(new EventStepData
+        {
+            label = "기상",
+            enterActions = new EventStepAction[]
+            {
+                new DummyEventStepAction { label = "사망 - 현실의 방에서 깨어남" },
+                new ScreenFadeAction { targetColor = new Color(0f, 0f, 0f, 0f), duration = 0.8f },
+                new SetInputModeAction { mode = EnumManager.InputMode.Play },
+            },
+            timeoutSeconds = 0.8f,
         });
 
         return def;
@@ -2106,7 +2255,7 @@ public class EventChainEditorWindow : EditorWindow
             {
                 new SetInputModeAction { mode = EnumManager.InputMode.Cutscene },
                 new DummyEventStepAction { label = "EVT-006 탈출 — 가위(Lily Form) 사용을 확인해 문을 가릅니다" },
-                CreateVerticalMultiTearAction(),
+                CreateFinalEscapeTearAction(),
             },
             advanceWhenAny = new StateDecision[] { new ScreenEffectEndedDecision() },
             timeoutSeconds = 2f,
@@ -2128,31 +2277,44 @@ public class EventChainEditorWindow : EditorWindow
 
     // 탈출문 트리거는 문 GameObject의 자식으로 배치된다. 문은 EVT-006 완료 전까지 비활성이므로,
     // Dood == 3만으로는 전투 이전에 이 이벤트를 발동할 수 없다.
-    private static ScreenTearAction CreateVerticalMultiTearAction()
+    // 최종 탈출("화면이 종이처럼 반으로 찢어지며 데모 종료")에 쓰는 찢김 연출.
+    //
+    // [이 값들은 실제로 맞춰 본 결과다] 2026-08-24에 편집기에서 직접 조정해 확정한 값을 그대로
+    // 코드로 옮겨 왔다. 그러니 "샘플 채우기"를 다시 눌러도 지금 보고 있는 연출이 그대로 나온다 -
+    // 예전엔 코드 기본값이 손으로 맞춘 값과 달라, 샘플을 다시 채우면 연출이 조용히 바뀌었다.
+    // 값을 더 만졌고 그 결과가 마음에 든다면, 다시 이 함수에 옮겨 적어야 영구히 남는다.
+    //
+    // [지금 모양] 화면 가운데에서 거의 수평(-8.6도)으로 4줄이 갈라진다. lineAngleRandomness가
+    // 76이라 네 줄의 각도가 크게 흩어져 "쫙 갈라진 뒤 파편이 튀는" 모양이 된다.
+    // segmentCount가 1이라 각 선은 꺾이지 않는 직선이다 - 종이를 단번에 그은 느낌을 위해서다
+    // (여기를 32쯤으로 올리면 jaggedness가 살아나 너덜너덜하게 찢어지는 쪽으로 바뀐다).
+    // 색은 흰 섬광에서 거의 검은 자주(endColor)로 떨어진다.
+    private static ScreenTearAction CreateFinalEscapeTearAction()
     {
         return new ScreenTearAction
         {
             duration = 1.35f,
             flashRatio = 0.12f,
-            flashColor = new Color(1f, 0.75f, 0.82f, 1f),
+            flashColor = new Color(1f, 1f, 1f, 1f),
             endColor = new Color(0.015f, 0.005f, 0.02f, 1f),
             origin = new Vector2(0.5f, 0.5f),
-            angle = 90f,
-            length = 2400f,
+            angle = -8.6f,
+            length = 2000f,
             thickness = 10f,
-            tearColor = new Color(1f, 0.24f, 0.42f, 1f),
+            tearColor = new Color(1f, 1f, 1f, 1f),
             innerColor = new Color(0.08f, 0.005f, 0.025f, 0.96f),
             shadowEdgeColor = new Color(0.12f, 0.01f, 0.05f, 0.95f),
             lineCount = 4,
             lineSpacing = 150f,
-            lineAngleRandomness = 28f,
-            segmentCount = 32,
-            jaggedness = 0.13f,
+            lineAngleRandomness = 76.1f,
+            segmentCount = 1,
+            jaggedness = 0.25f,
             opening = 84f,
             edgeThickness = 6f,
             shardCount = 28,
             shardSize = 26f,
             shardSpread = 340f,
+            // 고정 시드 - 매번 같은 모양으로 찢어져야 연출을 다시 확인하고 맞출 수 있다.
             randomSeed = 6006,
         };
     }
@@ -2186,7 +2348,7 @@ public class EventChainEditorWindow : EditorWindow
             {
                 new SetInputModeAction { mode = EnumManager.InputMode.Cutscene },
                 new DummyEventStepAction { label = "EVT-006 탈출 — 가위(Lily GearData 대역)로 문을 가릅니다" },
-                CreateVerticalMultiTearAction(),
+                CreateFinalEscapeTearAction(),
             },
             advanceWhenAny = new StateDecision[] { new ScreenEffectEndedDecision() },
             timeoutSeconds = 2f,

@@ -47,6 +47,8 @@ MonoBehaviour:
     - flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
       value: 0
     requiredClueIds: []
+    worldRequirement: 0
+    interruptRunningEvent: 0
     triggerKind: 1
     triggerRadius: 3
     triggerInputType: 9
@@ -54,83 +56,86 @@ MonoBehaviour:
     - label: "\uAC00\uC704\uC9C8"
       enterActions:
       - action:
-          rid: 6174889727073715172
+          rid: 6174889728934674709
         waitAfter: 0
       - action:
-          rid: 6174889727073715173
+          rid: 6174889728934674710
         waitAfter: 0
       - action:
-          rid: 6174889727073715174
+          rid: 6174889728934674711
         waitAfter: 0
       - action:
-          rid: 6174889727073715175
+          rid: 6174889728934674712
         waitAfter: 0
       - action:
-          rid: 6174889727073715176
+          rid: 6174889728934674713
         waitAfter: 0
       - action:
-          rid: 6174889727073715177
+          rid: 6174889728934674714
+        waitAfter: 0
+      - action:
+          rid: 6174889728934674715
         waitAfter: 0
       advanceWhenAny: []
       timeoutSeconds: 1.5
     - label: "\uC798\uB824 \uB098\uAC04 \uBA38\uB9AC\uCE74\uB77D \uC0DD\uC131"
       enterActions:
       - action:
-          rid: 6174889727073715178
+          rid: 6174889728934674716
         waitAfter: 0
       - action:
-          rid: 6174889727073715179
+          rid: 6174889728934674717
         waitAfter: 0
       - action:
-          rid: 6174889727073715180
+          rid: 6174889728934674718
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727073715181
+      - rid: 6174889728934674719
       timeoutSeconds: 0
     - label: "\uB2E8\uC11C \uD68D\uB4DD"
       enterActions:
       - action:
-          rid: 6174889727073715182
+          rid: 6174889728934674720
         waitAfter: 0
       - action:
-          rid: 6174889727073715183
+          rid: 6174889728934674721
         waitAfter: 0
       - action:
-          rid: 6174889727073715184
+          rid: 6174889728934674722
         waitAfter: 0
       - action:
-          rid: 6174889727073715185
+          rid: 6174889728934674723
         waitAfter: 0
       - action:
-          rid: 6174889727073715186
+          rid: 6174889728934674724
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727073715187
+      - rid: 6174889728934674725
       timeoutSeconds: 15
     - label: "\uB2E8\uC11C \uD68D\uB4DD \uB300\uC0AC \uC885\uB8CC"
       enterActions:
       - action:
-          rid: 6174889727073715188
+          rid: 6174889728934674726
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727073715189
+      - rid: 6174889728934674727
       timeoutSeconds: 15
     - label: "\uAE08\uBC1C \uD1F4\uC7A5"
       enterActions:
       - action:
-          rid: 6174889727073715190
+          rid: 6174889728934674728
         waitAfter: 0
       - action:
-          rid: 6174889727073715191
+          rid: 6174889728934674729
         waitAfter: 0
       - action:
-          rid: 6174889727073715192
+          rid: 6174889728934674730
         waitAfter: 0
       - action:
-          rid: 6174889727073715193
+          rid: 6174889728934674731
         waitAfter: 0
       - action:
-          rid: 6174889727073715194
+          rid: 6174889728934674732
         waitAfter: 0
       advanceWhenAny: []
       timeoutSeconds: 0
@@ -176,6 +181,8 @@ MonoBehaviour:
       value: 1
     requiredClueIds:
     - dummy-clue-wing
+    worldRequirement: 0
+    interruptRunningEvent: 0
     triggerKind: 2
     triggerRadius: 1.5
     triggerInputType: 9
@@ -183,129 +190,129 @@ MonoBehaviour:
     - label: "\uB300\uD654 \uC2DC\uC791"
       enterActions:
       - action:
-          rid: 6174889727073715195
+          rid: 6174889728934674733
         waitAfter: 0
       - action:
-          rid: 6174889727073715196
+          rid: 6174889728934674734
         waitAfter: 0
       - action:
-          rid: 6174889727073715197
+          rid: 6174889728934674735
         waitAfter: 0
       - action:
-          rid: 6174889727073715198
+          rid: 6174889728934674736
         waitAfter: 0
       - action:
-          rid: 6174889727073715199
+          rid: 6174889728934674737
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253544960
+      - rid: 6174889728934674738
       timeoutSeconds: 15
     - label: "\uB300\uC0AC 2"
       enterActions:
       - action:
-          rid: 6174889727253544961
+          rid: 6174889728934674739
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253544962
+      - rid: 6174889728934674740
       timeoutSeconds: 15
     - label: "\uB300\uD654 \uC885\uB8CC"
       enterActions:
       - action:
-          rid: 6174889727253544963
+          rid: 6174889728934674741
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253544964
+      - rid: 6174889728934674742
       timeoutSeconds: 15
     - label: "\uD074\uB85C\uC988\uC5C5"
       enterActions:
       - action:
-          rid: 6174889727253544965
+          rid: 6174889728934674743
         waitAfter: 0
       - action:
-          rid: 6174889727253544966
+          rid: 6174889728934674744
         waitAfter: 0
       - action:
-          rid: 6174889727253544967
+          rid: 6174889728934674745
         waitAfter: 0
       - action:
-          rid: 6174889727253544968
+          rid: 6174889728934674746
         waitAfter: 0
       - action:
-          rid: 6174889727253544969
+          rid: 6174889728934674747
         waitAfter: 0
       advanceWhenAny: []
       timeoutSeconds: 2.4
     - label: "\uBCF4\uC2A4\uD654"
       enterActions:
       - action:
-          rid: 6174889727253544970
+          rid: 6174889728934674748
         waitAfter: 0
       - action:
-          rid: 6174889727253544971
+          rid: 6174889728934674749
         waitAfter: 0
       - action:
-          rid: 6174889727253544972
+          rid: 6174889728934674750
         waitAfter: 0
       - action:
-          rid: 6174889727253544973
+          rid: 6174889728934674751
         waitAfter: 0
       - action:
-          rid: 6174889727253544974
+          rid: 6174889728934674752
         waitAfter: 0
       advanceWhenAny: []
       timeoutSeconds: 1
     - label: "\uB109\uBC31 \u2014 \uC2DC\uC791 + \uC720\uC9C0"
       enterActions:
       - action:
-          rid: 6174889727253544975
+          rid: 6174889728934674753
         waitAfter: 0
       - action:
-          rid: 6174889727253544976
+          rid: 6174889728934674754
         waitAfter: 0
       - action:
-          rid: 6174889727253544977
+          rid: 6174889728934674755
         waitAfter: 0
       - action:
-          rid: 6174889727253544978
+          rid: 6174889728934674756
         waitAfter: 0
       - action:
-          rid: 6174889727253544979
+          rid: 6174889728934674757
         waitAfter: 0
       - action:
-          rid: 6174889727253544980
+          rid: 6174889728934674758
         waitAfter: 0
       - action:
-          rid: 6174889727253544981
+          rid: 6174889728934674759
         waitAfter: 0
       - action:
-          rid: 6174889727253544982
+          rid: 6174889728934674760
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253544983
+      - rid: 6174889728934674761
       timeoutSeconds: 3
     - label: "\uB109\uBC31 \u2014 \uC885\uB8CC"
       enterActions:
       - action:
-          rid: 6174889727253544984
+          rid: 6174889728934674762
         waitAfter: 0
       - action:
-          rid: 6174889727253544985
+          rid: 6174889728934674763
         waitAfter: 0.6
       advanceWhenAny: []
       timeoutSeconds: 0
     - label: "\uC554\uC804"
       enterActions:
       - action:
-          rid: 6174889727253544986
+          rid: 6174889728934674764
         waitAfter: 0
       - action:
-          rid: 6174889727253544987
+          rid: 6174889728934674765
         waitAfter: 0
       - action:
-          rid: 6174889727253544988
+          rid: 6174889728934674766
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253544989
+      - rid: 6174889728934674767
       timeoutSeconds: 0
     - label: "\uC554\uC804 \uC720\uC9C0"
       enterActions:
@@ -317,52 +324,52 @@ MonoBehaviour:
     - label: "\uB9F5 \uC804\uD658"
       enterActions:
       - action:
-          rid: 6174889727253544990
+          rid: 6174889728934674768
         waitAfter: 0
       - action:
-          rid: 6174889727253544991
+          rid: 6174889728934674769
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253544992
+      - rid: 6174889728934674770
       timeoutSeconds: 0
     - label: "\uAE30\uC0C1 \uBC0F \uB2E8\uC11C \uD68D\uB4DD"
       enterActions:
       - action:
-          rid: 6174889727253544993
+          rid: 6174889728934674771
         waitAfter: 0
       - action:
-          rid: 6174889727253544994
+          rid: 6174889728934674772
         waitAfter: 0
       - action:
-          rid: 6174889727253544995
+          rid: 6174889728934674773
         waitAfter: 0
       - action:
-          rid: 6174889727253544996
+          rid: 6174889728934674774
         waitAfter: 0
       - action:
-          rid: 6174889727253544997
+          rid: 6174889728934674775
         waitAfter: 0
       - action:
-          rid: 6174889727253544998
+          rid: 6174889728934674776
         waitAfter: 0
       - action:
-          rid: 6174889727253544999
+          rid: 6174889728934674777
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253545000
+      - rid: 6174889728934674778
       timeoutSeconds: 15
     - label: "\uB2E8\uC11C \uD68D\uB4DD \uB300\uC0AC \uC885\uB8CC"
       enterActions:
       - action:
-          rid: 6174889727253545001
+          rid: 6174889728934674779
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253545002
+      - rid: 6174889728934674780
       timeoutSeconds: 15
     - label: "\uAE30\uC0C1 \uC644\uB8CC"
       enterActions:
       - action:
-          rid: 6174889727253545003
+          rid: 6174889728934674781
         waitAfter: 0
       advanceWhenAny: []
       timeoutSeconds: 0
@@ -372,14 +379,12 @@ MonoBehaviour:
       \uD50C\uB808\uC774\uB85C \uC804\uD658, \uC804\uD22C \uB300\uBE44"
     startTriggerDesc: "\uD604\uC2E4\uC758 \uBC29 \uCE68\uB300 \uC606 \uCC45\uC0C1
       \uC704\uC5D0 \uB193\uC778 '\uB178\uD2B8(\uACF5\uB7B5\uC11C)'\uC640 \uC0C1\uD638\uC791\uC6A9."
-    preconditionDesc: "\uD604\uC2E4\uC77C \uAC83 (GameStateEvent\uB294 \uB9F5\uC774
-      \uC544\uB2C8\uB77C \uD50C\uB798\uADF8\uB9CC \uD310\uC815\uD558\uBBC0\uB85C,
-      \uAD6C\uD604\uC5D0\uC11C\uB294 dood == 2\uB97C \uB300\uB9AC \uC870\uAC74\uC73C\uB85C
-      \uC4F4\uB2E4 \u2014 EVT-002\uAC00 \uB05D\uB098\uC57C dood\uAC00 2\uAC00 \uB418\uACE0
-      \uADF8 \uC2DC\uC810\uC5D4 \uD56D\uC0C1 \uD604\uC2E4\uC5D0 \uC788\uC73C\uBBC0\uB85C
-      \uADFC\uC0AC\uAC00 \uB9DE\uC544\uB5A8\uC5B4\uC9C4\uB2E4. \uB9F5 \uC790\uCCB4\uB97C
-      \uBCF4\uB294 \uC870\uAC74\uC774 \uC0DD\uAE30\uBA74 \uC774 \uADFC\uC0AC\uB97C
-      \uAC77\uC5B4\uB0BC \uAC83.)"
+    preconditionDesc: "\uD604\uC2E4\uC77C \uAC83 (2026-08-24: WorldRequirement.RealWorld\uB85C
+      \uB9F5\uC744 \uC9C1\uC811 \uBCF8\uB2E4. \uC608\uC804\uC5D4 dood == 2\uB97C
+      \uB300\uB9AC \uC870\uAC74\uC73C\uB85C \uC37C\uB294\uB370, EVT-005\uC5D0\uC11C
+      \uAC00\uC704\uB97C \uBC1B\uC544 dood\uAC00 3\uC774 \uB418\uBA74 \uADF8 \uADFC\uC0AC\uAC00
+      \uAE68\uC838 \uD604\uC2E4\uB85C \uB3CC\uC544\uC640 \uB178\uD2B8\uB97C \uC77D\uC5B4\uB3C4
+      \uAFC8\uC73C\uB85C \uBABB \uAC00\uB294 \uBC84\uADF8\uAC00 \uB0AC\uB2E4.)"
     interruptCondition: "\uD50C\uB808\uC774\uC5B4\uAC00 \uB178\uD2B8\uB97C \uB36E\uAC70\uB098
       UI\uB97C \uB2EB\uC744 \uB54C"
     retryPolicy: "\uD574\uBABD \uC644\uB8CC \uC804\uAE4C\uC9C0 \uBC18\uBCF5 \uD655\uC778
@@ -415,10 +420,10 @@ MonoBehaviour:
       targetSearchType: 1
     - ID: NPC_B
       targetSearchType: 1
-    preconditions:
-    - flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
-      value: 2
+    preconditions: []
     requiredClueIds: []
+    worldRequirement: 1
+    interruptRunningEvent: 0
     triggerKind: 2
     triggerRadius: 1.5
     triggerInputType: 9
@@ -426,42 +431,42 @@ MonoBehaviour:
     - label: "\uB178\uD2B8 \uC5F4\uAE30 \u2014 \uD574\uBABD \uB300\uAE30"
       enterActions:
       - action:
-          rid: 6174889727253545004
+          rid: 6174889728934674782
         waitAfter: 0
       - action:
-          rid: 6174889727253545005
+          rid: 6174889728934674783
         waitAfter: 0
       - action:
-          rid: 6174889727253545006
+          rid: 6174889728934674784
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253545007
+      - rid: 6174889728934674785
       timeoutSeconds: 0
     - label: "\uADDC\uCE59 \uD574\uAE08 \uC548\uB0B4 \u2014 \uB178\uD2B8\uB97C \uB2EB\uC744
         \uB54C\uAE4C\uC9C0 \uB300\uAE30"
       enterActions:
       - action:
-          rid: 6174889727253545008
+          rid: 6174889728934674786
         waitAfter: 0
       - action:
-          rid: 6174889727253545009
+          rid: 6174889728934674787
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253545010
+      - rid: 6174889728934674788
       timeoutSeconds: 0
     - label: "\uB178\uD2B8 \uB2EB\uD798 \u2014 \uC554\uC804"
       enterActions:
       - action:
-          rid: 6174889727253545011
+          rid: 6174889728934674789
         waitAfter: 0
       - action:
-          rid: 6174889727253545012
+          rid: 6174889728934674790
         waitAfter: 0
       - action:
-          rid: 6174889727253545013
+          rid: 6174889728934674791
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253545014
+      - rid: 6174889728934674792
       timeoutSeconds: 0
     - label: "\uC554\uC804 \uC720\uC9C0"
       enterActions:
@@ -473,24 +478,24 @@ MonoBehaviour:
     - label: "\uAFC8\uC73C\uB85C \uBCF5\uADC0"
       enterActions:
       - action:
-          rid: 6174889727253545015
+          rid: 6174889728934674793
         waitAfter: 0
       - action:
-          rid: 6174889727253545016
+          rid: 6174889728934674794
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253545017
+      - rid: 6174889728934674795
       timeoutSeconds: 0
     - label: "\uAFC8\uC5D0\uC11C \uAE30\uC0C1"
       enterActions:
       - action:
-          rid: 6174889727253545018
+          rid: 6174889728934674796
         waitAfter: 0
       - action:
-          rid: 6174889727253545019
+          rid: 6174889728934674797
         waitAfter: 0
       - action:
-          rid: 6174889727253545020
+          rid: 6174889728934674798
         waitAfter: 0
       advanceWhenAny: []
       timeoutSeconds: 0
@@ -546,6 +551,8 @@ MonoBehaviour:
     - flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
       value: 2
     requiredClueIds: []
+    worldRequirement: 0
+    interruptRunningEvent: 0
     triggerKind: 1
     triggerRadius: 3
     triggerInputType: 9
@@ -553,27 +560,27 @@ MonoBehaviour:
     - label: "\uC804\uD22C \uC9C4\uC785 \u2014 \uC804\uD22C \uD074\uB9AC\uC5B4 \uB300\uAE30"
       enterActions:
       - action:
-          rid: 6174889727253545021
+          rid: 6174889728934674799
         waitAfter: 0
       - action:
-          rid: 6174889727253545022
+          rid: 6174889728934674800
         waitAfter: 0
       - action:
-          rid: 6174889727253545023
+          rid: 6174889728934674801
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253545024
+      - rid: 6174889728934674802
       timeoutSeconds: 0
     - label: "\uC804\uD22C \uC644\uB8CC \u2014 \uAE08\uBC1C \uB300\uD654 \uAC00\uB2A5"
       enterActions:
       - action:
-          rid: 6174889727253545025
+          rid: 6174889728934674803
         waitAfter: 0
       - action:
-          rid: 6174889727253545026
+          rid: 6174889728934674804
         waitAfter: 0
       - action:
-          rid: 6174889727253545027
+          rid: 6174889728934674805
         waitAfter: 0
       advanceWhenAny: []
       timeoutSeconds: 0
@@ -607,6 +614,8 @@ MonoBehaviour:
     - flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
       value: 2
     requiredClueIds: []
+    worldRequirement: 0
+    interruptRunningEvent: 0
     triggerKind: 2
     triggerRadius: 1.5
     triggerInputType: 9
@@ -614,57 +623,57 @@ MonoBehaviour:
     - label: "\uB300\uD654 \uC2DC\uC791"
       enterActions:
       - action:
-          rid: 6174889727253545028
+          rid: 6174889728934674806
         waitAfter: 0
       - action:
-          rid: 6174889727253545029
+          rid: 6174889728934674807
         waitAfter: 0
       - action:
-          rid: 6174889727253545030
+          rid: 6174889728934674808
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253545031
+      - rid: 6174889728934674809
       timeoutSeconds: 15
     - label: "\uC124\uB4DD"
       enterActions:
       - action:
-          rid: 6174889727253545032
+          rid: 6174889728934674810
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253545033
+      - rid: 6174889728934674811
       timeoutSeconds: 15
     - label: "Lily \uAE30\uC5B4 \uC9C0\uAE09 \u2014 dood = 3"
       enterActions:
       - action:
-          rid: 6174889727253545034
+          rid: 6174889728934674812
         waitAfter: 0
       - action:
-          rid: 6174889727253545035
+          rid: 6174889728934674813
         waitAfter: 0
       - action:
-          rid: 6174889727253545036
+          rid: 6174889728934674814
         waitAfter: 0
       - action:
-          rid: 6174889727253545037
+          rid: 6174889728934674815
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253545038
+      - rid: 6174889728934674816
       timeoutSeconds: 15
     - label: "\uB300\uD654 \uC885\uB8CC"
       enterActions:
       - action:
-          rid: 6174889727253545039
+          rid: 6174889728934674817
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253545040
+      - rid: 6174889728934674818
       timeoutSeconds: 15
     - label: "\uC870\uC791 \uBCF5\uADC0"
       enterActions:
       - action:
-          rid: 6174889727253545041
+          rid: 6174889728934674819
         waitAfter: 0
       - action:
-          rid: 6174889727253545042
+          rid: 6174889728934674820
         waitAfter: 0
       advanceWhenAny: []
       timeoutSeconds: 0
@@ -699,6 +708,8 @@ MonoBehaviour:
     - flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
       value: 3
     requiredClueIds: []
+    worldRequirement: 0
+    interruptRunningEvent: 0
     triggerKind: 2
     triggerRadius: 1.5
     triggerInputType: 9
@@ -706,103 +717,195 @@ MonoBehaviour:
     - label: "\uC804\uD22C \uC9C4\uC785 \u2014 \uC804\uD22C \uD074\uB9AC\uC5B4 \uB300\uAE30"
       enterActions:
       - action:
-          rid: 6174889727253545043
+          rid: 6174889728934674821
         waitAfter: 0
       - action:
-          rid: 6174889727253545044
+          rid: 6174889728934674822
         waitAfter: 0
       - action:
-          rid: 6174889727253545045
+          rid: 6174889728934674823
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253545046
+      - rid: 6174889728934674824
       timeoutSeconds: 0
     - label: "\uC804\uD22C \uC644\uB8CC \u2014 \uD0C8\uCD9C\uBB38 \uC0DD\uC131"
       enterActions:
       - action:
-          rid: 6174889727253545047
+          rid: 6174889728934674825
         waitAfter: 0
       - action:
-          rid: 6174889727253545048
+          rid: 6174889728934674826
         waitAfter: 0
       - action:
-          rid: 6174889727253545049
+          rid: 6174889728934674827
         waitAfter: 0
       - action:
-          rid: 6174889727253545050
+          rid: 6174889728934674828
         waitAfter: 0
       - action:
-          rid: 6174889727253545051
+          rid: 6174889728934674829
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253545052
+      - rid: 6174889728934674830
       timeoutSeconds: 0
     - label: "\uAC00\uC704 \uC0AC\uC6A9 \uB300\uAE30"
       enterActions:
       - action:
-          rid: 6174889727253545053
+          rid: 6174889728934674831
         waitAfter: 0
       - action:
-          rid: 6174889727253545054
+          rid: 6174889728934674832
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253545055
+      - rid: 6174889728934674833
       timeoutSeconds: 0
     - label: "\uD0C8\uCD9C\uBB38 \uAC00\uB974\uAE30"
       enterActions:
       - action:
-          rid: 6174889727253545056
+          rid: 6174889728934674834
         waitAfter: 0
       - action:
-          rid: 6174889727253545057
+          rid: 6174889728934674835
         waitAfter: 0
       - action:
-          rid: 6174889727253545058
+          rid: 6174889728934674836
         waitAfter: 0
       advanceWhenAny:
-      - rid: 6174889727253545059
+      - rid: 6174889728934674837
       timeoutSeconds: 2
     - label: "\uB370\uBAA8 \uC885\uB8CC"
       enterActions:
       - action:
-          rid: 6174889727253545060
+          rid: 6174889728934674838
         waitAfter: 0
       - action:
-          rid: 6174889727253545061
+          rid: 6174889728934674839
         waitAfter: 0
       - action:
-          rid: 6174889727253545062
+          rid: 6174889728934674840
         waitAfter: 0
       advanceWhenAny: []
       timeoutSeconds: 0
+  - eventId: Dummy_DEATH
+    eventName: "\uC0AC\uB9DD \uBCF5\uADC0"
+    purpose: "\uC0AC\uB9DD \uC2DC \uC9C4\uD589 \uC911\uC774\uB358 \uC774\uBCA4\uD2B8\uB97C
+      \uBB34\uB974\uACE0 \uB9C8\uC9C0\uB9C9 \uC138\uC774\uBE0C \uC2DC\uC810\uC73C\uB85C
+      \uB418\uB3CC\uB9B0\uB2E4"
+    startTriggerDesc: "\uD50C\uB808\uC774\uC5B4 \uC0AC\uB9DD(EntityDeathEventTrigger\uAC00
+      \uD638\uCD9C)"
+    preconditionDesc: "\uC5C6\uC74C - \uC5B8\uC81C \uC8FD\uB4E0 \uD56D\uC0C1 \uBC1C\uB3D9"
+    interruptCondition: "\uC5C6\uC74C"
+    retryPolicy: "\uC8FD\uC744 \uB54C\uB9C8\uB2E4 \uB9E4\uBC88"
+    linkedEvents: "EVT-003(\uD604\uC2E4\uC758 \uBC29)"
+    narrativeContent: "\uAE30\uD68D\uC11C EVT-004/006\uC758 \uC911\uB2E8 \uC870\uAC74:
+      \uD50C\uB808\uC774\uC5B4 \uC0AC\uB9DD \uC2DC \uC18C\uB984 \uB3CB\uB294 \uC0AC\uC6B4\uB4DC\uC640
+      \uD568\uAED8 [EVT-003(\uD604\uC2E4\uC758 \uBC29)]\uC73C\uB85C \uAC15\uC81C
+      \uBCF5\uADC0 \uB9AC\uC2A4\uD3F0.\n\uCE68\uB300 \uBCF5\uADC0\uB294 \uC544\uC9C1
+      \uBBF8\uAD6C\uD604\uC774\uB77C(2026-08-22 \uACB0\uC815) \uD604\uC2E4\uC758
+      \uBC29 \uBCF5\uADC0\uB9CC \uC6B0\uC120 \uAD6C\uD604\uD55C\uB2E4."
+    targets:
+    - ID: Player
+      targetSearchType: 0
+    - ID: NPC_A
+      targetSearchType: 1
+    - ID: NPC_B
+      targetSearchType: 1
+    preconditions: []
+    requiredClueIds: []
+    worldRequirement: 0
+    interruptRunningEvent: 1
+    triggerKind: 3
+    triggerRadius: 1.5
+    triggerInputType: 9
+    steps:
+    - label: "\uC554\uC804"
+      enterActions:
+      - action:
+          rid: 6174889728934674841
+        waitAfter: 0
+      - action:
+          rid: 6174889728934674842
+        waitAfter: 0
+      - action:
+          rid: 6174889728934674843
+        waitAfter: 0
+      - action:
+          rid: 6174889728934674844
+        waitAfter: 0
+      - action:
+          rid: 6174889728934674845
+        waitAfter: 0
+      advanceWhenAny:
+      - rid: 6174889728934674846
+      timeoutSeconds: 3
+    - label: "\uB418\uC0B4\uB9AC\uAE30 + \uC9C4\uD589\uB3C4 \uB418\uB3CC\uB9AC\uAE30"
+      enterActions:
+      - action:
+          rid: 6174889728934674847
+        waitAfter: 0
+      - action:
+          rid: 6174889728934674848
+        waitAfter: 0
+      - action:
+          rid: 6174889728934674849
+        waitAfter: 0
+      - action:
+          rid: 6174889728934674850
+        waitAfter: 0
+      - action:
+          rid: 6174889728934674851
+        waitAfter: 0
+      advanceWhenAny: []
+      timeoutSeconds: 0.3
+    - label: "\uD604\uC2E4\uC758 \uBC29\uC73C\uB85C"
+      enterActions:
+      - action:
+          rid: 6174889728934674852
+        waitAfter: 0
+      advanceWhenAny:
+      - rid: 6174889728934674853
+      timeoutSeconds: 10
+    - label: "\uAE30\uC0C1"
+      enterActions:
+      - action:
+          rid: 6174889728934674854
+        waitAfter: 0
+      - action:
+          rid: 6174889728934674855
+        waitAfter: 0
+      - action:
+          rid: 6174889728934674856
+        waitAfter: 0
+      advanceWhenAny: []
+      timeoutSeconds: 0.8
   references:
     version: 2
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889727073715172
+    - rid: 6174889728934674709
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889727073715173
+    - rid: 6174889728934674710
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-001 S0 \uAE08\uBC1C\uC774 \uBC31\uBC1C\uC758 \uD2B8\uC708\uD14C\uC77C\uC744
           \uC790\uB984 (\uC560\uB2C8\uBA54\uC774\uC158\xB7\uC0AC\uC6B4\uB4DC \uC5C6\uC74C)"
         completeBoolName: 
-    - rid: 6174889727073715174
+    - rid: 6174889728934674711
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_A
         targetAction:
-          rid: 6174889727253545063
-    - rid: 6174889727073715175
+          rid: 6174889728934674857
+    - rid: 6174889728934674712
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_B
         targetAction:
-          rid: 6174889727253545064
-    - rid: 6174889727073715176
+          rid: 6174889728934674858
+    - rid: 6174889728934674713
       type: {class: ScreenNoiseAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         intensity: 0.5
@@ -813,53 +916,66 @@ MonoBehaviour:
         shakeDuration: 0
         shakeCount: 0
         stop: 0
-    - rid: 6174889727073715177
+    - rid: 6174889728934674714
+      type: {class: ScreenGlitchAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        intensity: 1
+        duration: 1.5
+        blockShift: 0.441
+        blockDensity: 22.7
+        blockCoverage: 1
+        rgbSplit: 0.0031
+        splitAngle: 5.34
+        scanline: 1
+        jitter: 0.197
+        stop: 0
+    - rid: 6174889728934674715
       type: {class: CameraShakeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         strength: 0
         direction: {x: 1, y: 1, z: 1}
-    - rid: 6174889727073715178
+    - rid: 6174889728934674716
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-001 S1 \uC798\uB824 \uB098\uAC04 \uBA38\uB9AC\uCE74\uB77D \uC0DD\uC131
           \u2014 \uAC00\uAE4C\uC774 \uAC00\uC11C \uD655\uC778 \uD0A4\uB97C \uB204\uB974\uBA74
           \uB2E8\uC11C\uB97C \uC2B5\uB4DD\uD569\uB2C8\uB2E4"
         completeBoolName: 
-    - rid: 6174889727073715179
+    - rid: 6174889728934674717
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: CLIPPED_HAIR
         targetAction:
-          rid: 6174889727253545065
-    - rid: 6174889727073715180
+          rid: 6174889728934674859
+    - rid: 6174889728934674718
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0
-    - rid: 6174889727073715181
+    - rid: 6174889728934674719
       type: {class: TargetProximityInputDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: CLIPPED_HAIR
         radius: 0.85
         inputType: 9
-    - rid: 6174889727073715182
+    - rid: 6174889728934674720
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889727073715183
+    - rid: 6174889728934674721
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: CLIPPED_HAIR
         targetAction:
-          rid: 6174889727253545066
-    - rid: 6174889727073715184
+          rid: 6174889728934674860
+    - rid: 6174889728934674722
       type: {class: AcquireClueAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         clueId: dummy-clue-wing
         openCodexImmediately: 0
-    - rid: 6174889727073715185
+    - rid: 6174889728934674723
       type: {class: DialogueStartAction, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727073715186
+    - rid: 6174889728934674724
       type: {class: DialogueShowLineAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         line:
@@ -871,61 +987,61 @@ MonoBehaviour:
           BG: {fileID: 0}
           isChoice: 0
           choices: []
-    - rid: 6174889727073715187
+    - rid: 6174889728934674725
       type: {class: DialogueLineEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727073715188
+    - rid: 6174889728934674726
       type: {class: DialogueExitAction, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727073715189
+    - rid: 6174889728934674727
       type: {class: DialogueEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727073715190
+    - rid: 6174889728934674728
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_A
         targetAction:
-          rid: 6174889727253545067
-    - rid: 6174889727073715191
+          rid: 6174889728934674861
+    - rid: 6174889728934674729
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_A
         targetAction:
-          rid: 6174889727253545068
-    - rid: 6174889727073715192
+          rid: 6174889728934674862
+    - rid: 6174889728934674730
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-001 S2 \uAE08\uBC1C \uD1F4\uC7A5 \u2014 dood = 1"
         completeBoolName: 
-    - rid: 6174889727073715193
+    - rid: 6174889728934674731
       type: {class: SetEventFlagAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
         flagValue: 1
-    - rid: 6174889727073715194
+    - rid: 6174889728934674732
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0
-    - rid: 6174889727073715195
+    - rid: 6174889728934674733
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889727073715196
+    - rid: 6174889728934674734
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-002 S0 \uB300\uD654 \uC2DC\uC791 \u2014 Submit \uD0A4\uB85C \uB300\uC0AC\uB97C
           \uB118\uAE30\uC138\uC694"
         completeBoolName: 
-    - rid: 6174889727073715197
+    - rid: 6174889728934674735
       type: {class: DialogueStartAction, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727073715198
+    - rid: 6174889728934674736
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_B
         targetAction:
-          rid: 6174889727253545069
-    - rid: 6174889727073715199
+          rid: 6174889728934674863
+    - rid: 6174889728934674737
       type: {class: DialogueShowLineAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         line:
@@ -936,10 +1052,10 @@ MonoBehaviour:
           BG: {fileID: 0}
           isChoice: 0
           choices: []
-    - rid: 6174889727253544960
+    - rid: 6174889728934674738
       type: {class: DialogueLineEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727253544961
+    - rid: 6174889728934674739
       type: {class: DialogueShowLineAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         line:
@@ -950,30 +1066,30 @@ MonoBehaviour:
           BG: {fileID: 0}
           isChoice: 0
           choices: []
-    - rid: 6174889727253544962
+    - rid: 6174889728934674740
       type: {class: DialogueLineEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727253544963
+    - rid: 6174889728934674741
       type: {class: DialogueExitAction, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727253544964
+    - rid: 6174889728934674742
       type: {class: DialogueEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727253544965
+    - rid: 6174889728934674743
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889727253544966
+    - rid: 6174889728934674744
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-002 S1 \uB208\uAC00 \uD074\uB85C\uC988\uC5C5"
         completeBoolName: 
-    - rid: 6174889727253544967
+    - rid: 6174889728934674745
       type: {class: SetCameraFollowAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_B
         returnToDefault: 0
-    - rid: 6174889727253544968
+    - rid: 6174889728934674746
       type: {class: CameraZoomAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         sizeMultiplier: 0.25
@@ -988,7 +1104,7 @@ MonoBehaviour:
         illustrationSize: {x: 1200, y: 675}
         preserveIllustrationAspect: 1
         hideIllustrationOnReturn: 1
-    - rid: 6174889727253544969
+    - rid: 6174889728934674747
       type: {class: ScreenNoiseAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         intensity: 0.6
@@ -999,49 +1115,49 @@ MonoBehaviour:
         shakeDuration: 0
         shakeCount: 0
         stop: 0
-    - rid: 6174889727253544970
+    - rid: 6174889728934674748
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-002 S2 \uBC31\uBC1C \uBCF4\uC2A4\uD654"
         completeBoolName: 
-    - rid: 6174889727253544971
+    - rid: 6174889728934674749
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_B
         targetAction:
-          rid: 6174889727253545070
-    - rid: 6174889727253544972
+          rid: 6174889728934674864
+    - rid: 6174889728934674750
       type: {class: TargetEntitiesManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetIDs:
         - NPC_B
         targetAction:
-          rid: 6174889727253545071
-    - rid: 6174889727253544973
+          rid: 6174889728934674865
+    - rid: 6174889728934674751
       type: {class: CameraShakeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         strength: 2
         direction: {x: 1, y: 1, z: 1}
-    - rid: 6174889727253544974
+    - rid: 6174889728934674752
       type: {class: ScreenFlashAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         color: {r: 1, g: 1, b: 1, a: 1}
         duration: 0.3
-    - rid: 6174889727253544975
+    - rid: 6174889728934674753
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-002 S3 \uD50C\uB808\uC774\uC5B4 \uB109\uBC31"
         completeBoolName: 
-    - rid: 6174889727253544976
+    - rid: 6174889728934674754
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 4
-    - rid: 6174889727253544977
+    - rid: 6174889728934674755
       type: {class: SetCameraFollowAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: 
         returnToDefault: 1
-    - rid: 6174889727253544978
+    - rid: 6174889728934674756
       type: {class: CameraZoomAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         sizeMultiplier: 0.4
@@ -1056,25 +1172,25 @@ MonoBehaviour:
         illustrationSize: {x: 1200, y: 675}
         preserveIllustrationAspect: 1
         hideIllustrationOnReturn: 1
-    - rid: 6174889727253544979
+    - rid: 6174889728934674757
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: Player
         targetAction:
-          rid: 6174889727253545072
-    - rid: 6174889727253544980
+          rid: 6174889728934674866
+    - rid: 6174889728934674758
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: Player
         targetAction:
-          rid: 6174889727253545073
-    - rid: 6174889727253544981
+          rid: 6174889728934674867
+    - rid: 6174889728934674759
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: Player
         targetAction:
-          rid: 6174889727253545074
-    - rid: 6174889727253544982
+          rid: 6174889728934674868
+    - rid: 6174889728934674760
       type: {class: ScreenNoiseAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         intensity: 0.5
@@ -1085,44 +1201,44 @@ MonoBehaviour:
         shakeDuration: 0
         shakeCount: 0
         stop: 1
-    - rid: 6174889727253544983
+    - rid: 6174889728934674761
       type: {class: KnockbackEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: Player
-    - rid: 6174889727253544984
+    - rid: 6174889728934674762
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-002 S3b \uB109\uBC31 \uC885\uB8CC \u2014 \uC790\uC138\uB97C \uB418\uB3CC\uB9B0\uB2E4"
         completeBoolName: 
-    - rid: 6174889727253544985
+    - rid: 6174889728934674763
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: Player
         targetAction:
-          rid: 6174889727253545075
-    - rid: 6174889727253544986
+          rid: 6174889728934674869
+    - rid: 6174889728934674764
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-002 S4 \uC554\uC804"
         completeBoolName: 
-    - rid: 6174889727253544987
+    - rid: 6174889728934674765
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889727253544988
+    - rid: 6174889728934674766
       type: {class: ScreenFadeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetColor: {r: 0, g: 0, b: 0, a: 1}
         duration: 1
-    - rid: 6174889727253544989
+    - rid: 6174889728934674767
       type: {class: ScreenEffectEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727253544990
+    - rid: 6174889728934674768
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-002 S5 \uD604\uC2E4\uB85C \uC774\uB3D9"
         completeBoolName: 
-    - rid: 6174889727253544991
+    - rid: 6174889728934674769
       type: {class: ChangeMapAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mapData: {fileID: 11400000, guid: ae962f631543bce4fad467668f09d265, type: 2}
@@ -1133,33 +1249,33 @@ MonoBehaviour:
         customEntryPosition: {x: 0, y: 0, z: 0}
         overrideEntryDirection: 0
         entryDirection: 0
-    - rid: 6174889727253544992
+    - rid: 6174889728934674770
       type: {class: MapLoadedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mapAddressableID: TestMap2
-    - rid: 6174889727253544993
+    - rid: 6174889728934674771
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889727253544994
+    - rid: 6174889728934674772
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-002 S6 \uAE30\uC0C1 \u2014 dood = 2"
         completeBoolName: 
-    - rid: 6174889727253544995
+    - rid: 6174889728934674773
       type: {class: ScreenFadeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetColor: {r: 0, g: 0, b: 0, a: 0}
         duration: 1
-    - rid: 6174889727253544996
+    - rid: 6174889728934674774
       type: {class: AcquireClueAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         clueId: dummy-clue-eye
         openCodexImmediately: 0
-    - rid: 6174889727253544997
+    - rid: 6174889728934674775
       type: {class: DialogueStartAction, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727253544998
+    - rid: 6174889728934674776
       type: {class: DialogueShowLineAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         line:
@@ -1170,36 +1286,36 @@ MonoBehaviour:
           BG: {fileID: 0}
           isChoice: 0
           choices: []
-    - rid: 6174889727253544999
+    - rid: 6174889728934674777
       type: {class: SetEventFlagAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
         flagValue: 2
-    - rid: 6174889727253545000
+    - rid: 6174889728934674778
       type: {class: DialogueLineEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727253545001
+    - rid: 6174889728934674779
       type: {class: DialogueExitAction, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727253545002
+    - rid: 6174889728934674780
       type: {class: DialogueEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727253545003
+    - rid: 6174889728934674781
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0
-    - rid: 6174889727253545004
+    - rid: 6174889728934674782
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-003 S0 \uD604\uC2E4\uC758 \uCC45\uC0C1 \u2014 \uB178\uD2B8\uB97C
           \uD3B8\uB2E4"
         completeBoolName: 
-    - rid: 6174889727253545005
+    - rid: 6174889728934674783
       type: {class: OpenWindowAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         windowName: Note
         close: 0
-    - rid: 6174889727253545006
+    - rid: 6174889728934674784
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "\uB354\uBBF8 \uB2E8\uC11C \uB450 \uAC1C(EVT-001/002\uAC00 \uC774\uBBF8
@@ -1207,50 +1323,50 @@ MonoBehaviour:
           \u2014 '\uB2E8\uC11C \uC5F0\uB3D9' \uBAA8\uB4DC\uB85C \uB458\uC744 \uC774\uC73C\uBA74
           \uD574\uBABD\uC774 \uC131\uB9BD\uD569\uB2C8\uB2E4"
         completeBoolName: 
-    - rid: 6174889727253545007
+    - rid: 6174889728934674785
       type: {class: DreamReadingResolvedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         readingId: 
-    - rid: 6174889727253545008
+    - rid: 6174889728934674786
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-003 S1 \uD574\uBABD \uC131\uB9BD \u2014 \uC2DC\uC2A4\uD15C \uADDC\uCE59\uC774
           \uD574\uAE08\uB418\uC5C8\uC2B5\uB2C8\uB2E4 (FLAG_USE_SCISSORS / FLAG_EMOTION_MERGE)"
         completeBoolName: 
-    - rid: 6174889727253545009
+    - rid: 6174889728934674787
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "\uB178\uD2B8\uB97C \uB2EB\uC73C\uBA74 \uAFC8\uC73C\uB85C \uB3CC\uC544\uAC11\uB2C8\uB2E4"
         completeBoolName: 
-    - rid: 6174889727253545010
+    - rid: 6174889728934674788
       type: {class: WindowClosedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         windowName: Note
-    - rid: 6174889727253545011
+    - rid: 6174889728934674789
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-003 S2 \uB178\uD2B8\uB97C \uB36E\uC5C8\uC2B5\uB2C8\uB2E4 \u2014
           \uAFC8\uC73C\uB85C \uB3CC\uC544\uAC00\uAE30 \uC804\uC5D0 \uC554\uC804\uD569\uB2C8\uB2E4"
         completeBoolName: 
-    - rid: 6174889727253545012
+    - rid: 6174889728934674790
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889727253545013
+    - rid: 6174889728934674791
       type: {class: ScreenFadeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetColor: {r: 0, g: 0, b: 0, a: 1}
         duration: 0.6
-    - rid: 6174889727253545014
+    - rid: 6174889728934674792
       type: {class: ScreenEffectEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727253545015
+    - rid: 6174889728934674793
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-003 S3 \uC554\uC804 \uC0C1\uD0DC\uC5D0\uC11C \uAFC8\uC73C\uB85C
           \uC774\uB3D9"
         completeBoolName: 
-    - rid: 6174889727253545016
+    - rid: 6174889728934674794
       type: {class: ChangeMapAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mapData: {fileID: 11400000, guid: 0e206c1f89d359f46a996f13d7a8dd1c, type: 2}
@@ -1261,70 +1377,70 @@ MonoBehaviour:
         customEntryPosition: {x: 0, y: 0, z: 0}
         overrideEntryDirection: 0
         entryDirection: 0
-    - rid: 6174889727253545017
+    - rid: 6174889728934674795
       type: {class: MapLoadedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mapAddressableID: TestMap1
-    - rid: 6174889727253545018
+    - rid: 6174889728934674796
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-003 S4 \uAFC8\uC73C\uB85C \uBCF5\uADC0 \uC644\uB8CC \u2014 \uC911\uC559
           \uC9D1\uD130\uB85C \uAC00\uBA74 EVT-004\uAC00 \uC2DC\uC791\uB429\uB2C8\uB2E4"
         completeBoolName: 
-    - rid: 6174889727253545019
+    - rid: 6174889728934674797
       type: {class: ScreenFadeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetColor: {r: 0, g: 0, b: 0, a: 0}
         duration: 0.6
-    - rid: 6174889727253545020
+    - rid: 6174889728934674798
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0
-    - rid: 6174889727253545021
+    - rid: 6174889728934674799
       type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         boolName: EVT004_BattleCleared
         value: 0
-    - rid: 6174889727253545022
+    - rid: 6174889728934674800
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0
-    - rid: 6174889727253545023
+    - rid: 6174889728934674801
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-004 \uC9C4\uC785 \u2014 \uC804\uD22C \uB2F4\uB2F9\uC740 EventManager.SetBoolParameterTrue(\"EVT004_BattleCleared\")\uB85C
           \uC644\uB8CC\uB97C \uC54C\uB824 \uC8FC\uC138\uC694. \uD328\uB9C1/\uBC18\uC0AC/\uADF8\uB85C\uAE30/\uAC01\uC131\uC740
           \uBCC4\uB3C4 \uB2F4\uB2F9"
         completeBoolName: 
-    - rid: 6174889727253545024
+    - rid: 6174889728934674802
       type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         boolName: EVT004_BattleCleared
-    - rid: 6174889727253545025
+    - rid: 6174889728934674803
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_A
         targetAction:
-          rid: 6174889727253545076
-    - rid: 6174889727253545026
+          rid: 6174889728934674870
+    - rid: 6174889728934674804
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-004 \uC644\uB8CC \u2014 \uAE08\uBC1C\uC774 \uC9C4\uC815\uB418\uC5B4
           \uB9D0\uC744 \uAC78 \uC218 \uC788\uC2B5\uB2C8\uB2E4. \uAE08\uBC1C\uC5D0\uAC8C
           \uD655\uC778 \uD0A4\uB97C \uB204\uB974\uBA74 EVT-005\uAC00 \uC2DC\uC791\uB429\uB2C8\uB2E4"
         completeBoolName: 
-    - rid: 6174889727253545027
+    - rid: 6174889728934674805
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0
-    - rid: 6174889727253545028
+    - rid: 6174889728934674806
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889727253545029
+    - rid: 6174889728934674807
       type: {class: DialogueStartAction, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727253545030
+    - rid: 6174889728934674808
       type: {class: DialogueShowLineAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         line:
@@ -1336,10 +1452,10 @@ MonoBehaviour:
           BG: {fileID: 0}
           isChoice: 0
           choices: []
-    - rid: 6174889727253545031
+    - rid: 6174889728934674809
       type: {class: DialogueLineEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727253545032
+    - rid: 6174889728934674810
       type: {class: DialogueShowLineAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         line:
@@ -1351,10 +1467,10 @@ MonoBehaviour:
           BG: {fileID: 0}
           isChoice: 0
           choices: []
-    - rid: 6174889727253545033
+    - rid: 6174889728934674811
       type: {class: DialogueLineEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727253545034
+    - rid: 6174889728934674812
       type: {class: DialogueShowLineAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         line:
@@ -1365,116 +1481,116 @@ MonoBehaviour:
           BG: {fileID: 0}
           isChoice: 0
           choices: []
-    - rid: 6174889727253545035
+    - rid: 6174889728934674813
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-005 \uAC00\uC704 \uD68D\uB4DD \u2014 \uD604\uC7AC\uB294 Lily
           GearData\uB97C \uAC00\uC704 \uB300\uC5ED\uC73C\uB85C \uC9C0\uAE09\uD569\uB2C8\uB2E4"
         completeBoolName: 
-    - rid: 6174889727253545036
+    - rid: 6174889728934674814
       type: {class: GrantGearAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         gear: {fileID: 11400000, guid: cba07c1f1556c3b469772f464811b36e, type: 2}
-    - rid: 6174889727253545037
+    - rid: 6174889728934674815
       type: {class: SetEventFlagAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
         flagValue: 3
-    - rid: 6174889727253545038
+    - rid: 6174889728934674816
       type: {class: DialogueLineEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727253545039
+    - rid: 6174889728934674817
       type: {class: DialogueExitAction, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727253545040
+    - rid: 6174889728934674818
       type: {class: DialogueEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727253545041
+    - rid: 6174889728934674819
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-005 \uC644\uB8CC \u2014 \uBC31\uBC1C\uC5D0\uAC8C \uD655\uC778
           \uD0A4\uB97C \uB204\uB974\uBA74 EVT-006\uC774 \uC2DC\uC791\uB429\uB2C8\uB2E4"
         completeBoolName: 
-    - rid: 6174889727253545042
+    - rid: 6174889728934674820
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0
-    - rid: 6174889727253545043
+    - rid: 6174889728934674821
       type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         boolName: EVT006_BattleCleared
         value: 0
-    - rid: 6174889727253545044
+    - rid: 6174889728934674822
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0
-    - rid: 6174889727253545045
+    - rid: 6174889728934674823
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-006 \uC9C4\uC785 \u2014 \uC804\uD22C \uB2F4\uB2F9\uC740 EventManager.SetBoolParameterTrue(\"EVT006_BattleCleared\")\uB85C
           \uC644\uB8CC\uB97C \uC54C\uB824 \uC8FC\uC138\uC694. \uB0A0\uAC1C \uC808\uB2E8/\uAC01\uC131
           \uAC8C\uC774\uC9C0\uB294 \uBCC4\uB3C4 \uB2F4\uB2F9"
         completeBoolName: 
-    - rid: 6174889727253545046
+    - rid: 6174889728934674824
       type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         boolName: EVT006_BattleCleared
-    - rid: 6174889727253545047
+    - rid: 6174889728934674825
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889727253545048
+    - rid: 6174889728934674826
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: EXIT_DOOR
         targetAction:
-          rid: 6174889727253545077
-    - rid: 6174889727253545049
+          rid: 6174889728934674871
+    - rid: 6174889728934674827
       type: {class: ScreenFlashAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         color: {r: 1, g: 1, b: 1, a: 1}
         duration: 0.35
-    - rid: 6174889727253545050
+    - rid: 6174889728934674828
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-006 \uC644\uB8CC \u2014 \uD0C8\uCD9C\uBB38\uC73C\uB85C \uAC00\uC11C
           \uD655\uC778 \uD0A4\uB97C \uB204\uB974\uC138\uC694"
         completeBoolName: 
-    - rid: 6174889727253545051
+    - rid: 6174889728934674829
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0
-    - rid: 6174889727253545052
+    - rid: 6174889728934674830
       type: {class: TargetProximityInputDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: EXIT_DOOR
         radius: 2
         inputType: 9
-    - rid: 6174889727253545053
+    - rid: 6174889728934674831
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0
-    - rid: 6174889727253545054
+    - rid: 6174889728934674832
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-006 \uD0C8\uCD9C \u2014 \uD0C8\uCD9C\uBB38 \uC55E\uC5D0\uC11C
           \uAC00\uC704(Lily Form)\uB97C \uC0AC\uC6A9\uD558\uC138\uC694"
         completeBoolName: 
-    - rid: 6174889727253545055
+    - rid: 6174889728934674833
       type: {class: GearActiveDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         gear: {fileID: 11400000, guid: cba07c1f1556c3b469772f464811b36e, type: 2}
-    - rid: 6174889727253545056
+    - rid: 6174889728934674834
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889727253545057
+    - rid: 6174889728934674835
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-006 \uD0C8\uCD9C \u2014 \uAC00\uC704(Lily Form) \uC0AC\uC6A9\uC744
           \uD655\uC778\uD574 \uBB38\uC744 \uAC00\uB985\uB2C8\uB2E4"
         completeBoolName: 
-    - rid: 6174889727253545058
+    - rid: 6174889728934674836
       type: {class: ScreenTearAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         duration: 1.35
@@ -1499,64 +1615,174 @@ MonoBehaviour:
         shardSize: 26
         shardSpread: 340
         randomSeed: 6006
-    - rid: 6174889727253545059
+    - rid: 6174889728934674837
       type: {class: ScreenEffectEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889727253545060
+    - rid: 6174889728934674838
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: EXIT_DOOR
         targetAction:
-          rid: 6174889727253545078
-    - rid: 6174889727253545061
+          rid: 6174889728934674872
+    - rid: 6174889728934674839
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-006 \uD0C8\uCD9C \uC5F0\uCD9C \uC644\uB8CC \u2014 \uB370\uBAA8
           \uC885\uB8CC"
         completeBoolName: 
-    - rid: 6174889727253545062
+    - rid: 6174889728934674840
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0
-    - rid: 6174889727253545063
+    - rid: 6174889728934674841
+      type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        label: "\uC0AC\uB9DD - \uBCF5\uADC0 \uC5F0\uCD9C \uC2DC\uC791"
+        completeBoolName: 
+    - rid: 6174889728934674842
+      type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mode: 3
+    - rid: 6174889728934674843
+      type: {class: ScreenGlitchAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        intensity: 1
+        duration: 0.5
+        blockShift: 0.18
+        blockDensity: 24
+        blockCoverage: 0.7
+        rgbSplit: 0.02
+        splitAngle: 0
+        scanline: 0.25
+        jitter: 0.01
+        stop: 0
+    - rid: 6174889728934674844
+      type: {class: ScreenNoiseAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        intensity: 0.7
+        alpha: 0.5
+        duration: 0.6
+        tiling: 0
+        shakeStrength: 0
+        shakeDuration: 0
+        shakeCount: 0
+        stop: 0
+    - rid: 6174889728934674845
+      type: {class: ScreenFadeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetColor: {r: 0, g: 0, b: 0, a: 1}
+        duration: 0.8
+    - rid: 6174889728934674846
+      type: {class: ScreenEffectEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 6174889728934674847
+      type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        label: "\uC0AC\uB9DD - \uB418\uC0B4\uB9AC\uACE0 \uC774\uBCA4\uD2B8 \uD50C\uB798\uADF8\uB97C
+          \uB9C8\uC9C0\uB9C9 \uC138\uC774\uBE0C\uB85C"
+        completeBoolName: 
+    - rid: 6174889728934674848
+      type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: Player
+        targetAction:
+          rid: 6174889728934674873
+    - rid: 6174889728934674849
+      type: {class: RevertEventFlagsToSaveAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        useLoadedDataInstead: 0
+    - rid: 6174889728934674850
+      type: {class: ScreenNoiseAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        intensity: 0.5
+        alpha: 0.5
+        duration: 1
+        tiling: 0
+        shakeStrength: 0
+        shakeDuration: 0
+        shakeCount: 0
+        stop: 1
+    - rid: 6174889728934674851
+      type: {class: ScreenGlitchAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        intensity: 1
+        duration: 1
+        blockShift: 0.06
+        blockDensity: 24
+        blockCoverage: 0.35
+        rgbSplit: 0.006
+        splitAngle: 0
+        scanline: 0.25
+        jitter: 0.01
+        stop: 1
+    - rid: 6174889728934674852
+      type: {class: ChangeMapAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mapData: {fileID: 11400000, guid: ae962f631543bce4fad467668f09d265, type: 2}
+        registry: {fileID: 0}
+        mapAddressableID: 
+        entryPlacement: 0
+        entryPointId: 
+        customEntryPosition: {x: 0, y: 0, z: 0}
+        overrideEntryDirection: 0
+        entryDirection: 0
+    - rid: 6174889728934674853
+      type: {class: MapLoadedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mapAddressableID: TestMap2
+    - rid: 6174889728934674854
+      type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        label: "\uC0AC\uB9DD - \uD604\uC2E4\uC758 \uBC29\uC5D0\uC11C \uAE68\uC5B4\uB0A8"
+        completeBoolName: 
+    - rid: 6174889728934674855
+      type: {class: ScreenFadeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetColor: {r: 0, g: 0, b: 0, a: 0}
+        duration: 0.8
+    - rid: 6174889728934674856
+      type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mode: 0
+    - rid: 6174889728934674857
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: 
-    - rid: 6174889727253545064
+    - rid: 6174889728934674858
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: 
-    - rid: 6174889727253545065
+    - rid: 6174889728934674859
       type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         active: 1
-    - rid: 6174889727253545066
+    - rid: 6174889728934674860
       type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         active: 0
-    - rid: 6174889727253545067
+    - rid: 6174889728934674861
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: 
-    - rid: 6174889727253545068
+    - rid: 6174889728934674862
       type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         active: 0
-    - rid: 6174889727253545069
+    - rid: 6174889728934674863
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: 
-    - rid: 6174889727253545070
+    - rid: 6174889728934674864
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: 
-    - rid: 6174889727253545071
+    - rid: 6174889728934674865
       type: {class: ChangeStateMachineAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         stateMachine: {fileID: 11400000, guid: 3ed29771e87add64495182945db2b2dd, type: 2}
         startState: {fileID: 0}
         followUpActions: []
-    - rid: 6174889727253545072
+    - rid: 6174889728934674866
       type: {class: KnockBackAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         directionMode: 2
@@ -1564,27 +1790,31 @@ MonoBehaviour:
         acceleration: 80
         accelDuration: 0.12
         knockbackFriction: 0.95
-    - rid: 6174889727253545073
+    - rid: 6174889728934674867
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: Knockback
-    - rid: 6174889727253545074
+    - rid: 6174889728934674868
       type: {class: ReserveAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: 
-    - rid: 6174889727253545075
+    - rid: 6174889728934674869
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: Idle
-    - rid: 6174889727253545076
+    - rid: 6174889728934674870
       type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         active: 1
-    - rid: 6174889727253545077
+    - rid: 6174889728934674871
       type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         active: 1
-    - rid: 6174889727253545078
+    - rid: 6174889728934674872
       type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         active: 0
+    - rid: 6174889728934674873
+      type: {class: ReviveEntityAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        healToFull: 1

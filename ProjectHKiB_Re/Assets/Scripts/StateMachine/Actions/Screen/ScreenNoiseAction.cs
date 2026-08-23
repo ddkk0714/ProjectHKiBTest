@@ -7,9 +7,11 @@ namespace StateMachine
     public class ScreenNoiseAction : StateAction
     {
         [Header("노이즈")]
+        [Tooltip("노이즈 입자 자체의 강도입니다. 화면을 얼마나 가릴지는 Alpha로 따로 조절합니다.")]
         [Range(0f, 1f)] public float intensity = 0.5f;
         [Tooltip("노이즈 강도와 별도로 적용되는 최종 투명도. 1이면 원본 화면을 완전히 가린다.")]
         [Range(0f, 1f)] public float alpha = 0.5f;
+        [Tooltip("0이면 Stop Noise 액션이 호출될 때까지 계속됩니다.")]
         [Min(0f)] public float duration = 1f;
         // 알갱이 크기 — 클수록 잘다. 0이면 기본값(16)을 쓴다.
         [Min(0f)] public float tiling;
@@ -28,6 +30,7 @@ namespace StateMachine
 
         public void Play()
         {
+            // stop은 다른 수치를 무시하고 현재 노이즈 요청만 취소한다.
             if (stop) ScreenEffectManager.Instance.StopNoise();
             else ScreenEffectManager.Instance.SetNoise(
                 intensity,

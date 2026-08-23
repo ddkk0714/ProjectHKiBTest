@@ -157,7 +157,7 @@ MonoBehaviour:
               m_Calls: []
       - Key: Dummy_EVT001_S1_mark
         Value:
-          value: 13335
+          value: 0
           OnValueChanged:
             m_PersistentCalls:
               m_Calls: []

@@ -164,10 +164,70 @@ public class EventManager : StateController, IEventSaveProvider
     // 이번 이벤트가 시작된 unscaled 시각 — 단계별 로그가 "시작 후 몇 초"를 찍는 데 쓴다.
     public float EventStartedAtUnscaled { get; private set; }
 
-    public void StartEvent(EventSO eventSO, EventTargets manualTargets = null)
+    /// <summary>
+    /// 진행 중이던 이벤트를 그 자리에서 끊는다. 사망처럼 "하던 걸 무르고 처음으로" 가야 하는
+    /// 경우에 쓴다 — 끊지 않으면 아래 StartEvent의 재진입 가드에 막혀 복귀 이벤트가 못 뜬다.
+    /// </summary>
+    /// <remarks>
+    /// 끊긴 이벤트가 걸어둔 것들(컷신 입력 잠금, 화면 연출, 카메라)은 **저절로 풀리지 않는다.**
+    /// 이 메서드는 상태 기계만 세운다. 복귀 이벤트의 첫 단계에서 SetInputModeAction(Play),
+    /// ScreenFadeAction 등으로 직접 되돌려 줄 것.
+    /// </remarks>
+    public void AbortEvent()
+    {
+        if (!CurrentState) return;
+
+        Debug.Log($"[EventManager] 진행 중이던 이벤트를 중단합니다 (State: '{CurrentState.name}').");
+        EliminateStateMachine();
+    }
+
+    /// <summary>
+    /// 이벤트 플래그를 마지막 세이브에 담긴 값으로 되돌린다 — 사망 시 "진행 중이던 이벤트만큼의
+    /// 진도"를 무르는 용도.
+    /// </summary>
+    /// <param name="lastSaved">
+    /// SaveModule.CurrentSaveData 또는 LoadedData. null이거나 이 provider의 스냅샷이 없으면
+    /// **아무것도 지우지 않는다** — SaveModule.LoadEvents와 같은 판단이다. 여기서 전부 비우면
+    /// 한 번도 저장하지 않고 죽었을 때 맵이 저작해 둔 초기 플래그까지 날아가 이벤트가 영영 안 뜬다.
+    /// </param>
+    /// <returns>실제로 되돌렸으면 true.</returns>
+    /// <remarks>
+    /// 이미 Initialize를 마친 월드 오브젝트(EventControllableEntity/Animation)는 값을 되돌려도
+    /// 스스로 다시 배치되지 않는다. 그래서 이 호출은 **맵을 다시 여는 흐름과 짝지어** 써야 한다
+    /// (사망 복귀는 대개 현실의 방으로 맵을 옮기므로 자연히 충족된다).
+    /// </remarks>
+    public bool RevertFlagsToSave(SaveSlotData lastSaved)
+    {
+        ProviderFlagsSaveInfo snapshot = lastSaved?.providerFlags?.Find(p => p.providerId == ProviderId);
+        if (snapshot == null)
+        {
+            Debug.LogWarning("[EventManager] 되돌릴 세이브 스냅샷이 없어 이벤트 플래그를 그대로 둡니다 " +
+                             "(아직 한 번도 저장하지 않았거나 이 provider의 기록이 없는 세이브).");
+            return false;
+        }
+
+        ResetForLoad();
+        if (snapshot.eventFlags != null)
+        {
+            foreach (EventFlagSaveInfo flag in snapshot.eventFlags)
+                SetEventFlag(flag.id, flag.value);
+        }
+
+        Debug.Log($"[EventManager] 이벤트 플래그를 마지막 세이브 시점으로 되돌렸습니다 " +
+                  $"({snapshot.eventFlags?.Count ?? 0}개).");
+        return true;
+    }
+
+    /// <param name="interruptRunning">
+    /// 진행 중인 이벤트를 끊고 시작한다. 사망 복귀처럼 **반드시 끼어들어야 하는** 이벤트만 켤 것 —
+    /// 평상시엔 꺼둬야 트리거가 겹쳐 이벤트가 되감기는 사고를 가드가 잡아준다.
+    /// </param>
+    public void StartEvent(EventSO eventSO, EventTargets manualTargets = null, bool interruptRunning = false)
     {
         // 트리거가 겹쳐 있거나 두 번 발동하면 진행 중인 이벤트가 첫 단계부터 다시 시작된다 —
         // 연출이 처음부터 되감기니 "이벤트가 유난히 오래 걸린다"로 보인다. 막고 알린다.
+        if (IsEventRunning && interruptRunning) AbortEvent();
+
         if (IsEventRunning)
         {
             Debug.LogWarning($"[EventManager] '{eventSO.name}'을 시작하려 했지만 이미 이벤트가 진행 중입니다 " +
