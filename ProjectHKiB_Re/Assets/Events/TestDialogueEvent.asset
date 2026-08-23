@@ -399,6 +399,7 @@ MonoBehaviour:
     floatVariables:
       _serializedList: []
   initialState: {fileID: -1662928233858585049}
+  graph: {fileID: 0}
   allStates:
   - {fileID: 611713257663710604}
   - {fileID: -7091550812145208786}
