@@ -39,6 +39,11 @@ public class TimeManager : MonoBehaviour
     // UIManager가 관리하는 창들은 여기에 창 이름을 붙여 "Menu:Map" 식으로 사유를 만든다.
     public const string ReasonMenu = "Menu";
 
+    // 이벤트 상태 기계의 강제 컷신 구간(InputManager.CUTSCENEMode) 전용 사유.
+    // 대화·메뉴처럼 도중에 시간이 계속 흘러야 하는 구간으로 넘어가면(PLAY/MENU/GRAFFITI 모드로
+    // 전환) 자동으로 풀린다 — InputManager의 각 모드 전환 메서드 참고.
+    public const string ReasonCutscene = "Cutscene";
+
     private readonly HashSet<string> _pauseReasons = new();
     private float _defaultFixedDeltaTime;
     private bool _lastAppliedPause;

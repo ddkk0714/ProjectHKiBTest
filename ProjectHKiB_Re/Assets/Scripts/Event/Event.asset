@@ -12,3 +12,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aafe359a79fe27b4884a122acb51d111, type: 3}
   m_Name: Event
   m_EditorClassIdentifier: Assembly-CSharp::EventSO
+  customVariables:
+    boolVariables:
+      _serializedList: []
+    intVariables:
+      _serializedList: []
+    floatVariables:
+      _serializedList: []
+  initialState: {fileID: 0}
+  graph: {fileID: 6176784622543381749}
+  allStates: []
+  _commandPairs: []
+  involvedEventTargets: []
+--- !u!114 &6176784622543381749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d5bce95d28994049b5bb57841a729ee, type: 3}
+  m_Name: EventEditor
+  m_EditorClassIdentifier: 
+  serializedNodes: []
+  nodes: []
+  edges: []
+  groups: []
+  stackNodes: []
+  pinnedElements: []
+  exposedParameters: []
+  serializedParameterList: []
+  stickyNotes: []
+  nodeInspectorReference: {fileID: 0}
+  position: {x: 0, y: 0, z: 0}
+  scale: {x: 1, y: 1, z: 1}
+  targetStateMachine: {fileID: 11400000}
+  references:
+    version: 2
+    RefIds: []

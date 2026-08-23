@@ -80,3 +80,10 @@ ProjectHKiB_Re/Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SD
 
 # 아직 확정 전인 기획서 초안 — 내용이 굳으면 이 줄을 지우고 커밋한다.
 /ProjectHKiB_Re/Docs/Internet_System_Plan.md
+
+# 맵 기획서 원본(외부 문서에서 내보낸 초안) — 구현 참고용이라 추적하지 않는다.
+/낙서세계(2).md
+
+# 낙서세계 맵 이벤트 작업 문서 — 기획서 원본에 딸린 초안이라 추적하지 않는다.
+/ProjectHKiB_Re/Docs/Map_Event_Implementation_Plan.md
+/ProjectHKiB_Re/Docs/Map_Event_Dev_Plan.md

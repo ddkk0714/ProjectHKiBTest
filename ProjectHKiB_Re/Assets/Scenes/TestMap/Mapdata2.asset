@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: Mapdata2
   m_EditorClassIdentifier: 
   mapAddressableID: TestMap2
+  isRealWorld: 1
   bgmID: 

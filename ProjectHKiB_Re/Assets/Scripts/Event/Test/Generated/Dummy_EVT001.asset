@@ -1,0 +1,185 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-2559125977590410982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d5bce95d28994049b5bb57841a729ee, type: 3}
+  m_Name: Dummy_EVT001Editor
+  m_EditorClassIdentifier: 
+  serializedNodes: []
+  nodes:
+  - rid: 6174889692154822877
+  - rid: 6174889692154822878
+  - rid: 6174889692154822879
+  - rid: 6174889692154822880
+  edges:
+  - GUID: 18920314-5886-42ca-aee9-c03aff6ddc04
+    owner: {fileID: -2559125977590410982}
+    inputNodeGUID: 1307b73b-b8f9-40c0-a994-2bec79233381
+    outputNodeGUID: 93cf9df7-a89b-4a81-94f2-b36c06610526
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: 32feddf6-3f85-492b-ac51-84bd523e7039
+    owner: {fileID: -2559125977590410982}
+    inputNodeGUID: a358de3d-334a-480b-b706-6926a508e295
+    outputNodeGUID: 1307b73b-b8f9-40c0-a994-2bec79233381
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: de2b175d-5b62-404d-965b-01be50f607b8
+    owner: {fileID: -2559125977590410982}
+    inputNodeGUID: 767fe9d5-451a-400b-b24b-501acc7a80a6
+    outputNodeGUID: a358de3d-334a-480b-b706-6926a508e295
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  groups: []
+  stackNodes: []
+  pinnedElements: []
+  exposedParameters: []
+  serializedParameterList: []
+  stickyNotes: []
+  nodeInspectorReference: {fileID: 0}
+  position: {x: 380.8, y: 21.6, z: 0}
+  scale: {x: 1, y: 1, z: 1}
+  targetStateMachine: {fileID: 11400000}
+  references:
+    version: 2
+    RefIds:
+    - rid: 6174889692154822877
+      type: {class: InitialStateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: 
+        GUID: 93cf9df7-a89b-4a81-94f2-b36c06610526
+        computeOrder: 0
+        position:
+          serializedVersion: 2
+          x: -560
+          y: 0
+          width: 100
+          height: 100
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        outputTransitions: {fileID: 0}
+    - rid: 6174889692154822878
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Dummy_EVT001_S0
+        GUID: 1307b73b-b8f9-40c0-a994-2bec79233381
+        computeOrder: 1
+        position:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 11400000, guid: 43f1e6dfa53631c4aa039f6243fb8d5b, type: 2}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889692154822879
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Dummy_EVT001_S1
+        GUID: a358de3d-334a-480b-b706-6926a508e295
+        computeOrder: 2
+        position:
+          serializedVersion: 2
+          x: 0
+          y: 1000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 11400000, guid: a6f8f6c93c24135479d9c8f87b594d4f, type: 2}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 6174889692154822880
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Dummy_EVT001_S2
+        GUID: 767fe9d5-451a-400b-b24b-501acc7a80a6
+        computeOrder: 3
+        position:
+          serializedVersion: 2
+          x: 560
+          y: 1000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 11400000, guid: 9bcdfcb442ff618499bb762275223590, type: 2}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aafe359a79fe27b4884a122acb51d111, type: 3}
+  m_Name: Dummy_EVT001
+  m_EditorClassIdentifier: 
+  customVariables:
+    boolVariables:
+      _serializedList: []
+    intVariables:
+      _serializedList:
+      - Key: Dummy_EVT001_S0_mark
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+      - Key: Dummy_EVT001_S1_mark
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+      - Key: Dummy_EVT002_S0_mark
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+    floatVariables:
+      _serializedList: []
+  initialState: {fileID: 11400000, guid: 43f1e6dfa53631c4aa039f6243fb8d5b, type: 2}
+  graph: {fileID: -2559125977590410982}
+  allStates:
+  - {fileID: 11400000, guid: 43f1e6dfa53631c4aa039f6243fb8d5b, type: 2}
+  - {fileID: 11400000, guid: a6f8f6c93c24135479d9c8f87b594d4f, type: 2}
+  - {fileID: 11400000, guid: 9bcdfcb442ff618499bb762275223590, type: 2}
+  _commandPairs: []
+  involvedEventTargets:
+  - ID: Player
+    targetSearchType: 0
+  - ID: NPC_A
+    targetSearchType: 1
+  - ID: NPC_B
+    targetSearchType: 1

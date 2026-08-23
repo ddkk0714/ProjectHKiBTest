@@ -330,6 +330,46 @@
                     "mapGuid": ""
                 }
             ]
+        },
+        {
+            "id": "dummy-clue-wing",
+            "name": "(더미) 떨리는 날개",
+            "description": "이벤트 체인 테스트용 더미 단서 — 실제 맵/이벤트키에 매이지 않는다.",
+            "targetMapGuid": "",
+            "targetConnectionGuid": "",
+            "requiredEventKey": "",
+            "type": 3,
+            "timestamp": "",
+            "content": "EventChainEditorWindow 샘플 체인(EVT-001)이 AcquireClueAction으로 직접 지급한다. 해몽 판정(DreamReadingModule) 테스트용.",
+            "source": "(더미)",
+            "codexMapGuid": "",
+            "keywords": [
+                "더미",
+                "테스트",
+                "해몽"
+            ],
+            "comments": [],
+            "attachments": []
+        },
+        {
+            "id": "dummy-clue-eye",
+            "name": "(더미) 노이즈 낀 눈",
+            "description": "이벤트 체인 테스트용 더미 단서 — 실제 맵/이벤트키에 매이지 않는다.",
+            "targetMapGuid": "",
+            "targetConnectionGuid": "",
+            "requiredEventKey": "",
+            "type": 3,
+            "timestamp": "",
+            "content": "EventChainEditorWindow 샘플 체인(EVT-002)이 AcquireClueAction으로 직접 지급한다. 해몽 판정(DreamReadingModule) 테스트용.",
+            "source": "(더미)",
+            "codexMapGuid": "",
+            "keywords": [
+                "더미",
+                "테스트",
+                "해몽"
+            ],
+            "comments": [],
+            "attachments": []
         }
     ]
 }

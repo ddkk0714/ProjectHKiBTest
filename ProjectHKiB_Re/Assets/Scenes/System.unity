@@ -1771,6 +1771,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &31957895
 MonoBehaviour:
@@ -4650,6 +4654,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &91706221
 MonoBehaviour:
@@ -5967,6 +5975,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &126842186
 MonoBehaviour:
@@ -11922,6 +11934,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &255197805
 MonoBehaviour:
@@ -15580,7 +15596,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 327803487}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 9.8, y: -4.62, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15874,6 +15890,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 10
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &327803512
 MonoBehaviour:
@@ -22113,6 +22133,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &470177829
 MonoBehaviour:
@@ -26694,6 +26718,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &547994588
 MonoBehaviour:
@@ -28932,6 +28960,7 @@ RectTransform:
   - {fileID: 415581605}
   - {fileID: 1568758191}
   - {fileID: 1129918845}
+  - {fileID: 1603460876}
   m_Father: {fileID: 1599627550}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -29000,6 +29029,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &601953263
 MonoBehaviour:
@@ -29784,6 +29817,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &614344026
 MonoBehaviour:
@@ -34882,6 +34919,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &725407581
 MonoBehaviour:
@@ -36171,6 +36212,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &745143722
 MonoBehaviour:
@@ -36937,6 +36982,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &760284369
 MonoBehaviour:
@@ -40475,6 +40524,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &827860543
 MonoBehaviour:
@@ -40666,6 +40719,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &828534940
 MonoBehaviour:
@@ -45290,6 +45347,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &893315053
 MonoBehaviour:
@@ -55637,6 +55698,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &1116164927
 MonoBehaviour:
@@ -57199,6 +57264,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 353534252684669108, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 50
+      objectReference: {fileID: 0}
     - target: {fileID: 440742617235834249, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -57246,6 +57315,10 @@ PrefabInstance:
     - target: {fileID: 521311794179224947, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 647257802230543887, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 667997186590144226, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -57806,6 +57879,10 @@ PrefabInstance:
     - target: {fileID: 2317117347219903099, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -12
+      objectReference: {fileID: 0}
+    - target: {fileID: 2374312453978798980, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 2388364228345088086, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchorMax.y
@@ -58553,11 +58630,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5701085014004860588, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 74.75195
+      value: 74.75
       objectReference: {fileID: 0}
     - target: {fileID: 5701085014004860588, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -13.445007
+      value: -13.5
       objectReference: {fileID: 0}
     - target: {fileID: 5732472173481752641, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchorMax.y
@@ -59606,6 +59683,10 @@ PrefabInstance:
     - target: {fileID: 9088227292387108866, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9152563088834630566, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -32
       objectReference: {fileID: 0}
     - target: {fileID: 9171896241195982092, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchorMax.y
@@ -62462,6 +62543,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!1 &1217475174
 GameObject:
@@ -63447,6 +63532,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &1236688445
 MonoBehaviour:
@@ -65882,6 +65971,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &1292047132
 MonoBehaviour:
@@ -66377,6 +66470,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &1300301299
 MonoBehaviour:
@@ -69545,6 +69642,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &1391855065
 MonoBehaviour:
@@ -76813,6 +76914,11 @@ MonoBehaviour:
   openedWindows: []
   defaultPauseWindowIndex: 0
   canExit: 1
+  realWorldOnlyWindows:
+  - Clue
+  - Note
+  - Map
+  - Internet
   dialogueModule: {fileID: 1346231659}
 --- !u!1 &1575398554
 GameObject:
@@ -79264,6 +79370,67 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1603433375}
   m_CullTransparentMesh: 1
+--- !u!1 &1603460875
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1603460876}
+  - component: {fileID: 1603460877}
+  m_Layer: 5
+  m_Name: EventTestbed
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1603460876
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1603460875}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 599265708}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1603460877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1603460875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaff51effd205159591935d1e7cc4eea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _doodFlag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
+  _doodValue: 0
+  _targetMap: {fileID: 11400000, guid: ae962f631543bce4fad467668f09d265, type: 2}
+  _clueId: clue-lakeside
+  _dummyEvent: {fileID: 11400000, guid: 390c439a92a0c3e4a94697982e12f210, type: 2}
+  _chainTriggers:
+  - {fileID: 2805556371517973119, guid: d18289a391520dc42a5baf592238c326, type: 3}
+  - {fileID: 5641469510271594099, guid: 450ba67e8a9856d469d3495ec4550f12, type: 3}
+  - {fileID: 6340638777498452742, guid: 3e977ba7b46275f4d94afe20fd8be80c, type: 3}
+  - {fileID: 6544885131358697005, guid: 03bea3095f8c90d499d50f39dbef44c9, type: 3}
+  _dreamExitMap: {fileID: 11400000, guid: ae962f631543bce4fad467668f09d265, type: 2}
+  _stepInterval: 2
 --- !u!1 &1607588521
 GameObject:
   m_ObjectHideFlags: 0
@@ -83424,10 +83591,10 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.05006986
+    x: 0
     y: 0
-    width: 0.9004813
-    height: 0.9993108
+    width: 1
+    height: 1
   near clip plane: -5000
   far clip plane: 5000
   field of view: 40
@@ -83456,7 +83623,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1718942438}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.000099897385, z: -10}
+  m_LocalPosition: {x: 9.8, y: -4.6198997, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -84283,6 +84450,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &1738345893
 MonoBehaviour:
@@ -85923,6 +86094,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &1776947703
 MonoBehaviour:
@@ -97922,6 +98097,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &2060873408
 MonoBehaviour:
@@ -103562,6 +103741,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &8038879578283673505
 MonoBehaviour:
@@ -103662,6 +103845,10 @@ MonoBehaviour:
   <WalkAcceleration>k__BackingField: 0
   <ZCol>k__BackingField: {fileID: 0}
   jump: 0
+  <IsKnockedBack>k__BackingField: 0
+  <KnockbackForce>k__BackingField: {x: 0, y: 0, z: 0}
+  <KnockbackTimeLeft>k__BackingField: 0
+  <KnockbackFriction>k__BackingField: 0
   dumpSpeedDiagnosticsKey: 287
 --- !u!114 &8349516551495548716
 MonoBehaviour:

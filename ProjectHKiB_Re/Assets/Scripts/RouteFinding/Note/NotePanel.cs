@@ -75,6 +75,9 @@ namespace RouteFinding.Note
         private ClueKeywordFilterWindow _keywordFilterWindow;
         private NoteClueCreateWindow _clueCreateWindow;
         private InputManager _inputManager;
+        private RectTransform _readingCardRT;   // 해몽 성립 시 뜨는 해석 카드
+        private TextMeshProUGUI _readingTitleTMP;
+        private TextMeshProUGUI _readingBodyTMP;
         private Image _linkModeBtnImg; // "단서 연동" 토글 버튼 — 활성 상태를 색으로 표시
 
         // [2026-07-21, 신설] 좌측 단서 그래프 팬·줌(MapViewer.GraphPanZoom 재사용) + 우측 서랍 접기/펼치기.
@@ -113,6 +116,7 @@ namespace RouteFinding.Note
         private void Start()
         {
             NoteModule.Instance.OnNoteChanged += Refresh;
+            if (DreamReadingModule.Instance != null) DreamReadingModule.Instance.OnReadingResolved += HandleReadingResolved;
             if (RouteModule.Instance != null) RouteModule.Instance.OnRouteSelected += HandleRouteSelected;
             Refresh();
             _panelGO.SetActive(false);
@@ -121,6 +125,7 @@ namespace RouteFinding.Note
         private void OnDestroy()
         {
             if (NoteModule.Instance != null) NoteModule.Instance.OnNoteChanged -= Refresh;
+            if (DreamReadingModule.Instance != null) DreamReadingModule.Instance.OnReadingResolved -= HandleReadingResolved;
             if (RouteModule.Instance != null) RouteModule.Instance.OnRouteSelected -= HandleRouteSelected;
             if (_inputManager != null) _inputManager.onOpenNote -= HandleOpenNoteInput;
         }
@@ -353,6 +358,7 @@ namespace RouteFinding.Note
             BuildTopBar(root);
             BuildList(root); // _graphView가 여기서 만들어진다 — 범례가 그 색을 받아 쓰므로 순서 유지
             EnsureLegend(root);
+            EnsureReadingCard(root);
             BuildBoardWindow(root);
             BuildKeywordFilterWindow(root);
             BuildClueCreateWindow(root);
@@ -454,6 +460,7 @@ namespace RouteFinding.Note
             // 범례(2026-08-17 신설)는 그 이전에 저장된 프리팹/씬 패널엔 없다 — 없으면 여기서 만들어
             // 끼워 넣는다(EnsureLegend 주석 참고). _graphView 바인딩 뒤에 호출해야 색을 받아올 수 있다.
             EnsureLegend(root);
+            EnsureReadingCard(root);
             UpdateDrawerLayout(); // 범례 높이만큼 그래프/서랍의 위쪽 오프셋을 다시 맞춘다
         }
 
@@ -661,6 +668,92 @@ namespace RouteFinding.Note
 
                 MakeLegendText(chip, item.Label, Color.white);
             }
+        }
+
+        // ─── 해몽 해석 카드 ───────────────────────────────────────
+        // 단서를 이어 해몽이 성립한 순간(DreamReadingModule.OnReadingResolved) 화면 가운데 뜬다.
+        //
+        // 별도의 "해몽 모드"를 만들지 않은 이유: 기획서가 말하는 "단서들을 배열해 해몽한다"는
+        // 행위가 기존 단서 연동 모드(BtnLinkMode)와 정확히 같은 조작이다. 모드를 하나 더 두면
+        // 같은 상호작용이 둘로 갈라질 뿐이라, 연동 결과를 판정해 해석을 보여주는 이 카드만 얹었다.
+        //
+        // EnsureLegend와 같은 이유로 마커가 아니라 Ensure~다 — 저장된 프리팹을 구버전으로 만들지 않는다.
+        private void EnsureReadingCard(RectTransform root)
+        {
+            if (root == null) return;
+
+            var card = FindDeepTransform(root, "ReadingCard") as RectTransform;
+            if (card == null) card = NewRect(root, "ReadingCard");
+
+            // 다른 오버레이 창들보다 위에 뜨도록 항상 맨 마지막 형제로 둔다.
+            card.SetAsLastSibling();
+            card.anchorMin = card.anchorMax = card.pivot = new Vector2(0.5f, 0.5f);
+            card.sizeDelta = new Vector2(220f, 110f);
+            card.anchoredPosition = Vector2.zero;
+            PanelBackground.Apply(card, _listBgColor, _listBgSprite);
+
+            for (int i = card.childCount - 1; i >= 0; i--)
+            {
+                var child = card.GetChild(i).gameObject;
+                child.SetActive(false);
+                Destroy(child);
+            }
+
+            var titleRT = NewRect(card, "Title");
+            titleRT.anchorMin = new Vector2(0f, 1f);
+            titleRT.anchorMax = Vector2.one;
+            titleRT.pivot     = new Vector2(0.5f, 1f);
+            titleRT.sizeDelta = new Vector2(-16f, 20f);
+            titleRT.anchoredPosition = new Vector2(0f, -8f);
+            _readingTitleTMP = MakeCardText(titleRT, 9f, new Color(0.98f, 0.90f, 0.45f), TextAlignmentOptions.Midline);
+
+            var bodyRT = NewRect(card, "Body");
+            bodyRT.anchorMin = Vector2.zero;
+            bodyRT.anchorMax = Vector2.one;
+            bodyRT.offsetMin = new Vector2(10f, 26f);
+            bodyRT.offsetMax = new Vector2(-10f, -30f);
+            _readingBodyTMP = MakeCardText(bodyRT, 7f, Color.white, TextAlignmentOptions.TopLeft);
+            _readingBodyTMP.enableWordWrapping = true;
+
+            var closeRT = NewRect(card, "BtnClose");
+            closeRT.anchorMin = new Vector2(0.5f, 0f);
+            closeRT.anchorMax = new Vector2(0.5f, 0f);
+            closeRT.pivot     = new Vector2(0.5f, 0f);
+            closeRT.sizeDelta = new Vector2(60f, 16f);
+            closeRT.anchoredPosition = new Vector2(0f, 6f);
+            var closeImg = AddImg(closeRT, new Color(0.20f, 0.28f, 0.42f));
+            var closeBtn = closeRT.gameObject.AddComponent<Button>();
+            closeBtn.targetGraphic = closeImg;
+            closeBtn.onClick.AddListener(() => { if (_readingCardRT != null) _readingCardRT.gameObject.SetActive(false); });
+            var closeLabelRT = NewRect(closeRT, "Label");
+            StretchFull(closeLabelRT);
+            MakeCardText(closeLabelRT, 7f, Color.white, TextAlignmentOptions.Midline).text = "확인";
+
+            _readingCardRT = card;
+            card.gameObject.SetActive(false); // 해몽이 성립할 때만 뜬다
+        }
+
+        private TextMeshProUGUI MakeCardText(RectTransform parent, float size, Color color, TextAlignmentOptions align)
+        {
+            var tmp = parent.gameObject.AddComponent<TextMeshProUGUI>();
+            if (_font != null) tmp.font = _font;
+            tmp.fontSize = size;
+            tmp.color = color;
+            tmp.alignment = align;
+            tmp.enableWordWrapping = false;
+            tmp.raycastTarget = false;
+            return tmp;
+        }
+
+        private void HandleReadingResolved(DreamReading reading)
+        {
+            if (reading == null || _readingCardRT == null) return;
+
+            if (_readingTitleTMP != null) _readingTitleTMP.text = string.IsNullOrEmpty(reading.title) ? "해몽" : reading.title;
+            if (_readingBodyTMP != null) _readingBodyTMP.text = reading.interpretation;
+
+            _readingCardRT.gameObject.SetActive(true);
+            _readingCardRT.SetAsLastSibling();
         }
 
         private void MakeLegendText(RectTransform parent, string text, Color color)

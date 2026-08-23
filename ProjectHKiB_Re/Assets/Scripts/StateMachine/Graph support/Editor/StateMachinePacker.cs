@@ -735,7 +735,9 @@ public static class StateMachinePacker
         }
     }
 
-    private static void BuildGraph(StateMachineSO packed)
+    // EventChainEditorWindow도 재사용한다 — 코드로 직접 채운 allStates/transitions를 그래프
+    // 노드로 시각화하는 로직이 여기 하나뿐이라, 중복 구현하지 않고 접근성만 넓혔다.
+    internal static void BuildGraph(StateMachineSO packed)
     {
         var graph = ScriptableObject.CreateInstance<StateMachineGraph>();
         graph.name = packed.name + "Editor";

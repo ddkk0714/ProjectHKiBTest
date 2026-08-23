@@ -25,8 +25,23 @@ public class MapLocalManager : MonoBehaviour
         }
     }
 
+    // 엔티티/애니메이션 초기화보다 반드시 먼저 돌아야 한다 — 그쪽이 바로 이 플래그를 읽어
+    // "어떤 상태 기계로 복원할지"를 고르기 때문이다(EventControllableEntity.Initialize).
+    private void ApplyInitialEventFlags()
+    {
+        if (!mapData || mapData.initialEventFlags == null) return;
+
+        EventManager eventManager = GameManager.instance.eventManager;
+        if (!eventManager) return;
+
+        foreach (var pair in mapData.initialEventFlags)
+            eventManager.EnsureEventFlag(pair.Key, pair.Value);
+    }
+
     public void Initialize()
     {
+        ApplyInitialEventFlags();
+
         string[] entities = allEventTargets.targetEntities.Keys.ToArray();
         for (int i = 0; i < entities.Length; i++)
         {

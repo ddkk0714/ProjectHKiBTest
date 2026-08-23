@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: Dummy_BossState
+  m_EditorClassIdentifier: 
+  isPacked: 0
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0
+  transitions: []
+  additionalTransitions: []
+  EnterActions:
+  - rid: 6174889692154822656
+  UpdateActions: []
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 6174889692154822656
+      type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        label: "\uBCF4\uC2A4\uD654\uB41C NPC\uAC00 \uBCF4\uC2A4 \uC0C1\uD0DC\uB85C
+          \uC9C4\uC785"
+        completeBoolName: 

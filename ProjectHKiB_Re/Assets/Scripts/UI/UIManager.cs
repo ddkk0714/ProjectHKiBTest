@@ -20,6 +20,15 @@ public class UIManager : MonoBehaviour
     public int defaultPauseWindowIndex;
     public bool canExit = true;
 
+    // "현실"에서만 열 수 있는 창들(MapDataSO.isRealWorld). 꿈속에서는 단서가 흐릿해 제대로 볼 수
+    // 없다는 기획을 그대로 옮긴 것으로, 해몽도 자연히 현실에서만 가능해진다 — 단서를 노트에
+    // 늘어놓는 것 자체가 현실에서만 되므로.
+    //
+    // 각 패널의 CanOpenWindow에 흩어 넣지 않고 여기 한 곳에 둔 이유는, 창을 여는 모든 경로
+    // (단축키·Toggle·OpenWindowAction·다른 패널의 링크)가 결국 OpenWindow(WindowItem)로 모이기
+    // 때문이다. 규칙이 한 군데 있어야 나중에 창이 늘어도 어긋나지 않는다.
+    public string[] realWorldOnlyWindows = { "Clue", "Note", "Map", "Internet" };
+
     public DialogueModule dialogueModule;
 
     public void Start()
@@ -77,9 +86,25 @@ public class UIManager : MonoBehaviour
         else OpenWindow(name);
     }
 
+    /// <summary>이 창이 "현실 전용"인데 지금 꿈속이라 열 수 없는지.</summary>
+    public bool IsBlockedByDreamWorld(string windowName)
+    {
+        if (realWorldOnlyWindows == null || System.Array.IndexOf(realWorldOnlyWindows, windowName) < 0) return false;
+
+        MapManager mapManager = GameManager.instance == null ? null : GameManager.instance.mapManager;
+        return mapManager == null || !mapManager.IsRealWorld;
+    }
+
     public void OpenWindow(WindowItem window)
     {
         if (window == null) return;
+
+        if (IsBlockedByDreamWorld(window.name))
+        {
+            Debug.Log($"[UIManager] '{window.name}' 창은 현실에서만 열 수 있습니다 — 꿈속에서는 단서가 흐릿해 읽을 수 없습니다.");
+            return;
+        }
+
         // 창 자신이 지금 열릴 수 없다고 하면(예: 이동 중 지도 열람 금지) 스택도 건드리지 않는다.
         if (!window.window.CanOpen) return;
         if (!window.window.isPopup) CloseWindow();

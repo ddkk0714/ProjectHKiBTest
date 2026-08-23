@@ -119,8 +119,16 @@ public class StateController : InterfaceRegister
 
     public void Initialize(StateMachineSO stateMachine)
     {
-        ResetStateMachine(stateMachine);
+        // customVariables를 **먼저** 바꿔야 한다. ResetStateMachine은 그 자리에서 초기 State의
+        // 진입 액션을 실행하는데, 예전 순서에서는 그 액션이 쓴 값이 전부 직전 상태 기계의 저장소로
+        // 들어갔다가 바로 다음 줄의 대입으로 통째로 버려졌다. 그리고 읽는 쪽은 새 저장소를 보므로,
+        // "진입할 때 쓰고 곧바로 읽는" 값(이벤트 단계 타임아웃의 시각 표식 등)이 항상 어긋났다.
+        //
+        // 게다가 이 대입은 SO의 객체를 그대로 참조로 물어간다(아래 경고). 그래서 읽는 쪽이 보는 값은
+        // 0이 아니라 **지난 플레이에서 남은 값**이었다 — 이벤트 단계가 지난 판의 시각을 기준으로
+        // 기다리는 바람에, 같은 이벤트인데도 진입한 시점에 따라 대기 시간이 제멋대로 달라졌다.
         customVariables = stateMachine.customVariables;
+        ResetStateMachine(stateMachine);
         //////
         ///  HAVE TO FIX THIS NOT TO DEEP REFERENCE CUSTOMVARS!!!
         //////
