@@ -15,13 +15,15 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.4270801
+  temporaryID: 0.22119966
   transitions: []
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889728934675005
-  - rid: 6174889728934675006
-  - rid: 6174889728934675007
+  - rid: 6174889742885454260
+  - rid: 6174889742885454261
+  - rid: 6174889742885454262
+  - rid: 6174889742885454263
+  - rid: 6174889742885454264
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -32,24 +34,39 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 6174889728934675005
+    - rid: 6174889742885454260
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_A
         targetAction:
-          rid: 6174889728934675008
-    - rid: 6174889728934675006
+          rid: 6174889742885454265
+    - rid: 6174889742885454261
+      type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: NPC_B
+        targetAction:
+          rid: 6174889742885454266
+    - rid: 6174889742885454262
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-004 \uC644\uB8CC \u2014 \uAE08\uBC1C\uC774 \uC9C4\uC815\uB418\uC5B4
           \uB9D0\uC744 \uAC78 \uC218 \uC788\uC2B5\uB2C8\uB2E4. \uAE08\uBC1C\uC5D0\uAC8C
           \uD655\uC778 \uD0A4\uB97C \uB204\uB974\uBA74 EVT-005\uAC00 \uC2DC\uC791\uB429\uB2C8\uB2E4"
         completeBoolName: 
-    - rid: 6174889728934675007
+    - rid: 6174889742885454263
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0
-    - rid: 6174889728934675008
+    - rid: 6174889742885454264
+      type: {class: ScreenFlashAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        color: {r: 1, g: 1, b: 1, a: 1}
+        duration: 1
+    - rid: 6174889742885454265
+      type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        active: 1
+    - rid: 6174889742885454266
       type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         active: 1

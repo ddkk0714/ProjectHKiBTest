@@ -422,7 +422,7 @@ MonoBehaviour:
       targetSearchType: 1
     preconditions: []
     requiredClueIds: []
-    worldRequirement: 1
+    worldRequirement: 0
     interruptRunningEvent: 0
     triggerKind: 2
     triggerRadius: 1.5
@@ -577,10 +577,16 @@ MonoBehaviour:
           rid: 6174889728934674803
         waitAfter: 0
       - action:
+          rid: 6174889742885454165
+        waitAfter: 0
+      - action:
           rid: 6174889728934674804
         waitAfter: 0
       - action:
           rid: 6174889728934674805
+        waitAfter: 0
+      - action:
+          rid: 6174889742458684281
         waitAfter: 0
       advanceWhenAny: []
       timeoutSeconds: 0
@@ -1369,7 +1375,7 @@ MonoBehaviour:
     - rid: 6174889728934674794
       type: {class: ChangeMapAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
-        mapData: {fileID: 11400000, guid: 0e206c1f89d359f46a996f13d7a8dd1c, type: 2}
+        mapData: {fileID: 11400000, guid: e04c945b3aa66a14390cc6cc006c369e, type: 2}
         registry: {fileID: 0}
         mapAddressableID: 
         entryPlacement: 0
@@ -1380,7 +1386,7 @@ MonoBehaviour:
     - rid: 6174889728934674795
       type: {class: MapLoadedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
-        mapAddressableID: TestMap1
+        mapAddressableID: TestMap3
     - rid: 6174889728934674796
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
@@ -1818,3 +1824,18 @@ MonoBehaviour:
       type: {class: ReviveEntityAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         healToFull: 1
+    - rid: 6174889742458684281
+      type: {class: ScreenFlashAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        color: {r: 1, g: 1, b: 1, a: 1}
+        duration: 1
+    - rid: 6174889742885454165
+      type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: NPC_B
+        targetAction:
+          rid: 6174889742885454166
+    - rid: 6174889742885454166
+      type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        active: 1
