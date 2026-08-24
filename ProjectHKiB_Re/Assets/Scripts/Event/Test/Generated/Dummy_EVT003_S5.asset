@@ -15,13 +15,13 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.84410846
+  temporaryID: 0.3129442
   transitions: []
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889747721748607
-  - rid: 6174889747721748608
-  - rid: 6174889747721748609
+  - rid: 6174889748626669980
+  - rid: 6174889748626669981
+  - rid: 6174889748626669982
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -32,18 +32,18 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 6174889747721748607
+    - rid: 6174889748626669980
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-003 S4 \uAFC8\uC73C\uB85C \uBCF5\uADC0 \uC644\uB8CC \u2014 \uC911\uC559
           \uC9D1\uD130\uB85C \uAC00\uBA74 EVT-004\uAC00 \uC2DC\uC791\uB429\uB2C8\uB2E4"
         completeBoolName: 
-    - rid: 6174889747721748608
+    - rid: 6174889748626669981
       type: {class: ScreenFadeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetColor: {r: 0, g: 0, b: 0, a: 0}
         duration: 0.6
-    - rid: 6174889747721748609
+    - rid: 6174889748626669982
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0

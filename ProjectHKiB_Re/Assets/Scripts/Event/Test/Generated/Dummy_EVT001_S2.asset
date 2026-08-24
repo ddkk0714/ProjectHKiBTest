@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.349968
+  temporaryID: 0.9935745
   transitions:
   - name: "\uC870\uAC74 0"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889747721748575
+        rid: 6174889748626669991
       negate: 0
     trueState: {fileID: 11400000, guid: 33417e268270ff24786772fef92fd4a5, type: 2}
     falseState: {fileID: 0}
@@ -41,7 +41,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889747721748728
+        rid: 6174889748626670146
       negate: 0
     trueState: {fileID: 11400000, guid: 33417e268270ff24786772fef92fd4a5, type: 2}
     falseState: {fileID: 0}
@@ -51,12 +51,12 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889747721748729
-  - rid: 6174889747721748578
-  - rid: 6174889747721748579
-  - rid: 6174889747721748580
-  - rid: 6174889747721748581
-  - rid: 6174889747721748582
+  - rid: 6174889748626670147
+  - rid: 6174889748626669994
+  - rid: 6174889748626669995
+  - rid: 6174889748626669996
+  - rid: 6174889748626669997
+  - rid: 6174889748626669998
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -69,28 +69,28 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889747721748575
+    - rid: 6174889748626669991
       type: {class: DialogueLineEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889747721748578
+    - rid: 6174889748626669994
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889747721748579
+    - rid: 6174889748626669995
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: CLIPPED_HAIR
         targetAction:
-          rid: 6174889747721748583
-    - rid: 6174889747721748580
+          rid: 6174889748626669999
+    - rid: 6174889748626669996
       type: {class: AcquireClueAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         clueId: dummy-clue-wing
         openCodexImmediately: 0
-    - rid: 6174889747721748581
+    - rid: 6174889748626669997
       type: {class: DialogueStartAction, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889747721748582
+    - rid: 6174889748626669998
       type: {class: DialogueShowLineAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         line:
@@ -102,16 +102,16 @@ MonoBehaviour:
           BG: {fileID: 0}
           isChoice: 0
           choices: []
-    - rid: 6174889747721748583
+    - rid: 6174889748626669999
       type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         active: 0
-    - rid: 6174889747721748728
+    - rid: 6174889748626670146
       type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT001_S2_mark
         seconds: 15
-    - rid: 6174889747721748729
+    - rid: 6174889748626670147
       type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT001_S2_mark

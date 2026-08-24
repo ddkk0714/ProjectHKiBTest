@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.034636382
+  temporaryID: 0.5599509
   transitions:
   - name: "\uD0C0\uC784\uC544\uC6C3"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889747721748748
+        rid: 6174889748626670166
       negate: 0
     trueState: {fileID: 11400000, guid: a6f8f6c93c24135479d9c8f87b594d4f, type: 2}
     falseState: {fileID: 0}
@@ -35,15 +35,15 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889747721748749
-  - rid: 6174889747721748562
-  - rid: 6174889747721748563
-  - rid: 6174889747721748564
-  - rid: 6174889747721748565
-  - rid: 6174889747721748566
-  - rid: 6174889747721748567
-  - rid: 6174889747721748568
-  - rid: 6174889747721748569
+  - rid: 6174889748626670167
+  - rid: 6174889748626670096
+  - rid: 6174889748626670097
+  - rid: 6174889748626670098
+  - rid: 6174889748626670099
+  - rid: 6174889748626670100
+  - rid: 6174889748626670101
+  - rid: 6174889748626670102
+  - rid: 6174889748626670103
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -56,29 +56,29 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889747721748562
+    - rid: 6174889748626670096
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889747721748563
+    - rid: 6174889748626670097
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-001 S0 \uAE08\uBC1C\uC774 \uBC31\uBC1C\uC758 \uD2B8\uC708\uD14C\uC77C\uC744
           \uC790\uB984 (\uC560\uB2C8\uBA54\uC774\uC158\xB7\uC0AC\uC6B4\uB4DC \uC5C6\uC74C)"
         completeBoolName: 
-    - rid: 6174889747721748564
+    - rid: 6174889748626670098
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_A
         targetAction:
-          rid: 6174889747721748570
-    - rid: 6174889747721748565
+          rid: 6174889748626670104
+    - rid: 6174889748626670099
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_B
         targetAction:
-          rid: 6174889747721748571
-    - rid: 6174889747721748566
+          rid: 6174889748626670105
+    - rid: 6174889748626670100
       type: {class: ScreenNoiseAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         intensity: 0.5
@@ -89,7 +89,7 @@ MonoBehaviour:
         shakeDuration: 0
         shakeCount: 0
         stop: 0
-    - rid: 6174889747721748567
+    - rid: 6174889748626670101
       type: {class: ScreenGlitchAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         intensity: 1
@@ -102,29 +102,29 @@ MonoBehaviour:
         scanline: 1
         jitter: 0.197
         stop: 0
-    - rid: 6174889747721748568
+    - rid: 6174889748626670102
       type: {class: CameraShakeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         strength: 0
         direction: {x: 1, y: 1, z: 1}
-    - rid: 6174889747721748569
+    - rid: 6174889748626670103
       type: {class: GrantGearAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         gear: {fileID: 11400000, guid: cde322ce6505e4842ba0195fee16dec1, type: 2}
-    - rid: 6174889747721748570
+    - rid: 6174889748626670104
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: 
-    - rid: 6174889747721748571
+    - rid: 6174889748626670105
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: 
-    - rid: 6174889747721748748
+    - rid: 6174889748626670166
       type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT001_S0_mark
         seconds: 1.5
-    - rid: 6174889747721748749
+    - rid: 6174889748626670167
       type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT001_S0_mark

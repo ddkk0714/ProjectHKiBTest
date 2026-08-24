@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.16706814
+  temporaryID: 0.58890504
   transitions:
   - name: "\uC870\uAC74 0"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889747721748639
+        rid: 6174889748626670013
       negate: 0
     trueState: {fileID: 11400000, guid: beb13b7c50cf10341855c00f0c64dac5, type: 2}
     falseState: {fileID: 0}
@@ -41,7 +41,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889747721748732
+        rid: 6174889748626670150
       negate: 0
     trueState: {fileID: 11400000, guid: beb13b7c50cf10341855c00f0c64dac5, type: 2}
     falseState: {fileID: 0}
@@ -51,11 +51,11 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889747721748733
-  - rid: 6174889747721748642
-  - rid: 6174889747721748643
-  - rid: 6174889747721748644
-  - rid: 6174889747721748645
+  - rid: 6174889748626670151
+  - rid: 6174889748626670016
+  - rid: 6174889748626670017
+  - rid: 6174889748626670018
+  - rid: 6174889748626670019
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -68,10 +68,10 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889747721748639
+    - rid: 6174889748626670013
       type: {class: DialogueLineEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889747721748642
+    - rid: 6174889748626670016
       type: {class: DialogueShowLineAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         line:
@@ -82,27 +82,27 @@ MonoBehaviour:
           BG: {fileID: 0}
           isChoice: 0
           choices: []
-    - rid: 6174889747721748643
+    - rid: 6174889748626670017
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-005 \uAC00\uC704 \uD68D\uB4DD \u2014 \uD604\uC7AC\uB294 Lily
           GearData\uB97C \uAC00\uC704 \uB300\uC5ED\uC73C\uB85C \uC9C0\uAE09\uD569\uB2C8\uB2E4"
         completeBoolName: 
-    - rid: 6174889747721748644
+    - rid: 6174889748626670018
       type: {class: GrantGearAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         gear: {fileID: 11400000, guid: cba07c1f1556c3b469772f464811b36e, type: 2}
-    - rid: 6174889747721748645
+    - rid: 6174889748626670019
       type: {class: SetEventFlagAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
         flagValue: 3
-    - rid: 6174889747721748732
+    - rid: 6174889748626670150
       type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT005_S2_mark
         seconds: 15
-    - rid: 6174889747721748733
+    - rid: 6174889748626670151
       type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT005_S2_mark

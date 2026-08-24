@@ -15,15 +15,15 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.06846953
+  temporaryID: 0.18561985
   transitions: []
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889747721748533
-  - rid: 6174889747721748534
-  - rid: 6174889747721748535
-  - rid: 6174889747721748536
-  - rid: 6174889747721748537
+  - rid: 6174889748626670037
+  - rid: 6174889748626670038
+  - rid: 6174889748626670039
+  - rid: 6174889748626670040
+  - rid: 6174889748626670041
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -34,37 +34,37 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 6174889747721748533
+    - rid: 6174889748626670037
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_A
         targetAction:
-          rid: 6174889747721748538
-    - rid: 6174889747721748534
+          rid: 6174889748626670042
+    - rid: 6174889748626670038
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_A
         targetAction:
-          rid: 6174889747721748539
-    - rid: 6174889747721748535
+          rid: 6174889748626670043
+    - rid: 6174889748626670039
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-001 S2 \uAE08\uBC1C \uD1F4\uC7A5 \u2014 dood = 1"
         completeBoolName: 
-    - rid: 6174889747721748536
+    - rid: 6174889748626670040
       type: {class: SetEventFlagAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
         flagValue: 1
-    - rid: 6174889747721748537
+    - rid: 6174889748626670041
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0
-    - rid: 6174889747721748538
+    - rid: 6174889748626670042
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: 
-    - rid: 6174889747721748539
+    - rid: 6174889748626670043
       type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         active: 0
