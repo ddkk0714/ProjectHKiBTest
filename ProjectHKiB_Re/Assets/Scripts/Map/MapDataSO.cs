@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Event", menuName = "Event/MapData")]
 public class MapDataSO : ScriptableObject
 {
-    [NaughtyAttributes.Scene]
+    [Tooltip("Addressables scene key. Enter the exact Addressable Name (for example: TestMap1). This must not depend on Build Settings.")]
     public string mapAddressableID;
 
     // 이 맵이 "현실"인가. 꿈속에서는 단서가 흐릿해 제대로 볼 수 없다는 기획을 코드로 옮긴 것으로,
