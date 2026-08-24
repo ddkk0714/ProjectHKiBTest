@@ -475,7 +475,7 @@ MonoBehaviour:
       enterActions:
       - action:
           rid: -2
-        waitAfter: 0.8
+        waitAfter: 1.6
       advanceWhenAny: []
       timeoutSeconds: 0
     - label: "\uAFC8\uC73C\uB85C \uBCF5\uADC0"
@@ -580,6 +580,9 @@ MonoBehaviour:
     - label: "\uC804\uD22C \uC644\uB8CC \u2014 \uAE08\uBC1C \uB300\uD654 \uAC00\uB2A5"
       enterActions:
       - action:
+          rid: 6174889747721748499
+        waitAfter: 1
+      - action:
           rid: 6174889728934674803
         waitAfter: 0
       - action:
@@ -593,9 +596,6 @@ MonoBehaviour:
         waitAfter: 0
       - action:
           rid: 6174889742458684281
-        waitAfter: 1
-      - action:
-          rid: 6174889747721748499
         waitAfter: 1
       advanceWhenAny: []
       timeoutSeconds: 0

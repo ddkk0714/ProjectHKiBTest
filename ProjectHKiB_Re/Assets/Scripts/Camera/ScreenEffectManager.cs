@@ -110,6 +110,11 @@ public class ScreenEffectManager : MonoBehaviour
     // 오버레이가 다른 UI(대화창·메뉴) 위에 확실히 올라오도록. 대화 위에 암전이 덮여야 하는 연출이 있다.
     private const int OverlaySortingOrder = 32000;
     private const float DefaultNoiseTiling = 16f;
+    // Addressables 씬 로딩 직후에는 한 프레임의 unscaled delta가 페이드 시간보다
+    // 커질 수 있다. 그 값을 그대로 쓰면 빌드에서 페이드 인이 한 프레임에 끝나
+    // 맵이 즉시 전환된 것처럼 보인다. 화면 연출은 실제 경과 시간보다 보이는
+    // 프레임을 우선하므로, 한 프레임이 소비할 페이드 시간을 제한한다.
+    private const float MaxFadeStepSeconds = 1f / 30f;
     // 글리치는 월드를 일그러뜨리는 층이라 UI(대화창/메뉴)보다 **아래**여야 한다. 위로 올리면
     // 대사창까지 찢겨 읽을 수 없게 된다. 메인 오버레이(암전/노이즈)는 이보다 훨씬 위에 있다.
     // 글리치 캔버스가 설 정렬 레이어. 셰이더가 읽는 _CameraSortingLayerTexture는 Renderer2D가
@@ -417,7 +422,10 @@ public class ScreenEffectManager : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < duration)
         {
-            elapsed += Time.unscaledDeltaTime;
+            // 맵 로드/GC 등으로 프레임이 잠시 멈춘 뒤에도 남은 페이드가 즉시
+            // 건너뛰어지지 않게 한다. 일반적인 프레임에서는 delta가 이 값보다
+            // 작으므로 기존 속도와 동일하다.
+            elapsed += Mathf.Min(Time.unscaledDeltaTime, MaxFadeStepSeconds);
             _fadeImage.color = Color.Lerp(from, target, Mathf.Clamp01(elapsed / duration));
             yield return null;
         }

@@ -40,8 +40,15 @@ public class EventManager : StateController, IEventSaveProvider
         if (flag == null) return;
 
         eventFlags ??= new();
-        eventFlags[flag] = value;
-        _pendingFlagsById.Remove(flag.Id);
+        string id = flag.Id;
+
+        // Addressables 빌드에서는 같은 EventFlagSO 에셋이 서로 다른 번들에서
+        // 별개의 Unity 인스턴스로 로드될 수 있다. 참조 자체를 key로만 쓰면
+        // 같은 플래그가 분리되므로, 이미 로드된 같은 ID를 함께 갱신한다.
+        if (!SetLoadedEventFlagsById(id, value))
+            eventFlags[flag] = value;
+
+        _pendingFlagsById.Remove(id);
     }
 
 
@@ -73,14 +80,16 @@ public class EventManager : StateController, IEventSaveProvider
 
         if (eventFlags != null && eventFlags.TryGetValue(flag, out value)) return true;
 
+        // 번들 경계를 넘은 같은 에셋은 Unity 참조 비교가 실패할 수 있으므로,
+        // 직접 참조를 못 찾으면 안정적인 EventFlagSO.Id로 다시 조회한다.
+        if (TryGetLoadedEventFlagById(flag.Id, out value)) return true;
+
         // 로드로 들어왔지만 에셋을 몰라 대기 중이던 항목 — 이제 참조를 알았으니 승격시킨다.
         // 조회 경로에서 상태를 바꾸는 게 깔끔하진 않지만, ID → 에셋 역참조 없이 인스펙터 표시까지
         // 정상화하려면 "참조가 들어오는 순간"이 유일한 기회다.
         if (_pendingFlagsById.TryGetValue(flag.Id, out value))
         {
-            eventFlags ??= new();
-            eventFlags[flag] = value;
-            _pendingFlagsById.Remove(flag.Id);
+            SetEventFlag(flag, value);
             return true;
         }
 
@@ -143,8 +152,11 @@ public class EventManager : StateController, IEventSaveProvider
 
         if (_knownAssetsByIdForLoad != null && _knownAssetsByIdForLoad.TryGetValue(id, out var asset) && asset != null)
         {
-            eventFlags ??= new();
-            eventFlags[asset] = value;
+            SetEventFlag(asset, value);
+        }
+        else if (SetLoadedEventFlagsById(id, value))
+        {
+            _pendingFlagsById.Remove(id);
         }
         else
         {
@@ -153,6 +165,46 @@ public class EventManager : StateController, IEventSaveProvider
     }
 
     // EventManager는 "통로 개방" 개념이 없다 — RouteModule과 인터페이스를 공유하기 위한 빈 구현.
+    /// <summary>
+    /// 이미 로드된 플래그 중 ID가 같은 모든 인스턴스를 갱신한다.
+    /// Addressables 번들 경계를 넘은 ScriptableObject 중복 로드를 흡수하는 내부 경로다.
+    /// </summary>
+    private bool SetLoadedEventFlagsById(string id, int value)
+    {
+        if (eventFlags == null || string.IsNullOrEmpty(id)) return false;
+
+        var matchingFlags = new List<EventFlagSO>();
+        foreach (KeyValuePair<EventFlagSO, int> pair in eventFlags)
+        {
+            if (pair.Key != null && pair.Key.Id == id)
+                matchingFlags.Add(pair.Key);
+        }
+
+        foreach (EventFlagSO matchingFlag in matchingFlags)
+            eventFlags[matchingFlag] = value;
+
+        return matchingFlags.Count > 0;
+    }
+
+    /// <summary>
+    /// 참조가 다른 EventFlagSO라도 동일한 안정 ID를 공유하면 같은 진행 플래그로 조회한다.
+    /// </summary>
+    private bool TryGetLoadedEventFlagById(string id, out int value)
+    {
+        value = 0;
+        if (eventFlags == null || string.IsNullOrEmpty(id)) return false;
+
+        foreach (KeyValuePair<EventFlagSO, int> pair in eventFlags)
+        {
+            if (pair.Key == null || pair.Key.Id != id) continue;
+
+            value = pair.Value;
+            return true;
+        }
+
+        return false;
+    }
+
     public Dictionary<string, bool> Passages => _emptyPassages;
     private static readonly Dictionary<string, bool> _emptyPassages = new();
     public void SetPassage(string id, bool opened) { }
