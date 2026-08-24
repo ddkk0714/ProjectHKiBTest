@@ -1,0 +1,125 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: Dummy_EVT001_S0
+  m_EditorClassIdentifier: 
+  isPacked: 0
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0.644676
+  transitions:
+  - name: "\uD0C0\uC784\uC544\uC6C3"
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 6174889728934674894
+      negate: 0
+    trueState: {fileID: 11400000, guid: a6f8f6c93c24135479d9c8f87b594d4f, type: 2}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 6174889728934674895
+  - rid: 6174889728934674896
+  - rid: 6174889728934674897
+  - rid: 6174889728934674898
+  - rid: 6174889728934674899
+  - rid: 6174889728934674900
+  - rid: 6174889728934674901
+  - rid: 6174889728934674902
+  UpdateActions: []
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 1.5
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 6174889728934674894
+      type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        key: Dummy_EVT001_S0_mark
+        seconds: 1.5
+    - rid: 6174889728934674895
+      type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        key: Dummy_EVT001_S0_mark
+    - rid: 6174889728934674896
+      type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mode: 3
+    - rid: 6174889728934674897
+      type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        label: "EVT-001 S0 \uAE08\uBC1C\uC774 \uBC31\uBC1C\uC758 \uD2B8\uC708\uD14C\uC77C\uC744
+          \uC790\uB984 (\uC560\uB2C8\uBA54\uC774\uC158\xB7\uC0AC\uC6B4\uB4DC \uC5C6\uC74C)"
+        completeBoolName: 
+    - rid: 6174889728934674898
+      type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: NPC_A
+        targetAction:
+          rid: 6174889728934674903
+    - rid: 6174889728934674899
+      type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: NPC_B
+        targetAction:
+          rid: 6174889728934674904
+    - rid: 6174889728934674900
+      type: {class: ScreenNoiseAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        intensity: 0.5
+        alpha: 0.5
+        duration: 1.5
+        tiling: 0
+        shakeStrength: 0
+        shakeDuration: 0
+        shakeCount: 0
+        stop: 0
+    - rid: 6174889728934674901
+      type: {class: ScreenGlitchAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        intensity: 1
+        duration: 1.5
+        blockShift: 0.441
+        blockDensity: 22.7
+        blockCoverage: 1
+        rgbSplit: 0.0031
+        splitAngle: 5.34
+        scanline: 1
+        jitter: 0.197
+        stop: 0
+    - rid: 6174889728934674902
+      type: {class: CameraShakeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        strength: 0
+        direction: {x: 1, y: 1, z: 1}
+    - rid: 6174889728934674903
+      type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        animationName: 
+    - rid: 6174889728934674904
+      type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        animationName: 

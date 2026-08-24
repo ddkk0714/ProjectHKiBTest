@@ -14,6 +14,8 @@ using UnityEngine;
 /// </summary>
 public class MapStartPos : MonoBehaviour
 {
+    [Tooltip("ID selectable by ChangeMapAction. Leave empty to use only the normal entry rules.")]
+    [SerializeField] private string entryPointId;
     [Tooltip("어느 맵에서 넘어오든 전용 지점이 없으면 여기로 배치된다. 맵마다 하나만 두면 된다.")]
     [SerializeField] private bool isDefaultEntry = false;
 
@@ -26,12 +28,13 @@ public class MapStartPos : MonoBehaviour
     [SerializeField] private PhysicsManager physicsManager;
 
     public bool IsDefaultEntry => isDefaultEntry;
+    public string EntryPointId => entryPointId;
 
     /// <summary>지정한 맵에서 넘어올 때 쓰는 전용 지점인지.</summary>
     public bool MatchesSource(string previousMapID)
         => !isDefaultEntry && !string.IsNullOrEmpty(fromScene) && fromScene == previousMapID;
 
-    public void SetPlayerToStartPos()
+    public void SetPlayerToStartPos(EnumManager.AnimDir? directionOverride = null)
     {
         // 맵 씬은 additive로 로드되는데 PhysicsManager는 System 씬에 있다 — 씬 간 참조는 저장할 수
         // 없으므로 인스펙터 필드로는 채울 방법이 없다(실제로 프로젝트의 모든 기존 배치가 비어 있다).
@@ -47,7 +50,7 @@ public class MapStartPos : MonoBehaviour
         physicsManager.RealTeleport(GameManager.instance.player.GetInterface<IPhysics>(), transform.position);
 
         IDirAnimatable dirAnimatable = GameManager.instance.player.GetInterface<IDirAnimatable>();
-        dirAnimatable.SetAnimationDirection(_endDir);
+        dirAnimatable.SetAnimationDirection(directionOverride ?? _endDir);
 
         // SetAnimationDirection은 CurrentAnimDir 값만 즉시 바꾼다 — 화면에 보이는 스프라이트는
         // SimpleAnimationPlayer.ApplyFrame이 이 값을 읽어 갱신하는데, 그 호출은 지금 재생 중인

@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aafe359a79fe27b4884a122acb51d111, type: 3}
+  m_Name: Dummy_EVT004
+  m_EditorClassIdentifier: 
+  customVariables:
+    boolVariables:
+      _serializedList:
+      - Key: EVT004_BattleCleared
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+    intVariables:
+      _serializedList: []
+    floatVariables:
+      _serializedList: []
+  initialState: {fileID: 11400000, guid: 24dec775dbf089b468b72594e1db49de, type: 2}
+  graph: {fileID: 0}
+  allStates:
+  - {fileID: 11400000, guid: 24dec775dbf089b468b72594e1db49de, type: 2}
+  - {fileID: 11400000, guid: eded3c34a51fd0f4cb8d55606d45c398, type: 2}
+  _commandPairs: []
+  involvedEventTargets:
+  - ID: Player
+    targetSearchType: 0
+  - ID: NPC_A
+    targetSearchType: 1
+  - ID: NPC_B
+    targetSearchType: 1

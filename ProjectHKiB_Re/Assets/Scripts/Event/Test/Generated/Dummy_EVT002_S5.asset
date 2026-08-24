@@ -1,0 +1,161 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: Dummy_EVT002_S5
+  m_EditorClassIdentifier: 
+  isPacked: 0
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0.92214227
+  transitions:
+  - name: "\uC870\uAC74 0"
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 6174889728934674968
+      negate: 0
+    trueState: {fileID: 11400000, guid: 9a0b2aa49dcba6044a4352277dbe2d07, type: 2}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: "\uD0C0\uC784\uC544\uC6C3"
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 6174889728934674969
+      negate: 0
+    trueState: {fileID: 11400000, guid: 9a0b2aa49dcba6044a4352277dbe2d07, type: 2}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 6174889728934674970
+  - rid: 6174889728934674971
+  - rid: 6174889728934674972
+  - rid: 6174889728934674973
+  - rid: 6174889728934674974
+  - rid: 6174889728934674975
+  - rid: 6174889728934674976
+  - rid: 6174889728934674977
+  - rid: 6174889728934674978
+  UpdateActions: []
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 6174889728934674968
+      type: {class: KnockbackEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: Player
+    - rid: 6174889728934674969
+      type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        key: Dummy_EVT002_S5_mark
+        seconds: 3
+    - rid: 6174889728934674970
+      type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        key: Dummy_EVT002_S5_mark
+    - rid: 6174889728934674971
+      type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        label: "EVT-002 S3 \uD50C\uB808\uC774\uC5B4 \uB109\uBC31"
+        completeBoolName: 
+    - rid: 6174889728934674972
+      type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mode: 4
+    - rid: 6174889728934674973
+      type: {class: SetCameraFollowAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: 
+        returnToDefault: 1
+    - rid: 6174889728934674974
+      type: {class: CameraZoomAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        sizeMultiplier: 0.4
+        blendTime: 0.3
+        returnToOriginal: 1
+        blendStyle: 1
+        warnMissingIllustration: 0
+        illustration: {fileID: 0}
+        illustrationColor: {r: 1, g: 1, b: 1, a: 1}
+        illustrationFadeTime: 0.15
+        illustrationAnchor: {x: 0.5, y: 0.5}
+        illustrationSize: {x: 1200, y: 675}
+        preserveIllustrationAspect: 1
+        hideIllustrationOnReturn: 1
+    - rid: 6174889728934674975
+      type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: Player
+        targetAction:
+          rid: 6174889728934674979
+    - rid: 6174889728934674976
+      type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: Player
+        targetAction:
+          rid: 6174889728934674980
+    - rid: 6174889728934674977
+      type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: Player
+        targetAction:
+          rid: 6174889728934674981
+    - rid: 6174889728934674978
+      type: {class: ScreenNoiseAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        intensity: 0.5
+        alpha: 0.5
+        duration: 1
+        tiling: 0
+        shakeStrength: 0
+        shakeDuration: 0
+        shakeCount: 0
+        stop: 1
+    - rid: 6174889728934674979
+      type: {class: KnockBackAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        directionMode: 2
+        fixedDirection: {x: 0, y: -1, z: 0}
+        acceleration: 80
+        accelDuration: 0.12
+        knockbackFriction: 0.95
+    - rid: 6174889728934674980
+      type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        animationName: Knockback
+    - rid: 6174889728934674981
+      type: {class: ReserveAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        animationName: 

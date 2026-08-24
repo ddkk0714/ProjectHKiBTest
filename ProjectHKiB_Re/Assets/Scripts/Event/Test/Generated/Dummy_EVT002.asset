@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aafe359a79fe27b4884a122acb51d111, type: 3}
+  m_Name: Dummy_EVT002
+  m_EditorClassIdentifier: 
+  customVariables:
+    boolVariables:
+      _serializedList: []
+    intVariables:
+      _serializedList:
+      - Key: Dummy_EVT002_S0_mark
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+      - Key: Dummy_EVT002_S1_mark
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+      - Key: Dummy_EVT002_S2_mark
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+      - Key: Dummy_EVT002_S3_mark
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+      - Key: Dummy_EVT002_S4_mark
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+      - Key: Dummy_EVT002_S5_mark
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+      - Key: Dummy_EVT002_S6_mark
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+      - Key: Dummy_EVT002_S8_mark
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+      - Key: Dummy_EVT002_S5w1_mark
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+      - Key: Dummy_EVT002_S10_mark
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+      - Key: Dummy_EVT002_S11_mark
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
+    floatVariables:
+      _serializedList: []
+  initialState: {fileID: 11400000, guid: edb26bd6ed65d5f49ae5d768accb691c, type: 2}
+  graph: {fileID: 0}
+  allStates:
+  - {fileID: 11400000, guid: edb26bd6ed65d5f49ae5d768accb691c, type: 2}
+  - {fileID: 11400000, guid: 8e6f8b79901278341bbd0a6eea61c0ad, type: 2}
+  - {fileID: 11400000, guid: 4028ba1ca4640aa429c438902d37c990, type: 2}
+  - {fileID: 11400000, guid: 29931340d2cbc664587c8bf905606e39, type: 2}
+  - {fileID: 11400000, guid: 3b48fe75733570242adb8044366eaefb, type: 2}
+  - {fileID: 11400000, guid: 2a6ecd150bd6ace4283b2dbe16edaaf1, type: 2}
+  - {fileID: 11400000, guid: 9a0b2aa49dcba6044a4352277dbe2d07, type: 2}
+  - {fileID: 11400000, guid: 1e16ec2fea02add4cbae981dc94beb95, type: 2}
+  - {fileID: 11400000, guid: 4e152dabbdd841b429e2a371c30801bb, type: 2}
+  - {fileID: 11400000, guid: f04fe7c94e7891e4d8bd3f5958534919, type: 2}
+  - {fileID: 11400000, guid: 1fbed62b8d454ac49bd0c0730db23727, type: 2}
+  - {fileID: 11400000, guid: 0c690e7076a844cf89a4d6cf089979d8, type: 2}
+  - {fileID: 11400000, guid: 46710749a6cf4662911fa7023c7de52f, type: 2}
+  _commandPairs: []
+  involvedEventTargets:
+  - ID: Player
+    targetSearchType: 0
+  - ID: NPC_A
+    targetSearchType: 1
+  - ID: NPC_B
+    targetSearchType: 1

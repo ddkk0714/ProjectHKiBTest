@@ -44,6 +44,22 @@ public class EventManager : StateController, IEventSaveProvider
         _pendingFlagsById.Remove(flag.Id);
     }
 
+
+    // 맵 진입 시 "아직 한 번도 설정된 적 없는 플래그만" 기본값으로 채운다. 이미 들어 있는 값
+    // (플레이 중 진행분이든 세이브 로드분이든)은 절대 덮지 않는다.
+    //
+    // 이게 필요한 이유는 아래 HasEventFlag의 의미론 때문이다 — 미설정 플래그는 값이 0이어도
+    // false다. 그래서 `dood == 0`처럼 "아직 아무것도 안 한 상태"를 조건으로 삼는 이벤트는
+    // 누군가 0을 명시적으로 넣어주지 않으면 영영 발동하지 않는다.
+    // 채워 넣었으면 true를 돌려준다(이미 있어서 건드리지 않았으면 false).
+    public bool EnsureEventFlag(EventFlagSO flag, int defaultValue)
+    {
+        if (flag == null) return false;
+        if (TryGetEventFlag(flag, out _)) return false;
+
+        SetEventFlag(flag, defaultValue);
+        return true;
+    }
     // 플래그가 "설정된 적 있고 그 값이 value와 같은가" — 기존 호출부
     // (eventFlags.ContainsKey(flag) && eventFlags[flag] == condition)와 정확히 같은 의미다.
     // 설정된 적 없는 플래그는 value가 0이어도 매치되지 않는다.
@@ -141,11 +157,95 @@ public class EventManager : StateController, IEventSaveProvider
     private static readonly Dictionary<string, bool> _emptyPassages = new();
     public void SetPassage(string id, bool opened) { }
 
-    public void StartEvent(EventSO eventSO, EventTargets manualTargets = null)
+    // 지금 이벤트가 진행 중인가. 빌드된 이벤트는 마지막 State에 전이가 하나도 없으므로
+    // "전이가 남아 있는 State에 머물러 있다"가 곧 "아직 끝나지 않았다"는 뜻이다.
+    public bool IsEventRunning => CurrentState && CurrentState.transitions != null && CurrentState.transitions.Length > 0;
+
+    // 이번 이벤트가 시작된 unscaled 시각 — 단계별 로그가 "시작 후 몇 초"를 찍는 데 쓴다.
+    public float EventStartedAtUnscaled { get; private set; }
+
+    /// <summary>
+    /// 진행 중이던 이벤트를 그 자리에서 끊는다. 사망처럼 "하던 걸 무르고 처음으로" 가야 하는
+    /// 경우에 쓴다 — 끊지 않으면 아래 StartEvent의 재진입 가드에 막혀 복귀 이벤트가 못 뜬다.
+    /// </summary>
+    /// <remarks>
+    /// 끊긴 이벤트가 걸어둔 것들(컷신 입력 잠금, 화면 연출, 카메라)은 **저절로 풀리지 않는다.**
+    /// 이 메서드는 상태 기계만 세운다. 복귀 이벤트의 첫 단계에서 SetInputModeAction(Play),
+    /// ScreenFadeAction 등으로 직접 되돌려 줄 것.
+    /// </remarks>
+    public void AbortEvent()
     {
+        if (!CurrentState) return;
+
+        Debug.Log($"[EventManager] 진행 중이던 이벤트를 중단합니다 (State: '{CurrentState.name}').");
+        EliminateStateMachine();
+    }
+
+    /// <summary>
+    /// 이벤트 플래그를 마지막 세이브에 담긴 값으로 되돌린다 — 사망 시 "진행 중이던 이벤트만큼의
+    /// 진도"를 무르는 용도.
+    /// </summary>
+    /// <param name="lastSaved">
+    /// SaveModule.CurrentSaveData 또는 LoadedData. null이거나 이 provider의 스냅샷이 없으면
+    /// **아무것도 지우지 않는다** — SaveModule.LoadEvents와 같은 판단이다. 여기서 전부 비우면
+    /// 한 번도 저장하지 않고 죽었을 때 맵이 저작해 둔 초기 플래그까지 날아가 이벤트가 영영 안 뜬다.
+    /// </param>
+    /// <returns>실제로 되돌렸으면 true.</returns>
+    /// <remarks>
+    /// 이미 Initialize를 마친 월드 오브젝트(EventControllableEntity/Animation)는 값을 되돌려도
+    /// 스스로 다시 배치되지 않는다. 그래서 이 호출은 **맵을 다시 여는 흐름과 짝지어** 써야 한다
+    /// (사망 복귀는 대개 현실의 방으로 맵을 옮기므로 자연히 충족된다).
+    /// </remarks>
+    public bool RevertFlagsToSave(SaveSlotData lastSaved)
+    {
+        ProviderFlagsSaveInfo snapshot = lastSaved?.providerFlags?.Find(p => p.providerId == ProviderId);
+        if (snapshot == null)
+        {
+            Debug.LogWarning("[EventManager] 되돌릴 세이브 스냅샷이 없어 이벤트 플래그를 그대로 둡니다 " +
+                             "(아직 한 번도 저장하지 않았거나 이 provider의 기록이 없는 세이브).");
+            return false;
+        }
+
+        ResetForLoad();
+        if (snapshot.eventFlags != null)
+        {
+            foreach (EventFlagSaveInfo flag in snapshot.eventFlags)
+                SetEventFlag(flag.id, flag.value);
+        }
+
+        Debug.Log($"[EventManager] 이벤트 플래그를 마지막 세이브 시점으로 되돌렸습니다 " +
+                  $"({snapshot.eventFlags?.Count ?? 0}개).");
+        return true;
+    }
+
+    /// <param name="interruptRunning">
+    /// 진행 중인 이벤트를 끊고 시작한다. 사망 복귀처럼 **반드시 끼어들어야 하는** 이벤트만 켤 것 —
+    /// 평상시엔 꺼둬야 트리거가 겹쳐 이벤트가 되감기는 사고를 가드가 잡아준다.
+    /// </param>
+    public void StartEvent(EventSO eventSO, EventTargets manualTargets = null, bool interruptRunning = false)
+    {
+        // 트리거가 겹쳐 있거나 두 번 발동하면 진행 중인 이벤트가 첫 단계부터 다시 시작된다 —
+        // 연출이 처음부터 되감기니 "이벤트가 유난히 오래 걸린다"로 보인다. 막고 알린다.
+        if (IsEventRunning && interruptRunning) AbortEvent();
+
+        if (IsEventRunning)
+        {
+            Debug.LogWarning($"[EventManager] '{eventSO.name}'을 시작하려 했지만 이미 이벤트가 진행 중입니다 " +
+                             $"(현재 State: '{CurrentState.name}'). 무시합니다 — 같은 트리거가 두 번 발동했거나 " +
+                             "트리거가 겹쳐 있는지 확인하세요.");
+            return;
+        }
+
+        EventStartedAtUnscaled = Time.unscaledTime;
         FindTargets(eventSO, manualTargets);
-        Initialize(eventSO);
+
+        // 대상은 반드시 Initialize보다 먼저 넘겨야 한다. Initialize는 ResetStateMachine을 거쳐
+        // **첫 State의 진입 액션을 그 자리에서 실행**하는데, 그 액션이 대상을 쓰면(예: NPC 애니메이션
+        // 재생) 아직 CurrentTargets가 비어 있어 NullReferenceException이 난다.
+        // 예전엔 첫 단계가 대상을 안 써서 드러나지 않았을 뿐이다.
         if (TryGetInterface(out IEvent @event)) @event.CurrentTargets = currentTargets;
+
+        Initialize(eventSO);
     }
 
     public void FindTargets(EventSO eventSO, EventTargets manualTargets)
@@ -160,12 +260,27 @@ public class EventManager : StateController, IEventSaveProvider
             }
             else if (target.targetSearchType == TargetSearchType.FromMap)
             {
+                // 여기서 못 찾고 조용히 넘어가면, 나중에 그 대상을 쓰는 액션이 훨씬 뒤에서 엉뚱한
+                // 에러를 내며 죽는다(TargetEntityManipulateAction 등). 원인이 드러나는 이 자리에서 알린다.
                 MapLocalManager localManager = GameManager.instance.mapManager.localManager;
-                if (!localManager) continue;
+                if (!localManager)
+                {
+                    Debug.LogWarning($"[EventManager] FromMap 대상 '{target.ID}'를 찾을 수 없습니다 — 로드된 맵에 " +
+                                     "MapLocalManager가 없습니다(맵이 아직 안 떴거나 맵 씬에 그 컴포넌트가 없음).");
+                    continue;
+                }
+
                 EventTargets targets = localManager.allEventTargets;
                 if (targets.targetEntities.ContainsKey(target.ID)) currentTargets.targetEntities[target.ID] = targets.targetEntities[target.ID];
                 else if (targets.targetAnimations.ContainsKey(target.ID)) currentTargets.targetAnimations[target.ID] = targets.targetAnimations[target.ID];
-
+                else
+                {
+                    Debug.LogWarning($"[EventManager] FromMap 대상 '{target.ID}'가 '{localManager.gameObject.scene.name}' 씬의 " +
+                                     $"MapLocalManager.allEventTargets에 없습니다. 등록된 대상: " +
+                                     $"[{string.Join(", ", targets.targetEntities.Keys)}]. " +
+                                     "그 ID의 EventControllableEntity가 이 맵 씬 안에 있어야 하고(다른 씬은 안 됨), " +
+                                     "MapLocalManager의 Auto Find Event Targets를 누른 뒤 씬을 저장해야 합니다.");
+                }
             }
             else if (target.targetSearchType == TargetSearchType.Manual && manualTargets != null)
             {

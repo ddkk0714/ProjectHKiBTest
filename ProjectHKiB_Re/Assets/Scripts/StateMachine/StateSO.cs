@@ -32,12 +32,14 @@ public class StateSO : ScriptableObject
     }
     [HideInInspector] public float temporaryID;
 
-    public StateTransition[] transitions;
-    public StateTransition[] additionalTransitions;
-    [SerializeReference, SubclassSelector] public StateAction[] EnterActions;
-    [SerializeReference, SubclassSelector] public StateAction[] UpdateActions;
-    [SerializeReference, SubclassSelector] public StateAction[] ExitActions;
-    public ActionSequence[] actionSequence;
+    // 배열은 반드시 비어 있는 상태로라도 존재해야 한다 — 그래프 편집기가 CreateInstance로 만든
+    // State는 에셋으로 저장·재로드되기 전까지 이 필드들이 null이라, .Length에서 그대로 터진다.
+    public StateTransition[] transitions = System.Array.Empty<StateTransition>();
+    public StateTransition[] additionalTransitions = System.Array.Empty<StateTransition>();
+    [SerializeReference, SubclassSelector] public StateAction[] EnterActions = System.Array.Empty<StateAction>();
+    [SerializeReference, SubclassSelector] public StateAction[] UpdateActions = System.Array.Empty<StateAction>();
+    [SerializeReference, SubclassSelector] public StateAction[] ExitActions = System.Array.Empty<StateAction>();
+    public ActionSequence[] actionSequence = System.Array.Empty<ActionSequence>();
     public bool loopActionSequence;
     public bool useTimer;
     [NaughtyAttributes.ShowIf("useTimer")][NaughtyAttributes.MinValue(0)][NaughtyAttributes.MaxValue(9)] public int timerID;

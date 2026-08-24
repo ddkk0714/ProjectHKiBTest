@@ -63,7 +63,21 @@ public interface IPhysics : IPhysicsBase, IInitializable
     public ZCollider2D ZCol { get; set; }
     public int ID { get; set; }
     public Vector3 CurrentWallNormal { get; set; }
+    // 지금 넉백으로 밀려나는 중인가. 상태 기계가 KnockbackState로 들어갈지 판정하는 근거다
+    // (KnockbackMoveDecision). KnockBack()이 켜고, 멈춰 서면 PhysicsManager가 끈다.
+    public bool IsKnockedBack { get; set; }
+
+    // 넉백을 "한 방에 속도를 꽂는" 대신 짧게 밀어내는 가속으로 표현하기 위한 상태.
+    // PhysicsManager가 남은 시간 동안 매 틱 KnockbackForce를 ExForce에 더한다.
+    public Vector3 KnockbackForce { get; set; }
+    public float KnockbackTimeLeft { get; set; }
+
+    // 넉백 중에만 쓰는 지면 마찰(매 틱 곱해지는 감쇠). 0이면 평소 마찰을 그대로 쓴다.
+    // 1에 가까울수록 천천히 감속해 "튕겨 나가 미끄러지는" 느낌이 된다.
+    public float KnockbackFriction { get; set; }
+
     public void KnockBack(Vector3 dir, float strength);
+    public void KnockBack(Vector3 dir, float acceleration, float duration, float friction);
     public void EndKnockbackEarly();
     public void KnockBackEndCallback();
 
@@ -176,9 +190,42 @@ public class PhysicsModule : InterfaceModule, IPhysics
     }
     public float jump;
 
-    public void KnockBack(Vector3 dir, float strength) => ExForce += dir * strength;
-    public void EndKnockbackEarly() { }
-    public void KnockBackEndCallback() { }
+    [field: NaughtyAttributes.ReadOnly][field: SerializeField] public bool IsKnockedBack { get; set; }
+    [field: NaughtyAttributes.ReadOnly][field: SerializeField] public Vector3 KnockbackForce { get; set; }
+    [field: NaughtyAttributes.ReadOnly][field: SerializeField] public float KnockbackTimeLeft { get; set; }
+    [field: NaughtyAttributes.ReadOnly][field: SerializeField] public float KnockbackFriction { get; set; }
+
+    public void KnockBack(Vector3 dir, float strength)
+    {
+        ExForce += dir * strength;
+        IsKnockedBack = true;
+    }
+
+    /// <summary>
+    /// 짧은 가속으로 밀어낸 뒤 천천히 감속시키는 넉백.
+    /// </summary>
+    /// <param name="acceleration">밀어내는 가속도(units/s²). 질량을 곱해 힘으로 쓴다.</param>
+    /// <param name="duration">그 가속을 주는 시간(초). 이 동안 매 물리 틱마다 힘이 더해진다.</param>
+    /// <param name="friction">넉백 중 매 틱 곱해지는 감쇠. 1에 가까울수록 오래 미끄러진다. 0이면 평소 마찰.</param>
+    public void KnockBack(Vector3 dir, float acceleration, float duration, float friction)
+    {
+        IsKnockedBack = true;
+        KnockbackForce = dir.normalized * (acceleration * Mass);
+        KnockbackTimeLeft = duration;
+        KnockbackFriction = friction;
+    }
+
+    // 넉백을 도중에 끊는다(예: 벽에 부딪혀 멈췄을 때). 남은 가속까지 같이 지워야 계속 밀리지 않는다.
+    public void EndKnockbackEarly() => ClearKnockback();
+    public void KnockBackEndCallback() => ClearKnockback();
+
+    private void ClearKnockback()
+    {
+        IsKnockedBack = false;
+        KnockbackForce = Vector3.zero;
+        KnockbackTimeLeft = 0f;
+        KnockbackFriction = 0f;
+    }
 
     public override void Register(IInterfaceRegistable interfaceRegistable)
     {

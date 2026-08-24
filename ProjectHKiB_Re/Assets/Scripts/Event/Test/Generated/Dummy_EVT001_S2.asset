@@ -1,0 +1,117 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: Dummy_EVT001_S2
+  m_EditorClassIdentifier: 
+  isPacked: 0
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0.21393922
+  transitions:
+  - name: "\uC870\uAC74 0"
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 6174889728934674874
+      negate: 0
+    trueState: {fileID: 11400000, guid: 33417e268270ff24786772fef92fd4a5, type: 2}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  - name: "\uD0C0\uC784\uC544\uC6C3"
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 6174889728934674875
+      negate: 0
+    trueState: {fileID: 11400000, guid: 33417e268270ff24786772fef92fd4a5, type: 2}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 1
+  additionalTransitions: []
+  EnterActions:
+  - rid: 6174889728934674876
+  - rid: 6174889728934674877
+  - rid: 6174889728934674878
+  - rid: 6174889728934674879
+  - rid: 6174889728934674880
+  - rid: 6174889728934674881
+  UpdateActions: []
+  ExitActions: []
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 6174889728934674874
+      type: {class: DialogueLineEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 6174889728934674875
+      type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        key: Dummy_EVT001_S2_mark
+        seconds: 15
+    - rid: 6174889728934674876
+      type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        key: Dummy_EVT001_S2_mark
+    - rid: 6174889728934674877
+      type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mode: 3
+    - rid: 6174889728934674878
+      type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: CLIPPED_HAIR
+        targetAction:
+          rid: 6174889728934674882
+    - rid: 6174889728934674879
+      type: {class: AcquireClueAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        clueId: dummy-clue-wing
+        openCodexImmediately: 0
+    - rid: 6174889728934674880
+      type: {class: DialogueStartAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 
+    - rid: 6174889728934674881
+      type: {class: DialogueShowLineAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        line:
+          name: "\uC548\uB0B4"
+          characterName: "\uC548\uB0B4"
+          sublines:
+          - "\uC798\uB824 \uB098\uAC04 \uBA38\uB9AC\uCE74\uB77D \uB2E8\uC11C\uB97C
+            \uD68D\uB4DD\uD588\uB2E4."
+          BG: {fileID: 0}
+          isChoice: 0
+          choices: []
+    - rid: 6174889728934674882
+      type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        active: 0

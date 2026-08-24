@@ -122,6 +122,30 @@ namespace RouteFinding.Codex
         public void Close() => UI?.CloseWindow(WindowName);
         public void Toggle() => UI?.ToggleWindow(WindowName);
 
+        /// <summary>
+        /// 도감을 열면서 특정 단서 카드를 바로 펼친다 — "단서를 얻자마자 확인" 경로용
+        /// (AcquireClueAction이 호출한다).
+        ///
+        /// Open()이 OpenWindowContent → RebuildFromProgress → OnCodexChanged → RefreshTree까지
+        /// 태우므로, 돌아온 시점의 _allEntries에는 방금 획득한 단서가 이미 들어 있다.
+        /// 못 찾으면 도감만 열린 채로 두고 경고를 남긴다(창이 안 열리는 것보다는 낫다).
+        /// </summary>
+        public void OpenWithClue(string clueId)
+        {
+            Open();
+
+            if (string.IsNullOrEmpty(clueId)) return;
+
+            CodexEntry entry = _allEntries.Find(e => e.clueId == clueId);
+            if (entry == null)
+            {
+                Debug.LogWarning($"[CodexPanel] OpenWithClue: 도감 목록에서 '{clueId}' 단서를 찾지 못했습니다. 도감만 엽니다.");
+                return;
+            }
+
+            OnEntrySelected(entry);
+        }
+
         private static UIManager UI => GameManager.instance == null ? null : GameManager.instance.UIManager;
 
         // ─── IWindowContent — Window가 호출하는 실제 작업 ─────────

@@ -1208,6 +1208,7 @@ namespace RouteFinding.Note
 
             var visibleIds = _visibleClueVisuals.Keys.ToList();
             var resolvedCache = new Dictionary<string, ResolvedClue?>();
+            DreamReadingModule dreamReadings = DreamReadingModule.Instance;
             ResolvedClue? ResolveCached(string id)
             {
                 if (!resolvedCache.TryGetValue(id, out var r)) resolvedCache[id] = r = NoteClueResolver.Resolve(id);
@@ -1215,9 +1216,15 @@ namespace RouteFinding.Note
             }
             for (int i = 0; i < visibleIds.Count; i++)
             {
+                // Dream-reading clues are intentionally excluded from automatic keyword edges.
+                // The manual-link pass below remains available for resolving a dream reading.
+                if (dreamReadings != null && dreamReadings.IsDreamReadingClue(visibleIds[i])) continue;
+
                 var resolvedA = ResolveCached(visibleIds[i]);
                 for (int j = i + 1; j < visibleIds.Count; j++)
                 {
+                    if (dreamReadings != null && dreamReadings.IsDreamReadingClue(visibleIds[j])) continue;
+
                     var resolvedB = ResolveCached(visibleIds[j]);
                     if (!CodexFilterService.SharesKeyword(resolvedA?.Keywords, resolvedB?.Keywords)) continue;
 

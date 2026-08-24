@@ -365,7 +365,6 @@ namespace EntityControl
             NavigationPathPoint waypoint = _path[currentWaypoint];
             if (ShouldWaitForPhysicalRecovery(waypoint.LinkType))
             {
-                Debug.Log("Wait for phys recover");
                 status = NavigationStatus.Displaced;
                 _physics.IsWalking = false;
                 return;

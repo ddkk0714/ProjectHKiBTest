@@ -93,6 +93,10 @@ public class SimpleAnimationPlayer : MonoBehaviour
 
     public void Reserve(string clipName)
     {
+        // 아직 아무것도 재생하지 않았으면 예약할 "다음"이 없다 — 그냥 지금 튼다.
+        // (예전엔 _currentClip이 null인 채로 들어오면 여기서 그대로 터졌다.)
+        if (_currentClip == null) { PlayInternal(clipName); return; }
+
         if (!_currentClip.isLoop && IsFirstLoopEnded && _reservedClips.Count < 1) { PlayInternal(clipName); return; }
         if (_reservedClips.Count < _reservedClips.Capacity)
             _reservedClips.Add(clipName);

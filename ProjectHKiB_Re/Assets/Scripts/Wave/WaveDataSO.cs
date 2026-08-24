@@ -19,6 +19,8 @@ public class AndDecision
         bool decide = true;
         for (int j = 0; j < StateDecisionsAnd.Length; j++)
         {
+            // 빈 칸은 조건 없음으로 본다 — 하나가 비었다고 판정 전체가 죽으면 안 된다.
+            if (StateDecisionsAnd[j] == null) continue;
             if (!StateDecisionsAnd[j].Decide(stateController))
             {
                 decide = false;
@@ -54,20 +56,22 @@ public class WaveDataSO : ScriptableObject
     {
         for (int i = 0; i < _startActions.Length; i++)
         {
-            _startActions[i].Act(stateController);
+            // 빈 칸은 건너뛴다 — 여기서 터지면 뒤쪽 액션이 통째로 실행되지 않는다.
+            _startActions[i]?.Act(stateController);
         }
     }
     public void UpdateAction(StateController stateController)
     {
         for (int i = 0; i < _updateActions.Length; i++)
         {
-            _updateActions[i].Act(stateController);
+            _updateActions[i]?.Act(stateController);
         }
     }
     public bool WaveEndDecision(StateController stateController)
     {
         for (int j = 0; j < _waveEndDecisionsOr.Length; j++)
         {
+            if (_waveEndDecisionsOr[j] == null) continue;
             if (_waveEndDecisionsOr[j].Decide(stateController))
                 return true;
         }

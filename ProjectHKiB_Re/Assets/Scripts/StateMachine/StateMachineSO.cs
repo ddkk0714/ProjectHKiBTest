@@ -19,6 +19,7 @@ public class StateMachineSO : ScriptableObject
         _commandPairs = new();
         foreach (StateSO state in allStates)
         {
+            if (state == null) continue; // 목록에 빈 칸이 섞여 있어도 나머지는 정상 처리한다
             state.temporaryID = Random.value;
             if (state.transitions == null) continue;
             foreach (StateTransition transition in state.transitions)
@@ -46,16 +47,20 @@ public class StateMachineSO : ScriptableObject
     }
 #endif
 
+    // _commandPairs는 UpdateStateMachine()이 채운다. 한 번도 안 돌린 기계(코드로 만들고 잊었거나
+    // 그래프 편집기에서 갓 만든 것)는 null이라, 상태 기계를 붙이는 순간 여기서 터졌다.
     public void BindCommands(StateController stateController)
     {
+        if (_commandPairs == null) return;
         for (int i = 0; i < _commandPairs.Count; i++)
-            _commandPairs[i].Bind(stateController);
+            _commandPairs[i]?.Bind(stateController);
     }
 
     public void UnbindCommands()
     {
+        if (_commandPairs == null) return;
         for (int i = 0; i < _commandPairs.Count; i++)
-            _commandPairs[i].Unbind();
+            _commandPairs[i]?.Unbind();
     }
 
 }

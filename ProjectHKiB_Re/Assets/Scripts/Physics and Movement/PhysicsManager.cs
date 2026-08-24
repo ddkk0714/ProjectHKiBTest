@@ -266,11 +266,26 @@ public class PhysicsManager : MonoBehaviour
 
     private void UpdateVelocity(IPhysics obj)
     {
+        // 넉백 지속 가속 — 한 틱짜리 임펄스가 아니라 짧은 시간 동안 밀어내야 "튕겨 나가는" 느낌이 난다.
+        if (obj.KnockbackTimeLeft > 0f)
+        {
+            obj.ExForce += obj.KnockbackForce;
+            obj.KnockbackTimeLeft -= Time.fixedDeltaTime;
+            if (obj.KnockbackTimeLeft <= 0f) obj.KnockbackForce = Vector3.zero;
+        }
+
         obj.ExForce   += gravity * obj.Mass * Vector3.forward;
         obj.ZVelocity += obj.ExForce.z * obj.InvM * Time.fixedDeltaTime;
         
         obj.ZVelocity = ApplyAirFriction(obj, obj.ZVelocity);
         obj.HVelocity = ApplyGroundFriction(obj, obj.HVelocity);
+
+        // 넉백은 "밀려나는 동안"만이다 — 멈춰 서고 미는 힘도 없으면 표시를 내려, 상태 기계가
+        // KnockbackState에서 빠져나오게 한다(KnockbackMoveDecision이 이 값을 본다).
+        if (obj.IsKnockedBack
+            && obj.HVelocity.magnitude < gridSettleSpeed
+            && ((Vector2)obj.ExForce).sqrMagnitude < EPSILON)
+            obj.IsKnockedBack = false;
 
         if (obj.IsWalking && obj.WalkingDir.sqrMagnitude > EPSILON)
         {
@@ -288,7 +303,12 @@ public class PhysicsManager : MonoBehaviour
         }
         else if (obj.Mode == MovementMode.Grid)
         {
-            if (obj.HVelocity.magnitude < gridSettleSpeed)
+            // 가만히 서 있으면 격자 칸 중앙으로 정렬시키고 끝낸다. 단, 수평 외력이 들어와 있으면
+            // 여기서 return하면 안 된다 — 아래 ExForce 적용을 건너뛰고 FixedUpdate 끝에서 ExForce가
+            // 0으로 비워져, 넉백이 통째로 삼켜진다(멈춰 선 대상은 절대 밀려나지 않았다).
+            // 중력은 ExForce.z에만 더해지므로 (Vector2) 변환이 수평 성분만 정확히 골라낸다.
+            bool hasExternalPush = ((Vector2)obj.ExForce).sqrMagnitude > EPSILON;
+            if (obj.HVelocity.magnitude < gridSettleSpeed && !hasExternalPush)
             {
                 obj.HVelocity = Vector2.zero;
                 StartGridSettle(obj);
@@ -303,7 +323,10 @@ public class PhysicsManager : MonoBehaviour
 #region MODE SWITCH
     private void UpdateMode(IPhysics obj)
     {
-        bool wantsGrid    = obj.Ground && !obj.IsOnSlope
+        // 넉백 중에는 격자 모드로 돌아가면 안 된다 — 격자 이동은 칸 단위라 속도를 무시해서,
+        // 밀어내는 힘이 끝나는 순간 미끄러짐이 뚝 끊긴다.
+        bool wantsGrid    = !obj.IsKnockedBack
+                         && obj.Ground && !obj.IsOnSlope
                          && obj.HVelocity.magnitude < obj.GridEndureSpeed * obj.BuffedMaxWalkSpeed
                          && obj.ExForce.magnitude < obj.GridEndureForce;
         bool wantsPhysics = !wantsGrid;
@@ -874,6 +897,11 @@ public class PhysicsManager : MonoBehaviour
     private Vector2 ApplyGroundFriction(IPhysics obj, Vector2 vel)
     {
         float friction = obj.Ground ? Mathf.Max(obj.GroundFriction, obj.Ground.frictionCoeff) : obj.AirFriction;
+
+        // 넉백 중에는 전용 마찰을 쓴다. 평소 마찰(0.85 등)은 매 틱 곱해지는 감쇠라 1초면 속도가
+        // 거의 0이 되어, 밀려나는 연출이 "툭" 끊긴다. 1에 가까운 값을 주면 천천히 미끄러진다.
+        if (obj.IsKnockedBack && obj.KnockbackFriction > 0f) friction = obj.KnockbackFriction;
+
         vel *= friction;
 
         float iceBlend      = Mathf.Clamp01((friction - 0.5f) / 0.5f);

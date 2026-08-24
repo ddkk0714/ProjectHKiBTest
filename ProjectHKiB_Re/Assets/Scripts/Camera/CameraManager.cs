@@ -23,9 +23,13 @@ public class CameraManager : MonoBehaviour
     public bool freeze = false;
     public Transform currentFollowTarget;
 
+    // 컷신에서 카메라를 NPC 쪽으로 돌렸다가 되돌리기 위해, 원래 추적 대상을 기억해 둔다.
+    private Transform _defaultFollowTarget;
+
     private void Start()
     {
         theCamera = GetComponent<Camera>();
+        _defaultFollowTarget = currentFollowTarget;
         this.transform.position = currentFollowTarget.position;
         for (int i = 0; i < Cameras.Length; i++)
         {
@@ -124,6 +128,65 @@ public class CameraManager : MonoBehaviour
     public void Shake()
     {
         impulseSource.GenerateImpulse();
+    }
+
+    /// <summary>세기를 지정해 흔든다. strength가 0 이하면 임펄스 소스에 설정된 기본 세기를 쓴다.</summary>
+    public void Shake(Vector3 direction, float strength)
+    {
+        if (strength <= 0f || direction == Vector3.zero)
+        {
+            impulseSource.GenerateImpulse();
+            return;
+        }
+
+        impulseSource.GenerateImpulse(direction.normalized * strength);
+    }
+
+    /// <summary>
+    /// 카메라가 따라다닐 대상을 바꾼다 — 컷신에서 특정 NPC를 클로즈업할 때 쓴다.
+    /// null을 넘기면 시작 시점의 기본 대상(보통 플레이어)으로 되돌린다.
+    /// </summary>
+    public void SetFollowTarget(Transform target)
+    {
+        if (target == null) target = _defaultFollowTarget;
+        if (target == null) return;
+
+        currentFollowTarget = target;
+        for (int i = 0; i < Cameras.Length; i++)
+            if (Cameras[i]) Cameras[i].Follow = target;
+    }
+
+    // 컷신 진입 전의 브레인 갱신 방식. 컷신이 끝나면 이 값으로 되돌린다.
+    private CinemachineBrain.UpdateMethod _updateMethodBeforeCutscene;
+    private bool _cutsceneCameraMode;
+
+    /// <summary>
+    /// 컷신용 카메라 모드. 게임플레이가 멈춘(Time.timeScale = 0) 동안에도 카메라 연출이 흐르게 한다.
+    ///
+    /// 두 가지를 같이 손봐야 한다:
+    ///  1. m_IgnoreTimeScale — 블렌딩이 스케일 시간을 쓰면 timeScale 0에서 진행이 멎는다.
+    ///  2. m_UpdateMethod — 기본값 SmartUpdate는 대상이 물리 오브젝트면 그 가상 카메라를
+    ///     FixedUpdate에서 갱신하는데, timeScale이 0이면 FixedUpdate 자체가 호출되지 않는다.
+    ///     그래서 OrthographicSize를 바꿔도 화면이 그대로였다(줌이 안 먹는 것처럼 보이던 원인).
+    ///     컷신 동안에는 LateUpdate로 고정해 두고 끝나면 원래 값으로 되돌린다.
+    ///
+    /// (Cinemachine Impulse로 만드는 흔들림은 별도 경로라 이것만으로는 안 풀릴 수 있다.)
+    /// </summary>
+    public void SetCutsceneCameraMode(bool enabled)
+    {
+        if (!CBrain || _cutsceneCameraMode == enabled) return;
+        _cutsceneCameraMode = enabled;
+
+        if (enabled)
+        {
+            _updateMethodBeforeCutscene = CBrain.m_UpdateMethod;
+            CBrain.m_UpdateMethod = CinemachineBrain.UpdateMethod.LateUpdate;
+            CBrain.m_IgnoreTimeScale = true;
+            return;
+        }
+
+        CBrain.m_UpdateMethod = _updateMethodBeforeCutscene;
+        CBrain.m_IgnoreTimeScale = false;
     }
 
     public Vector3 GetCurrentCameraPos()

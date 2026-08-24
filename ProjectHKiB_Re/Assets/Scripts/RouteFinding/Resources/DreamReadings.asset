@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39c700aee611120532eb89501e0f811d, type: 3}
+  m_Name: DreamReadings
+  m_EditorClassIdentifier: 
+  readings:
+  - id: reading_dummy_test
+    title: (테스트용 더미 해몽)
+    interpretation: '아트/콘텐츠 없이 해몽 판정을 확인하려고 넣어둔 더미다. dummy-clue-wing/
+      dummy-clue-eye(clues.json 전용 더미 항목, EVT-001/002가 자동 지급)를 노트에서 이으면
+      성립한다. 실제 두 해몽(reading_wing/reading_eye)을 대신해 두 플래그를 한 번에 풀어
+      EVT-004까지 자동으로 이어지게 하는 테스트 지름길이다. 콘텐츠가 확정되면 이 항목은 지울 것.'
+    requiredClueIds:
+    - dummy-clue-wing
+    - dummy-clue-eye
+    unlockFlags:
+    - {fileID: 11400000, guid: 1572b19f5bee1e1da25a9eeab3a9af14, type: 2}
+    - {fileID: 11400000, guid: 2253916f6a15fb9f0f23cc94782cf1af, type: 2}
+    unlockValue: 1
+  - id: reading_eye
+    title: 노이즈가 낀 눈
+    interpretation: '슬픔+분노 = [공포], 기쁨+분노 = [각성].'
+    requiredClueIds: []
+    unlockFlags:
+    - {fileID: 11400000, guid: 2253916f6a15fb9f0f23cc94782cf1af, type: 2}
+    unlockValue: 1
+  - id: reading_wing
+    title: 떨리는 날개
+    interpretation: '보스가 날개로 내리칠 때 패링한 후 [가위] 인터랙션을 할 것.'
+    requiredClueIds: []
+    unlockFlags:
+    - {fileID: 11400000, guid: 1572b19f5bee1e1da25a9eeab3a9af14, type: 2}
+    unlockValue: 1
