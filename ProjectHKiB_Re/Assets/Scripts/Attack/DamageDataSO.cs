@@ -4,7 +4,6 @@ using UnityEngine;
 public class DamageDataSO : ScriptableObject
 {
     public float damageCoefficient;
-    public DamageTypeSO damageType;
     public float knockBack;
     public LayerMask damageLayer;
     public AudioDataSO initialSound;

@@ -8,16 +8,16 @@ namespace Combat
         [SerializeField] private SpriteRenderer frame;
         [SerializeField] private SpriteRenderer fill;
 
-        public void Apply(CombatArea area)
+        public void Apply(BoxData downwardArea, EnumManager.AnimDir direction, Transform attackRoot)
         {
-            Vector2 size = area.Shape == CombatAreaShape.Circle
-                ? Vector2.one * area.Radius * 2f
-                : area.Size;
+            if (downwardArea == null || attackRoot == null) return;
 
-            transform.localPosition = area.LocalOffset;
-            transform.localRotation = Quaternion.Euler(0f, 0f, area.LocalAngle);
-            if (frame != null) frame.size = size;
-            if (fill != null) fill.size = size;
+            Quaternion directionRotation = direction.DirToQuaternion4();
+            transform.SetPositionAndRotation(
+                attackRoot.position + directionRotation * (Vector3)downwardArea.offset,
+                directionRotation);
+            if (frame != null) frame.size = downwardArea.size;
+            if (fill != null) fill.size = downwardArea.size;
         }
 
         public void SetProgress(float progress)

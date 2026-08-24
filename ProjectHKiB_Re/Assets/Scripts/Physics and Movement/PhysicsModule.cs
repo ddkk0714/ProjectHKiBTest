@@ -1,4 +1,12 @@
+using System.Collections.Generic;
 using UnityEngine;
+
+public enum PhysicsLayerMaskOperation
+{
+    Replace,
+    Add,
+    Remove
+}
 
 public interface IPhysicsBase
 {
@@ -84,11 +92,37 @@ public interface IPhysics : IPhysicsBase, IInitializable
     public void LogicalTeleport(Vector3 position);
     public void RealTeleport(Vector3 position);
     public void MoveToward(Vector3 targetPos, float maxDistance);
+    public void MoveTowardByPhysics(Vector3 targetPos, float arrivalTime);
+    public void CancelMoveTowardByPhysics();
+    public void SetMovementMode(MovementMode mode);
     public void StopMove();
+    public void SetLayerOverride(
+        string slot,
+        bool changeWallLayer,
+        PhysicsLayerMaskOperation wallOperation,
+        LayerMask wallMask,
+        bool changeFloorLayer,
+        PhysicsLayerMaskOperation floorOperation,
+        LayerMask floorMask);
+    public void ClearLayerOverride(string slot);
+    public void DisableAllCollisions(string slot);
+    public void RestoreCollisions(string slot);
+    public void ClearAllLayerOverrides();
 }
 
 public class PhysicsModule : InterfaceModule, IPhysics
 {
+    private sealed class PhysicsLayerOverride
+    {
+        public string Slot;
+        public bool ChangeWallLayer;
+        public PhysicsLayerMaskOperation WallOperation;
+        public LayerMask WallMask;
+        public bool ChangeFloorLayer;
+        public PhysicsLayerMaskOperation FloorOperation;
+        public LayerMask FloorMask;
+    }
+
     public PhysicsManager physManager;
     public FloatBuffContainer SpeedBuffer { get; set; }
 
@@ -98,8 +132,8 @@ public class PhysicsModule : InterfaceModule, IPhysics
     [field: SerializeField] public float FrictionWalkInfluence { get; set; }
 
     [field: SerializeField] public MovementMode Mode { get; set; }
-    public GridState Grid { get; set; }
-    public PhysicsState Phys { get; set; }
+    public GridState Grid { get; set; } = new();
+    public PhysicsState Phys { get; set; } = new();
     [field: SerializeField] public Vector2Int Size { get; set; }
 
     [field: SerializeField] public float GridEndureSpeed { get; set; }
@@ -142,6 +176,12 @@ public class PhysicsModule : InterfaceModule, IPhysics
     [field: SerializeField] public ZCollider2D ZCol { get; set; }
     public int ID { get; set; }
     public Vector3 CurrentWallNormal { get; set; }
+
+    private readonly List<PhysicsLayerOverride> _layerOverrides = new();
+    private readonly List<string> _collisionDisableSlots = new();
+    private LayerMask _baseWallLayer;
+    private LayerMask _baseFloorLayer;
+    private bool _hasLayerOverrides;
 
     [NaughtyAttributes.Button]
     public void Jump()
@@ -198,8 +238,8 @@ public class PhysicsModule : InterfaceModule, IPhysics
         if (!ZCol && TryGetComponent(out ZBoxCollider2D z)) ZCol = z;
         if (!physManager) physManager = FindObjectOfType<PhysicsManager>();
         ExForce = new();
-        Grid = new();
-        Phys = new();
+        Grid ??= new();
+        Phys ??= new();
         SpeedBuffer = new();
         PrevEntityPos = transform.position;
         if (Size.x <= 0 || Size.y <= 0) Size = Vector2Int.one;
@@ -235,6 +275,151 @@ public class PhysicsModule : InterfaceModule, IPhysics
     public void LogicalTeleport(Vector3 position) => physManager.LogicalTeleport(this, position);
     public void RealTeleport(Vector3 position) => physManager.RealTeleport(this, position);
 
+    /// <summary>
+    /// 이름이 같은 slot은 교체하고, 서로 다른 slot은 적용 순서대로 합성한다.
+    /// 첫 override가 등록될 때 Data에서 받은 현재 LayerMask를 원본으로 캡처한다.
+    /// </summary>
+    public void SetLayerOverride(
+        string slot,
+        bool changeWallLayer,
+        PhysicsLayerMaskOperation wallOperation,
+        LayerMask wallMask,
+        bool changeFloorLayer,
+        PhysicsLayerMaskOperation floorOperation,
+        LayerMask floorMask)
+    {
+        if (!changeWallLayer && !changeFloorLayer) return;
+
+        string normalizedSlot = NormalizeLayerOverrideSlot(slot);
+        CaptureBaseLayersIfNeeded();
+
+        _layerOverrides.RemoveAll(layerOverride => layerOverride.Slot == normalizedSlot);
+        _layerOverrides.Add(new PhysicsLayerOverride
+        {
+            Slot = normalizedSlot,
+            ChangeWallLayer = changeWallLayer,
+            WallOperation = wallOperation,
+            WallMask = wallMask,
+            ChangeFloorLayer = changeFloorLayer,
+            FloorOperation = floorOperation,
+            FloorMask = floorMask
+        });
+        ApplyLayerOverrides();
+    }
+
+    public void ClearLayerOverride(string slot)
+    {
+        if (!_hasLayerOverrides) return;
+
+        string normalizedSlot = NormalizeLayerOverrideSlot(slot);
+        if (_layerOverrides.RemoveAll(layerOverride => layerOverride.Slot == normalizedSlot) == 0)
+            return;
+
+        if (_layerOverrides.Count == 0 && _collisionDisableSlots.Count == 0)
+            ClearAllLayerOverrides();
+        else
+            ApplyLayerOverrides();
+    }
+
+    /// <summary>
+    /// 해당 slot이 유지되는 동안 Wall/Floor LayerMask를 모두 비워 모든 커스텀 물리 충돌을 막는다.
+    /// 다른 Layer override보다 항상 우선하며, 여러 slot이 있으면 모두 해제될 때 복구된다.
+    /// </summary>
+    public void DisableAllCollisions(string slot)
+    {
+        string normalizedSlot = NormalizeLayerOverrideSlot(slot);
+        CaptureBaseLayersIfNeeded();
+
+        if (!_collisionDisableSlots.Contains(normalizedSlot))
+            _collisionDisableSlots.Add(normalizedSlot);
+
+        ApplyLayerOverrides();
+    }
+
+    public void RestoreCollisions(string slot)
+    {
+        if (!_hasLayerOverrides) return;
+
+        string normalizedSlot = NormalizeLayerOverrideSlot(slot);
+        if (!_collisionDisableSlots.Remove(normalizedSlot)) return;
+
+        if (_layerOverrides.Count == 0 && _collisionDisableSlots.Count == 0)
+            ClearAllLayerOverrides();
+        else
+            ApplyLayerOverrides();
+    }
+
+    public void ClearAllLayerOverrides()
+    {
+        _layerOverrides.Clear();
+        _collisionDisableSlots.Clear();
+        if (!_hasLayerOverrides) return;
+
+        WallLayer = _baseWallLayer;
+        FloorLayer = _baseFloorLayer;
+        _hasLayerOverrides = false;
+    }
+
+    private void ApplyLayerOverrides()
+    {
+        LayerMask wallLayer = _baseWallLayer;
+        LayerMask floorLayer = _baseFloorLayer;
+
+        for (int i = 0; i < _layerOverrides.Count; i++)
+        {
+            PhysicsLayerOverride layerOverride = _layerOverrides[i];
+            if (layerOverride.ChangeWallLayer)
+                wallLayer = ApplyLayerMaskOperation(
+                    wallLayer,
+                    layerOverride.WallOperation,
+                    layerOverride.WallMask);
+            if (layerOverride.ChangeFloorLayer)
+                floorLayer = ApplyLayerMaskOperation(
+                    floorLayer,
+                    layerOverride.FloorOperation,
+                    layerOverride.FloorMask);
+        }
+
+        if (_collisionDisableSlots.Count > 0)
+        {
+            wallLayer = 0;
+            floorLayer = 0;
+        }
+
+        WallLayer = wallLayer;
+        FloorLayer = floorLayer;
+    }
+
+    private void CaptureBaseLayersIfNeeded()
+    {
+        if (_hasLayerOverrides) return;
+
+        _baseWallLayer = WallLayer;
+        _baseFloorLayer = FloorLayer;
+        _hasLayerOverrides = true;
+    }
+
+    private static LayerMask ApplyLayerMaskOperation(
+        LayerMask current,
+        PhysicsLayerMaskOperation operation,
+        LayerMask operand)
+    {
+        switch (operation)
+        {
+            case PhysicsLayerMaskOperation.Add:
+                return current.value | operand.value;
+            case PhysicsLayerMaskOperation.Remove:
+                return current.value & ~operand.value;
+            default:
+                return operand;
+        }
+    }
+
+    private static string NormalizeLayerOverrideSlot(string slot)
+    {
+        return string.IsNullOrWhiteSpace(slot) ? "Default" : slot.Trim();
+    }
+
     // 수평 이동을 멈춘다. 공격을 시작할 때처럼 "여기서부터는 액션이 옮기는 만큼만 움직인다"를
     // 만들 때 쓴다. ZVelocity는 건드리지 않는다 — 낙하/점프는 별개 축이라 같이 끄면 간섭한다.
     //
@@ -261,6 +446,38 @@ public class PhysicsModule : InterfaceModule, IPhysics
         physManager.InstantMove(this, toTarget.normalized * distance, true);
     }
 
+    /// <summary>
+    /// 위치를 직접 덮어쓰지 않고 PhysicsManager가 FixedUpdate에서 속도와 충돌을 처리하도록 요청한다.
+    /// arrivalTime은 Time.time 기준의 절대 도착 시각이다.
+    /// </summary>
+    public void MoveTowardByPhysics(Vector3 targetPos, float arrivalTime)
+    {
+        if (TryResolvePhysicsManager(out PhysicsManager manager))
+            manager.RequestMoveToPosition(this, targetPos, arrivalTime);
+    }
+
+    public void CancelMoveTowardByPhysics()
+    {
+        if (TryResolvePhysicsManager(out PhysicsManager manager))
+            manager.CancelMoveToPosition(this);
+    }
+
+    public void SetMovementMode(MovementMode mode)
+    {
+        if (TryResolvePhysicsManager(out PhysicsManager manager))
+            manager.SetMovementMode(this, mode);
+    }
+
+    private bool TryResolvePhysicsManager(out PhysicsManager manager)
+    {
+        if (!physManager) physManager = FindObjectOfType<PhysicsManager>();
+        manager = physManager;
+        if (manager) return true;
+
+        Debug.LogError("ERROR: PhysicsManager not found.", this);
+        return false;
+    }
+
     // 인스펙터 버튼은 클릭하려고 게임 창 포커스를 빼야 해서 그 순간 이동 입력이 끊기고 IsWalking이
     // False로 찍힌다 — 이동 키를 누른 채로 확인할 수 있도록 키 입력으로도 트리거한다.
     [SerializeField] private KeyCode dumpSpeedDiagnosticsKey = KeyCode.F6;
@@ -269,6 +486,14 @@ public class PhysicsModule : InterfaceModule, IPhysics
     {
         if (Input.GetKeyDown(dumpSpeedDiagnosticsKey))
             DumpSpeedDiagnostics();
+    }
+
+    private void OnDisable()
+    {
+        ClearAllLayerOverrides();
+        Grid = new GridState();
+        Phys = new PhysicsState();
+        HVelocity = Vector2.zero;
     }
 
     // SpeedBuffType이 걸어둔 버프가 실제로 이동 속도에 반영되는지 직접 확인하기 위한 진단 도구.

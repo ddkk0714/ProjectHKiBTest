@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ed48a725cd5443fb6b6afcd8b194566, type: 3}
+  m_Name: Attack1
+  m_EditorClassIdentifier: 
+  kind: 0
+  damageData: {fileID: 11400000, guid: abbf6b71ebb759649a1aa84c17d9c19f, type: 2}
+  hitEachTargetOnce: 1
+  repeatInterval: 0
+  telegraphDuration: 0
+  activeDuration: 0.1
+  motion: 0
+  speed: 0
+  acceleration: 0
+  homingTurnSpeed: 360
+  faceDestination: 1
+  endOnArrival: 0
+  endOnDamageableHit: 0
+  telegraphPrefab: {fileID: 0}
+  activePrefab: {fileID: 0}

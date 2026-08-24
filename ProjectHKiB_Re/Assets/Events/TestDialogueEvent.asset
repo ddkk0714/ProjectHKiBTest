@@ -74,7 +74,7 @@ MonoBehaviour:
   temporaryID: 0.6798826
   transitions:
   - name: Ended
-    activationInput: 11
+    activationInput: 10
     trigger: {fileID: 0}
     type: 0
     availableTime: 0
@@ -145,7 +145,7 @@ MonoBehaviour:
   temporaryID: 0.75049376
   transitions:
   - name: Ended
-    activationInput: 11
+    activationInput: 10
     trigger: {fileID: 0}
     type: 0
     availableTime: 0
@@ -215,7 +215,7 @@ MonoBehaviour:
   temporaryID: 0.008880378
   transitions:
   - name: Ended
-    activationInput: 11
+    activationInput: 10
     trigger: {fileID: 0}
     type: 0
     availableTime: 0
@@ -286,7 +286,7 @@ MonoBehaviour:
   temporaryID: 0.5739704
   transitions:
   - name: Ended
-    activationInput: 11
+    activationInput: 10
     trigger: {fileID: 0}
     type: 0
     availableTime: 0
@@ -462,7 +462,7 @@ MonoBehaviour:
   temporaryID: 0.14390518
   transitions:
   - name: Ended
-    activationInput: 11
+    activationInput: 10
     trigger: {fileID: 0}
     type: 0
     availableTime: 0
