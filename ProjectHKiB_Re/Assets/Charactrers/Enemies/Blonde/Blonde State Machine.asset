@@ -303,7 +303,7 @@ MonoBehaviour:
   serializedParameterList: []
   stickyNotes: []
   nodeInspectorReference: {fileID: 0}
-  position: {x: -200, y: 37, z: 0}
+  position: {x: -153, y: -59, z: 0}
   scale: {x: 0.65751624, y: 0.65751624, z: 1}
   targetStateMachine: {fileID: 11400000}
   references:
@@ -353,10 +353,10 @@ MonoBehaviour:
         computeOrder: -2
         position:
           serializedVersion: 2
-          x: 1782.0085
-          y: 291.50195
+          x: 1406.0616
+          y: 171.95825
           width: 400
-          height: 1757
+          height: 698
         expanded: 1
         debug: 0
         nodeLock: 0
@@ -373,10 +373,10 @@ MonoBehaviour:
         computeOrder: -2
         position:
           serializedVersion: 2
-          x: 1152.5974
-          y: 321.50198
+          x: 908.3936
+          y: 236.9781
           width: 400
-          height: 477
+          height: 717
         expanded: 0
         debug: 0
         nodeLock: 0
@@ -484,7 +484,7 @@ MonoBehaviour:
     activationInput: 10
     trigger: {fileID: 0}
     type: 0
-    availableTime: 2
+    availableTime: 1.4
     disableTime: 0
     decisions: []
     trueState: {fileID: -3289367818216268253}
@@ -495,25 +495,48 @@ MonoBehaviour:
     showFalseStatePort: 0
   additionalTransitions: []
   EnterActions: []
-  UpdateActions:
-  - rid: 7387912726605725719
+  UpdateActions: []
   ExitActions: []
   actionSequence:
   - time: 0
     Action:
       rid: 7387912726605725706
+  - time: 0
+    Action:
+      rid: 7387912726605725771
   - time: 0.2
     Action:
       rid: 7387912726605725752
+  - time: 0
+    Action:
+      rid: 7387912726605725766
+  - time: 0
+    Action:
+      rid: 7387912726605725772
+  - time: 0
+    Action:
+      rid: 7387912726605725773
+  - time: 0.2
+    Action:
+      rid: 7387912726605725707
   - time: 0.2
     Action:
       rid: 7387912726605725753
+  - time: 0
+    Action:
+      rid: 7387912726605725767
   - time: 0.2
     Action:
       rid: 7387912726605725755
+  - time: 0
+    Action:
+      rid: 7387912726605725768
   - time: 0.2
     Action:
       rid: 7387912726605725757
+  - time: 0
+    Action:
+      rid: 7387912726605725769
   - time: 0.2
     Action:
       rid: 7387912726605725758
@@ -534,7 +557,7 @@ MonoBehaviour:
       data:
         definition: {fileID: 11400000, guid: 9346e304896656748a50d5f264807664, type: 2}
         slot: Default
-        cancelExistingInSlot: 0
+        cancelExistingInSlot: 1
         origin:
           source: 0
           follow: 0
@@ -555,171 +578,12 @@ MonoBehaviour:
           snapFinalPositionToGrid: 0
           gridCellSize: 0
           gridOrigin: {x: 0, y: 0}
-        directionSource: 0
+        directionSource: 5
     - rid: 7387912726605725707
       type: {class: CancelComposableAttackAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         slot: Default
         cancelAllInSlot: 0
-    - rid: 7387912726605725719
-      type: {class: MoveAlongPositionKeyframesAction, ns: StateMachine, asm: Assembly-CSharp}
-      data:
-        keyframes:
-        - mode: 0
-          destination:
-            source: 0
-            follow: 0
-            worldPosition: {x: 0, y: 0, z: 0}
-            sceneAnchorId: 
-            offset: {x: 20, y: 0, z: 0}
-            offsetSpace: 1
-            snapFinalPositionToGrid: 0
-            gridCellSize: 0
-            gridOrigin: {x: 0, y: 0}
-          duration: 0.2
-          forceRepath: 0
-          stopHorizontalMovementBeforeTeleport: 0
-        - mode: 1
-          destination:
-            source: 0
-            follow: 0
-            worldPosition: {x: 0, y: 0, z: 0}
-            sceneAnchorId: 
-            offset: {x: 0, y: -2, z: 0}
-            offsetSpace: 1
-            snapFinalPositionToGrid: 0
-            gridCellSize: 0
-            gridOrigin: {x: 0, y: 0}
-          duration: 0.1
-          forceRepath: 0
-          stopHorizontalMovementBeforeTeleport: 0
-        - mode: 0
-          destination:
-            source: 0
-            follow: 0
-            worldPosition: {x: 0, y: 0, z: 0}
-            sceneAnchorId: 
-            offset: {x: -20, y: 0, z: 0}
-            offsetSpace: 1
-            snapFinalPositionToGrid: 0
-            gridCellSize: 0
-            gridOrigin: {x: 0, y: 0}
-          duration: 0.2
-          forceRepath: 0
-          stopHorizontalMovementBeforeTeleport: 0
-        - mode: 1
-          destination:
-            source: 0
-            follow: 0
-            worldPosition: {x: 0, y: 0, z: 0}
-            sceneAnchorId: 
-            offset: {x: 0, y: -2, z: 0}
-            offsetSpace: 1
-            snapFinalPositionToGrid: 0
-            gridCellSize: 0
-            gridOrigin: {x: 0, y: 0}
-          duration: 0.1
-          forceRepath: 0
-          stopHorizontalMovementBeforeTeleport: 0
-        - mode: 0
-          destination:
-            source: 0
-            follow: 0
-            worldPosition: {x: 0, y: 0, z: 0}
-            sceneAnchorId: 
-            offset: {x: 20, y: 0, z: 0}
-            offsetSpace: 1
-            snapFinalPositionToGrid: 0
-            gridCellSize: 0
-            gridOrigin: {x: 0, y: 0}
-          duration: 0.2
-          forceRepath: 0
-          stopHorizontalMovementBeforeTeleport: 0
-        - mode: 1
-          destination:
-            source: 0
-            follow: 0
-            worldPosition: {x: 0, y: 0, z: 0}
-            sceneAnchorId: 
-            offset: {x: 0, y: -2, z: 0}
-            offsetSpace: 1
-            snapFinalPositionToGrid: 0
-            gridCellSize: 0
-            gridOrigin: {x: 0, y: 0}
-          duration: 0.1
-          forceRepath: 0
-          stopHorizontalMovementBeforeTeleport: 0
-        - mode: 0
-          destination:
-            source: 0
-            follow: 0
-            worldPosition: {x: 0, y: 0, z: 0}
-            sceneAnchorId: 
-            offset: {x: -20, y: 0, z: 0}
-            offsetSpace: 1
-            snapFinalPositionToGrid: 0
-            gridCellSize: 0
-            gridOrigin: {x: 0, y: 0}
-          duration: 0.2
-          forceRepath: 0
-          stopHorizontalMovementBeforeTeleport: 0
-        - mode: 1
-          destination:
-            source: 0
-            follow: 0
-            worldPosition: {x: 0, y: 0, z: 0}
-            sceneAnchorId: 
-            offset: {x: 0, y: -2, z: 0}
-            offsetSpace: 1
-            snapFinalPositionToGrid: 0
-            gridCellSize: 0
-            gridOrigin: {x: 0, y: 0}
-          duration: 0.1
-          forceRepath: 0
-          stopHorizontalMovementBeforeTeleport: 0
-        - mode: 0
-          destination:
-            source: 0
-            follow: 0
-            worldPosition: {x: 0, y: 0, z: 0}
-            sceneAnchorId: 
-            offset: {x: 7, y: 0, z: 0}
-            offsetSpace: 1
-            snapFinalPositionToGrid: 0
-            gridCellSize: 0
-            gridOrigin: {x: 0, y: 0}
-          duration: 0.2
-          forceRepath: 0
-          stopHorizontalMovementBeforeTeleport: 0
-        - mode: 0
-          destination:
-            source: 0
-            follow: 0
-            worldPosition: {x: 0, y: 0, z: 0}
-            sceneAnchorId: 
-            offset: {x: 2, y: 0, z: 0}
-            offsetSpace: 1
-            snapFinalPositionToGrid: 0
-            gridCellSize: 0
-            gridOrigin: {x: 0, y: 0}
-          duration: 0.2
-          forceRepath: 0
-          stopHorizontalMovementBeforeTeleport: 0
-        - mode: 0
-          destination:
-            source: 0
-            follow: 0
-            worldPosition: {x: 0, y: 0, z: 0}
-            sceneAnchorId: 
-            offset: {x: 1, y: 0, z: 0}
-            offsetSpace: 1
-            snapFinalPositionToGrid: 0
-            gridCellSize: 0
-            gridOrigin: {x: 0, y: 0}
-          duration: 0.2
-          forceRepath: 0
-          stopHorizontalMovementBeforeTeleport: 0
-        loop: 0
     - rid: 7387912726605725752
       type: {class: DestroyRegisteredTargetAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
@@ -745,3 +609,162 @@ MonoBehaviour:
       data:
         targetID: indicate4
         destroyRegisteredSceneObject: 1
+    - rid: 7387912726605725766
+      type: {class: StartComposableAttackAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        definition: {fileID: 11400000, guid: 9346e304896656748a50d5f264807664, type: 2}
+        slot: Default
+        cancelExistingInSlot: 1
+        origin:
+          source: 0
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: 0, y: 0, z: 0}
+          offsetSpace: 0
+          snapFinalPositionToGrid: 0
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        destination:
+          source: 0
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: 0, y: 0, z: 0}
+          offsetSpace: 0
+          snapFinalPositionToGrid: 0
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        directionSource: 4
+    - rid: 7387912726605725767
+      type: {class: StartComposableAttackAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        definition: {fileID: 11400000, guid: 9346e304896656748a50d5f264807664, type: 2}
+        slot: Default
+        cancelExistingInSlot: 1
+        origin:
+          source: 0
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: 0, y: 0, z: 0}
+          offsetSpace: 0
+          snapFinalPositionToGrid: 0
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        destination:
+          source: 0
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: 0, y: 0, z: 0}
+          offsetSpace: 0
+          snapFinalPositionToGrid: 0
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        directionSource: 5
+    - rid: 7387912726605725768
+      type: {class: StartComposableAttackAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        definition: {fileID: 11400000, guid: 9346e304896656748a50d5f264807664, type: 2}
+        slot: Default
+        cancelExistingInSlot: 1
+        origin:
+          source: 0
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: 0, y: 0, z: 0}
+          offsetSpace: 0
+          snapFinalPositionToGrid: 0
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        destination:
+          source: 0
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: 0, y: 0, z: 0}
+          offsetSpace: 0
+          snapFinalPositionToGrid: 0
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        directionSource: 4
+    - rid: 7387912726605725769
+      type: {class: StartComposableAttackAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        definition: {fileID: 11400000, guid: 9346e304896656748a50d5f264807664, type: 2}
+        slot: Default
+        cancelExistingInSlot: 1
+        origin:
+          source: 0
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: 0, y: 0, z: 0}
+          offsetSpace: 0
+          snapFinalPositionToGrid: 0
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        destination:
+          source: 0
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: 0, y: 0, z: 0}
+          offsetSpace: 0
+          snapFinalPositionToGrid: 0
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        directionSource: 5
+    - rid: 7387912726605725771
+      type: {class: MoveToPositionAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mode: 0
+        destination:
+          source: 0
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: 20, y: 0, z: 0}
+          offsetSpace: 1
+          snapFinalPositionToGrid: 0
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        duration: 0.2
+        forceRepath: 0
+        stopHorizontalMovementBeforeTeleport: 1
+    - rid: 7387912726605725772
+      type: {class: MoveToPositionAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mode: 1
+        destination:
+          source: 0
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: 0, y: -2, z: 0}
+          offsetSpace: 1
+          snapFinalPositionToGrid: 0
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        duration: 1
+        forceRepath: 0
+        stopHorizontalMovementBeforeTeleport: 1
+    - rid: 7387912726605725773
+      type: {class: MoveToPositionAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mode: 0
+        destination:
+          source: 0
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: -20, y: 0, z: 0}
+          offsetSpace: 1
+          snapFinalPositionToGrid: 0
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        duration: 0.2
+        forceRepath: 0
+        stopHorizontalMovementBeforeTeleport: 1

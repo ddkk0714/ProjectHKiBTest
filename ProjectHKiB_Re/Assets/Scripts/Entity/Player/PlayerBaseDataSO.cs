@@ -1,4 +1,3 @@
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.U2D.Animation;
 
@@ -6,11 +5,13 @@ using UnityEngine.U2D.Animation;
 public class PlayerBaseDataSO : ScriptableObject, IPhysicsBase, IAttackableBase, ITargetableBase,
 IDodgeableBase, IDamagableBase, ISkinableBase, IAnimatableBase, IFootstepBase, IGraffitiableBase
 {
+#if UNITY_EDITOR
     [NaughtyAttributes.Button]
     public void Save()
     {
-        AssetDatabase.SaveAssets();
+        UnityEditor.AssetDatabase.SaveAssets();
     }
+#endif
 
     [field: Header("Physics")]
     [field: SerializeField] public Vector2Int Size { get; set; } = Vector2Int.one;

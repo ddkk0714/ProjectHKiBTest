@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   readings:
   - id: reading_dummy_test
-    title: (테스트용 더미 해몽)
-    interpretation: '아트/콘텐츠 없이 해몽 판정을 확인하려고 넣어둔 더미다. dummy-clue-wing/
-      dummy-clue-eye(clues.json 전용 더미 항목, EVT-001/002가 자동 지급)를 노트에서 이으면
-      성립한다. 실제 두 해몽(reading_wing/reading_eye)을 대신해 두 플래그를 한 번에 풀어
-      EVT-004까지 자동으로 이어지게 하는 테스트 지름길이다. 콘텐츠가 확정되면 이 항목은 지울 것.'
+    title: "\uC218\uC694\uC77C\uC758 \uAC00\uC704"
+    interpretation: "\uC77C\uC8FC\uC77C \uC911 \uC218\uC694\uC77C\uC5D0 \uBA38\uB9AC\uB97C
+      \uC790\uB974\uBA74 \uC2AC\uD508 \uC77C\uC774 \uC77C\uC5B4\uB098\uB098? \uADF8
+      \uB54C \uC4F4 \uAC00\uC704\uB294 \uC2AC\uD514\uC774 \uBCA0\uC5B4\uC788\uC744\uC9C0\uB3C4
+      \uBAA8\uB974\uACA0\uB2E4."
     requiredClueIds:
     - dummy-clue-wing
     - dummy-clue-eye
@@ -27,15 +27,18 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 2253916f6a15fb9f0f23cc94782cf1af, type: 2}
     unlockValue: 1
   - id: reading_eye
-    title: 노이즈가 낀 눈
-    interpretation: '슬픔+분노 = [공포], 기쁨+분노 = [각성].'
+    title: "\uB178\uC774\uC988\uAC00 \uB080 \uB208"
+    interpretation: "\uC2AC\uD514+\uBD84\uB178 = [\uACF5\uD3EC], \uAE30\uC068+\uBD84\uB178
+      = [\uAC01\uC131]."
     requiredClueIds: []
     unlockFlags:
     - {fileID: 11400000, guid: 2253916f6a15fb9f0f23cc94782cf1af, type: 2}
     unlockValue: 1
   - id: reading_wing
-    title: 떨리는 날개
-    interpretation: '보스가 날개로 내리칠 때 패링한 후 [가위] 인터랙션을 할 것.'
+    title: "\uB5A8\uB9AC\uB294 \uB0A0\uAC1C"
+    interpretation: "\uBCF4\uC2A4\uAC00 \uB0A0\uAC1C\uB85C \uB0B4\uB9AC\uCE60 \uB54C
+      \uD328\uB9C1\uD55C \uD6C4 [\uAC00\uC704] \uC778\uD130\uB799\uC158\uC744 \uD560
+      \uAC83."
     requiredClueIds: []
     unlockFlags:
     - {fileID: 11400000, guid: 1572b19f5bee1e1da25a9eeab3a9af14, type: 2}

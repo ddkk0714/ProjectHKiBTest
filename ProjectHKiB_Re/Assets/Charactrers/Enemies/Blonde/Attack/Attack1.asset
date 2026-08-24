@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Attack1
   m_EditorClassIdentifier: 
   kind: 0
+  parentInstanceToOwner: 1
   damageData: {fileID: 11400000, guid: abbf6b71ebb759649a1aa84c17d9c19f, type: 2}
   hitEachTargetOnce: 1
   repeatInterval: 0

@@ -334,7 +334,7 @@
         {
             "id": "dummy-clue-wing",
             "name": "(더미) 떨리는 날개",
-            "description": "이벤트 체인 테스트용 더미 단서 — 실제 맵/이벤트키에 매이지 않는다.",
+            "description": "주기적으로 자르는 머리카락의 끝이 날개와 같이 생겼다.\n(x키로 메뉴 열어 잠자는 미녀 장착 후 나와 1키 누르면 C키로 공격 가능)",
             "targetMapGuid": "",
             "targetConnectionGuid": "",
             "requiredEventKey": "",
@@ -353,8 +353,8 @@
         },
         {
             "id": "dummy-clue-eye",
-            "name": "(더미) 노이즈 낀 눈",
-            "description": "이벤트 체인 테스트용 더미 단서 — 실제 맵/이벤트키에 매이지 않는다.",
+            "name": "(더미) 수요일의 슬픈 얼굴 달력",
+            "description": "달력. 수요일에는 모두 슬픈 얼굴이 그려져있다.\n(대화 후 가위를 장착해 C 누르면 성공)",
             "targetMapGuid": "",
             "targetConnectionGuid": "",
             "requiredEventKey": "",

@@ -43,7 +43,8 @@ public class StateMachineSO : ScriptableObject
             UnityEditor.Undo.RegisterCreatedObjectUndo(graph, "Added Graph Editor");
             UnityEditor.EditorUtility.SetDirty(this);
         }
-        UnityEditor.EditorWindow.GetWindow<StateMachineGraphWindow>().InitializeGraph(graph);
+        //UnityEditor.EditorWindow.GetWindow<StateMachineGraphWindow>().InitializeGraph(graph);
+        Debug.LogError("임시로 비활성화됨!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
 #endif
 

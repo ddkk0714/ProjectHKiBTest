@@ -1,7 +1,6 @@
 using GraphProcessor;
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEditor;
 
 [System.Serializable, NodeMenuItem("State Machine/State Node")]
 public class StateNode : BaseNode
@@ -24,17 +23,19 @@ public class StateNode : BaseNode
 
         if (stateSO != null && stateSO.name != customName)
         {
-            Undo.RecordObject(stateSO, "Rename State Asset");
+#if UNITY_EDITOR
+            UnityEditor.Undo.RecordObject(stateSO, "Rename State Asset");
 
             stateSO.name = customName;
 
-            EditorUtility.SetDirty(stateSO);
+            UnityEditor.EditorUtility.SetDirty(stateSO);
 
             if (graph != null)
             {
-                EditorUtility.SetDirty(graph);
-                AssetDatabase.SaveAssetIfDirty(stateSO);
+                UnityEditor.EditorUtility.SetDirty(graph);
+                UnityEditor.AssetDatabase.SaveAssetIfDirty(stateSO);
             }
+#endif
         }
     }
 
@@ -172,9 +173,9 @@ public class StateNode : BaseNode
                         stateSO.transitions[index].trueState = targetStateSO;
                     else
                         stateSO.transitions[index].falseState = targetStateSO;
-
-                    EditorUtility.SetDirty(stateSO);
-
+#if UNITY_EDITOR
+                    UnityEditor.EditorUtility.SetDirty(stateSO);
+#endif
                 }
             }
         }

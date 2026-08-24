@@ -178,7 +178,9 @@ namespace StateMachine
     [Serializable]
     public sealed class GroupAction : StateAction
     {
-        [SerializeReference, SubclassSelector] private StateAction[] actions =
+        [SerializeField] private string label;
+        [SerializeReference, SubclassSelector]
+        private StateAction[] actions =
             Array.Empty<StateAction>();
 
         public override void Act(StateController stateController)
@@ -200,6 +202,7 @@ namespace StateMachine
     [Serializable]
     public sealed class SequenceAction : StateAction
     {
+        [SerializeField] private string label;
         [Serializable]
         public struct ActionTween
         {
@@ -227,7 +230,8 @@ namespace StateMachine
         [SerializeField] private int loops = 1;
 
         [Tooltip("이 Sequence를 시작한 State에서 벗어날 때 남은 Action을 버릴지, 즉시 모두 실행하고 종료할지 선택한다. 무한 반복은 항상 Kill한다.")]
-        [SerializeField] private SequenceStateExitBehaviour stateExitBehaviour =
+        [SerializeField]
+        private SequenceStateExitBehaviour stateExitBehaviour =
             SequenceStateExitBehaviour.Kill;
 
         [NonSerialized] private Dictionary<int, RunningSequence> _runningSequences;

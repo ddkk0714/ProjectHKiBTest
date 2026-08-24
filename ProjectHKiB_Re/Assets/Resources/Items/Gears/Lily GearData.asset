@@ -16,7 +16,7 @@ MonoBehaviour:
   itemImage36x36: {fileID: 0}
   itemIcon: {fileID: 1382505611, guid: a6c00675429263047bc6b2d631a4f3ec, type: 3}
   color: {r: 0.33962262, g: 0.3588569, b: 1, a: 1}
-  name: "\uBC31\uC870\uC758 \uD638\uC218"
+  name: "\uAC00\uC704"
   description: 
   canStack: 0
   itemUseEvent: {fileID: 0}

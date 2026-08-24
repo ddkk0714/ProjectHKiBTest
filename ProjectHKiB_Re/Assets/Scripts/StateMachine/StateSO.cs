@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using StateMachine;
-using UnityEditor;
 using UnityEngine;
 
 [Serializable]
@@ -25,11 +24,13 @@ public class StateSO : ScriptableObject
     [HideInInspector] public bool isTemplate = false; // 생성 메뉴에 띄울 템플릿 여부
     public System.Collections.Generic.List<ExposedVariable> exposedVariables = new(); // 노출할 변수 목록
 
+#if UNITY_EDITOR
     [NaughtyAttributes.Button]
     public void Save()
     {
-        AssetDatabase.SaveAssets();
+        UnityEditor.AssetDatabase.SaveAssets();
     }
+#endif
     [HideInInspector] public float temporaryID;
 
     // 배열은 반드시 비어 있는 상태로라도 존재해야 한다 — 그래프 편집기가 CreateInstance로 만든
