@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.0661794
+  temporaryID: 0.74872094
   transitions:
   - name: "\uC870\uAC74 0"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889743949758476
+        rid: 6174889747721748633
       negate: 0
     trueState: {fileID: 11400000, guid: eded3c34a51fd0f4cb8d55606d45c398, type: 2}
     falseState: {fileID: 0}
@@ -35,10 +35,10 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889743949758477
-  - rid: 6174889743949758478
-  - rid: 6174889743949758479
-  - rid: 6174889743949758480
+  - rid: 6174889747721748634
+  - rid: 6174889747721748635
+  - rid: 6174889747721748636
+  - rid: 6174889747721748637
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -51,33 +51,33 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889743949758476
+    - rid: 6174889747721748633
       type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         boolName: EVT004_BattleCleared
-    - rid: 6174889743949758477
+    - rid: 6174889747721748634
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_A
         targetAction:
-          rid: 6174889743949758481
-    - rid: 6174889743949758478
+          rid: 6174889747721748638
+    - rid: 6174889747721748635
       type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         boolName: EVT004_BattleCleared
         value: 0
-    - rid: 6174889743949758479
+    - rid: 6174889747721748636
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0
-    - rid: 6174889743949758480
+    - rid: 6174889747721748637
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-004 \uC9C4\uC785 \u2014 \uC804\uD22C \uB2F4\uB2F9\uC740 EventManager.SetBoolParameterTrue(\"EVT004_BattleCleared\")\uB85C
           \uC644\uB8CC\uB97C \uC54C\uB824 \uC8FC\uC138\uC694. \uD328\uB9C1/\uBC18\uC0AC/\uADF8\uB85C\uAE30/\uAC01\uC131\uC740
           \uBCC4\uB3C4 \uB2F4\uB2F9"
         completeBoolName: 
-    - rid: 6174889743949758481
+    - rid: 6174889747721748638
       type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         active: 1

@@ -594,6 +594,9 @@ MonoBehaviour:
       - action:
           rid: 6174889742458684281
         waitAfter: 1
+      - action:
+          rid: 6174889747721748499
+        waitAfter: 1
       advanceWhenAny: []
       timeoutSeconds: 0
   - eventId: Dummy_EVT005
@@ -624,7 +627,7 @@ MonoBehaviour:
       targetSearchType: 1
     preconditions:
     - flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
-      value: 2
+      value: 3
     requiredClueIds: []
     worldRequirement: 0
     interruptRunningEvent: 0
@@ -1384,8 +1387,8 @@ MonoBehaviour:
         mapData: {fileID: 11400000, guid: e04c945b3aa66a14390cc6cc006c369e, type: 2}
         registry: {fileID: 0}
         mapAddressableID: 
-        entryPlacement: 0
-        entryPointId: 
+        entryPlacement: 1
+        entryPointId: MapStartPos
         customEntryPosition: {x: 0, y: 0, z: 0}
         overrideEntryDirection: 0
         entryDirection: 0
@@ -1859,3 +1862,8 @@ MonoBehaviour:
       type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         active: 1
+    - rid: 6174889747721748499
+      type: {class: SetEventFlagAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
+        flagValue: 3

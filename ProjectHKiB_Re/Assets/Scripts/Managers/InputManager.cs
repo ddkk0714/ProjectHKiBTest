@@ -20,6 +20,18 @@ public class InputManager : MonoBehaviour, @PlayerAction.IPLAYActions, PlayerAct
         PLAYMode();
     }
 
+    /// <summary>
+    /// StateMachine 자산이 들고 있는 InputActionReference는 프로젝트의 원본 입력 자산을
+    /// 가리킨다. 실제 플레이 중에는 이 컴포넌트가 만든 <see cref="inputs"/> 인스턴스만
+    /// Enable/Disable되므로, 상태 전이에서는 반드시 그 런타임 인스턴스의 같은 이름 액션을
+    /// 사용해야 한다.
+    /// </summary>
+    public InputAction GetRuntimeAction(InputActionReference reference)
+    {
+        if (reference == null || reference.action == null || inputs == null) return null;
+        return inputs.asset.FindAction(reference.action.name, throwIfNotFound: false);
+    }
+
     public bool GetInputByEnum(EnumManager.InputType inputType)
     {
         return inputType switch

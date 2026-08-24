@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.50231403
+  temporaryID: 0.5143605
   transitions:
   - name: "\uD0C0\uC784\uC544\uC6C3"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889743949758552
+        rid: 6174889747721748744
       negate: 0
     trueState: {fileID: 11400000, guid: 3b48fe75733570242adb8044366eaefb, type: 2}
     falseState: {fileID: 0}
@@ -35,12 +35,12 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889743949758553
-  - rid: 6174889743949758554
-  - rid: 6174889743949758555
-  - rid: 6174889743949758556
-  - rid: 6174889743949758557
-  - rid: 6174889743949758558
+  - rid: 6174889747721748745
+  - rid: 6174889747721748620
+  - rid: 6174889747721748621
+  - rid: 6174889747721748622
+  - rid: 6174889747721748623
+  - rid: 6174889747721748624
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -53,30 +53,21 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889743949758552
-      type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
-      data:
-        key: Dummy_EVT002_S3_mark
-        seconds: 2.4
-    - rid: 6174889743949758553
-      type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
-      data:
-        key: Dummy_EVT002_S3_mark
-    - rid: 6174889743949758554
+    - rid: 6174889747721748620
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889743949758555
+    - rid: 6174889747721748621
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-002 S1 \uB208\uAC00 \uD074\uB85C\uC988\uC5C5"
         completeBoolName: 
-    - rid: 6174889743949758556
+    - rid: 6174889747721748622
       type: {class: SetCameraFollowAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_B
         returnToDefault: 0
-    - rid: 6174889743949758557
+    - rid: 6174889747721748623
       type: {class: CameraZoomAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         sizeMultiplier: 0.25
@@ -91,7 +82,7 @@ MonoBehaviour:
         illustrationSize: {x: 1200, y: 675}
         preserveIllustrationAspect: 1
         hideIllustrationOnReturn: 1
-    - rid: 6174889743949758558
+    - rid: 6174889747721748624
       type: {class: ScreenNoiseAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         intensity: 0.6
@@ -102,3 +93,12 @@ MonoBehaviour:
         shakeDuration: 0
         shakeCount: 0
         stop: 0
+    - rid: 6174889747721748744
+      type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        key: Dummy_EVT002_S3_mark
+        seconds: 2.4
+    - rid: 6174889747721748745
+      type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        key: Dummy_EVT002_S3_mark

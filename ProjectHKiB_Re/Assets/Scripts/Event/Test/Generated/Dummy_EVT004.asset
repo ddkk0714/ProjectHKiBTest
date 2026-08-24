@@ -22,7 +22,13 @@ MonoBehaviour:
             m_PersistentCalls:
               m_Calls: []
     intVariables:
-      _serializedList: []
+      _serializedList:
+      - Key: Dummy_EVT004_S1_mark
+        Value:
+          value: 0
+          OnValueChanged:
+            m_PersistentCalls:
+              m_Calls: []
     floatVariables:
       _serializedList: []
   initialState: {fileID: 11400000, guid: 24dec775dbf089b468b72594e1db49de, type: 2}
@@ -30,6 +36,7 @@ MonoBehaviour:
   allStates:
   - {fileID: 11400000, guid: 24dec775dbf089b468b72594e1db49de, type: 2}
   - {fileID: 11400000, guid: eded3c34a51fd0f4cb8d55606d45c398, type: 2}
+  - {fileID: 11400000, guid: 37cc7a5a0526efc449741f22f970110a, type: 2}
   _commandPairs: []
   involvedEventTargets:
   - ID: Player

@@ -17,6 +17,7 @@ public class CommandPair
     public EnumManager.InputActionType type;
 
     private Action<InputAction.CallbackContext> _cachedBindFunction;
+    private InputAction _boundAction;
 
     public void Bind(StateController stateController)
     {
@@ -29,12 +30,17 @@ public class CommandPair
         };
 
         InputManager inputManager = GameManager.instance.inputManager;
+        _boundAction = inputManager != null ? inputManager.GetRuntimeAction(trigger) : null;
+        // 이벤트 등 런타임 입력 컬렉션에 없는 참조는 기존 자산 액션을 그대로 사용한다.
+        _boundAction ??= trigger ? trigger.action : null;
+
+        if (_boundAction == null) return;
 
         switch (type)
         {
-            case EnumManager.InputActionType.Performed: if (trigger) trigger.action.performed += _cachedBindFunction; break;
-            case EnumManager.InputActionType.Started: if (trigger) trigger.action.started += _cachedBindFunction; break;
-            case EnumManager.InputActionType.Canceled: if (trigger) trigger.action.canceled += _cachedBindFunction; break;
+            case EnumManager.InputActionType.Performed: _boundAction.performed += _cachedBindFunction; break;
+            case EnumManager.InputActionType.Started: _boundAction.started += _cachedBindFunction; break;
+            case EnumManager.InputActionType.Canceled: _boundAction.canceled += _cachedBindFunction; break;
         }
     }
 
@@ -42,11 +48,12 @@ public class CommandPair
     {
         switch (type)
         {
-            case EnumManager.InputActionType.Performed: if (trigger) trigger.action.performed -= _cachedBindFunction; break;
-            case EnumManager.InputActionType.Started: if (trigger) trigger.action.started -= _cachedBindFunction; break;
-            case EnumManager.InputActionType.Canceled: if (trigger) trigger.action.canceled -= _cachedBindFunction; break;
+            case EnumManager.InputActionType.Performed: if (_boundAction != null) _boundAction.performed -= _cachedBindFunction; break;
+            case EnumManager.InputActionType.Started: if (_boundAction != null) _boundAction.started -= _cachedBindFunction; break;
+            case EnumManager.InputActionType.Canceled: if (_boundAction != null) _boundAction.canceled -= _cachedBindFunction; break;
         }
         _cachedBindFunction = null;
+        _boundAction = null;
     }
 
 }

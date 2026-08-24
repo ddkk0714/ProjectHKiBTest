@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
-  m_Name: Dummy_EVT002_S12
+  m_Name: Dummy_EVT004_S1w1
   m_EditorClassIdentifier: 
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.18724896
+  temporaryID: 0.08184684
   transitions: []
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889747721748549
+  - rid: 6174889747721748632
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -30,7 +30,8 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 6174889747721748549
-      type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
+    - rid: 6174889747721748632
+      type: {class: SetEventFlagAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
-        mode: 0
+        flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
+        flagValue: 3

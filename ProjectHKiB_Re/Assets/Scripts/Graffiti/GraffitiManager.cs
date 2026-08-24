@@ -15,6 +15,8 @@ public class GraffitiManager : MonoBehaviour
     private int graffitiMoveCount;
     private bool canGraffitiTinker;
     private bool biggerTinkerPresent;
+    private bool _isGraffitiActive;
+    private int _graffitiSession;
     public GearManager gearManager;
     public InputManager inputManager;
     private Timer _graffitiTimer = new();
@@ -79,6 +81,9 @@ public class GraffitiManager : MonoBehaviour
             AbortGraffiti();
             return;
         }
+
+        int session = ++_graffitiSession;
+        _isGraffitiActive = true;
         _currentTargetSlot = targetSlot;
 
         inputManager.GRAFFITIMode();
@@ -91,6 +96,8 @@ public class GraffitiManager : MonoBehaviour
         biggerTinkerPresent = false;
 
         ProcessGraffiti(Vector2Int.zero);
+        StartCoroutine(ExitWhenGraffitiSlotIsReleased(targetSlot, session));
+        LogControlState("변신 시작", targetSlot);
     }
     public void ResetGraffiti()
     {
@@ -111,7 +118,12 @@ public class GraffitiManager : MonoBehaviour
     /// 꺼내주거나 (b) OnGraffitiCancel 전이뿐인데, 그 전이는 trigger가 비어 있어 죽어 있고 애초에
     /// 꺼진 입력 맵에 속한다. 되돌리지 않으면 플레이어는 변신 도중에 영구히 멈춘다.
     /// </summary>
-    private void AbortGraffiti() => StartCoroutine(AbortGraffitiCoroutine());
+    private void AbortGraffiti()
+    {
+        _isGraffitiActive = false;
+        _graffitiSession++;
+        StartCoroutine(AbortGraffitiCoroutine());
+    }
 
     private IEnumerator AbortGraffitiCoroutine()
     {
@@ -127,6 +139,48 @@ public class GraffitiManager : MonoBehaviour
     {
         if (player.StateMachine != null && player.StateMachine.initialState)
             player.ChangeState(player.StateMachine.initialState);
+    }
+
+    // 변신 후 조작 불능을 재현할 때, 실제로 입력 맵이 남았는지 또는 상태 머신이
+    // 예상과 다른 상태에 있는지를 Player.log/Console 한 줄로 확인하기 위한 상태 기록이다.
+    private void LogControlState(string phase, int targetSlot)
+    {
+        bool playEnabled = inputManager != null && inputManager.inputs != null && inputManager.inputs.PLAY.enabled;
+        bool graffitiEnabled = inputManager != null && inputManager.inputs != null && inputManager.inputs.GRAFFITI.enabled;
+        string stateMachineName = player != null && player.StateMachine != null ? player.StateMachine.name : "(없음)";
+        string stateName = player != null && player.CurrentState != null ? player.CurrentState.name : "(없음)";
+
+        Debug.Log($"[GraffitiManager] {phase} (slot {targetSlot}) — PLAY={playEnabled}, GRAFFITI={graffitiEnabled}, " +
+                  $"StateMachine={stateMachineName}, CurrentState={stateName}, TimeScale={Time.timeScale}");
+    }
+
+    /// <summary>
+    /// 변신을 시작한 숫자 키는 PLAY 맵에서 눌린 뒤 곧바로 GRAFFITI 맵으로 넘어간다.
+    /// 액션 맵 전환 시점에 이미 눌려 있던 버튼은 canceled 콜백을 놓칠 수 있으므로,
+    /// 실제 버튼이 떼어진 것도 확인해 낙서 모드가 영구히 남지 않게 한다.
+    /// </summary>
+    private IEnumerator ExitWhenGraffitiSlotIsReleased(int targetSlot, int session)
+    {
+        // 입력 맵이 전환되고 현재 입력 상태가 동기화될 때까지 한 프레임 기다린다.
+        yield return null;
+
+        InputAction slotAction = targetSlot switch
+        {
+            0 => inputManager.inputs.GRAFFITI.Graffiti1,
+            1 => inputManager.inputs.GRAFFITI.Graffiti2,
+            2 => inputManager.inputs.GRAFFITI.Graffiti3,
+            3 => inputManager.inputs.GRAFFITI.Graffiti4,
+            4 => inputManager.inputs.GRAFFITI.Graffiti5,
+            _ => null,
+        };
+
+        if (slotAction == null) yield break;
+
+        while (_isGraffitiActive && session == _graffitiSession && slotAction.IsPressed())
+            yield return null;
+
+        if (_isGraffitiActive && session == _graffitiSession)
+            ExitGraffiti(targetSlot);
     }
 
     /// <summary>
@@ -161,6 +215,12 @@ public class GraffitiManager : MonoBehaviour
 
     public void ExitGraffiti(int targetSlot)
     {
+        // canceled 이벤트, 타임아웃, 위의 보조 코루틴이 같은 프레임에 겹쳐도
+        // 종료 처리는 한 번만 실행해야 한다.
+        if (!_isGraffitiActive) return;
+
+        _isGraffitiActive = false;
+        _graffitiSession++;
         _graffitiTimer.CancelTimer();
 
         int result = CheckCompleted(targetSlot);
@@ -189,13 +249,26 @@ public class GraffitiManager : MonoBehaviour
         }
         finally
         {
-            if (comp) gearManager.ActivateGear(targetSlot);
-            // BaseData는 기어를 켜도 갱신되지 않으므로(SetGear를 부르는 GearMergeManagerSO가 죽어 있다)
-            // 그쪽 StateMachine은 기본형 기계다. 지금 돌고 있는 기계의 초기 상태로 보내야 한다.
-            else ChangeToInitialStateOfCurrentMachine();
-
+            // 기어 활성화 도중 예외가 나더라도, 낙서 모드에 남아 이동/공격 입력이 영구히
+            // 막히면 안 된다. 먼저 PLAY 입력을 복구한 뒤 상태 머신을 바꾼다.
             graffitiProgress.Clear();
             inputManager.PLAYMode();
+
+            try
+            {
+                if (comp) gearManager.ActivateGear(targetSlot);
+            }
+            catch (System.Exception exception)
+            {
+                // 활성화 실패 시에도 아래의 초기 상태 복구로 Transforming 상태를 빠져나간다.
+                Debug.LogError($"[GraffitiManager] 기어 활성화에 실패했습니다. 변신을 취소하고 기본 상태로 복구합니다.\n{exception}");
+            }
+
+            // ActivateGear는 새 기어 상태 머신의 초기 상태를 진입시킨다. 혹시 기어 데이터의
+            // startStateName이 실제 상태 이름과 달라 전환이 실패하더라도, 현재 머신의 초기
+            // 상태(Idle)로 한 번 더 확정해 Transforming에 남지 않게 한다.
+            ChangeToInitialStateOfCurrentMachine();
+            LogControlState("변신 종료 복구", targetSlot);
 
             if (result == 1) StartCoroutine(GraffitiEndSkillCoroutine());
             else if (result == 0) StartCoroutine(GraffitiEndAttackCoroutine());

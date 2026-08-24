@@ -56,7 +56,7 @@ MonoBehaviour:
       _serializedList: []
   _preconditions:
   - flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
-    value: 2
+    value: 3
   _worldRequirement: 0
   _interruptRunningEvent: 0
   _requiredClueIds: []

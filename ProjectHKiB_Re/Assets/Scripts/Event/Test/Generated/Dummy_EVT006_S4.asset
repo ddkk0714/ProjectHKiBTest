@@ -15,13 +15,13 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.95145535
+  temporaryID: 0.60269374
   transitions: []
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889743949758563
-  - rid: 6174889743949758564
-  - rid: 6174889743949758565
+  - rid: 6174889747721748703
+  - rid: 6174889747721748704
+  - rid: 6174889747721748705
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -32,23 +32,23 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 6174889743949758563
+    - rid: 6174889747721748703
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: EXIT_DOOR
         targetAction:
-          rid: 6174889743949758566
-    - rid: 6174889743949758564
+          rid: 6174889747721748706
+    - rid: 6174889747721748704
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-006 \uD0C8\uCD9C \uC5F0\uCD9C \uC644\uB8CC \u2014 \uB370\uBAA8
           \uC885\uB8CC"
         completeBoolName: 
-    - rid: 6174889743949758565
+    - rid: 6174889747721748705
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0
-    - rid: 6174889743949758566
+    - rid: 6174889747721748706
       type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         active: 0

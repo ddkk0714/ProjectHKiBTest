@@ -118123,7 +118123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f8f323ab6dfeac408d708208c3fcb63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entryPointId: 
+  entryPointId: MapStartPos
   isDefaultEntry: 1
   fromScene: System
   _endDir: 0
@@ -118137,7 +118137,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 367319707}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.47, y: -0.1, z: 0}
+  m_LocalPosition: {x: 14.32, y: -0.67, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
