@@ -6,12 +6,8 @@ namespace StateMachine
     {
         public string targetID;
         [SerializeReference, SubclassSelector] public StateAction targetAction;
-        // 예전엔 어느 쪽이 틀어져도 "Interface Not Found!!!" 하나만 찍혀서, 실제로는 대상 ID를 못 찾은
-        // 것인데도 인터페이스 문제로 오해하기 쉬웠다. 원인별로 갈라서 무엇을 고쳐야 하는지까지 남긴다.
         public override void Act(StateController stateController)
         {
-            // 안쪽 액션을 아직 안 고른 빈칸은 "할 일 없음"으로 본다 — 여기서 터지면 같은 State의
-            // 뒤쪽 액션들까지 통째로 실행되지 않는다(StateSO의 액션 목록과 같은 사정).
             if (targetAction == null) return;
 
             if (!stateController.TryGetInterface(out IEvent @event))
@@ -21,8 +17,6 @@ namespace StateMachine
                 return;
             }
 
-            // 이벤트가 StartEvent를 거치지 않고 돌거나(직접 Initialize 등) 대상 검색 전에 액션이
-            // 실행되면 여기가 비어 있다. 터뜨리는 대신 무엇이 없는지 알리고 넘어간다.
             if (@event.CurrentTargets == null)
             {
                 Debug.LogError($"ERROR: TargetEntityManipulateAction - 이벤트 대상 목록이 아직 준비되지 않았습니다 " +
