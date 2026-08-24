@@ -15,18 +15,15 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.07667614
+  temporaryID: 0.9029212
   transitions:
   - name: Attack
     activationInput: 10
     trigger: {fileID: 0}
     type: 0
-    availableTime: 2
+    availableTime: 1.21
     disableTime: 0
-    decisions:
-    - Decision:
-        rid: -2
-      negate: 0
+    decisions: []
     trueState: {fileID: 6906918945960794283}
     falseState: {fileID: 0}
     Action:
@@ -34,13 +31,26 @@ MonoBehaviour:
     showTrueStatePort: 1
     showFalseStatePort: 0
   additionalTransitions: []
-  EnterActions: []
+  EnterActions:
+  - rid: 7387912726605725760
   UpdateActions: []
   ExitActions: []
   actionSequence:
   - time: 0
     Action:
-      rid: 7387912726605725731
+      rid: 7387912726605725737
+  - time: 0.2
+    Action:
+      rid: 7387912726605725735
+  - time: 0.2
+    Action:
+      rid: 7387912726605725740
+  - time: 0.2
+    Action:
+      rid: 7387912726605725743
+  - time: 0.2
+    Action:
+      rid: 7387912726605725745
   loopActionSequence: 0
   useTimer: 0
   timerID: 0
@@ -50,11 +60,31 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 7387912726605725731
-      type: {class: MoveToPositionAction, ns: StateMachine, asm: Assembly-CSharp}
+    - rid: 7387912726605725735
+      type: {class: InstanciateObjectAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
-        mode: 0
-        destination:
+        targetID: indicate1
+        prefab: {fileID: 8135660681591118400, guid: 43a88b5a79be76a4d9dd0a49b189132b, type: 3}
+        position:
+          source: 0
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: 0, y: -2, z: 0}
+          offsetSpace: 1
+          snapFinalPositionToGrid: 1
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        directionSource: 0
+        parentToOwner: 0
+        replaceExisting: 1
+        destroyReplacedOwnedTarget: 1
+    - rid: 7387912726605725737
+      type: {class: InstanciateObjectAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: indicate0
+        prefab: {fileID: 8135660681591118400, guid: 43a88b5a79be76a4d9dd0a49b189132b, type: 3}
+        position:
           source: 0
           follow: 0
           worldPosition: {x: 0, y: 0, z: 0}
@@ -62,6 +92,154 @@ MonoBehaviour:
           offset: {x: 0, y: 0, z: 0}
           offsetSpace: 0
           snapFinalPositionToGrid: 0
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        directionSource: 0
+        parentToOwner: 0
+        replaceExisting: 1
+        destroyReplacedOwnedTarget: 1
+    - rid: 7387912726605725740
+      type: {class: InstanciateObjectAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: indicate2
+        prefab: {fileID: 8135660681591118400, guid: 43a88b5a79be76a4d9dd0a49b189132b, type: 3}
+        position:
+          source: 0
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: 0, y: -4, z: 0}
+          offsetSpace: 1
+          snapFinalPositionToGrid: 1
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        directionSource: 0
+        parentToOwner: 0
+        replaceExisting: 1
+        destroyReplacedOwnedTarget: 1
+    - rid: 7387912726605725743
+      type: {class: InstanciateObjectAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: indicate3
+        prefab: {fileID: 8135660681591118400, guid: 43a88b5a79be76a4d9dd0a49b189132b, type: 3}
+        position:
+          source: 0
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: 0, y: -6, z: 0}
+          offsetSpace: 1
+          snapFinalPositionToGrid: 1
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        directionSource: 0
+        parentToOwner: 0
+        replaceExisting: 1
+        destroyReplacedOwnedTarget: 1
+    - rid: 7387912726605725745
+      type: {class: InstanciateObjectAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: indicate4
+        prefab: {fileID: 8135660681591118400, guid: 43a88b5a79be76a4d9dd0a49b189132b, type: 3}
+        position:
+          source: 0
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: 0, y: -8, z: 0}
+          offsetSpace: 1
+          snapFinalPositionToGrid: 1
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        directionSource: 0
+        parentToOwner: 0
+        replaceExisting: 1
+        destroyReplacedOwnedTarget: 1
+    - rid: 7387912726605725760
+      type: {class: BranchAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        valueSource:
+          rid: 7387912726605725761
+        branches:
+        - value: 0
+          action:
+            rid: 7387912726605725763
+        - value: 1
+          action:
+            rid: 7387912726605725764
+        - value: 2
+          action:
+            rid: 7387912726605725765
+        defaultAction:
+          rid: 7387912726605725762
+    - rid: 7387912726605725761
+      type: {class: RandomBranchIntSource, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        minimumInclusive: 0
+        maximumExclusive: 3
+    - rid: 7387912726605725762
+      type: {class: MoveToPositionAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mode: 1
+        destination:
+          source: 1
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: -10, y: 4, z: 0}
+          offsetSpace: 1
+          snapFinalPositionToGrid: 1
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        duration: 1
+        forceRepath: 0
+        stopHorizontalMovementBeforeTeleport: 1
+    - rid: 7387912726605725763
+      type: {class: MoveToPositionAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mode: 1
+        destination:
+          source: 1
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: -10, y: 9, z: 0}
+          offsetSpace: 1
+          snapFinalPositionToGrid: 1
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        duration: 1
+        forceRepath: 0
+        stopHorizontalMovementBeforeTeleport: 1
+    - rid: 7387912726605725764
+      type: {class: MoveToPositionAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mode: 1
+        destination:
+          source: 1
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: -10, y: 6, z: 0}
+          offsetSpace: 1
+          snapFinalPositionToGrid: 1
+          gridCellSize: 0
+          gridOrigin: {x: 0, y: 0}
+        duration: 1
+        forceRepath: 0
+        stopHorizontalMovementBeforeTeleport: 1
+    - rid: 7387912726605725765
+      type: {class: MoveToPositionAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        mode: 1
+        destination:
+          source: 1
+          follow: 0
+          worldPosition: {x: 0, y: 0, z: 0}
+          sceneAnchorId: 
+          offset: {x: -10, y: 3, z: 0}
+          offsetSpace: 1
+          snapFinalPositionToGrid: 1
           gridCellSize: 0
           gridOrigin: {x: 0, y: 0}
         duration: 1
@@ -110,6 +288,14 @@ MonoBehaviour:
     outputFieldName: outputTransitions
     inputPortIdentifier: 
     outputPortIdentifier: T_0_True
+  - GUID: ce995604-d86a-401a-b5e1-70560305d6d0
+    owner: {fileID: -8065582189672893665}
+    inputNodeGUID: 6ed04a06-4596-4b0e-85b9-7e712d9c346a
+    outputNodeGUID: 1c9f0007-6589-4458-bbbf-b54fdc82d7da
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
   groups: []
   stackNodes: []
   pinnedElements: []
@@ -117,8 +303,8 @@ MonoBehaviour:
   serializedParameterList: []
   stickyNotes: []
   nodeInspectorReference: {fileID: 0}
-  position: {x: -659, y: -165, z: 0}
-  scale: {x: 0.8695652, y: 0.8695652, z: 1}
+  position: {x: -200, y: 37, z: 0}
+  scale: {x: 0.65751624, y: 0.65751624, z: 1}
   targetStateMachine: {fileID: 11400000}
   references:
     version: 2
@@ -144,7 +330,7 @@ MonoBehaviour:
       data:
         nodeCustomName: Idle
         GUID: 6ed04a06-4596-4b0e-85b9-7e712d9c346a
-        computeOrder: 1
+        computeOrder: -2
         position:
           serializedVersion: 2
           x: 403
@@ -164,13 +350,13 @@ MonoBehaviour:
       data:
         nodeCustomName: Pattern1-1
         GUID: 1c9f0007-6589-4458-bbbf-b54fdc82d7da
-        computeOrder: 3
+        computeOrder: -2
         position:
           serializedVersion: 2
-          x: 1413.055
-          y: 223.36003
+          x: 1782.0085
+          y: 291.50195
           width: 400
-          height: 894
+          height: 1757
         expanded: 1
         debug: 0
         nodeLock: 0
@@ -184,13 +370,13 @@ MonoBehaviour:
       data:
         nodeCustomName: Pattern1-1 teleg
         GUID: 95ff7349-bac2-4736-90f1-84aea89ef182
-        computeOrder: 2
+        computeOrder: -2
         position:
           serializedVersion: 2
-          x: 947.905
-          y: 271.2625
+          x: 1152.5974
+          y: 321.50198
           width: 400
-          height: 519
+          height: 477
         expanded: 0
         debug: 0
         nodeLock: 0
@@ -214,7 +400,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.6734887
+  temporaryID: 0.94356227
   transitions:
   - name: Start Phase 1
     activationInput: 10
@@ -292,7 +478,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.6213365
+  temporaryID: 0.8609607
   transitions:
   - name: Next
     activationInput: 10
@@ -301,7 +487,7 @@ MonoBehaviour:
     availableTime: 2
     disableTime: 0
     decisions: []
-    trueState: {fileID: 0}
+    trueState: {fileID: -3289367818216268253}
     falseState: {fileID: 0}
     Action:
       rid: -2
@@ -316,7 +502,22 @@ MonoBehaviour:
   - time: 0
     Action:
       rid: 7387912726605725706
-  - time: 1.41
+  - time: 0.2
+    Action:
+      rid: 7387912726605725752
+  - time: 0.2
+    Action:
+      rid: 7387912726605725753
+  - time: 0.2
+    Action:
+      rid: 7387912726605725755
+  - time: 0.2
+    Action:
+      rid: 7387912726605725757
+  - time: 0.2
+    Action:
+      rid: 7387912726605725758
+  - time: 0.2
     Action:
       rid: 7387912726605725707
   loopActionSequence: 0
@@ -384,7 +585,7 @@ MonoBehaviour:
             follow: 0
             worldPosition: {x: 0, y: 0, z: 0}
             sceneAnchorId: 
-            offset: {x: 0, y: -1, z: 0}
+            offset: {x: 0, y: -2, z: 0}
             offsetSpace: 1
             snapFinalPositionToGrid: 0
             gridCellSize: 0
@@ -412,7 +613,7 @@ MonoBehaviour:
             follow: 0
             worldPosition: {x: 0, y: 0, z: 0}
             sceneAnchorId: 
-            offset: {x: 0, y: -1, z: 0}
+            offset: {x: 0, y: -2, z: 0}
             offsetSpace: 1
             snapFinalPositionToGrid: 0
             gridCellSize: 0
@@ -440,7 +641,7 @@ MonoBehaviour:
             follow: 0
             worldPosition: {x: 0, y: 0, z: 0}
             sceneAnchorId: 
-            offset: {x: 0, y: -1, z: 0}
+            offset: {x: 0, y: -2, z: 0}
             offsetSpace: 1
             snapFinalPositionToGrid: 0
             gridCellSize: 0
@@ -468,7 +669,7 @@ MonoBehaviour:
             follow: 0
             worldPosition: {x: 0, y: 0, z: 0}
             sceneAnchorId: 
-            offset: {x: 0, y: -1, z: 0}
+            offset: {x: 0, y: -2, z: 0}
             offsetSpace: 1
             snapFinalPositionToGrid: 0
             gridCellSize: 0
@@ -519,3 +720,28 @@ MonoBehaviour:
           forceRepath: 0
           stopHorizontalMovementBeforeTeleport: 0
         loop: 0
+    - rid: 7387912726605725752
+      type: {class: DestroyRegisteredTargetAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: indicate0
+        destroyRegisteredSceneObject: 1
+    - rid: 7387912726605725753
+      type: {class: DestroyRegisteredTargetAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: indicate1
+        destroyRegisteredSceneObject: 1
+    - rid: 7387912726605725755
+      type: {class: DestroyRegisteredTargetAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: indicate2
+        destroyRegisteredSceneObject: 1
+    - rid: 7387912726605725757
+      type: {class: DestroyRegisteredTargetAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: indicate3
+        destroyRegisteredSceneObject: 1
+    - rid: 7387912726605725758
+      type: {class: DestroyRegisteredTargetAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: indicate4
+        destroyRegisteredSceneObject: 1

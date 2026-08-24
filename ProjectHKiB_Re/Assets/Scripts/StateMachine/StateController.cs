@@ -5,6 +5,12 @@ using System;
 
 public class StateController : InterfaceRegister
 {
+    /// <summary>
+    /// 현재 State의 ExitState와 다음 State의 EnterState 사이로 넘어가기 전에 호출된다.
+    /// 장시간 실행되는 Action이 자신이 시작된 State의 수명에 맞춰 정리할 때 사용한다.
+    /// </summary>
+    public event Action<StateSO, StateSO> StateChanging;
+
     [HideInInspector] public CustomVariableSets customVariables = new();
     [NaughtyAttributes.ReadOnly][SerializeField] protected StateSO _currentState;
     [NaughtyAttributes.ReadOnly][SerializeField] protected StateMachineSO _stateMachine;
@@ -94,6 +100,7 @@ public class StateController : InterfaceRegister
 
     public virtual void ChangeState(StateSO state)
     {
+        StateChanging?.Invoke(CurrentState, state);
         CurrentState.ExitState(this);
         CurrentState = state;
         CurrentState.EnterState(this);
@@ -141,6 +148,9 @@ public class StateController : InterfaceRegister
             Debug.LogError("ERROR: StateMachine Missing!!!");
             return;
         }
+        if (CurrentState)
+            StateChanging?.Invoke(CurrentState, stateMachine.initialState);
+
         stateMachine.UnbindCommands();
         _stateMachine = stateMachine;
         stateMachine.BindCommands(this);
@@ -152,7 +162,11 @@ public class StateController : InterfaceRegister
     {
         if (_stateMachine) _stateMachine.UnbindCommands();
         _stateMachine = null;
-        if (CurrentState) CurrentState.ExitState(this);
+        if (CurrentState)
+        {
+            StateChanging?.Invoke(CurrentState, null);
+            CurrentState.ExitState(this);
+        }
         CurrentState = null;
         StopAllCoroutines();
     }

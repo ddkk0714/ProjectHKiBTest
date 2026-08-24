@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using EntityControl;
 using Movement;
 using UnityEngine;
@@ -17,82 +18,140 @@ namespace StateMachine
         Navigation
     }
 
-    internal sealed class TimedPositionMovementSegment
+    /// <summary>
+    /// 같은 StateController에 예약된 위치 이동 Tween은 하나만 유지한다.
+    /// 서로 다른 Move To Position Action이 동시에 PhysicsManager의 목적지를 덮어쓰지 않게 한다.
+    /// </summary>
+    internal static class PositionMovementTweenRegistry
     {
-        public RuntimePositionReference Destination;
-        public float Elapsed;
-        public float ArrivalTime;
-        public bool TimingInitialized;
-        public bool NavigationIssued;
+        private static readonly Dictionary<int, Tween> ActiveTweens = new();
+
+        public static void Play(StateController owner, Tween tween)
+        {
+            if (owner == null || tween == null) return;
+
+            Cancel(owner);
+
+            int ownerId = owner.GetInstanceID();
+            StateSO startingState = owner.CurrentState;
+            ActiveTweens[ownerId] = tween;
+
+            // 예전 UpdateAction 방식은 State를 벗어나 호출이 끊기면 이동도 중단됐다.
+            // 한 번 실행하는 Tween 방식에서도 같은 수명 범위를 유지한다.
+            tween.OnUpdate(() =>
+            {
+                if (owner != null && owner.isActiveAndEnabled && owner.CurrentState == startingState)
+                    return;
+
+                Cancel(ownerId, owner);
+            });
+
+            tween.OnKill(() =>
+            {
+                if (ActiveTweens.TryGetValue(ownerId, out Tween current) && current == tween)
+                    ActiveTweens.Remove(ownerId);
+            });
+
+            tween.Play();
+        }
+
+        public static void Cancel(StateController owner)
+        {
+            if (owner == null) return;
+            Cancel(owner.GetInstanceID(), owner);
+        }
+
+        private static void Cancel(int ownerId, StateController owner)
+        {
+            if (ActiveTweens.TryGetValue(ownerId, out Tween activeTween))
+            {
+                ActiveTweens.Remove(ownerId);
+                if (activeTween != null && activeTween.IsActive())
+                    activeTween.Kill(false);
+            }
+
+            if (owner != null && owner.TryGetInterface(out IPhysics physics))
+                physics.CancelMoveTowardByPhysics();
+        }
     }
 
     internal static class PositionMovementExecutor
     {
-        public static bool TryBeginInterpolated(
+        /// <summary>
+        /// DOTween이 구간 시간을 진행하는 동안 목적지와 남은 시간을 PhysicsManager에 계속 전달한다.
+        /// 실제 위치 변경과 충돌 처리는 PhysicsManager의 FixedUpdate가 담당한다.
+        /// </summary>
+        public static bool TryCreateInterpolatedTween(
             StateController owner,
             PositionReference destination,
-            out TimedPositionMovementSegment segment)
+            float duration,
+            out Tween tween)
         {
-            segment = null;
+            tween = null;
             if (!owner.TryGetInterface(out IPhysics physics)) return false;
 
             RuntimePositionReference runtimeDestination = new(destination, owner);
             if (!runtimeDestination.TryGetPosition(out _)) return false;
 
-            segment = new TimedPositionMovementSegment
-            {
-                Destination = runtimeDestination
-            };
+            float safeDuration = Mathf.Max(0.01f, duration);
+            float arrivalTime = 0f;
+            float previousProgress = -1f;
+            bool timingInitialized = false;
+
+            tween = DOVirtual.Float(0f, 1f, safeDuration, progress =>
+                {
+                    if (owner == null) return;
+
+                    // Sequence가 반복되면 자식 Tween의 progress가 1에서 다시 0으로 돌아온다.
+                    // 각 반복마다 새 절대 도착 시각을 계산해야 이전 루프의 시간이 재사용되지 않는다.
+                    if (!timingInitialized || progress + 0.000001f < previousProgress)
+                    {
+                        arrivalTime = Time.time + safeDuration * Mathf.Max(0f, 1f - progress);
+                        timingInitialized = true;
+                    }
+
+                    previousProgress = progress;
+                    if (runtimeDestination.TryGetPosition(out Vector3 targetPosition))
+                        physics.MoveTowardByPhysics(targetPosition, arrivalTime);
+                })
+                .SetEase(Ease.Linear);
+
             return true;
         }
 
-        public static bool TryBeginNavigation(
+        public static bool TryCreateNavigationTween(
             StateController owner,
             PositionReference destination,
-            out TimedPositionMovementSegment segment)
+            float duration,
+            bool forceRepath,
+            out Tween tween)
         {
-            segment = null;
+            tween = null;
+            if (!owner.TryGetInterface(out INavigationAgent navigation)) return false;
+
             RuntimePositionReference runtimeDestination = new(destination, owner);
             if (!runtimeDestination.TryGetPosition(out _)) return false;
 
-            segment = new TimedPositionMovementSegment { Destination = runtimeDestination };
+            float safeDuration = Mathf.Max(0.01f, duration);
+            float previousProgress = -1f;
+            bool destinationIssued = false;
+
+            tween = DOVirtual.Float(0f, 1f, safeDuration, progress =>
+                {
+                    if (owner == null) return;
+
+                    if (progress + 0.000001f < previousProgress)
+                        destinationIssued = false;
+
+                    previousProgress = progress;
+                    if (!runtimeDestination.TryGetPosition(out Vector3 targetPosition)) return;
+
+                    navigation.SetDestination(targetPosition, forceRepath && !destinationIssued);
+                    destinationIssued = true;
+                })
+                .SetEase(Ease.Linear);
+
             return true;
-        }
-
-        public static bool TickInterpolated(
-            StateController owner,
-            TimedPositionMovementSegment segment,
-            float duration)
-        {
-            if (!owner.TryGetInterface(out IPhysics physics) ||
-                !segment.Destination.TryGetPosition(out Vector3 targetPosition))
-                return false;
-
-            if (!segment.TimingInitialized)
-            {
-                segment.ArrivalTime = Time.time + duration;
-                segment.TimingInitialized = true;
-            }
-
-            segment.Elapsed = Mathf.Min(segment.Elapsed + Time.deltaTime, duration);
-            physics.MoveTowardByPhysics(targetPosition, segment.ArrivalTime);
-            return Time.time >= segment.ArrivalTime;
-        }
-
-        public static bool TickNavigation(
-            StateController owner,
-            TimedPositionMovementSegment segment,
-            float duration,
-            bool forceRepath)
-        {
-            if (!owner.TryGetInterface(out INavigationAgent navigation) ||
-                !segment.Destination.TryGetPosition(out Vector3 targetPosition))
-                return false;
-
-            navigation.SetDestination(targetPosition, forceRepath && !segment.NavigationIssued);
-            segment.NavigationIssued = true;
-            segment.Elapsed = Mathf.Min(segment.Elapsed + Time.deltaTime, duration);
-            return duration <= 0f || segment.Elapsed >= duration;
         }
 
         public static bool Teleport(
@@ -104,6 +163,8 @@ namespace StateMachine
                 !destination.TryResolve(owner, out Vector3 targetPosition))
                 return false;
 
+            // 직전 보간 이동의 마지막 요청이 다음 FixedUpdate에서 순간이동을 되돌리지 않게 한다.
+            physics.CancelMoveTowardByPhysics();
             if (stopHorizontalMovement)
                 physics.StopMove();
 
@@ -146,21 +207,13 @@ namespace StateMachine
     }
 
     /// <summary>
-    /// 공격 실행과 무관하게 StateController의 소유자를 지정 위치로 이동시킨다.
-    /// UpdateActions에 두면 Player, CurrentTarget, SceneAnchor처럼 Scene에서 움직이는 목적지를 계속 다시 읽는다.
+    /// 한 번 실행하면 DOTween이 duration 동안 PhysicsManager의 실제 이동을 구동한다.
+    /// EnterActions나 ActionSequence에 배치하며, UpdateActions에서 매 프레임 호출할 필요가 없다.
     /// </summary>
     [AddTypeMenu("Movement/Move To Position")]
-    [System.Serializable]
+    [Serializable]
     public sealed class MoveToPositionAction : StateAction
     {
-        private sealed class RuntimeState
-        {
-            public StateSO OwnerState;
-            public int LastFrame;
-            public bool Completed;
-            public TimedPositionMovementSegment Segment;
-        }
-
         [Tooltip("이동을 처리할 모듈과 이동 방식을 선택한다.")]
         [SerializeField] private PositionMovementMode mode;
 
@@ -184,21 +237,23 @@ namespace StateMachine
         [Tooltip("순간이동 전에 걷기 상태와 수평 속도를 정지한다.")]
         [SerializeField] private bool stopHorizontalMovementBeforeTeleport = true;
 
-        [NonSerialized] private Dictionary<int, RuntimeState> _runtimeStates;
-
         public override void Act(StateController stateController)
         {
             switch (mode)
             {
                 case PositionMovementMode.Navigation:
+                    PositionMovementTweenRegistry.Cancel(stateController);
                     Navigate(stateController);
                     break;
+
                 case PositionMovementMode.InstantTeleport:
+                    PositionMovementTweenRegistry.Cancel(stateController);
                     PositionMovementExecutor.Teleport(
                         stateController,
                         destination,
                         stopHorizontalMovementBeforeTeleport);
                     break;
+
                 default:
                     MoveInterpolated(stateController);
                     break;
@@ -207,32 +262,19 @@ namespace StateMachine
 
         private void MoveInterpolated(StateController stateController)
         {
-            _runtimeStates ??= new Dictionary<int, RuntimeState>();
-            int ownerId = stateController.GetInstanceID();
-            int currentFrame = Time.frameCount;
-
-            if (!_runtimeStates.TryGetValue(ownerId, out RuntimeState runtime) ||
-                runtime.OwnerState != stateController.CurrentState ||
-                currentFrame > runtime.LastFrame + 1)
-            {
-                runtime = new RuntimeState { OwnerState = stateController.CurrentState };
-                _runtimeStates[ownerId] = runtime;
-            }
-
-            runtime.LastFrame = currentFrame;
-            if (runtime.Completed) return;
-
-            if (runtime.Segment == null &&
-                !PositionMovementExecutor.TryBeginInterpolated(
+            if (!PositionMovementExecutor.TryCreateInterpolatedTween(
                     stateController,
                     destination,
-                    out runtime.Segment))
+                    duration,
+                    out Tween tween))
+            {
+                Debug.LogError(
+                    "ERROR: MoveToPositionAction - IPhysics 또는 이동 목적지를 찾을 수 없습니다.",
+                    stateController);
                 return;
+            }
 
-            runtime.Completed = PositionMovementExecutor.TickInterpolated(
-                stateController,
-                runtime.Segment,
-                Mathf.Max(0.01f, duration));
+            PositionMovementTweenRegistry.Play(stateController, tween);
         }
 
         private void Navigate(StateController stateController)
@@ -244,124 +286,99 @@ namespace StateMachine
     }
 
     /// <summary>
-    /// 여러 Move To Position 구간을 키프레임처럼 순서대로 실행한다.
-    /// UpdateActions에 배치해야 duration 진행과 움직이는 목적지 추적이 계속 갱신된다.
+    /// 여러 위치 이동 구간을 하나의 DOTween Sequence로 만들어 순서대로 실행한다.
+    /// EnterActions나 ActionSequence에서 한 번만 호출하면 전체 키프레임 경로가 진행된다.
     /// </summary>
     [AddTypeMenu("Movement/Move Along Position Keyframes")]
     [Serializable]
     public sealed class MoveAlongPositionKeyframesAction : StateAction
     {
-        private sealed class RuntimeState
-        {
-            public StateSO OwnerState;
-            public int LastFrame;
-            public int KeyframeIndex;
-            public bool Completed;
-            public TimedPositionMovementSegment Segment;
-        }
-
         [Tooltip("순서대로 실행할 위치 이동 구간.")]
-        [SerializeField] private PositionMovementKeyframe[] keyframes = Array.Empty<PositionMovementKeyframe>();
-        [SerializeField] private bool loop;
+        [SerializeField] private PositionMovementKeyframe[] keyframes =
+            Array.Empty<PositionMovementKeyframe>();
 
-        [NonSerialized] private Dictionary<int, RuntimeState> _runtimeStates;
+        [SerializeField] private bool loop;
 
         public override void Act(StateController stateController)
         {
             if (keyframes == null || keyframes.Length == 0) return;
 
-            RuntimeState runtime = GetRuntime(stateController);
-            runtime.LastFrame = Time.frameCount;
-            if (runtime.Completed) return;
+            Sequence sequence = DOTween.Sequence();
+            bool hasKeyframe = false;
 
-            // null 또는 즉시 이동 키프레임은 같은 프레임에 넘긴다. loop가 전부 즉시 이동일 때의
-            // 무한 반복을 막기 위해 한 번의 Act에서 배열 길이만큼만 처리한다.
-            int remainingImmediateSteps = keyframes.Length;
-            while (!runtime.Completed && remainingImmediateSteps-- > 0)
+            for (int i = 0; i < keyframes.Length; i++)
             {
-                PositionMovementKeyframe keyframe = keyframes[runtime.KeyframeIndex];
-                if (keyframe == null)
-                {
-                    Advance(runtime);
-                    continue;
-                }
+                PositionMovementKeyframe keyframe = keyframes[i];
+                if (keyframe == null) continue;
 
-                if (keyframe.Mode == PositionMovementMode.InstantTeleport)
+                switch (keyframe.Mode)
                 {
-                    if (!PositionMovementExecutor.Teleport(
+                    case PositionMovementMode.InstantTeleport:
+                        sequence.AppendCallback(() => PositionMovementExecutor.Teleport(
                             stateController,
                             keyframe.Destination,
-                            keyframe.StopHorizontalMovementBeforeTeleport))
-                        return;
+                            keyframe.StopHorizontalMovementBeforeTeleport));
+                        hasKeyframe = true;
+                        break;
 
-                    Advance(runtime);
-                    continue;
+                    case PositionMovementMode.Navigation:
+                        if (!PositionMovementExecutor.TryCreateNavigationTween(
+                                stateController,
+                                keyframe.Destination,
+                                keyframe.Duration,
+                                keyframe.ForceRepath,
+                                out Tween navigationTween))
+                        {
+                            sequence.Kill(false);
+                            Debug.LogError(
+                                $"ERROR: MoveAlongPositionKeyframesAction - Keyframe {i}의 " +
+                                "INavigationAgent 또는 목적지를 찾을 수 없습니다.",
+                                stateController);
+                            return;
+                        }
+
+                        sequence.Append(navigationTween);
+                        hasKeyframe = true;
+                        break;
+
+                    default:
+                        if (!PositionMovementExecutor.TryCreateInterpolatedTween(
+                                stateController,
+                                keyframe.Destination,
+                                keyframe.Duration,
+                                out Tween movementTween))
+                        {
+                            sequence.Kill(false);
+                            Debug.LogError(
+                                $"ERROR: MoveAlongPositionKeyframesAction - Keyframe {i}의 " +
+                                "IPhysics 또는 목적지를 찾을 수 없습니다.",
+                                stateController);
+                            return;
+                        }
+
+                        sequence.Append(movementTween);
+                        hasKeyframe = true;
+                        break;
                 }
+            }
 
-                if (!EnsureSegment(stateController, runtime, keyframe)) return;
-
-                float keyframeDuration = Mathf.Max(0.01f, keyframe.Duration);
-                bool segmentCompleted = keyframe.Mode == PositionMovementMode.Navigation
-                    ? PositionMovementExecutor.TickNavigation(
-                        stateController,
-                        runtime.Segment,
-                        keyframeDuration,
-                        keyframe.ForceRepath)
-                    : PositionMovementExecutor.TickInterpolated(
-                        stateController,
-                        runtime.Segment,
-                        keyframeDuration);
-
-                if (segmentCompleted) Advance(runtime);
+            if (!hasKeyframe)
+            {
+                sequence.Kill(false);
                 return;
             }
-        }
-
-        private RuntimeState GetRuntime(StateController stateController)
-        {
-            _runtimeStates ??= new Dictionary<int, RuntimeState>();
-            int ownerId = stateController.GetInstanceID();
-
-            if (!_runtimeStates.TryGetValue(ownerId, out RuntimeState runtime) ||
-                runtime.OwnerState != stateController.CurrentState ||
-                Time.frameCount > runtime.LastFrame + 1 ||
-                (!runtime.Completed && runtime.KeyframeIndex >= keyframes.Length))
-            {
-                runtime = new RuntimeState { OwnerState = stateController.CurrentState };
-                _runtimeStates[ownerId] = runtime;
-            }
-
-            return runtime;
-        }
-
-        private static bool EnsureSegment(
-            StateController stateController,
-            RuntimeState runtime,
-            PositionMovementKeyframe keyframe)
-        {
-            if (runtime.Segment != null) return true;
-
-            return keyframe.Mode == PositionMovementMode.Navigation
-                ? PositionMovementExecutor.TryBeginNavigation(
-                    stateController,
-                    keyframe.Destination,
-                    out runtime.Segment)
-                : PositionMovementExecutor.TryBeginInterpolated(
-                    stateController,
-                    keyframe.Destination,
-                    out runtime.Segment);
-        }
-
-        private void Advance(RuntimeState runtime)
-        {
-            runtime.Segment = null;
-            runtime.KeyframeIndex++;
-            if (runtime.KeyframeIndex < keyframes.Length) return;
 
             if (loop)
-                runtime.KeyframeIndex = 0;
-            else
-                runtime.Completed = true;
+            {
+                if (sequence.Duration(false) > 0f)
+                    sequence.SetLoops(-1, LoopType.Restart);
+                else
+                    Debug.LogWarning(
+                        "[MoveAlongPositionKeyframesAction] 순간이동만 있는 0초 경로는 반복할 수 없습니다.",
+                        stateController);
+            }
+
+            PositionMovementTweenRegistry.Play(stateController, sequence);
         }
     }
 }
