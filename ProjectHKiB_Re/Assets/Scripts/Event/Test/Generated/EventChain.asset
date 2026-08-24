@@ -76,6 +76,9 @@ MonoBehaviour:
       - action:
           rid: 6174889728934674715
         waitAfter: 0
+      - action:
+          rid: 6174889742885454380
+        waitAfter: 0
       advanceWhenAny: []
       timeoutSeconds: 1.5
     - label: "\uC798\uB824 \uB098\uAC04 \uBA38\uB9AC\uCE74\uB77D \uC0DD\uC131"
@@ -422,7 +425,7 @@ MonoBehaviour:
       targetSearchType: 1
     preconditions: []
     requiredClueIds: []
-    worldRequirement: 1
+    worldRequirement: 0
     interruptRunningEvent: 0
     triggerKind: 2
     triggerRadius: 1.5
@@ -560,6 +563,9 @@ MonoBehaviour:
     - label: "\uC804\uD22C \uC9C4\uC785 \u2014 \uC804\uD22C \uD074\uB9AC\uC5B4 \uB300\uAE30"
       enterActions:
       - action:
+          rid: 6174889742885454594
+        waitAfter: 0
+      - action:
           rid: 6174889728934674799
         waitAfter: 0
       - action:
@@ -577,11 +583,17 @@ MonoBehaviour:
           rid: 6174889728934674803
         waitAfter: 0
       - action:
+          rid: 6174889742885454165
+        waitAfter: 0
+      - action:
           rid: 6174889728934674804
         waitAfter: 0
       - action:
           rid: 6174889728934674805
         waitAfter: 0
+      - action:
+          rid: 6174889742458684281
+        waitAfter: 1
       advanceWhenAny: []
       timeoutSeconds: 0
   - eventId: Dummy_EVT005
@@ -1369,7 +1381,7 @@ MonoBehaviour:
     - rid: 6174889728934674794
       type: {class: ChangeMapAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
-        mapData: {fileID: 11400000, guid: 0e206c1f89d359f46a996f13d7a8dd1c, type: 2}
+        mapData: {fileID: 11400000, guid: e04c945b3aa66a14390cc6cc006c369e, type: 2}
         registry: {fileID: 0}
         mapAddressableID: 
         entryPlacement: 0
@@ -1380,7 +1392,7 @@ MonoBehaviour:
     - rid: 6174889728934674795
       type: {class: MapLoadedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
-        mapAddressableID: TestMap1
+        mapAddressableID: TestMap3
     - rid: 6174889728934674796
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
@@ -1818,3 +1830,32 @@ MonoBehaviour:
       type: {class: ReviveEntityAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         healToFull: 1
+    - rid: 6174889742458684281
+      type: {class: ScreenFlashAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        color: {r: 1, g: 1, b: 1, a: 1}
+        duration: 1
+    - rid: 6174889742885454165
+      type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: NPC_B
+        targetAction:
+          rid: 6174889742885454166
+    - rid: 6174889742885454166
+      type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        active: 1
+    - rid: 6174889742885454380
+      type: {class: GrantGearAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        gear: {fileID: 11400000, guid: cde322ce6505e4842ba0195fee16dec1, type: 2}
+    - rid: 6174889742885454594
+      type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: NPC_A
+        targetAction:
+          rid: 6174889742885454595
+    - rid: 6174889742885454595
+      type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        active: 1
