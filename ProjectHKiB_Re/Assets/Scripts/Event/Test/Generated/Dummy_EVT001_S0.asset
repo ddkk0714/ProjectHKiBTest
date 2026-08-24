@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.644676
+  temporaryID: 0.28318897
   transitions:
   - name: "\uD0C0\uC784\uC544\uC6C3"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889728934674894
+        rid: 6174889743949758574
       negate: 0
     trueState: {fileID: 11400000, guid: a6f8f6c93c24135479d9c8f87b594d4f, type: 2}
     falseState: {fileID: 0}
@@ -35,14 +35,15 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889728934674895
-  - rid: 6174889728934674896
-  - rid: 6174889728934674897
-  - rid: 6174889728934674898
-  - rid: 6174889728934674899
-  - rid: 6174889728934674900
-  - rid: 6174889728934674901
-  - rid: 6174889728934674902
+  - rid: 6174889743949758575
+  - rid: 6174889743949758576
+  - rid: 6174889743949758577
+  - rid: 6174889743949758578
+  - rid: 6174889743949758579
+  - rid: 6174889743949758580
+  - rid: 6174889743949758581
+  - rid: 6174889743949758582
+  - rid: 6174889743949758583
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -55,38 +56,38 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889728934674894
+    - rid: 6174889743949758574
       type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT001_S0_mark
         seconds: 1.5
-    - rid: 6174889728934674895
+    - rid: 6174889743949758575
       type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT001_S0_mark
-    - rid: 6174889728934674896
+    - rid: 6174889743949758576
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889728934674897
+    - rid: 6174889743949758577
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-001 S0 \uAE08\uBC1C\uC774 \uBC31\uBC1C\uC758 \uD2B8\uC708\uD14C\uC77C\uC744
           \uC790\uB984 (\uC560\uB2C8\uBA54\uC774\uC158\xB7\uC0AC\uC6B4\uB4DC \uC5C6\uC74C)"
         completeBoolName: 
-    - rid: 6174889728934674898
+    - rid: 6174889743949758578
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_A
         targetAction:
-          rid: 6174889728934674903
-    - rid: 6174889728934674899
+          rid: 6174889743949758584
+    - rid: 6174889743949758579
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_B
         targetAction:
-          rid: 6174889728934674904
-    - rid: 6174889728934674900
+          rid: 6174889743949758585
+    - rid: 6174889743949758580
       type: {class: ScreenNoiseAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         intensity: 0.5
@@ -97,7 +98,7 @@ MonoBehaviour:
         shakeDuration: 0
         shakeCount: 0
         stop: 0
-    - rid: 6174889728934674901
+    - rid: 6174889743949758581
       type: {class: ScreenGlitchAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         intensity: 1
@@ -110,16 +111,20 @@ MonoBehaviour:
         scanline: 1
         jitter: 0.197
         stop: 0
-    - rid: 6174889728934674902
+    - rid: 6174889743949758582
       type: {class: CameraShakeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         strength: 0
         direction: {x: 1, y: 1, z: 1}
-    - rid: 6174889728934674903
+    - rid: 6174889743949758583
+      type: {class: GrantGearAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        gear: {fileID: 11400000, guid: cde322ce6505e4842ba0195fee16dec1, type: 2}
+    - rid: 6174889743949758584
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: 
-    - rid: 6174889728934674904
+    - rid: 6174889743949758585
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: 

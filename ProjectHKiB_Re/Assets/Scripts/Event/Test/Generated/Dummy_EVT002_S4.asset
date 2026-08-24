@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.6018391
+  temporaryID: 0.85684514
   transitions:
   - name: "\uD0C0\uC784\uC544\uC6C3"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889728934674915
+        rid: 6174889743949758633
       negate: 0
     trueState: {fileID: 11400000, guid: 2a6ecd150bd6ace4283b2dbe16edaaf1, type: 2}
     falseState: {fileID: 0}
@@ -35,12 +35,12 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889728934674916
-  - rid: 6174889728934674917
-  - rid: 6174889728934674918
-  - rid: 6174889728934674919
-  - rid: 6174889728934674920
-  - rid: 6174889728934674921
+  - rid: 6174889743949758634
+  - rid: 6174889743949758635
+  - rid: 6174889743949758636
+  - rid: 6174889743949758637
+  - rid: 6174889743949758638
+  - rid: 6174889743949758639
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -53,48 +53,48 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889728934674915
+    - rid: 6174889743949758633
       type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT002_S4_mark
         seconds: 1
-    - rid: 6174889728934674916
+    - rid: 6174889743949758634
       type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT002_S4_mark
-    - rid: 6174889728934674917
+    - rid: 6174889743949758635
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-002 S2 \uBC31\uBC1C \uBCF4\uC2A4\uD654"
         completeBoolName: 
-    - rid: 6174889728934674918
+    - rid: 6174889743949758636
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_B
         targetAction:
-          rid: 6174889728934674922
-    - rid: 6174889728934674919
+          rid: 6174889743949758640
+    - rid: 6174889743949758637
       type: {class: TargetEntitiesManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetIDs:
         - NPC_B
         targetAction:
-          rid: 6174889728934674923
-    - rid: 6174889728934674920
+          rid: 6174889743949758641
+    - rid: 6174889743949758638
       type: {class: CameraShakeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         strength: 2
         direction: {x: 1, y: 1, z: 1}
-    - rid: 6174889728934674921
+    - rid: 6174889743949758639
       type: {class: ScreenFlashAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         color: {r: 1, g: 1, b: 1, a: 1}
         duration: 0.3
-    - rid: 6174889728934674922
+    - rid: 6174889743949758640
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: 
-    - rid: 6174889728934674923
+    - rid: 6174889743949758641
       type: {class: ChangeStateMachineAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         stateMachine: {fileID: 11400000, guid: 3ed29771e87add64495182945db2b2dd, type: 2}

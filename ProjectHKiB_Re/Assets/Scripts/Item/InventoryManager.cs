@@ -19,12 +19,13 @@ public class InventoryManager : MonoBehaviour
             AddItem(data, 99);
         }
         GearDataSO[] gears = Resources.LoadAll<GearDataSO>("Items/Gears");
+        /*
         foreach (GearDataSO data in gears)
         {
             //Debug.Log(data.name);
             AddItem(data, 99);
             AddGear(data);
-        }
+        }*/
     }
 
     public void AddItem(ItemDataSO item, int count)

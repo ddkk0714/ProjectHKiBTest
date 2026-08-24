@@ -39,7 +39,7 @@ public sealed class ReliableEventAttackContext
 /// 실제 체력, 피격 이펙트, 넉백 상태는 변경하지 않습니다.
 /// </summary>
 [AddComponentMenu("ProjectHKiB/Event/Reliable Event Attack Sensor")]
-public sealed class ReliableEventAttackSensor : MonoBehaviour, IDamagable
+public sealed class ReliableEventAttackSensor : InterfaceModule, IDamagable
 {
     [SerializeField] private ReliableGameEventTrigger trigger;
     [Tooltip("넉백 판정에 사용할 가상 질량입니다. DamageDataSO.knockBack이 이 값보다 커야 넉백으로 봅니다.")]
@@ -77,6 +77,15 @@ public sealed class ReliableEventAttackSensor : MonoBehaviour, IDamagable
     public Action<float> OnResistanceChanged { get; set; }
     public Action<bool> OnInvincibleChanged { get; set; }
     public Action<bool> OnSuperArmourChanged { get; set; }
+
+    /// <summary>
+    /// 조합형 전투는 <see cref="InterfaceRegister"/>에서 IDamagable을 찾습니다.
+    /// 센서를 엔티티 루트에 붙였을 때 기존 Damager와 조합형 전투 모두 같은 피격 대상으로 인식하게 합니다.
+    /// </summary>
+    public override void Register(IInterfaceRegistable interfaceRegistable)
+    {
+        interfaceRegistable.RegisterInterface<IDamagable>(this);
+    }
 
     private void Awake()
     {

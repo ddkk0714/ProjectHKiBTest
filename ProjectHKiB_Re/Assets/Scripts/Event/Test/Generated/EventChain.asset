@@ -76,6 +76,9 @@ MonoBehaviour:
       - action:
           rid: 6174889728934674715
         waitAfter: 0
+      - action:
+          rid: 6174889742885454380
+        waitAfter: 0
       advanceWhenAny: []
       timeoutSeconds: 1.5
     - label: "\uC798\uB824 \uB098\uAC04 \uBA38\uB9AC\uCE74\uB77D \uC0DD\uC131"
@@ -560,6 +563,9 @@ MonoBehaviour:
     - label: "\uC804\uD22C \uC9C4\uC785 \u2014 \uC804\uD22C \uD074\uB9AC\uC5B4 \uB300\uAE30"
       enterActions:
       - action:
+          rid: 6174889742885454594
+        waitAfter: 0
+      - action:
           rid: 6174889728934674799
         waitAfter: 0
       - action:
@@ -587,7 +593,7 @@ MonoBehaviour:
         waitAfter: 0
       - action:
           rid: 6174889742458684281
-        waitAfter: 0
+        waitAfter: 1
       advanceWhenAny: []
       timeoutSeconds: 0
   - eventId: Dummy_EVT005
@@ -1836,6 +1842,20 @@ MonoBehaviour:
         targetAction:
           rid: 6174889742885454166
     - rid: 6174889742885454166
+      type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        active: 1
+    - rid: 6174889742885454380
+      type: {class: GrantGearAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        gear: {fileID: 11400000, guid: cde322ce6505e4842ba0195fee16dec1, type: 2}
+    - rid: 6174889742885454594
+      type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        targetID: NPC_A
+        targetAction:
+          rid: 6174889742885454595
+    - rid: 6174889742885454595
       type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         active: 1

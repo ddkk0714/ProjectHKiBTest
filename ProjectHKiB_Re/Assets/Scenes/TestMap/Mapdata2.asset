@@ -14,4 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapAddressableID: TestMap2
   isRealWorld: 1
+  initialEventFlags:
+    _serializedList: []
   bgmID: 
+  allEntityInitInfos:
+    _serializedList: []
+  allAnimInitInfos:
+    _serializedList: []
