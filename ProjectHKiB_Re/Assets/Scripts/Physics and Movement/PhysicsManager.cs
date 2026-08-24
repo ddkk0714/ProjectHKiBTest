@@ -22,6 +22,11 @@ public class GridState
 public class PhysicsState
 {
     public int KeepPhysics;
+    public bool HasMoveToPositionRequest;
+    public Vector2 MoveToPositionTarget;
+    public float MoveToPositionArrivalTime;
+    public int MoveToPositionRequestFrame;
+    public bool CompleteMoveToPositionAfterStep;
 }
 
 public class PhysicsManager : MonoBehaviour
@@ -80,6 +85,46 @@ public class PhysicsManager : MonoBehaviour
     {
         obj.HVelocity = Vector2.zero;
         obj.ZVelocity = 0;
+    }
+
+    /// <summary>
+    /// 다음 물리 갱신부터 목표 위치와 도착 시각을 바탕으로 속도를 계산한다.
+    /// 위치를 직접 변경하지 않으므로 Physics 이동의 벽/엔티티 충돌 처리를 그대로 거친다.
+    /// </summary>
+    public void RequestMoveToPosition(IPhysics obj, Vector3 targetPosition, float arrivalTime)
+    {
+        obj.Phys.HasMoveToPositionRequest = true;
+        obj.Phys.MoveToPositionTarget = targetPosition;
+        obj.Phys.MoveToPositionArrivalTime = arrivalTime;
+        obj.Phys.MoveToPositionRequestFrame = Time.frameCount;
+        obj.Phys.CompleteMoveToPositionAfterStep = false;
+    }
+
+    public void CancelMoveToPosition(IPhysics obj)
+    {
+        if (!obj.Phys.HasMoveToPositionRequest) return;
+
+        obj.Phys.HasMoveToPositionRequest = false;
+        obj.Phys.CompleteMoveToPositionAfterStep = false;
+        obj.HVelocity = Vector2.zero;
+    }
+
+    /// <summary>자동 모드 판정 조건과 관계없이 요청한 모드로 전환한다.</summary>
+    public void SetMovementMode(IPhysics obj, MovementMode mode)
+    {
+        switch (mode)
+        {
+            case MovementMode.Physics:
+                SwitchToPhysics(obj, true);
+                obj.Phys.KeepPhysics = keepPhysicsFrames;
+                break;
+            case MovementMode.Static:
+                SwitchToStatic(obj, true);
+                break;
+            default:
+                SwitchToGrid(obj, true);
+                break;
+        }
     }
 
     public void InstantMove(IPhysics obj, Vector2 displacement, bool interpolate)
@@ -145,6 +190,9 @@ public class PhysicsManager : MonoBehaviour
 
         for (int i = 0; i < AllPhysicsEntitys.Count; i++)
             UpdateVelocity(AllPhysicsEntitys[i]);
+
+        for (int i = 0; i < AllPhysicsEntitys.Count; i++)
+            PrepareMoveToPosition(AllPhysicsEntitys[i]);
         
         for (int i = 0; i < AllPhysicsEntitys.Count; i++)
             UpdateVerticalPhysics(AllPhysicsEntitys[i]);
@@ -170,10 +218,50 @@ public class PhysicsManager : MonoBehaviour
         for (int i = 0; i < AllPhysicsEntitys.Count; i++)
         {
             IPhysics obj = AllPhysicsEntitys[i];
+            FinalizeMoveToPosition(obj);
             obj.ExForce       = Vector3.zero;
             obj.PrevEntityPos = obj.HPosition;
             obj.LastSetDir    = obj.IsWalking ? (Vector3)obj.WalkingDir : (Vector3)obj.HVelocity.normalized;
         }
+    }
+
+    private void PrepareMoveToPosition(IPhysics obj)
+    {
+        PhysicsState state = obj.Phys;
+        if (!state.HasMoveToPositionRequest) return;
+
+        // UpdateAction이 더 이상 실행되지 않는 상태 전환 뒤에는 남은 요청을 자동 폐기한다.
+        if (Time.frameCount > state.MoveToPositionRequestFrame + 1)
+        {
+            CancelMoveToPosition(obj);
+            return;
+        }
+
+        Vector2 displacement = state.MoveToPositionTarget - obj.HPosition;
+        if (displacement.sqrMagnitude <= EPSILON * EPSILON)
+        {
+            CancelMoveToPosition(obj);
+            return;
+        }
+
+        SwitchToPhysics(obj, true);
+        obj.Phys.KeepPhysics = keepPhysicsFrames;
+
+        float remainingTime = state.MoveToPositionArrivalTime - Time.fixedTime;
+        float movementTime = Mathf.Max(Time.fixedDeltaTime, remainingTime);
+        obj.HVelocity = displacement / movementTime;
+        state.CompleteMoveToPositionAfterStep = remainingTime <= Time.fixedDeltaTime;
+    }
+
+    private void FinalizeMoveToPosition(IPhysics obj)
+    {
+        if (!obj.Phys.HasMoveToPositionRequest ||
+            !obj.Phys.CompleteMoveToPositionAfterStep)
+            return;
+
+        obj.Phys.HasMoveToPositionRequest = false;
+        obj.Phys.CompleteMoveToPositionAfterStep = false;
+        obj.HVelocity = Vector2.zero;
     }
 
     private void UpdateVelocity(IPhysics obj)
@@ -231,10 +319,16 @@ public class PhysicsManager : MonoBehaviour
         else if (obj.Mode == MovementMode.Static) return;
     }
 
-    public void SwitchToPhysics(IPhysics obj)
+    public void SwitchToPhysics(IPhysics obj) => SwitchToPhysics(obj, false);
+
+    private void SwitchToPhysics(IPhysics obj, bool force)
     {
-        if (obj.Mode == MovementMode.Physics) return;
-        if (obj.Mode == MovementMode.Static && obj.ExForce.magnitude < obj.StaticEndureForce) return;
+        if (obj.Mode == MovementMode.Physics)
+        {
+            if (force) obj.Phys.KeepPhysics = keepPhysicsFrames;
+            return;
+        }
+        if (!force && obj.Mode == MovementMode.Static && obj.ExForce.magnitude < obj.StaticEndureForce) return;
 
         RemoveFootprintOccupant(obj, obj.Grid.CurrentCell);
         RemoveFootprintOccupant(obj, obj.Grid.TargetCell);
@@ -246,10 +340,12 @@ public class PhysicsManager : MonoBehaviour
         AddFootprintOccupant(obj, anchor);
     }
 
-    public void SwitchToGrid(IPhysics obj)
+    public void SwitchToGrid(IPhysics obj) => SwitchToGrid(obj, false);
+
+    private void SwitchToGrid(IPhysics obj, bool force)
     {
         if (obj.Mode == MovementMode.Grid) return;
-        if (obj.Mode == MovementMode.Static) return;
+        if (!force && obj.Mode == MovementMode.Static) return;
         obj.Mode = MovementMode.Grid;
 
         obj.Grid.CurrentCell  = WorldCenterToAnchorCell(obj.HPosition, obj.Size);
@@ -268,10 +364,17 @@ public class PhysicsManager : MonoBehaviour
         obj.Grid.PhysicsReturnOffset = obj.HPosition - gridCenter;
     }
 
-    public void SwitchToStatic(IPhysics obj)
+    public void SwitchToStatic(IPhysics obj) => SwitchToStatic(obj, false);
+
+    private void SwitchToStatic(IPhysics obj, bool force)
     {
-        if (obj.Mode == MovementMode.Static || obj.ExForce.magnitude >= obj.StaticEndureForce) return;
-        if (obj.Mode == MovementMode.Physics) SwitchToGrid(obj);
+        if (obj.Mode == MovementMode.Static)
+        {
+            obj.HVelocity = Vector2.zero;
+            return;
+        }
+        if (!force && obj.ExForce.magnitude >= obj.StaticEndureForce) return;
+        if (obj.Mode == MovementMode.Physics) SwitchToGrid(obj, force);
         
         obj.Mode = MovementMode.Static;
         obj.HVelocity = Vector2.zero;
@@ -453,7 +556,11 @@ public class PhysicsManager : MonoBehaviour
 
     private void UpdatePhysicsMovementOnlyWall(IPhysics obj)
     {
-        if (obj.HVelocity.magnitude < stopThreshold) { obj.HVelocity = Vector2.zero; return; }
+        if (!obj.Phys.HasMoveToPositionRequest && obj.HVelocity.magnitude < stopThreshold)
+        {
+            obj.HVelocity = Vector2.zero;
+            return;
+        }
         float totalDist = obj.HVelocity.magnitude * Time.fixedDeltaTime;
         int   steps = Mathf.Max(1, Mathf.CeilToInt(totalDist / gridSize));
         float dt    = Time.fixedDeltaTime / steps;
@@ -550,6 +657,7 @@ public class PhysicsManager : MonoBehaviour
             {
                 var occupant = occupants[o];
                 if (occupant == null || occupant == obj) continue;
+                if (!CanEntitiesCollide(obj, occupant)) continue;
                 
                 if (obj.ID > occupant.ID) continue; // Prevent double collision 
     
@@ -817,6 +925,7 @@ public class PhysicsManager : MonoBehaviour
         {
             IPhysics occupant = occupants[i];
             if (occupant != null && occupant != self
+            && CanEntitiesCollide(self, occupant)
             && self.ZCol.ZMin + self.StepUpTolerance + EPSILON < occupant.ZCol.ZMax
             && self.ZCol.ZMax                                  > occupant.ZCol.ZMin)
                 return occupant;
@@ -835,6 +944,24 @@ public class PhysicsManager : MonoBehaviour
             if (occ != null && check.Add(occ)) results[validCnt++] = occ;
         }
         return validCnt;
+    }
+
+    /// <summary>
+    /// 동적 엔티티 충돌은 양쪽 WallLayer가 서로의 실제 Collider Layer를 허용할 때만 성립한다.
+    /// 어느 한쪽이라도 상대 Layer를 제외하면 Grid 점유 검사와 Physics 충돌 해결 모두 통과한다.
+    /// </summary>
+    private static bool CanEntitiesCollide(IPhysics objA, IPhysics objB)
+    {
+        if (objA == null || objB == null || objA.ZCol == null || objB.ZCol == null)
+            return false;
+
+        return ContainsLayer(objA.WallLayer, objB.ZCol.gameObject.layer) &&
+               ContainsLayer(objB.WallLayer, objA.ZCol.gameObject.layer);
+    }
+
+    private static bool ContainsLayer(LayerMask mask, int layer)
+    {
+        return layer >= 0 && layer < 32 && (mask.value & (1 << layer)) != 0;
     }
 
     private void AddCellOccupant(Vector2Int cell, IPhysics obj)
@@ -884,7 +1011,7 @@ public class PhysicsManager : MonoBehaviour
     {
         int cnt = ZPhysics2D.OverlapCircleNonAlloc(
             point, radius, overlapBuffer,
-            obj != null ? obj.WallLayer : ~0,
+            obj != null ? obj.WallLayer : (LayerMask)~0,
             obj != null ? obj.ZCol.ZMin + obj.StepUpTolerance + EPSILON : float.MinValue,
             obj != null ? obj.ZCol.ZMax                             : float.MaxValue);
 

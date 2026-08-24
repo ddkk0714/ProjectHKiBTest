@@ -1,35 +1,43 @@
 using System.Collections.Generic;
+using Movement;
 using UnityEngine;
 
 namespace Combat
 {
-    /// <summary>한 번 시작된 공격의 위치, 표시, 판정, 피격 이력과 수명을 독립 소유한다.</summary>
+    /// <summary>한 번 시작된 공격의 위치, 4방향, 표시, 판정, 연출, 피격 이력과 수명을 독립 소유한다.</summary>
     public sealed class CombatAttackInstance : MonoBehaviour
     {
         private const int QueryBufferSize = 128;
 
         private readonly Collider2D[] _queryBuffer = new Collider2D[QueryBufferSize];
         private readonly RaycastHit2D[] _castBuffer = new RaycastHit2D[QueryBufferSize];
-        private readonly HashSet<int> _hitTargets = new HashSet<int>();
-        private readonly Dictionary<int, float> _lastHitTimes = new Dictionary<int, float>();
+        private readonly HashSet<int> _hitTargets = new();
+        private readonly Dictionary<int, float> _lastHitTimes = new();
 
         private CombatAttackModule _module;
         private StateController _owner;
         private CombatAttackDefinitionSO _definition;
         private RuntimePositionReference _origin;
         private RuntimePositionReference _destination;
+        private CombatAttackDirectionSource _directionSource;
         private IAttackable _attacker;
         private GameObject _telegraphVisual;
         private GameObject _activeVisual;
+        private CombatAreaVisual _telegraphAreaVisual;
+        private CombatAreaVisual _activeAreaVisual;
+        private CombatAttackEffectPlayer _effectPlayer;
         private Vector2 _heading = Vector2.right;
+        private EnumManager.AnimDir _attackDirection = EnumManager.AnimDir.D;
+        private EnumManager.AnimDir _previousAttackDirection = EnumManager.AnimDir.D;
+        private Vector3 _previousPosition;
         private float _speed;
         private float _elapsed;
         private float _nextDamageTime;
+        private float _damageIndicatorRandomPosition;
         private int _handle;
         private string _slot;
         private bool _active;
         private bool _ended;
-        private Vector3 _previousPosition;
 
         public bool IsActive => _active && !_ended;
 
@@ -39,8 +47,9 @@ namespace Combat
             int handle,
             string slot,
             CombatAttackDefinitionSO definition,
-            CombatPositionReference origin,
-            CombatPositionReference destination)
+            PositionReference origin,
+            PositionReference destination,
+            CombatAttackDirectionSource directionSource)
         {
             _module = module;
             _owner = owner;
@@ -49,9 +58,18 @@ namespace Combat
             _definition = definition;
             _origin = new RuntimePositionReference(origin, owner);
             _destination = new RuntimePositionReference(destination, owner);
+            _directionSource = directionSource;
             _speed = definition.Speed;
+            _damageIndicatorRandomPosition = Random.value;
 
             owner.TryGetInterface(out _attacker);
+            if (definition.DamageData == null || definition.DamageArea == null)
+            {
+                Debug.LogError($"{owner.name}: Attack '{definition.name}' requires DamageDataSO with downwardDamageArea.", owner);
+                Cancel();
+                return;
+            }
+
             if (!_origin.TryGetPosition(out Vector3 startPosition))
             {
                 Debug.LogError($"{owner.name}: Attack '{definition.name}' could not resolve its origin.", owner);
@@ -62,15 +80,26 @@ namespace Combat
             transform.position = startPosition;
             _previousPosition = startPosition;
             AimAtDestination(true);
-            _telegraphVisual = CreateVisual(definition.TelegraphPrefab);
+            _attackDirection = ResolveDirection(directionSource);
+            _previousAttackDirection = _attackDirection;
+            _telegraphVisual = CreateVisual(definition.TelegraphPrefab, false);
+            UpdateVisualPlacement();
+
             if (definition.TelegraphDuration <= 0f)
                 EnterActivePhase();
         }
 
-        public void Retarget(CombatPositionReference destination)
+        public void Retarget(PositionReference destination)
         {
             _destination = new RuntimePositionReference(destination, _owner);
             AimAtDestination(false);
+            if (_directionSource == CombatAttackDirectionSource.TowardDestination)
+                SetAttackDirection(ResolveDirection(_directionSource));
+        }
+
+        public void StopEffect()
+        {
+            if (_effectPlayer != null) _effectPlayer.StopEffect();
         }
 
         public void Cancel()
@@ -82,14 +111,11 @@ namespace Combat
         {
             if (_ended || (!_active && !includeTelegraph)) return false;
 
-            Quaternion areaRotation = transform.rotation * Quaternion.Euler(0f, 0f, _definition.Area.LocalAngle);
-            Vector3 center = transform.position + transform.rotation * (Vector3)_definition.Area.LocalOffset;
-            Vector3 local = Quaternion.Inverse(areaRotation) * (worldPosition - center);
-
-            if (_definition.Area.Shape == CombatAreaShape.Circle)
-                return ((Vector2)local).sqrMagnitude <= _definition.Area.Radius * _definition.Area.Radius;
-
-            Vector2 half = _definition.Area.Size * 0.5f;
+            BoxData area = _definition.DamageArea;
+            Quaternion rotation = _attackDirection.DirToQuaternion4();
+            Vector3 center = transform.position + rotation * (Vector3)area.offset;
+            Vector3 local = Quaternion.Inverse(rotation) * (worldPosition - center);
+            Vector2 half = GetAreaSize(area) * 0.5f;
             return Mathf.Abs(local.x) <= half.x && Mathf.Abs(local.y) <= half.y;
         }
 
@@ -108,7 +134,12 @@ namespace Combat
             float deltaTime = Time.deltaTime;
             _elapsed += deltaTime;
             _previousPosition = transform.position;
+            _previousAttackDirection = _attackDirection;
             TickMovement(deltaTime);
+
+            if (_directionSource == CombatAttackDirectionSource.MovementDirection)
+                SetAttackDirection(DirectionFromVector(_heading));
+            UpdateVisualPlacement();
 
             if (!_active)
             {
@@ -211,18 +242,83 @@ namespace Combat
                 Mathf.Atan2(_heading.y, _heading.x) * Mathf.Rad2Deg);
         }
 
+        private EnumManager.AnimDir ResolveDirection(CombatAttackDirectionSource source)
+        {
+            switch (source)
+            {
+                case CombatAttackDirectionSource.OwnerAnimationDirection:
+                    if (_owner != null && _owner.TryGetInterface(out IDirAnimatable animatable))
+                        return animatable.AnimationDirection;
+                    return EnumManager.AnimDir.D;
+                case CombatAttackDirectionSource.TowardDestination:
+                    if (_destination.TryGetPosition(out Vector3 targetPosition))
+                        return DirectionFromVector(targetPosition - transform.position);
+                    return EnumManager.AnimDir.D;
+                case CombatAttackDirectionSource.MovementDirection:
+                    return DirectionFromVector(_heading);
+                case CombatAttackDirectionSource.Left:
+                    return EnumManager.AnimDir.L;
+                case CombatAttackDirectionSource.Right:
+                    return EnumManager.AnimDir.R;
+                case CombatAttackDirectionSource.Up:
+                    return EnumManager.AnimDir.U;
+                default:
+                    return EnumManager.AnimDir.D;
+            }
+        }
+
+        private static EnumManager.AnimDir DirectionFromVector(Vector2 direction)
+        {
+            if (direction.sqrMagnitude <= 0.000001f) return EnumManager.AnimDir.D;
+            if (Mathf.Abs(direction.x) >= Mathf.Abs(direction.y))
+                return direction.x < 0f ? EnumManager.AnimDir.L : EnumManager.AnimDir.R;
+            return direction.y < 0f ? EnumManager.AnimDir.D : EnumManager.AnimDir.U;
+        }
+
+        private void SetAttackDirection(EnumManager.AnimDir direction)
+        {
+            if (_attackDirection == direction) return;
+            _attackDirection = direction;
+            if (_effectPlayer != null) _effectPlayer.SetDirection(direction);
+        }
+
         private void EnterActivePhase()
         {
             if (_active || _ended) return;
             _active = true;
             if (_telegraphVisual != null) Destroy(_telegraphVisual);
-            _activeVisual = CreateVisual(_definition.ActivePrefab);
+            _telegraphVisual = null;
+            _telegraphAreaVisual = null;
+            _activeVisual = CreateVisual(_definition.ActivePrefab, true);
             _nextDamageTime = Time.time;
 
             DamageDataSO damageData = _definition.DamageData;
-            if (damageData != null && damageData.initialSound != null &&
-                GameManager.instance != null && GameManager.instance.audioManager != null)
-                GameManager.instance.audioManager.PlayAudioOneShot(damageData.initialSound, 1f, transform.position);
+            if (damageData.initialSound != null && GameManager.instance != null &&
+                GameManager.instance.audioManager != null)
+                GameManager.instance.audioManager.PlayAudioOneShot(
+                    damageData.initialSound,
+                    1f,
+                    transform.position);
+
+            PlayDirectionalParticle(damageData);
+            UpdateVisualPlacement();
+        }
+
+        private void PlayDirectionalParticle(DamageDataSO damageData)
+        {
+            if (damageData.DLRUDamageEffects == null ||
+                !damageData.DLRUDamageEffects.ContainsKey(_attackDirection))
+                return;
+
+            ParticlePlayer particle = damageData.DLRUDamageEffects[_attackDirection];
+            if (particle == null || GameManager.instance == null ||
+                GameManager.instance.particleManager == null)
+                return;
+
+            GameManager.instance.particleManager.PlayParticle(
+                particle.GetHashCode(),
+                transform,
+                damageData.attatchParticleToBody);
         }
 
         private void ApplyDamage()
@@ -237,8 +333,12 @@ namespace Combat
             DamageDataSO damageData = _definition.DamageData;
             if (damageData == null || _attacker == null) return;
 
-            int count = QueryOverlaps(_definition.QueryLayer);
+            int count = QueryOverlaps(damageData.damageLayer);
             bool hitDamageable = false;
+            Quaternion directionRotation = _attackDirection.DirToQuaternion4();
+            Vector3 knockbackOrigin = transform.position +
+                                      directionRotation * damageData.downwardDamageArea.pivot;
+
             for (int i = 0; i < count; i++)
             {
                 Collider2D collider = _queryBuffer[i];
@@ -254,16 +354,21 @@ namespace Combat
                     Time.time - lastHit < _definition.RepeatInterval)
                     continue;
 
-                Vector3 hitPoint = collider.ClosestPoint(transform.position);
-                damageable.Damage(damageData, _attacker, hitPoint);
+                // DamageManager가 표시 위치 난수를 IAttackable에서 읽으므로, 동시 공격에서도
+                // 이 인스턴스가 시작할 때 정한 값을 동기 호출 직전에 복원한다.
+                _attacker.DamageIndicatorRandomPosInfo = _damageIndicatorRandomPosition;
+                damageable.Damage(damageData, _attacker, knockbackOrigin);
                 _hitTargets.Add(targetId);
                 _lastHitTimes[targetId] = Time.time;
                 hitDamageable = true;
 
-                // 총알/미사일은 한 충돌 프레임에 겹친 모든 대상을 관통시키지 않는다.
                 if (_definition.EndOnDamageableHit)
                     break;
             }
+
+            if (hitDamageable && damageData.camShake && GameManager.instance != null &&
+                GameManager.instance.cameraManager != null)
+                GameManager.instance.cameraManager.Shake();
 
             if (hitDamageable && _definition.EndOnDamageableHit)
                 EndAttack();
@@ -271,50 +376,36 @@ namespace Combat
 
         private int QueryOverlaps(LayerMask layerMask)
         {
-            CombatArea area = _definition.Area;
-            Vector2 center = transform.position + transform.rotation * (Vector3)area.LocalOffset;
-            int count;
-            if (area.Shape == CombatAreaShape.Circle)
-                count = Physics2D.OverlapCircleNonAlloc(center, area.Radius, _queryBuffer, layerMask);
-            else
-            {
-                float angle = transform.eulerAngles.z + area.LocalAngle;
-                count = Physics2D.OverlapBoxNonAlloc(center, area.Size, angle, _queryBuffer, layerMask);
-            }
+            BoxData area = _definition.DamageArea;
+            Vector2 size = GetAreaSize(area);
+            Quaternion currentRotation = _attackDirection.DirToQuaternion4();
+            Vector2 center = transform.position + currentRotation * (Vector3)area.offset;
+            int count = Physics2D.OverlapBoxNonAlloc(
+                center,
+                size,
+                _attackDirection.DirToAngle4(),
+                _queryBuffer,
+                layerMask);
 
             // 빠른 총알/미사일이 한 프레임에 Collider를 통과해도 놓치지 않도록 이전 위치부터
-            // 현재 위치까지 공격 모양을 sweep한다. Area 공격은 현재 범위 overlap만 사용한다.
+            // 현재 위치까지 DamageData의 box를 sweep한다. Area 공격은 현재 범위 overlap만 사용한다.
             if (_definition.Kind == CombatAttackKind.Area || count >= QueryBufferSize)
                 return count;
 
-            Vector2 previousCenter = _previousPosition + transform.rotation * (Vector3)area.LocalOffset;
+            Quaternion previousRotation = _previousAttackDirection.DirToQuaternion4();
+            Vector2 previousCenter = _previousPosition + previousRotation * (Vector3)area.offset;
             Vector2 movement = center - previousCenter;
             float distance = movement.magnitude;
             if (distance <= 0.000001f) return count;
 
-            int castCount;
-            if (area.Shape == CombatAreaShape.Circle)
-            {
-                castCount = Physics2D.CircleCastNonAlloc(
-                    previousCenter,
-                    area.Radius,
-                    movement / distance,
-                    _castBuffer,
-                    distance,
-                    layerMask);
-            }
-            else
-            {
-                float angle = transform.eulerAngles.z + area.LocalAngle;
-                castCount = Physics2D.BoxCastNonAlloc(
-                    previousCenter,
-                    area.Size,
-                    angle,
-                    movement / distance,
-                    _castBuffer,
-                    distance,
-                    layerMask);
-            }
+            int castCount = Physics2D.BoxCastNonAlloc(
+                previousCenter,
+                size,
+                _previousAttackDirection.DirToAngle4(),
+                movement / distance,
+                _castBuffer,
+                distance,
+                layerMask);
 
             for (int i = 0; i < castCount && count < QueryBufferSize; i++)
             {
@@ -325,6 +416,13 @@ namespace Combat
             return count;
         }
 
+        private static Vector2 GetAreaSize(BoxData area)
+        {
+            return new Vector2(
+                Mathf.Max(0.01f, Mathf.Abs(area.size.x)),
+                Mathf.Max(0.01f, Mathf.Abs(area.size.y)));
+        }
+
         private bool ContainsCollider(Collider2D collider, int count)
         {
             for (int i = 0; i < count; i++)
@@ -332,28 +430,49 @@ namespace Combat
             return false;
         }
 
-        private GameObject CreateVisual(GameObject prefab)
+        private GameObject CreateVisual(GameObject prefab, bool playEffect)
         {
             if (prefab == null) return null;
             GameObject visual = Instantiate(prefab, transform);
-            visual.transform.localPosition = Vector3.zero;
-            visual.transform.localRotation = Quaternion.identity;
-            CombatAreaVisual adapter = visual.GetComponent<CombatAreaVisual>();
-            if (adapter != null) adapter.Apply(_definition.Area);
+            visual.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+            if (visual.TryGetComponent(out CombatAreaVisual areaVisual))
+            {
+                if (playEffect) _activeAreaVisual = areaVisual;
+                else _telegraphAreaVisual = areaVisual;
+            }
+
+            if (playEffect && visual.TryGetComponent(out CombatAttackEffectPlayer effectPlayer))
+            {
+                _effectPlayer = effectPlayer;
+                _effectPlayer.Play(_attacker, _definition.DamageData, _attackDirection);
+            }
+
             return visual;
+        }
+
+        private void UpdateVisualPlacement()
+        {
+            BoxData area = _definition.DamageArea;
+            if (_telegraphAreaVisual != null)
+                _telegraphAreaVisual.Apply(area, _attackDirection, transform);
+            if (_activeAreaVisual != null)
+                _activeAreaVisual.Apply(area, _attackDirection, transform);
+            if (_effectPlayer != null)
+                _effectPlayer.AlignToAttackRoot(transform);
         }
 
         private void UpdateTelegraphProgress()
         {
-            if (_telegraphVisual == null || _definition.TelegraphDuration <= 0f) return;
-            CombatAreaVisual adapter = _telegraphVisual.GetComponent<CombatAreaVisual>();
-            if (adapter != null) adapter.SetProgress(_elapsed / _definition.TelegraphDuration);
+            if (_telegraphAreaVisual == null || _definition.TelegraphDuration <= 0f) return;
+            _telegraphAreaVisual.SetProgress(_elapsed / _definition.TelegraphDuration);
         }
 
         private void EndAttack()
         {
             if (_ended) return;
             _ended = true;
+            StopEffect();
             if (_module != null) _module.NotifyEnded(_handle, _slot);
             Destroy(gameObject);
         }
@@ -370,18 +489,20 @@ namespace Combat
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
-            if (_definition == null) return;
-            CombatArea area = _definition.Area;
+            if (_definition == null || _definition.DamageArea == null) return;
+            BoxData area = _definition.DamageArea;
+            Quaternion rotation = _attackDirection.DirToQuaternion4();
             Gizmos.color = _active ? Color.red : Color.yellow;
             Matrix4x4 previous = Gizmos.matrix;
             Gizmos.matrix = Matrix4x4.TRS(
-                transform.position + transform.rotation * (Vector3)area.LocalOffset,
-                transform.rotation * Quaternion.Euler(0f, 0f, area.LocalAngle),
+                transform.position + rotation * (Vector3)area.offset,
+                rotation,
                 Vector3.one);
-            if (area.Shape == CombatAreaShape.Circle)
-                Gizmos.DrawWireSphere(Vector3.zero, area.Radius);
-            else
-                Gizmos.DrawWireCube(Vector3.zero, area.Size);
+            Gizmos.DrawWireCube(Vector3.zero, GetAreaSize(area));
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawSphere(
+                area.pivot - (Vector3)area.offset,
+                0.08f);
             Gizmos.matrix = previous;
         }
 #endif

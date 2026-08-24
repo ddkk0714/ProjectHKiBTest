@@ -1,4 +1,5 @@
 using Combat;
+using Movement;
 using UnityEngine;
 
 namespace StateMachine
@@ -23,7 +24,7 @@ namespace StateMachine
     public sealed class IsPositionInComposableAttackDecision : StateDecision
     {
         [SerializeField] private string slot = "Default";
-        [SerializeField] private CombatPositionReference target;
+        [SerializeField] private PositionReference target;
         [SerializeField] private bool includeTelegraph;
 
         public override bool Decide(StateController stateController)
@@ -39,7 +40,7 @@ namespace StateMachine
     public sealed class HasComposableAttackHitTargetDecision : StateDecision
     {
         [SerializeField] private string slot = "Default";
-        [SerializeField] private CombatPositionReference target;
+        [SerializeField] private PositionReference target;
 
         public override bool Decide(StateController stateController)
         {

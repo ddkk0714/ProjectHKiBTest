@@ -3728,7 +3728,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   localManager: {fileID: 0}
   navigationManager: {fileID: 490475675}
-  initialMap: {fileID: 11400000, guid: 0e206c1f89d359f46a996f13d7a8dd1c, type: 2}
+  initialMap: {fileID: 11400000, guid: 7b91c2576d1296847acb2e395e3cf5aa, type: 2}
 --- !u!114 &75784914
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -83424,10 +83424,10 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.05006986
+    x: 0.14172535
     y: 0
-    width: 0.9004813
-    height: 0.9993108
+    width: 0.71596247
+    height: 1
   near clip plane: -5000
   far clip plane: 5000
   field of view: 40
@@ -102956,7 +102956,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &6324719738429905105
 MonoBehaviour:
   m_ObjectHideFlags: 0

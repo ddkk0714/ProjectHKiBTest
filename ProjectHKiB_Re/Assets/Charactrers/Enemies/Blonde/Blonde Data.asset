@@ -40,7 +40,9 @@ MonoBehaviour:
   <CriticalChanceRate>k__BackingField: 0.1
   <CriticalDamageRate>k__BackingField: 2
   <AttackDatas>k__BackingField: []
-  <TargetLayers>k__BackingField: []
+  <TargetLayers>k__BackingField:
+  - serializedVersion: 2
+    m_Bits: 1024
   <DamageParticle>k__BackingField: {fileID: 0}
   <PoolSize>k__BackingField: 0
   <BaseMaxHP>k__BackingField: 100

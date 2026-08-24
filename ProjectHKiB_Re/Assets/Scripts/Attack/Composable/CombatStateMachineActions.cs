@@ -1,5 +1,5 @@
-using EntityControl;
 using Combat;
+using Movement;
 using UnityEngine;
 
 namespace StateMachine
@@ -10,8 +10,9 @@ namespace StateMachine
         [SerializeField] private CombatAttackDefinitionSO definition;
         [SerializeField] private string slot = "Default";
         [SerializeField] private bool cancelExistingInSlot;
-        [SerializeField] private CombatPositionReference origin;
-        [SerializeField] private CombatPositionReference destination;
+        [SerializeField] private PositionReference origin;
+        [SerializeField] private PositionReference destination;
+        [SerializeField] private CombatAttackDirectionSource directionSource;
 
         public override void Act(StateController stateController)
         {
@@ -22,7 +23,7 @@ namespace StateMachine
             }
 
             if (cancelExistingInSlot) attacks.CancelSlot(slot);
-            attacks.StartAttack(definition, origin, destination, slot);
+            attacks.StartAttack(definition, origin, destination, directionSource, slot);
         }
     }
 
@@ -30,7 +31,7 @@ namespace StateMachine
     public sealed class RetargetComposableAttackAction : StateAction
     {
         [SerializeField] private string slot = "Default";
-        [SerializeField] private CombatPositionReference destination;
+        [SerializeField] private PositionReference destination;
 
         public override void Act(StateController stateController)
         {
@@ -63,37 +64,16 @@ namespace StateMachine
         }
     }
 
-    public enum CombatOwnerMovementBackend
-    {
-        PhysicsStep,
-        Navigation
-    }
-
-    /// <summary>
-    /// 공격 실행과 별개로 공격자만 이동시킨다. UpdateActions에 놓으면 Player/Anchor처럼 움직이는 목표도 추적한다.
-    /// PhysicsStep은 IPhysics, Navigation은 INavigationAgent를 사용한다.
-    /// </summary>
     [System.Serializable]
-    public sealed class MoveCombatOwnerAction : StateAction
+    public sealed class StopComposableAttackEffectAction : StateAction
     {
-        [SerializeField] private CombatOwnerMovementBackend backend;
-        [SerializeField] private CombatPositionReference destination;
-        [SerializeField, Min(0f)] private float speed = 1f;
-        [SerializeField] private bool forceRepath;
+        [SerializeField] private string slot = "Default";
 
         public override void Act(StateController stateController)
         {
-            if (!destination.TryResolve(stateController, out Vector3 targetPosition)) return;
-
-            if (backend == CombatOwnerMovementBackend.Navigation)
-            {
-                if (stateController.TryGetInterface(out INavigationAgent navigation))
-                    navigation.SetDestination(targetPosition, forceRepath);
-                return;
-            }
-
-            if (stateController.TryGetInterface(out IPhysics physics))
-                physics.MoveToward(targetPosition, speed * Time.deltaTime);
+            if (stateController.TryGetInterface(out ICombatAttackModule attacks))
+                attacks.StopLatestEffect(slot);
         }
     }
+
 }

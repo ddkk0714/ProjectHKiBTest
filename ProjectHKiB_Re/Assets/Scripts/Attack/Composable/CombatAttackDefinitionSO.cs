@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace Combat
@@ -10,10 +9,16 @@ namespace Combat
         Missile
     }
 
-    public enum CombatAreaShape
+    /// <summary>StateMachine이 공격을 시작할 때 4방향을 결정하는 방법.</summary>
+    public enum CombatAttackDirectionSource
     {
-        Circle,
-        Box
+        OwnerAnimationDirection,
+        TowardDestination,
+        MovementDirection,
+        Down,
+        Left,
+        Right,
+        Up
     }
 
     public enum CombatAttackMotion
@@ -25,32 +30,17 @@ namespace Combat
         Homing
     }
 
-    [Serializable]
-    public struct CombatArea
-    {
-        [SerializeField] private CombatAreaShape shape;
-        [SerializeField, Min(0.01f)] private float radius;
-        [SerializeField] private Vector2 size;
-        [SerializeField] private Vector2 localOffset;
-        [SerializeField] private float localAngle;
-
-        public CombatAreaShape Shape => shape;
-        public float Radius => Mathf.Max(0.01f, radius);
-        public Vector2 Size => new Vector2(Mathf.Max(0.01f, size.x), Mathf.Max(0.01f, size.y));
-        public Vector2 LocalOffset => localOffset;
-        public float LocalAngle => localAngle;
-    }
-
     [CreateAssetMenu(fileName = "ComposableAttack", menuName = "Scriptable Objects/Attack/Composable Attack")]
     public sealed class CombatAttackDefinitionSO : ScriptableObject
     {
         [Header("Identity")]
         [SerializeField] private CombatAttackKind kind;
+        [Tooltip("생성된 공격 인스턴스를 공격자 StateController의 Transform 자식으로 둔다. 끄면 기존처럼 Scene root에 생성한다.")]
+        [SerializeField] private bool parentInstanceToOwner;
 
-        [Header("Area and damage")]
-        [SerializeField] private CombatArea area;
+        [Header("Damage and area (single source)")]
+        [Tooltip("damageLayer, downwardDamageArea, pivot, sounds, effects and animation are all read from this asset.")]
         [SerializeField] private DamageDataSO damageData;
-        [SerializeField] private LayerMask queryLayer;
         [SerializeField] private bool hitEachTargetOnce = true;
         [SerializeField, Min(0f)] private float repeatInterval;
 
@@ -59,12 +49,23 @@ namespace Combat
         [SerializeField, Min(0.01f)] private float activeDuration = 0.1f;
 
         [Header("Independent movement")]
+        [NaughtyAttributes.ShowIf(nameof(kind), CombatAttackKind.Area)]
         [SerializeField] private CombatAttackMotion motion;
+
+        [NaughtyAttributes.ShowIf(nameof(UsesSpeed))]
         [SerializeField, Min(0f)] private float speed;
+
+        [NaughtyAttributes.ShowIf(nameof(UsesAcceleration))]
         [SerializeField, Min(0f)] private float acceleration;
+
+        [NaughtyAttributes.ShowIf(nameof(UsesHomingTurnSpeed))]
         [SerializeField, Min(0f)] private float homingTurnSpeed = 360f;
         [SerializeField] private bool faceDestination = true;
+
+        [NaughtyAttributes.ShowIf(nameof(CanEndOnArrival))]
         [SerializeField] private bool endOnArrival;
+
+        [NaughtyAttributes.ShowIf(nameof(kind), CombatAttackKind.Area)]
         [SerializeField] private bool endOnDamageableHit;
 
         [Header("Optional world-space visuals")]
@@ -72,9 +73,10 @@ namespace Combat
         [SerializeField] private GameObject activePrefab;
 
         public CombatAttackKind Kind => kind;
-        public CombatArea Area => area;
+        public bool ParentInstanceToOwner => parentInstanceToOwner;
         public DamageDataSO DamageData => damageData;
-        public LayerMask QueryLayer => damageData != null ? damageData.damageLayer : queryLayer;
+        public BoxData DamageArea => damageData != null ? damageData.downwardDamageArea : null;
+        public LayerMask QueryLayer => damageData != null ? damageData.damageLayer : (LayerMask)0;
         public bool HitEachTargetOnce => hitEachTargetOnce;
         public float RepeatInterval => repeatInterval;
         public float TelegraphDuration => telegraphDuration;
@@ -97,6 +99,25 @@ namespace Combat
         public bool EndOnDamageableHit => endOnDamageableHit || kind != CombatAttackKind.Area;
         public GameObject TelegraphPrefab => telegraphPrefab;
         public GameObject ActivePrefab => activePrefab;
+
+        private CombatAttackMotion InspectorMotion
+        {
+            get
+            {
+                if (kind == CombatAttackKind.Bullet) return CombatAttackMotion.Linear;
+                if (kind == CombatAttackKind.Missile) return CombatAttackMotion.Homing;
+                return motion;
+            }
+        }
+
+        private bool UsesSpeed =>
+            InspectorMotion == CombatAttackMotion.Linear ||
+            InspectorMotion == CombatAttackMotion.SeekDestination ||
+            InspectorMotion == CombatAttackMotion.Homing;
+
+        private bool UsesAcceleration => UsesSpeed;
+        private bool UsesHomingTurnSpeed => InspectorMotion == CombatAttackMotion.Homing;
+        private bool CanEndOnArrival => InspectorMotion == CombatAttackMotion.SeekDestination;
 
         private void OnValidate()
         {

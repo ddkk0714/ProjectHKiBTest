@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Movement;
 using UnityEngine;
 
 namespace Combat
@@ -7,10 +8,12 @@ namespace Combat
     {
         int StartAttack(
             CombatAttackDefinitionSO definition,
-            CombatPositionReference origin,
-            CombatPositionReference destination,
+            PositionReference origin,
+            PositionReference destination,
+            CombatAttackDirectionSource directionSource,
             string slot);
-        bool RetargetLatest(string slot, CombatPositionReference destination);
+        bool RetargetLatest(string slot, PositionReference destination);
+        void StopLatestEffect(string slot);
         void CancelLatest(string slot);
         void CancelSlot(string slot);
         void CancelAll();
@@ -21,17 +24,15 @@ namespace Combat
     }
 
     /// <summary>
-    /// 공격자는 실행 요청과 조회만 담당한다. 실제 공격은 Scene root의 독립 인스턴스가 소유하므로
-    /// 공격자 이동/비활성화와 공격 위치·수명·이동을 분리하고 여러 인스턴스를 동시에 유지한다.
+    /// 공격자는 실행 요청과 조회만 담당한다. 실제 공격은 기본적으로 Scene root의 독립 인스턴스가
+    /// 소유하며, 정의가 요청한 경우에만 공격자의 자식으로 생성한다.
     /// </summary>
     public sealed class CombatAttackModule : InterfaceModule, ICombatAttackModule
     {
         [SerializeField] private bool cancelAttacksOnDisable;
 
-        private readonly Dictionary<int, CombatAttackInstance> _instances =
-            new Dictionary<int, CombatAttackInstance>();
-        private readonly Dictionary<string, List<int>> _slots =
-            new Dictionary<string, List<int>>(System.StringComparer.Ordinal);
+        private readonly Dictionary<int, CombatAttackInstance> _instances = new();
+        private readonly Dictionary<string, List<int>> _slots = new(System.StringComparer.Ordinal);
 
         private StateController _owner;
         private int _nextHandle = 1;
@@ -54,8 +55,9 @@ namespace Combat
 
         public int StartAttack(
             CombatAttackDefinitionSO definition,
-            CombatPositionReference origin,
-            CombatPositionReference destination,
+            PositionReference origin,
+            PositionReference destination,
+            CombatAttackDirectionSource directionSource,
             string slot)
         {
             EnsureInitialized();
@@ -67,8 +69,9 @@ namespace Combat
 
             int handle = NextHandle();
             string normalizedSlot = NormalizeSlot(slot);
-            GameObject runtimeObject = new GameObject($"Attack_{normalizedSlot}_{handle}");
-            runtimeObject.transform.SetParent(null, true);
+            GameObject runtimeObject = new($"Attack_{normalizedSlot}_{handle}");
+            Transform runtimeParent = definition.ParentInstanceToOwner ? _owner.transform : null;
+            runtimeObject.transform.SetParent(runtimeParent, true);
             CombatAttackInstance instance = runtimeObject.AddComponent<CombatAttackInstance>();
 
             _instances.Add(handle, instance);
@@ -79,16 +82,30 @@ namespace Combat
             }
             handles.Add(handle);
 
-            instance.Initialize(this, _owner, handle, normalizedSlot, definition, origin, destination);
+            instance.Initialize(
+                this,
+                _owner,
+                handle,
+                normalizedSlot,
+                definition,
+                origin,
+                destination,
+                directionSource);
             return handle;
         }
 
-        public bool RetargetLatest(string slot, CombatPositionReference destination)
+        public bool RetargetLatest(string slot, PositionReference destination)
         {
             CombatAttackInstance instance = GetLatest(slot);
             if (instance == null) return false;
             instance.Retarget(destination);
             return true;
+        }
+
+        public void StopLatestEffect(string slot)
+        {
+            CombatAttackInstance instance = GetLatest(slot);
+            if (instance != null) instance.StopEffect();
         }
 
         public void CancelLatest(string slot)
@@ -116,10 +133,7 @@ namespace Combat
                 if (snapshot[i] != null) snapshot[i].Cancel();
         }
 
-        public bool IsRunning(string slot)
-        {
-            return GetLatest(slot) != null;
-        }
+        public bool IsRunning(string slot) => GetLatest(slot) != null;
 
         public bool Contains(string slot, Transform target, bool includeTelegraph = false)
         {
@@ -128,9 +142,7 @@ namespace Combat
         }
 
         public bool Contains(string slot, Vector3 worldPosition, bool includeTelegraph = false)
-        {
-            return ForAnyInSlot(slot, attack => attack.Contains(worldPosition, includeTelegraph));
-        }
+        => ForAnyInSlot(slot, attack => attack.Contains(worldPosition, includeTelegraph));
 
         public bool HasHit(string slot, Transform target)
         {
