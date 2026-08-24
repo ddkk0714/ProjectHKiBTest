@@ -17,33 +17,18 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: ec261c7596ac2114d9ff95f659354183
   m_SerializeEntries:
-  - m_GUID: 0e206c1f89d359f46a996f13d7a8dd1c
-    m_Address: Assets/Scenes/TestMap/Mapdata1.asset
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9c4972d4fc22247488840ef4a492efeb
-    m_Address: Assets/Scenes/TestMap/TestMap3.unity
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: ae962f631543bce4fad467668f09d265
-    m_Address: Assets/Scenes/TestMap/Mapdata2.asset
+    m_Address: TestMap3
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: aebe1265615695c4aaebe03fbac3bf4b
-    m_Address: Assets/Scenes/TestMap/TestMap2.unity
+    m_Address: TestMap2
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c7b84e74def3f8940a3e01b87171a65c
-    m_Address: Assets/Scenes/TestMap/TestMap1.unity
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: e04c945b3aa66a14390cc6cc006c369e
-    m_Address: Assets/Scenes/TestMap/Mapdata3.asset
+    m_Address: TestMap1
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
