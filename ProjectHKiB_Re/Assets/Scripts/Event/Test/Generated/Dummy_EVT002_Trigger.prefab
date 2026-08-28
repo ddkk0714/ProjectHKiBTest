@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5641469510271594099}
   - component: {fileID: 6398302865508561160}
   - component: {fileID: 6738910632136036640}
-  - component: {fileID: 283454898519716350}
+  - component: {fileID: 724663064225929067}
   m_Layer: 0
   m_Name: Dummy_EVT002_Trigger
   m_TagString: Untagged
@@ -47,7 +47,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee734c739b4e1694ca1843841621fcc6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _trigger: {fileID: 283454898519716350}
   _event: {fileID: 11400000, guid: 390c439a92a0c3e4a94697982e12f210, type: 2}
   _manualTargets:
     targetEntities:
@@ -100,7 +99,7 @@ MonoBehaviour:
   leftMostOffset: 0
   rightMostOffset: 0
   isStair: 0
---- !u!114 &283454898519716350
+--- !u!114 &724663064225929067
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -109,13 +108,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 7759659122245527595}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 408a66b6050dc6144b8bb196f869b1d9, type: 3}
+  m_Script: {fileID: 11500000, guid: 924ed9c8213840adb03a2aa8b5bf4609, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cooltime: 0
-  _layerMask:
+  _gameEvent: {fileID: 5641469510271594099}
+  _chunk: {fileID: 0}
+  _cooldown: 0
+  _triggerOnce: 0
+  _targetLayers:
     serializedVersion: 2
     m_Bits: 1024
-  _collider2D: {fileID: 6738910632136036640}
-  chunk: {fileID: 0}
-  _inputType: 9
+  _requiredTargetName: 
+  _targetNameMatch: 0
+  _ignoreTargetNameCase: 0
+  _areaCollider: {fileID: 6738910632136036640}
+  _targetScope: 1
+  _activation: 0
+  _inputAction: {fileID: -2664373297183972651, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+  _inputProcessType: 3
+  _holdDuration: 1
+  _requiredDirection: {x: 0, y: -1}
+  _minimumDirectionDot: 0.5
+  _consumeDirection: 1
+  _legacyInputType: -1

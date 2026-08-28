@@ -155,24 +155,7 @@ public class MapStartPosPlacer : MonoBehaviour
             return;
         }
 
-        // The first Addressables map is entered from the System scene, so there is
-        // no previous map ID. Place the Player at this map's default entry instead
-        // of leaving it at the System scene's initial (often empty) coordinates.
-        if (string.IsNullOrEmpty(previousMapID))
-        {
-            MapStartPos[] initialStartPoses = FindObjectsOfType<MapStartPos>();
-            for (int i = 0; i < initialStartPoses.Length; i++)
-            {
-                if (!initialStartPoses[i].IsDefaultEntry) continue;
-
-                initialStartPoses[i].SetPlayerToStartPos();
-                Debug.Log($"[MapStartPosPlacer] Placed player at the default entry for initial map '{_previousMapID}'.");
-                return;
-            }
-
-            Debug.LogWarning($"[MapStartPosPlacer] Initial map '{_previousMapID}' has no default MapStartPos; player placement was skipped.");
-            return;
-        }
+        if (string.IsNullOrEmpty(previousMapID)) return;
 
         // 전용 진입 지점(fromScene 지정)을 먼저 찾고, 없으면 기본 진입 지점으로 떨어진다.
         // 한 맵에 연결이 여러 개여도 대부분은 기본 지점 하나로 충분하다 — 방향별로 다른 자리에

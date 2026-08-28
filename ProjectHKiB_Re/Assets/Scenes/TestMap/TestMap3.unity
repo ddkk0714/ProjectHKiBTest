@@ -117651,9 +117651,9 @@ GameObject:
   - component: {fileID: 143928144}
   - component: {fileID: 143928143}
   - component: {fileID: 143928147}
-  - component: {fileID: 143928148}
   - component: {fileID: 143928149}
   - component: {fileID: 143928150}
+  - component: {fileID: 143928151}
   m_Layer: 11
   m_Name: DummyNPC_NPC_A
   m_TagString: Untagged
@@ -117782,49 +117782,6 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.65
---- !u!114 &143928148
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 143928142}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2620f011be94afd95a80c913d3829ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  activation: 0
-  filter:
-    layers:
-      serializedVersion: 2
-      m_Bits: 4294967295
-    requiredName: 
-    nameMatch: 0
-    ignoreNameCase: 0
-    attackOnly: 1
-    attack:
-      requiredAttacker: {fileID: 0}
-      requiredAttackerName: 
-      attackerNameMatch: 0
-      ignoreAttackerNameCase: 0
-      minimumDamage: 0
-      maximumDamage: 0
-      knockback: 0
-  areaCollider: {fileID: 0}
-  targetScope: 1
-  chunk: {fileID: 0}
-  inputAction: {fileID: 0}
-  inputProcessType: 3
-  requiredDirection: {x: 0, y: -1}
-  minimumDirectionDot: 0.5
-  consumeConfirmDirection: 1
-  gameEvent: {fileID: 0}
-  onTriggered:
-    m_PersistentCalls:
-      m_Calls: []
-  cooldown: 0
-  triggerOnce: 0
 --- !u!114 &143928149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -117837,12 +117794,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 264b5d52d5214b26965c537885d56a73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trigger: {fileID: 143928148}
-  knockbackThreshold: 0
-  superArmour: 0
-  defense: 0
-  resistance: 0
-  invincible: 0
+  _trigger: {fileID: 143928151}
+  _knockbackThreshold: 0
+  _superArmour: 0
+  _defense: 0
+  _resistance: 0
+  _invincible: 0
 --- !u!114 &143928150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -117855,10 +117812,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 436dfc51986348bca782a4310ff9bfe8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trigger: {fileID: 143928148}
-  requiredEvent: {fileID: 11400000, guid: 08a9976efdf2a9f498d6c06a046051b8, type: 2}
-  completionBoolName: EVT004_BattleCleared
-  disableTriggerAfterCompletion: 1
+  _trigger: {fileID: 143928151}
+  _requiredEvent: {fileID: 11400000, guid: 08a9976efdf2a9f498d6c06a046051b8, type: 2}
+  _completionBoolName: EVT004_BattleCleared
+  _disableTriggerAfterCompletion: 1
+--- !u!114 &143928151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 143928142}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 102db18a05514b659205d6445d3e771f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gameEvent: {fileID: 0}
+  _chunk: {fileID: 0}
+  _cooldown: 0
+  _triggerOnce: 0
+  _filter:
+    _attackerLayers:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    _requiredAttackerName: 
+    _attackerNameMatch: 0
+    _ignoreAttackerNameCase: 0
+    _details:
+      _requiredAttacker: {fileID: 0}
+      _requiredAttackerName: 
+      _attackerNameMatch: 0
+      _ignoreAttackerNameCase: 0
+      _minimumDamage: 0
+      _maximumDamage: 0
+      _knockback: 0
 --- !u!1 &279291300
 GameObject:
   m_ObjectHideFlags: 0
@@ -123682,9 +123670,9 @@ GameObject:
   - component: {fileID: 1073501654}
   - component: {fileID: 1073501653}
   - component: {fileID: 1073501657}
-  - component: {fileID: 1073501658}
   - component: {fileID: 1073501659}
   - component: {fileID: 1073501660}
+  - component: {fileID: 1073501661}
   m_Layer: 11
   m_Name: DummyNPC_NPC_B
   m_TagString: Untagged
@@ -123813,49 +123801,6 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.65
---- !u!114 &1073501658
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1073501652}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2620f011be94afd95a80c913d3829ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  activation: 0
-  filter:
-    layers:
-      serializedVersion: 2
-      m_Bits: 4294967295
-    requiredName: 
-    nameMatch: 0
-    ignoreNameCase: 0
-    attackOnly: 1
-    attack:
-      requiredAttacker: {fileID: 0}
-      requiredAttackerName: 
-      attackerNameMatch: 0
-      ignoreAttackerNameCase: 0
-      minimumDamage: 0
-      maximumDamage: 0
-      knockback: 0
-  areaCollider: {fileID: 0}
-  targetScope: 1
-  chunk: {fileID: 0}
-  inputAction: {fileID: 0}
-  inputProcessType: 3
-  requiredDirection: {x: 0, y: -1}
-  minimumDirectionDot: 0.5
-  consumeConfirmDirection: 1
-  gameEvent: {fileID: 0}
-  onTriggered:
-    m_PersistentCalls:
-      m_Calls: []
-  cooldown: 0
-  triggerOnce: 0
 --- !u!114 &1073501659
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123868,12 +123813,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 264b5d52d5214b26965c537885d56a73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trigger: {fileID: 1073501658}
-  knockbackThreshold: 0
-  superArmour: 0
-  defense: 0
-  resistance: 0
-  invincible: 0
+  _trigger: {fileID: 1073501661}
+  _knockbackThreshold: 0
+  _superArmour: 0
+  _defense: 0
+  _resistance: 0
+  _invincible: 0
 --- !u!114 &1073501660
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123886,10 +123831,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 436dfc51986348bca782a4310ff9bfe8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trigger: {fileID: 1073501658}
-  requiredEvent: {fileID: 11400000, guid: 2c896fdf02ae5374dad98648de0dd5fd, type: 2}
-  completionBoolName: EVT006_BattleCleared
-  disableTriggerAfterCompletion: 1
+  _trigger: {fileID: 1073501661}
+  _requiredEvent: {fileID: 11400000, guid: 2c896fdf02ae5374dad98648de0dd5fd, type: 2}
+  _completionBoolName: EVT006_BattleCleared
+  _disableTriggerAfterCompletion: 1
+--- !u!114 &1073501661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1073501652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 102db18a05514b659205d6445d3e771f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gameEvent: {fileID: 0}
+  _chunk: {fileID: 0}
+  _cooldown: 0
+  _triggerOnce: 0
+  _filter:
+    _attackerLayers:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    _requiredAttackerName: 
+    _attackerNameMatch: 0
+    _ignoreAttackerNameCase: 0
+    _details:
+      _requiredAttacker: {fileID: 0}
+      _requiredAttackerName: 
+      _attackerNameMatch: 0
+      _ignoreAttackerNameCase: 0
+      _minimumDamage: 0
+      _maximumDamage: 0
+      _knockback: 0
 --- !u!1 &1320541109
 GameObject:
   m_ObjectHideFlags: 0

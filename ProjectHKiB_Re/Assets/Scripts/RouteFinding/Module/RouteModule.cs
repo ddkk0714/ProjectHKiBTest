@@ -293,7 +293,6 @@ public class RouteModule : MonoBehaviour, IEventSaveProvider
         _isTraveling = true;
         _currentNodeIndex = 0;
         _currentLocation = _selectedRoute.Nodes[0];
-        TrySubscribeCombatBridge(); // 전투 결과를 받아 진행해야 하므로 출발 시점에 반드시 연결
         Debug.Log($"[RouteModule] 출발 → {_selectedRoute.Nodes[0].nodeName}");
         OnTravelStarted?.Invoke();
         return true;
@@ -399,12 +398,6 @@ public class RouteModule : MonoBehaviour, IEventSaveProvider
             Progress.ApplyPassage(p.id, p.opened);
     }
 
-    // ─── 전투 연동 ───────────────────────────────────────────────
-    // WaveCombatBridge는 전투의 시작/종료 "사실"만 이벤트로 알린다.
-    // 그 결과로 일어나는 일(연결 영구 개방, 노드 진행, 이동 중단)은 모두 이 모듈의 책임이다.
-
-    private bool _bridgeSubscribed;
-
     private void Awake()
     {
         if (_instance != null && _instance != this)
@@ -416,34 +409,8 @@ public class RouteModule : MonoBehaviour, IEventSaveProvider
         _instance = this;
     }
 
-    private void Start() => TrySubscribeCombatBridge();
-
     private void OnDestroy()
     {
         if (_instance == this) _instance = null;
-
-        if (_bridgeSubscribed && WaveCombatBridge.Instance != null)
-        {
-            WaveCombatBridge.Instance.OnCombatCompleted -= HandleCombatCompleted;
-            WaveCombatBridge.Instance.OnCombatFailed -= HandleCombatFailed;
-        }
     }
-
-    private void TrySubscribeCombatBridge()
-    {
-        if (_bridgeSubscribed || WaveCombatBridge.Instance == null) return;
-        WaveCombatBridge.Instance.OnCombatCompleted += HandleCombatCompleted;
-        WaveCombatBridge.Instance.OnCombatFailed += HandleCombatFailed;
-        _bridgeSubscribed = true;
-    }
-
-    private void HandleCombatCompleted(MapNodeData node)
-    {
-        // 전투 승리 → 맵 영구 클리어(기획서: 한 번 클리어하면 이후 전투 없이 재방문 가능) 후 다음 노드로.
-        // 단, 일기장 세이브 전에 사망하면 RevertToLastSave로 클리어가 취소된다.
-        Progress.MarkNodeCleared(node);
-        AdvanceToNextNode();
-    }
-
-    private void HandleCombatFailed(MapNodeData node) => AbortTravel();
 }

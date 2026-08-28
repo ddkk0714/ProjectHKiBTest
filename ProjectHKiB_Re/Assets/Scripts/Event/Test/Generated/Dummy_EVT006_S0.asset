@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.86656797
+  temporaryID: 0.55817264
   transitions:
   - name: "\uC870\uAC74 0"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889748626669959
+        rid: 7387912846122156223
       negate: 0
     trueState: {fileID: 11400000, guid: edef7acd68dca1d42b2c7ff67893b91d, type: 2}
     falseState: {fileID: 0}
@@ -35,9 +35,9 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889748626669960
-  - rid: 6174889748626669961
-  - rid: 6174889748626669962
+  - rid: 7387912846122156224
+  - rid: 7387912846122156225
+  - rid: 7387912846122156226
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -50,20 +50,20 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889748626669959
+    - rid: 7387912846122156223
       type: {class: CustomBoolDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         boolName: EVT006_BattleCleared
-    - rid: 6174889748626669960
+    - rid: 7387912846122156224
       type: {class: SetCustomBoolAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         boolName: EVT006_BattleCleared
         value: 0
-    - rid: 6174889748626669961
+    - rid: 7387912846122156225
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0
-    - rid: 6174889748626669962
+    - rid: 7387912846122156226
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-006 \uC9C4\uC785 \u2014 \uC804\uD22C \uB2F4\uB2F9\uC740 EventManager.SetBoolParameterTrue(\"EVT006_BattleCleared\")\uB85C

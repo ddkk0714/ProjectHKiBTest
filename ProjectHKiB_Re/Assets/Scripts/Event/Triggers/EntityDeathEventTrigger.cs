@@ -1,34 +1,33 @@
+using System.Collections;
 using UnityEngine;
 
-// 이 오브젝트가 죽는 순간 지정한 이벤트를 발동시킨다 — EVT-004/006의 "플레이어 사망 시 강제 복귀"
-// 같은 중단 조건을 이벤트로 표현할 수 있게 해주는 다리.
-//
-// 다른 트리거들(EventStayTrigger 등)과 달리 GameEventTrigger를 상속하지 않는다. 그쪽은 콜라이더
-// 겹침을 매 FixedUpdate 검사하는 구조라 콜라이더가 반드시 있어야 하는데, 사망은 물리와 무관한
-// 순수 콜백 사건이기 때문이다.
-//
-// [무엇을 하지 않는가] 죽은 뒤 무엇을 할지는 정하지 않는다. 되살릴지, 어느 맵으로 보낼지,
-// 진행도를 어디까지 되돌릴지는 전부 연결된 이벤트(EventSO)가 결정한다. 리스폰 정책을 코드에
-// 박지 않으려고 일부러 이렇게 갈랐다.
-//
-// ※ DamagableModule.Die()는 이 콜백을 부른 "뒤"가 아니라 gameObject.SetActive(false) "뒤"에
-//   OnDie를 부른다. 즉 이벤트가 시작될 때 이 오브젝트는 이미 꺼져 있다. 되살리려면 이벤트 쪽에서
-//   ReviveEntityAction을 쓸 것.
-public class EntityDeathEventTrigger : MonoBehaviour
+/// <summary>
+/// 지정 엔티티 또는 플레이어의 IDamagable.OnDie 콜백을 이벤트로 변환합니다.
+/// 콜라이더를 사용하지 않고 사망 이후의 처리 정책은 연결된 GameEvent에 위임합니다.
+/// </summary>
+[AddComponentMenu("ProjectHKiB/Event/Entity Death Event Trigger")]
+public sealed class EntityDeathEventTrigger : EventTriggerBase
 {
-    [SerializeField] private GameEvent _event;
-    [SerializeField] private InterfaceRegister _owner;
+    [Tooltip("사망을 감시할 엔티티의 인터페이스 등록기입니다. 플레이어 감시 시에는 사용하지 않습니다.")]
+    [SerializeField]
+    [NaughtyAttributes.HideIf(nameof(_watchPlayer))]
+    private InterfaceRegister _owner;
 
-    // 켜면 _owner를 무시하고 **플레이어**의 사망을 지켜본다.
-    //
-    // 사망 복귀 이벤트는 이 오브젝트(트리거 프리팹)가 아니라 플레이어가 죽었을 때 떠야 하는데,
-    // 플레이어는 System 씬에 상주하고 트리거 프리팹은 맵 씬에 놓이므로 인스펙터에서 서로를
-    // 참조하도록 끌어다 놓을 수가 없다(씬을 넘는 참조는 저장되지 않는다). 그래서 이름으로 찾는
-    // 대신 GameManager를 통해 플레이를 시작한 뒤 스스로 묶는다.
-    [SerializeField] private bool _watchPlayer;
+    [Tooltip("켜면 Scene 참조 대신 GameManager를 통해 플레이어의 사망을 감시합니다.")]
+    [SerializeField]
+    private bool _watchPlayer;
+
+    [Tooltip("플레이어가 준비되기를 기다릴 최대 시간입니다.")]
+    [SerializeField, Min(0.1f)]
+    [NaughtyAttributes.ShowIf(nameof(_watchPlayer))]
+    private float _playerBindTimeout = 10f;
 
     private IDamagable _damagable;
 
+    /// <summary>
+    /// 감시 대상 종류에 따라 로컬 엔티티를 즉시 연결하거나 플레이어 준비를 기다립니다.
+    /// 연결 실패 시 이벤트가 조용히 누락되지 않도록 오류를 남깁니다.
+    /// </summary>
     private void Start()
     {
         if (_watchPlayer)
@@ -37,24 +36,33 @@ public class EntityDeathEventTrigger : MonoBehaviour
             return;
         }
 
+        BindLocalOwner();
+    }
+
+    /// <summary>
+    /// 같은 오브젝트의 InterfaceRegister에서 IDamagable을 찾아 사망 콜백을 구독합니다.
+    /// 명시된 owner가 있으면 해당 참조를 우선 사용합니다.
+    /// </summary>
+    private void BindLocalOwner()
+    {
         if (!_owner) _owner = GetComponent<InterfaceRegister>();
         if (!_owner || !_owner.TryGetInterface(out _damagable))
         {
-            Debug.LogError($"ERROR: EntityDeathEventTrigger - '{name}'에서 IDamagable을 찾을 수 없습니다.");
+            Debug.LogError($"[EntityDeathEventTrigger] '{name}'에서 IDamagable을 찾을 수 없습니다.", this);
             return;
         }
 
         _damagable.OnDie += HandleDeath;
     }
 
-    // 맵 씬이 System 씬보다 먼저 뜰 수도 있어 Start 시점에 플레이어가 없을 수 있다.
-    // 준비될 때까지 기다렸다가 묶는다.
-    private System.Collections.IEnumerator BindPlayerWhenReady()
+    /// <summary>
+    /// System Scene의 플레이어가 준비될 때까지 unscaled 시간으로 기다린 뒤 사망 콜백을 구독합니다.
+    /// 제한 시간 안에 찾지 못하면 명시적인 오류를 남깁니다.
+    /// </summary>
+    private IEnumerator BindPlayerWhenReady()
     {
-        const float timeoutSeconds = 10f;
         float waited = 0f;
-
-        while (waited < timeoutSeconds)
+        while (waited < _playerBindTimeout)
         {
             Player player = GameManager.instance != null ? GameManager.instance.player : null;
             if (player != null && player.TryGetInterface(out _damagable))
@@ -67,23 +75,38 @@ public class EntityDeathEventTrigger : MonoBehaviour
             yield return null;
         }
 
-        Debug.LogError($"ERROR: EntityDeathEventTrigger - '{name}'이 플레이어의 IDamagable을 찾지 못했습니다. " +
-                       "사망해도 이 이벤트가 발동하지 않습니다.");
+        Debug.LogError(
+            $"[EntityDeathEventTrigger] '{name}'이 플레이어의 IDamagable을 찾지 못했습니다.",
+            this);
     }
 
+    /// <summary>
+    /// 오브젝트가 파괴될 때 구독한 IDamagable 콜백을 안전하게 해제합니다.
+    /// Scene 전환 뒤 파괴된 트리거로 콜백이 전달되는 것을 막습니다.
+    /// </summary>
     private void OnDestroy()
     {
         if (_damagable != null) _damagable.OnDie -= HandleDeath;
     }
 
+    /// <summary>
+    /// 사망 콜백을 공통 실행 정책에 전달합니다.
+    /// 연결된 GameEvent의 부활, 맵 이동, 진행도 정책은 이 클래스가 결정하지 않습니다.
+    /// </summary>
     private void HandleDeath()
     {
-        if (!_event)
-        {
-            Debug.LogWarning($"[EntityDeathEventTrigger] '{name}'이 죽었지만 연결된 이벤트가 없습니다.");
-            return;
-        }
-
-        _event.TriggerEvent();
+        TryTrigger(new EventTriggerContext(this, (_damagable as Component)?.gameObject));
     }
+
+#if UNITY_EDITOR
+    /// <summary>
+    /// 로컬 감시 모드에서 InterfaceRegister 참조를 자동으로 채웁니다.
+    /// 플레이어 감시 모드에서는 Scene 간 참조를 만들지 않습니다.
+    /// </summary>
+    protected override void OnValidate()
+    {
+        base.OnValidate();
+        if (!_watchPlayer && !_owner) _owner = GetComponent<InterfaceRegister>();
+    }
+#endif
 }

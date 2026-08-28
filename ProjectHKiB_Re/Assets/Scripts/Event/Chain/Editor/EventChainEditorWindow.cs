@@ -5,6 +5,7 @@ using StateMachine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 /// <summary>
@@ -195,7 +196,9 @@ public class EventChainEditorWindow : EditorWindow
             added.FindPropertyRelative("requiredClueIds").ClearArray();
             added.FindPropertyRelative("triggerKind").enumValueIndex = (int)EventTriggerKind.None;
             added.FindPropertyRelative("triggerRadius").floatValue = 1.5f;
-            added.FindPropertyRelative("triggerInputType").enumValueIndex = (int)EnumManager.InputType.OnConfirm;
+            added.FindPropertyRelative("triggerInputAction").objectReferenceValue = null;
+            added.FindPropertyRelative("triggerInputProcessType").enumValueIndex =
+                (int)EnumManager.InputProcessType.WasPerformedThisFrame;
             added.FindPropertyRelative("steps").ClearArray();
             _selectedEvent = _eventsProp.arraySize - 1;
         }
@@ -333,7 +336,14 @@ public class EventChainEditorWindow : EditorWindow
             EditorGUI.indentLevel++;
             EditorGUILayout.PropertyField(eventProp.FindPropertyRelative("triggerRadius"), new GUIContent("반경"));
             if ((EventTriggerKind)triggerKindProp.enumValueIndex == EventTriggerKind.Input)
-                EditorGUILayout.PropertyField(eventProp.FindPropertyRelative("triggerInputType"), new GUIContent("발동 입력"));
+            {
+                EditorGUILayout.PropertyField(
+                    eventProp.FindPropertyRelative("triggerInputAction"),
+                    new GUIContent("발동 Input Action"));
+                EditorGUILayout.PropertyField(
+                    eventProp.FindPropertyRelative("triggerInputProcessType"),
+                    new GUIContent("입력 판정"));
+            }
             EditorGUI.indentLevel--;
         }
 
@@ -809,8 +819,13 @@ public class EventChainEditorWindow : EditorWindow
         serialized.FindProperty("_worldRequirement").enumValueIndex = (int)def.worldRequirement;
         serialized.FindProperty("_interruptRunningEvent").boolValue = def.interruptRunningEvent;
 
-        GameEventTrigger trigger = ConfigureSceneTrigger(root, def);
-        serialized.FindProperty("_trigger").objectReferenceValue = trigger;
+        EventTriggerBase trigger = ConfigureSceneTrigger(root, def);
+        if (trigger != null)
+        {
+            var serializedTrigger = new SerializedObject(trigger);
+            serializedTrigger.FindProperty("_gameEvent").objectReferenceValue = gameStateEvent;
+            serializedTrigger.ApplyModifiedPropertiesWithoutUndo();
+        }
 
         serialized.ApplyModifiedPropertiesWithoutUndo();
 
@@ -823,13 +838,15 @@ public class EventChainEditorWindow : EditorWindow
     // 종류를 채운다. None이면 대신 예전 컴포넌트(트리거 종류를 바꿔 더는 안 쓰게 된 것)를 정리한다.
     // 반환값이 null이면 GameStateEvent._trigger도 비워진다 — 그러면 EventSystemTestbed처럼
     // 코드로 TriggerEvent()를 직접 불러야 발동한다.
-    private static GameEventTrigger ConfigureSceneTrigger(GameObject root, EventDefinition def)
+    private static EventTriggerBase ConfigureSceneTrigger(GameObject root, EventDefinition def)
     {
-        // 트리거 종류를 바꿨을 수 있으니, 지금 쓰지 않는 GameEventTrigger는 콜라이더와 함께 지운다.
-        foreach (GameEventTrigger old in root.GetComponents<GameEventTrigger>())
+        // 역할을 바꿨을 수 있으므로 현재 종류와 정확히 일치하지 않는 기존 트리거를 정리한다.
+        foreach (EventTriggerBase old in root.GetComponents<EventTriggerBase>())
         {
-            bool keep = def.triggerKind == EventTriggerKind.Stay && old is EventStayTrigger
-                     || def.triggerKind == EventTriggerKind.Input && old is EventInputTrigger;
+            if (old is EntityDeathEventTrigger) continue;
+
+            bool keep = def.triggerKind == EventTriggerKind.Stay && old.GetType() == typeof(AreaEventTrigger)
+                     || def.triggerKind == EventTriggerKind.Input && old.GetType() == typeof(InteractionEventTrigger);
             if (!keep) UnityEngine.Object.DestroyImmediate(old, true);
         }
 
@@ -850,16 +867,13 @@ public class EventChainEditorWindow : EditorWindow
             {
                 if (deathTrigger == null) deathTrigger = root.AddComponent<EntityDeathEventTrigger>();
                 var serializedDeath = new SerializedObject(deathTrigger);
-                serializedDeath.FindProperty("_event").objectReferenceValue = root.GetComponent<GameStateEvent>();
                 // 이 프리팹이 아니라 플레이어의 사망을 지켜봐야 한다(씬을 넘는 참조는 저장되지 않으므로
                 // 인스펙터로 끌어다 놓을 수 없고, 트리거가 스스로 GameManager를 통해 묶는다).
                 serializedDeath.FindProperty("_watchPlayer").boolValue = true;
                 serializedDeath.ApplyModifiedPropertiesWithoutUndo();
             }
 
-            // GameEvent._trigger에 넣을 수 있는 건 GameEventTrigger뿐이라 사망 트리거는 여기 안 들어간다.
-            // 참조 방향이 반대다 - EntityDeathEventTrigger가 GameEvent를 들고 직접 부른다.
-            return null;
+            return deathTrigger;
         }
 
         // [RequireComponent] 덕에 CircleCollider2D가 같이 붙는다. 반경/isTrigger는 ZCircleCollider2D의
@@ -878,19 +892,44 @@ public class EventChainEditorWindow : EditorWindow
         zCollider.zCenter = 0f;
         zCollider.height = 4f;
 
-        GameEventTrigger trigger = def.triggerKind == EventTriggerKind.Stay
-            ? root.GetComponent<EventStayTrigger>() as GameEventTrigger ?? root.AddComponent<EventStayTrigger>()
-            : root.GetComponent<EventInputTrigger>() as GameEventTrigger ?? root.AddComponent<EventInputTrigger>();
+        EventTriggerBase trigger = def.triggerKind == EventTriggerKind.Stay
+            ? root.GetComponent<AreaEventTrigger>() ?? root.AddComponent<AreaEventTrigger>()
+            : root.GetComponent<InteractionEventTrigger>() ?? root.AddComponent<InteractionEventTrigger>();
 
         var serializedTrigger = new SerializedObject(trigger);
-        serializedTrigger.FindProperty("_collider2D").objectReferenceValue = zCollider;
+        serializedTrigger.FindProperty("_areaCollider").objectReferenceValue = zCollider;
         // 플레이어 레이어만 걸러야 한다 — 비워두면 아무 것도 안 걸려 영원히 발동하지 않는다.
-        serializedTrigger.FindProperty("_layerMask").intValue = LayerMask.GetMask("Player");
+        serializedTrigger.FindProperty("_targetLayers").intValue = LayerMask.GetMask("Player");
         if (def.triggerKind == EventTriggerKind.Input)
-            serializedTrigger.FindProperty("_inputType").enumValueIndex = (int)def.triggerInputType;
+        {
+            InputActionReference inputAction = def.triggerInputAction ?? FindDefaultInteractionAction();
+            serializedTrigger.FindProperty("_inputAction").objectReferenceValue = inputAction;
+            serializedTrigger.FindProperty("_inputProcessType").enumValueIndex = (int)def.triggerInputProcessType;
+        }
         serializedTrigger.ApplyModifiedPropertiesWithoutUndo();
 
         return trigger;
+    }
+
+    /// <summary>
+    /// EventDefinition에 입력이 지정되지 않았을 때 사용할 PLAY/Confirm 정본 참조를 찾습니다.
+    /// InputType 매핑 없이 InputActionReference 서브에셋을 직접 반환합니다.
+    /// </summary>
+    private static InputActionReference FindDefaultInteractionAction()
+    {
+        UnityEngine.Object[] assets =
+            AssetDatabase.LoadAllAssetsAtPath("Assets/Scripts/PlayerAction.inputactions");
+        foreach (UnityEngine.Object asset in assets)
+        {
+            if (asset is not InputActionReference reference || reference.action == null) continue;
+            if (reference.action.actionMap?.name != "PLAY" || reference.action.name != "Confirm") continue;
+            if (reference.hideFlags.HasFlag(HideFlags.HideInHierarchy)) continue;
+
+            return reference;
+        }
+
+        Debug.LogError("PlayerAction.inputactions에서 PLAY/Confirm InputActionReference를 찾지 못했습니다.");
+        return null;
     }
 
     private static void EnsureFolderFor(string assetPath)

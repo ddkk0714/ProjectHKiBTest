@@ -51,7 +51,8 @@ MonoBehaviour:
     interruptRunningEvent: 0
     triggerKind: 1
     triggerRadius: 3
-    triggerInputType: 9
+    triggerInputAction: {fileID: 0}
+    triggerInputProcessType: 3
     steps:
     - label: "\uAC00\uC704\uC9C8"
       enterActions:
@@ -188,7 +189,8 @@ MonoBehaviour:
     interruptRunningEvent: 0
     triggerKind: 2
     triggerRadius: 1.5
-    triggerInputType: 9
+    triggerInputAction: {fileID: -2664373297183972651, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+    triggerInputProcessType: 3
     steps:
     - label: "\uB300\uD654 \uC2DC\uC791"
       enterActions:
@@ -429,7 +431,8 @@ MonoBehaviour:
     interruptRunningEvent: 0
     triggerKind: 2
     triggerRadius: 1.5
-    triggerInputType: 9
+    triggerInputAction: {fileID: -2664373297183972651, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+    triggerInputProcessType: 3
     steps:
     - label: "\uB178\uD2B8 \uC5F4\uAE30 \u2014 \uD574\uBABD \uB300\uAE30"
       enterActions:
@@ -558,7 +561,8 @@ MonoBehaviour:
     interruptRunningEvent: 0
     triggerKind: 1
     triggerRadius: 3
-    triggerInputType: 9
+    triggerInputAction: {fileID: 0}
+    triggerInputProcessType: 3
     steps:
     - label: "\uC804\uD22C \uC9C4\uC785 \u2014 \uC804\uD22C \uD074\uB9AC\uC5B4 \uB300\uAE30"
       enterActions:
@@ -633,7 +637,8 @@ MonoBehaviour:
     interruptRunningEvent: 0
     triggerKind: 2
     triggerRadius: 1.5
-    triggerInputType: 9
+    triggerInputAction: {fileID: -2664373297183972651, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+    triggerInputProcessType: 3
     steps:
     - label: "\uB300\uD654 \uC2DC\uC791"
       enterActions:
@@ -657,7 +662,7 @@ MonoBehaviour:
       advanceWhenAny:
       - rid: 6174889728934674811
       timeoutSeconds: 15
-    - label: "Lily \uAE30\uC5B4 \uC9C0\uAE09 \u2014 dood = 3"
+    - label: "Lily \uAE30\uC5B4 \uC9C0\uAE09 \u2014 dood = 4"
       enterActions:
       - action:
           rid: 6174889728934674812
@@ -697,7 +702,7 @@ MonoBehaviour:
     purpose: "\uCD5C\uC885 \uC804\uD22C \uC9C4\uC785\uBD80\uD130 \uD0C8\uCD9C \uC5F0\uCD9C\uAE4C\uC9C0"
     startTriggerDesc: "\uBC31\uBC1C\uC5D0\uAC8C \uD655\uC778 \uD0A4\uB85C \uB9D0\uC744
       \uAC74\uB2E4"
-    preconditionDesc: Dood == 3
+    preconditionDesc: Dood == 4
     interruptCondition: "\uD50C\uB808\uC774\uC5B4 \uC0AC\uB9DD\uC740 \uC804\uD22C
       \uB2F4\uB2F9\uC774 \uD604\uC2E4 \uBCF5\uADC0\uB85C \uCC98\uB9AC. \uC774\uBCA4\uD2B8\uB294
       \uC804\uD22C \uD074\uB9AC\uC5B4 \uC2E0\uD638\uAE4C\uC9C0 \uB300\uAE30"
@@ -721,13 +726,14 @@ MonoBehaviour:
       targetSearchType: 1
     preconditions:
     - flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
-      value: 3
+      value: 4
     requiredClueIds: []
     worldRequirement: 0
     interruptRunningEvent: 0
     triggerKind: 2
     triggerRadius: 1.5
-    triggerInputType: 9
+    triggerInputAction: {fileID: -2664373297183972651, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}
+    triggerInputProcessType: 3
     steps:
     - label: "\uC804\uD22C \uC9C4\uC785 \u2014 \uC804\uD22C \uD074\uB9AC\uC5B4 \uB300\uAE30"
       enterActions:
@@ -831,7 +837,8 @@ MonoBehaviour:
     interruptRunningEvent: 1
     triggerKind: 3
     triggerRadius: 1.5
-    triggerInputType: 9
+    triggerInputAction: {fileID: 0}
+    triggerInputProcessType: 3
     steps:
     - label: "\uC554\uC804"
       enterActions:
@@ -1510,7 +1517,7 @@ MonoBehaviour:
       type: {class: SetEventFlagAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}
-        flagValue: 3
+        flagValue: 4
     - rid: 6174889728934674816
       type: {class: DialogueLineEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 

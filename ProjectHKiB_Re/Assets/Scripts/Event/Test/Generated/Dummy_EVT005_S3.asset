@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.38895148
+  temporaryID: 0.681809
   transitions:
   - name: "\uC870\uAC74 0"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889748626670064
+        rid: 7387912846122156172
       negate: 0
     trueState: {fileID: 11400000, guid: 96c6eb883e145c74c967d587365f11c9, type: 2}
     falseState: {fileID: 0}
@@ -41,7 +41,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889748626670164
+        rid: 7387912846122156173
       negate: 0
     trueState: {fileID: 11400000, guid: 96c6eb883e145c74c967d587365f11c9, type: 2}
     falseState: {fileID: 0}
@@ -51,8 +51,8 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889748626670165
-  - rid: 6174889748626670067
+  - rid: 7387912846122156174
+  - rid: 7387912846122156175
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -65,18 +65,18 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889748626670064
+    - rid: 7387912846122156172
       type: {class: DialogueEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889748626670067
-      type: {class: DialogueExitAction, ns: StateMachine, asm: Assembly-CSharp}
-      data: 
-    - rid: 6174889748626670164
+    - rid: 7387912846122156173
       type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT005_S3_mark
         seconds: 15
-    - rid: 6174889748626670165
+    - rid: 7387912846122156174
       type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT005_S3_mark
+    - rid: 7387912846122156175
+      type: {class: DialogueExitAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 

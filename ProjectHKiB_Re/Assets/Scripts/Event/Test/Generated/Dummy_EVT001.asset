@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-2559125977590410982
+--- !u!114 &-6566075885610496270
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -14,35 +14,69 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serializedNodes: []
   nodes:
-  - rid: 6174889692154822877
-  - rid: 6174889692154822878
-  - rid: 6174889692154822879
-  - rid: 6174889692154822880
+  - rid: 7387912846122156032
+  - rid: 7387912846122156033
+  - rid: 7387912846122156034
+  - rid: 7387912846122156035
+  - rid: 7387912846122156036
+  - rid: 7387912846122156037
   edges:
-  - GUID: 18920314-5886-42ca-aee9-c03aff6ddc04
-    owner: {fileID: -2559125977590410982}
-    inputNodeGUID: 1307b73b-b8f9-40c0-a994-2bec79233381
-    outputNodeGUID: 93cf9df7-a89b-4a81-94f2-b36c06610526
+  - GUID: 27d07163-9251-4655-b61f-2775d076faf8
+    owner: {fileID: -6566075885610496270}
+    inputNodeGUID: e164c37e-5dc5-49f3-8c9d-8b424a3ba440
+    outputNodeGUID: 1416ed58-9212-4c8d-b1a5-59f92d59cffb
     inputFieldName: inputState
     outputFieldName: outputTransitions
     inputPortIdentifier: 
     outputPortIdentifier: 
-  - GUID: 32feddf6-3f85-492b-ac51-84bd523e7039
-    owner: {fileID: -2559125977590410982}
-    inputNodeGUID: a358de3d-334a-480b-b706-6926a508e295
-    outputNodeGUID: 1307b73b-b8f9-40c0-a994-2bec79233381
+  - GUID: bc597811-2186-4bf1-9bc9-19d88cce6041
+    owner: {fileID: -6566075885610496270}
+    inputNodeGUID: d37f2ced-8f14-4fc5-ab22-7fb9cb78900e
+    outputNodeGUID: e164c37e-5dc5-49f3-8c9d-8b424a3ba440
     inputFieldName: inputState
     outputFieldName: outputTransitions
     inputPortIdentifier: 
     outputPortIdentifier: T_0_True
-  - GUID: de2b175d-5b62-404d-965b-01be50f607b8
-    owner: {fileID: -2559125977590410982}
-    inputNodeGUID: 767fe9d5-451a-400b-b24b-501acc7a80a6
-    outputNodeGUID: a358de3d-334a-480b-b706-6926a508e295
+  - GUID: 4f3186f2-4fee-4dee-b20c-a5c54b9d177a
+    owner: {fileID: -6566075885610496270}
+    inputNodeGUID: cff3931b-a5f7-44d9-8d6b-71a5f9d7961d
+    outputNodeGUID: d37f2ced-8f14-4fc5-ab22-7fb9cb78900e
     inputFieldName: inputState
     outputFieldName: outputTransitions
     inputPortIdentifier: 
     outputPortIdentifier: T_0_True
+  - GUID: a71ec88f-465d-4c8a-9735-4ebee4f36780
+    owner: {fileID: -6566075885610496270}
+    inputNodeGUID: 2221f8a2-1eb1-46ce-bc97-7fe9378117f3
+    outputNodeGUID: cff3931b-a5f7-44d9-8d6b-71a5f9d7961d
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 3277507d-fc50-43bc-8e96-5f0bd1520af6
+    owner: {fileID: -6566075885610496270}
+    inputNodeGUID: 2221f8a2-1eb1-46ce-bc97-7fe9378117f3
+    outputNodeGUID: cff3931b-a5f7-44d9-8d6b-71a5f9d7961d
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: c8a51f25-c79a-436c-9fb2-aef1d68337ba
+    owner: {fileID: -6566075885610496270}
+    inputNodeGUID: c260cd32-66d2-4f38-90bb-6d40c91aea30
+    outputNodeGUID: 2221f8a2-1eb1-46ce-bc97-7fe9378117f3
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 480d8c56-0a1a-4af3-b7a8-ca5b13c00182
+    owner: {fileID: -6566075885610496270}
+    inputNodeGUID: c260cd32-66d2-4f38-90bb-6d40c91aea30
+    outputNodeGUID: 2221f8a2-1eb1-46ce-bc97-7fe9378117f3
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
   groups: []
   stackNodes: []
   pinnedElements: []
@@ -50,17 +84,17 @@ MonoBehaviour:
   serializedParameterList: []
   stickyNotes: []
   nodeInspectorReference: {fileID: 0}
-  position: {x: 380.8, y: 21.6, z: 0}
-  scale: {x: 1, y: 1, z: 1}
+  position: {x: 339.39395, y: -0, z: 0}
+  scale: {x: 0.6060606, y: 0.6060606, z: 1}
   targetStateMachine: {fileID: 11400000}
   references:
     version: 2
     RefIds:
-    - rid: 6174889692154822877
+    - rid: 7387912846122156032
       type: {class: InitialStateNode, ns: , asm: Assembly-CSharp}
       data:
         nodeCustomName: 
-        GUID: 93cf9df7-a89b-4a81-94f2-b36c06610526
+        GUID: 1416ed58-9212-4c8d-b1a5-59f92d59cffb
         computeOrder: 0
         position:
           serializedVersion: 2
@@ -72,11 +106,11 @@ MonoBehaviour:
         debug: 0
         nodeLock: 0
         outputTransitions: {fileID: 0}
-    - rid: 6174889692154822878
+    - rid: 7387912846122156033
       type: {class: StateNode, ns: , asm: Assembly-CSharp}
       data:
         nodeCustomName: Dummy_EVT001_S0
-        GUID: 1307b73b-b8f9-40c0-a994-2bec79233381
+        GUID: e164c37e-5dc5-49f3-8c9d-8b424a3ba440
         computeOrder: 1
         position:
           serializedVersion: 2
@@ -92,11 +126,11 @@ MonoBehaviour:
         inputStateV: {fileID: 0}
         outputTransitions: {fileID: 0}
         outputTransitionsV: {fileID: 0}
-    - rid: 6174889692154822879
+    - rid: 7387912846122156034
       type: {class: StateNode, ns: , asm: Assembly-CSharp}
       data:
         nodeCustomName: Dummy_EVT001_S1
-        GUID: a358de3d-334a-480b-b706-6926a508e295
+        GUID: d37f2ced-8f14-4fc5-ab22-7fb9cb78900e
         computeOrder: 2
         position:
           serializedVersion: 2
@@ -112,11 +146,11 @@ MonoBehaviour:
         inputStateV: {fileID: 0}
         outputTransitions: {fileID: 0}
         outputTransitionsV: {fileID: 0}
-    - rid: 6174889692154822880
+    - rid: 7387912846122156035
       type: {class: StateNode, ns: , asm: Assembly-CSharp}
       data:
         nodeCustomName: Dummy_EVT001_S2
-        GUID: 767fe9d5-451a-400b-b24b-501acc7a80a6
+        GUID: cff3931b-a5f7-44d9-8d6b-71a5f9d7961d
         computeOrder: 3
         position:
           serializedVersion: 2
@@ -128,6 +162,46 @@ MonoBehaviour:
         debug: 0
         nodeLock: 0
         stateSO: {fileID: 11400000, guid: 9bcdfcb442ff618499bb762275223590, type: 2}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 7387912846122156036
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Dummy_EVT001_S3
+        GUID: 2221f8a2-1eb1-46ce-bc97-7fe9378117f3
+        computeOrder: 4
+        position:
+          serializedVersion: 2
+          x: 1120
+          y: 1000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 11400000, guid: 33417e268270ff24786772fef92fd4a5, type: 2}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 7387912846122156037
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Dummy_EVT001_S4
+        GUID: c260cd32-66d2-4f38-90bb-6d40c91aea30
+        computeOrder: 5
+        position:
+          serializedVersion: 2
+          x: 1680
+          y: 1000
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 11400000, guid: 7a8f3e5c9d2b4a16b7c8d9e0f1a2b3c4, type: 2}
         inputState: {fileID: 0}
         inputStateV: {fileID: 0}
         outputTransitions: {fileID: 0}
@@ -182,7 +256,7 @@ MonoBehaviour:
     floatVariables:
       _serializedList: []
   initialState: {fileID: 11400000, guid: 43f1e6dfa53631c4aa039f6243fb8d5b, type: 2}
-  graph: {fileID: -2559125977590410982}
+  graph: {fileID: -6566075885610496270}
   allStates:
   - {fileID: 11400000, guid: 43f1e6dfa53631c4aa039f6243fb8d5b, type: 2}
   - {fileID: 11400000, guid: a6f8f6c93c24135479d9c8f87b594d4f, type: 2}

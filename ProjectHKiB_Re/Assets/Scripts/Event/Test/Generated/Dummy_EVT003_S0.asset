@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.463772
+  temporaryID: 0.21238354
   transitions:
   - name: "\uC870\uAC74 0"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889748626670053
+        rid: 7387912846122156151
       negate: 0
     trueState: {fileID: 11400000, guid: ba865a060b34bf44d93d85f3de05e033, type: 2}
     falseState: {fileID: 0}
@@ -35,9 +35,9 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889748626670054
-  - rid: 6174889748626670055
-  - rid: 6174889748626670056
+  - rid: 7387912846122156152
+  - rid: 7387912846122156153
+  - rid: 7387912846122156154
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -50,22 +50,22 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889748626670053
+    - rid: 7387912846122156151
       type: {class: DreamReadingResolvedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         readingId: 
-    - rid: 6174889748626670054
+    - rid: 7387912846122156152
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-003 S0 \uD604\uC2E4\uC758 \uCC45\uC0C1 \u2014 \uB178\uD2B8\uB97C
           \uD3B8\uB2E4"
         completeBoolName: 
-    - rid: 6174889748626670055
+    - rid: 7387912846122156153
       type: {class: OpenWindowAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         windowName: Note
         close: 0
-    - rid: 6174889748626670056
+    - rid: 7387912846122156154
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "\uB354\uBBF8 \uB2E8\uC11C \uB450 \uAC1C(EVT-001/002\uAC00 \uC774\uBBF8

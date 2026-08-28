@@ -14,7 +14,6 @@ public class GameManager : MonoBehaviour
     public TimerManager timerManager;
     public TimeManager timeManager;
     public ObjectSpawnManager objectSpawnManager;
-    public ObjectDeathCountManager objectDeathCountManager;
     public GearManager gearManager;
     public InventoryManager inventoryManager;
     public UIManager UIManager;

@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.6347882
+  temporaryID: 0.81880605
   transitions:
   - name: "\uC870\uAC74 0"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889748626670077
+        rid: 7387912846122156127
       negate: 0
     trueState: {fileID: 11400000, guid: 9a0b2aa49dcba6044a4352277dbe2d07, type: 2}
     falseState: {fileID: 0}
@@ -41,7 +41,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889748626670172
+        rid: 7387912846122156128
       negate: 0
     trueState: {fileID: 11400000, guid: 9a0b2aa49dcba6044a4352277dbe2d07, type: 2}
     falseState: {fileID: 0}
@@ -51,15 +51,15 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889748626670173
-  - rid: 6174889748626670080
-  - rid: 6174889748626670081
-  - rid: 6174889748626670082
-  - rid: 6174889748626670083
-  - rid: 6174889748626670084
-  - rid: 6174889748626670085
-  - rid: 6174889748626670086
-  - rid: 6174889748626670087
+  - rid: 7387912846122156129
+  - rid: 7387912846122156130
+  - rid: 7387912846122156131
+  - rid: 7387912846122156132
+  - rid: 7387912846122156133
+  - rid: 7387912846122156134
+  - rid: 7387912846122156135
+  - rid: 7387912846122156136
+  - rid: 7387912846122156137
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -72,25 +72,34 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889748626670077
+    - rid: 7387912846122156127
       type: {class: KnockbackEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: Player
-    - rid: 6174889748626670080
+    - rid: 7387912846122156128
+      type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        key: Dummy_EVT002_S5_mark
+        seconds: 3
+    - rid: 7387912846122156129
+      type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        key: Dummy_EVT002_S5_mark
+    - rid: 7387912846122156130
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-002 S3 \uD50C\uB808\uC774\uC5B4 \uB109\uBC31"
         completeBoolName: 
-    - rid: 6174889748626670081
+    - rid: 7387912846122156131
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 4
-    - rid: 6174889748626670082
+    - rid: 7387912846122156132
       type: {class: SetCameraFollowAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: 
         returnToDefault: 1
-    - rid: 6174889748626670083
+    - rid: 7387912846122156133
       type: {class: CameraZoomAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         sizeMultiplier: 0.4
@@ -105,25 +114,25 @@ MonoBehaviour:
         illustrationSize: {x: 1200, y: 675}
         preserveIllustrationAspect: 1
         hideIllustrationOnReturn: 1
-    - rid: 6174889748626670084
+    - rid: 7387912846122156134
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: Player
         targetAction:
-          rid: 6174889748626670088
-    - rid: 6174889748626670085
+          rid: 7387912846122156138
+    - rid: 7387912846122156135
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: Player
         targetAction:
-          rid: 6174889748626670089
-    - rid: 6174889748626670086
+          rid: 7387912846122156139
+    - rid: 7387912846122156136
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: Player
         targetAction:
-          rid: 6174889748626670090
-    - rid: 6174889748626670087
+          rid: 7387912846122156140
+    - rid: 7387912846122156137
       type: {class: ScreenNoiseAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         intensity: 0.5
@@ -134,7 +143,7 @@ MonoBehaviour:
         shakeDuration: 0
         shakeCount: 0
         stop: 1
-    - rid: 6174889748626670088
+    - rid: 7387912846122156138
       type: {class: KnockBackAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         directionMode: 2
@@ -142,20 +151,11 @@ MonoBehaviour:
         acceleration: 80
         accelDuration: 0.12
         knockbackFriction: 0.95
-    - rid: 6174889748626670089
+    - rid: 7387912846122156139
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: Knockback
-    - rid: 6174889748626670090
+    - rid: 7387912846122156140
       type: {class: ReserveAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: 
-    - rid: 6174889748626670172
-      type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
-      data:
-        key: Dummy_EVT002_S5_mark
-        seconds: 3
-    - rid: 6174889748626670173
-      type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
-      data:
-        key: Dummy_EVT002_S5_mark

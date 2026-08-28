@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using StateMachine;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// 이벤트 체인 하나(예: EVT-001~EVT-004)를 에셋 하나에 담는 저작 데이터.
@@ -78,8 +79,12 @@ public class EventDefinition
 
     public EventTriggerKind triggerKind = EventTriggerKind.None;
     [Min(0.1f)] public float triggerRadius = 1.5f;
-    // Input 트리거가 반응할 입력. "말을 건다/상호작용"류는 대개 OnConfirm.
-    public EnumManager.InputType triggerInputType = EnumManager.InputType.OnConfirm;
+    [Tooltip("Interaction 트리거가 읽을 Input System 액션입니다. 비우면 생성 도구가 PLAY/Confirm을 사용합니다.")]
+    public InputActionReference triggerInputAction;
+
+    [Tooltip("Interaction 트리거가 InputAction 상태를 판정할 규칙입니다.")]
+    [EnumDropdown(typeof(EnumManager.InputProcessType))]
+    public EnumManager.InputProcessType triggerInputProcessType = EnumManager.InputProcessType.WasPerformedThisFrame;
 
     public List<EventStepData> steps = new();
 }

@@ -32732,7 +32732,7 @@ Transform:
   m_Children:
   - {fileID: 980040270}
   m_Father: {fileID: 1845891765}
-  m_RootOrder: 15
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &684965945
 GameObject:
@@ -42778,50 +42778,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 855909276}
   m_CullTransparentMesh: 1
---- !u!1 &857761129
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 857761131}
-  - component: {fileID: 857761130}
-  m_Layer: 0
-  m_Name: ObjectDeathCountManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &857761130
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 857761129}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6e3062941636e1439e94d60d9ae29a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &857761131
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 857761129}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1845891765}
-  m_RootOrder: 14
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &858256630
 GameObject:
   m_ObjectHideFlags: 0
@@ -50025,7 +49981,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1845891765}
-  m_RootOrder: 17
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &993332394
 MonoBehaviour:
@@ -57408,7 +57364,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 667997186590144226, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -11.9999695
+      value: -12
       objectReference: {fileID: 0}
     - target: {fileID: 836826197125674569, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchorMax.y
@@ -57964,7 +57920,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2317117347219903099, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -11.9999695
+      value: -12
       objectReference: {fileID: 0}
     - target: {fileID: 2374312453978798980, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -58724,7 +58680,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5701085014004860588, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 74.75
+      value: 74.5
       objectReference: {fileID: 0}
     - target: {fileID: 5701085014004860588, guid: 78eda063a6a3dab42a45c300bff301f3, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -83707,10 +83663,10 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.2256236
+    x: 0.1919369
     y: 0
-    width: 0.54875284
-    height: 1.0005513
+    width: 0.61583406
+    height: 1
   near clip plane: -5000
   far clip plane: 5000
   field of view: 40
@@ -89831,7 +89787,6 @@ MonoBehaviour:
   timerManager: {fileID: 2732933}
   timeManager: {fileID: 993332394}
   objectSpawnManager: {fileID: 1310757089}
-  objectDeathCountManager: {fileID: 857761130}
   gearManager: {fileID: 147051296}
   inventoryManager: {fileID: 1855532042}
   UIManager: {fileID: 1568758192}
@@ -89865,7 +89820,6 @@ Transform:
   - {fileID: 75784912}
   - {fileID: 490475674}
   - {fileID: 1310757088}
-  - {fileID: 857761131}
   - {fileID: 681393689}
   - {fileID: 2135137255}
   - {fileID: 993332393}
@@ -100624,7 +100578,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1845891765}
-  m_RootOrder: 16
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2137012631
 GameObject:

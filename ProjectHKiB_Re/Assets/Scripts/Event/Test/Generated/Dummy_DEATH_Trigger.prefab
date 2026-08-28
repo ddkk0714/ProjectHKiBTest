@@ -45,7 +45,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee734c739b4e1694ca1843841621fcc6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _trigger: {fileID: 0}
   _event: {fileID: 11400000, guid: 30ef3da42c83ffc4aa637f59f87896ea, type: 2}
   _manualTargets:
     targetEntities:
@@ -68,6 +67,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6b86a5f911be5a015091331cb8bdbff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _event: {fileID: 777647316832965935}
+  _gameEvent: {fileID: 777647316832965935}
+  _chunk: {fileID: 0}
+  _cooldown: 0
+  _triggerOnce: 0
   _owner: {fileID: 0}
   _watchPlayer: 1
+  _playerBindTimeout: 10

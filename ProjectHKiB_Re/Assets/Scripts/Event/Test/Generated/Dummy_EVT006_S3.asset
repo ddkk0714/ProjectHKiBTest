@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.82351494
+  temporaryID: 0.06480671
   transitions:
   - name: "\uC870\uAC74 0"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889748626670023
+        rid: 7387912846122156227
       negate: 0
     trueState: {fileID: 11400000, guid: fb8bc19279c64b25817e9dc89dfa87cf, type: 2}
     falseState: {fileID: 0}
@@ -41,7 +41,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 6174889748626670154
+        rid: 7387912846122156228
       negate: 0
     trueState: {fileID: 11400000, guid: fb8bc19279c64b25817e9dc89dfa87cf, type: 2}
     falseState: {fileID: 0}
@@ -51,10 +51,10 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 6174889748626670155
-  - rid: 6174889748626670026
-  - rid: 6174889748626670027
-  - rid: 6174889748626670028
+  - rid: 7387912846122156229
+  - rid: 7387912846122156230
+  - rid: 7387912846122156231
+  - rid: 7387912846122156232
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -67,20 +67,29 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6174889748626670023
+    - rid: 7387912846122156227
       type: {class: ScreenEffectEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 6174889748626670026
+    - rid: 7387912846122156228
+      type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        key: Dummy_EVT006_S3_mark
+        seconds: 2
+    - rid: 7387912846122156229
+      type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        key: Dummy_EVT006_S3_mark
+    - rid: 7387912846122156230
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 6174889748626670027
+    - rid: 7387912846122156231
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-006 \uD0C8\uCD9C \u2014 \uAC00\uC704(Lily Form) \uC0AC\uC6A9\uC744
           \uD655\uC778\uD574 \uBB38\uC744 \uAC00\uB985\uB2C8\uB2E4"
         completeBoolName: 
-    - rid: 6174889748626670028
+    - rid: 7387912846122156232
       type: {class: ScreenTearAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         duration: 1.35
@@ -105,12 +114,3 @@ MonoBehaviour:
         shardSize: 26
         shardSpread: 340
         randomSeed: 6006
-    - rid: 6174889748626670154
-      type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
-      data:
-        key: Dummy_EVT006_S3_mark
-        seconds: 2
-    - rid: 6174889748626670155
-      type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
-      data:
-        key: Dummy_EVT006_S3_mark

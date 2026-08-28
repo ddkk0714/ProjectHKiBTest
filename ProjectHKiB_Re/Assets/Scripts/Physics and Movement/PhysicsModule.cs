@@ -478,16 +478,6 @@ public class PhysicsModule : InterfaceModule, IPhysics
         return false;
     }
 
-    // 인스펙터 버튼은 클릭하려고 게임 창 포커스를 빼야 해서 그 순간 이동 입력이 끊기고 IsWalking이
-    // False로 찍힌다 — 이동 키를 누른 채로 확인할 수 있도록 키 입력으로도 트리거한다.
-    [SerializeField] private KeyCode dumpSpeedDiagnosticsKey = KeyCode.F6;
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(dumpSpeedDiagnosticsKey))
-            DumpSpeedDiagnostics();
-    }
-
     private void OnDisable()
     {
         ClearAllLayerOverrides();
@@ -495,6 +485,12 @@ public class PhysicsModule : InterfaceModule, IPhysics
         Phys = new PhysicsState();
         HVelocity = Vector2.zero;
     }
+
+#if UNITY_EDITOR
+    // 인스펙터 버튼은 클릭하려고 게임 창 포커스를 빼야 해서 그 순간 이동 입력이 끊기고 IsWalking이
+    // False로 찍힌다 — 이동 키를 누른 채로 확인할 수 있도록 키 입력으로도 트리거한다.
+    [SerializeField] private KeyCode dumpSpeedDiagnosticsKey = KeyCode.F6;
+    private void Update() { if (Input.GetKeyDown(dumpSpeedDiagnosticsKey)) DumpSpeedDiagnostics(); }
 
     // SpeedBuffType이 걸어둔 버프가 실제로 이동 속도에 반영되는지 직접 확인하기 위한 진단 도구.
     // BuffedMaxWalkSpeed/BuffedWalkAcceleration은 IPhysics 인터페이스의 디폴트 구현이라 이 클래스
@@ -509,4 +505,5 @@ public class PhysicsModule : InterfaceModule, IPhysics
                   $"HVelocity.magnitude={HVelocity.magnitude:F2}, IsWalking={IsWalking}, IsSprinting={IsSprinting}, " +
                   $"Mode={Mode}, CanWalkFrameLeft={CanWalkFrameLeft}, SprintCoeff={SprintCoeff:F2}");
     }
+#endif
 }
