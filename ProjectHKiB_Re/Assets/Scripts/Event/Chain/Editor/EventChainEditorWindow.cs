@@ -449,6 +449,8 @@ public class EventChainEditorWindow : EditorWindow
                 EditorGUILayout.EndHorizontal();
 
                 EditorGUILayout.PropertyField(stepProp.FindPropertyRelative("advanceWhenAny"), new GUIContent("다음 단계로 (OR)"), true);
+                EditorGUILayout.PropertyField(stepProp.FindPropertyRelative("externalCompletionRequirements"),
+                    new GUIContent("외부 완료 계약"), true);
                 EditorGUILayout.PropertyField(stepProp.FindPropertyRelative("timeoutSeconds"), new GUIContent("타임아웃(초, 0=없음)"));
                 EditorGUI.indentLevel--;
             }
@@ -462,6 +464,7 @@ public class EventChainEditorWindow : EditorWindow
             added.FindPropertyRelative("label").stringValue = "";
             added.FindPropertyRelative("enterActions").ClearArray();
             added.FindPropertyRelative("advanceWhenAny").ClearArray();
+            added.FindPropertyRelative("externalCompletionRequirements").ClearArray();
             added.FindPropertyRelative("timeoutSeconds").floatValue = 0f;
             added.isExpanded = true;
         }
@@ -472,6 +475,14 @@ public class EventChainEditorWindow : EditorWindow
     private void BuildChain()
     {
         if (_chain == null) return;
+
+        // 잘못된 체인을 Generated 에셋으로 굽고 나면 씬 참조까지 함께 오염된다.
+        // Player 빌드 전 검증과 같은 규칙을 여기서 먼저 적용해 원본 단계에서 차단한다.
+        if (!EventSystemBuildValidator.ValidateChainBeforeGeneration(_chain))
+        {
+            Debug.LogError("[EventChainEditorWindow] 이벤트 체인 검증에 실패해 빌드를 중단합니다.", _chain);
+            return;
+        }
 
         EnsureFolderFor($"{OutputFolder}/_");
         for (int i = 0; i < _chain.events.Count; i++)
@@ -892,9 +903,13 @@ public class EventChainEditorWindow : EditorWindow
         zCollider.zCenter = 0f;
         zCollider.height = 4f;
 
-        EventTriggerBase trigger = def.triggerKind == EventTriggerKind.Stay
-            ? root.GetComponent<AreaEventTrigger>() ?? root.AddComponent<AreaEventTrigger>()
-            : root.GetComponent<InteractionEventTrigger>() ?? root.AddComponent<InteractionEventTrigger>();
+        // Unity 2021의 C# 컴파일러는 서로 다른 파생 타입을 반환하는 조건식에 왼쪽의
+        // EventTriggerBase 대상 타입을 적용하지 못한다. 분기를 명시해 같은 동작을 유지한다.
+        EventTriggerBase trigger;
+        if (def.triggerKind == EventTriggerKind.Stay)
+            trigger = root.GetComponent<AreaEventTrigger>() ?? root.AddComponent<AreaEventTrigger>();
+        else
+            trigger = root.GetComponent<InteractionEventTrigger>() ?? root.AddComponent<InteractionEventTrigger>();
 
         var serializedTrigger = new SerializedObject(trigger);
         serializedTrigger.FindProperty("_areaCollider").objectReferenceValue = zCollider;
@@ -2066,6 +2081,16 @@ public class EventChainEditorWindow : EditorWindow
                 },
             },
             advanceWhenAny = new StateDecision[] { new CustomBoolDecision { boolName = Evt004BattleCleared } },
+            externalCompletionRequirements = new[]
+            {
+                new ExternalCompletionRequirement
+                {
+                    key = Evt004BattleCleared,
+                    provider = ExternalCompletionProviderKind.AttackTrigger,
+                    isRequired = true,
+                    allowInfiniteWait = true,
+                },
+            },
         });
 
         def.steps.Add(new EventStepData
@@ -2257,6 +2282,16 @@ public class EventChainEditorWindow : EditorWindow
                 },
             },
             advanceWhenAny = new StateDecision[] { new CustomBoolDecision { boolName = Evt006BattleCleared } },
+            externalCompletionRequirements = new[]
+            {
+                new ExternalCompletionRequirement
+                {
+                    key = Evt006BattleCleared,
+                    provider = ExternalCompletionProviderKind.AttackTrigger,
+                    isRequired = true,
+                    allowInfiniteWait = true,
+                },
+            },
         });
 
         def.steps.Add(new EventStepData

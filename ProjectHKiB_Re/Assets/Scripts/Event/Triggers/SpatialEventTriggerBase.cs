@@ -40,9 +40,15 @@ public abstract class SpatialEventTriggerBase : EventTriggerBase
     private bool _ignoreTargetNameCase;
 
     [Tooltip("영역 판정에 사용할 프로젝트 ZCollider2D입니다.")]
-    [SerializeField, FormerlySerializedAs("_collider2D"), FormerlySerializedAs("areaCollider")]
+    [SerializeField, FormerlySerializedAs("areaCollider")]
     [NaughtyAttributes.Required]
     private ZCollider2D _areaCollider;
+
+    // 구형 EventInput/Stay 계열은 일반 Collider2D를 _collider2D에 저장했다.
+    // 호환 래퍼에서만 이 값을 사용한다. 새 트리거는 Reset과 빌드 Validator가
+    // ZCollider2D 구성을 보장하므로, 상속되는 RequireComponent를 사용하지 않는다.
+    [SerializeField, HideInInspector, FormerlySerializedAs("_collider2D")]
+    private Collider2D _legacyAreaCollider;
 
     [Tooltip("콜라이더가 감지됐을 때 실제 이벤트 대상으로 사용할 오브젝트 범위입니다.")]
     [SerializeField, FormerlySerializedAs("targetScope")]
@@ -52,7 +58,13 @@ public abstract class SpatialEventTriggerBase : EventTriggerBase
     private readonly Dictionary<int, SpatialTargetRecord> _currentTargets = new();
     private ContactFilter2D _contactFilter;
 
+#if UNITY_EDITOR
+    [NonSerialized]
+    private bool _colliderValidationScheduled;
+#endif
+
     protected IReadOnlyDictionary<int, SpatialTargetRecord> CurrentTargets => _currentTargets;
+    protected virtual bool SupportsLegacyAreaCollider => false;
 
     /// <summary>
     /// 감지된 이벤트 대상과 실제 충돌 콜라이더를 함께 보관합니다.
@@ -82,6 +94,8 @@ public abstract class SpatialEventTriggerBase : EventTriggerBase
     {
         base.Awake();
         if (!_areaCollider) _areaCollider = GetComponent<ZCollider2D>();
+        if (SupportsLegacyAreaCollider && !_legacyAreaCollider)
+            _legacyAreaCollider = GetComponent<Collider2D>();
         RebuildContactFilter();
     }
 
@@ -94,9 +108,14 @@ public abstract class SpatialEventTriggerBase : EventTriggerBase
         _currentTargets.Clear();
         _overlapResults.Clear();
 
-        if (!IsAvailableInCurrentChunk() || !_areaCollider) return;
+        if (!IsAvailableInCurrentChunk()) return;
 
-        _areaCollider.OverlapCollider(_contactFilter, _overlapResults);
+        if (_areaCollider)
+            _areaCollider.OverlapCollider(_contactFilter, _overlapResults);
+        else if (SupportsLegacyAreaCollider && _legacyAreaCollider)
+            _legacyAreaCollider.OverlapCollider(_contactFilter, _overlapResults);
+        else
+            return;
         for (int i = 0; i < _overlapResults.Count; i++)
         {
             Collider2D candidateCollider = _overlapResults[i];
@@ -174,6 +193,26 @@ public abstract class SpatialEventTriggerBase : EventTriggerBase
 
 #if UNITY_EDITOR
     /// <summary>
+    /// 새 공간 트리거를 직접 추가할 때 기본 원형 감지 영역을 구성합니다.
+    /// 구형 호환 래퍼는 기존 Box/Capsule Collider를 유지해야 하므로 자동 생성하지 않습니다.
+    /// </summary>
+    protected virtual void Reset()
+    {
+        if (SupportsLegacyAreaCollider)
+        {
+            _legacyAreaCollider = GetComponent<Collider2D>();
+        }
+        else
+        {
+            _areaCollider = GetComponent<ZCollider2D>();
+            if (!_areaCollider)
+                _areaCollider = UnityEditor.Undo.AddComponent<ZCircleCollider2D>(gameObject);
+        }
+
+        RebuildContactFilter();
+    }
+
+    /// <summary>
     /// 인스펙터 변경 시 콜라이더 참조와 물리 필터를 즉시 갱신합니다.
     /// 필수 콜라이더가 없으면 편집 단계에서 경고합니다.
     /// </summary>
@@ -181,10 +220,37 @@ public abstract class SpatialEventTriggerBase : EventTriggerBase
     {
         base.OnValidate();
         if (!_areaCollider) _areaCollider = GetComponent<ZCollider2D>();
+        if (SupportsLegacyAreaCollider && !_legacyAreaCollider)
+            _legacyAreaCollider = GetComponent<Collider2D>();
         RebuildContactFilter();
 
-        if (!_areaCollider)
+        // AddComponent/스크립트 리로드 중에는 Reset이 붙이는 기본 콜라이더보다
+        // OnValidate가 먼저 호출될 수 있다. 즉시 경고하면 정상 구성도 누락처럼 보이므로
+        // 에디터가 컴포넌트 구성을 마친 다음 한 번 더 확인한다.
+        if (!HasUsableAreaCollider() && !_colliderValidationScheduled)
+        {
+            _colliderValidationScheduled = true;
+            UnityEditor.EditorApplication.delayCall += ValidateAreaColliderAfterEditorUpdate;
+        }
+    }
+
+    private void ValidateAreaColliderAfterEditorUpdate()
+    {
+        if (!this) return;
+
+        _colliderValidationScheduled = false;
+        if (!_areaCollider) _areaCollider = GetComponent<ZCollider2D>();
+        if (SupportsLegacyAreaCollider && !_legacyAreaCollider)
+            _legacyAreaCollider = GetComponent<Collider2D>();
+        RebuildContactFilter();
+
+        if (!HasUsableAreaCollider())
             Debug.LogWarning("영역 기반 이벤트 트리거에는 ZCollider2D가 필요합니다.", this);
+    }
+
+    private bool HasUsableAreaCollider()
+    {
+        return _areaCollider || SupportsLegacyAreaCollider && _legacyAreaCollider;
     }
 #endif
 }

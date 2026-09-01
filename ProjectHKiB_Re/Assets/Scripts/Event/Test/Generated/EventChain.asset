@@ -580,6 +580,11 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674802
+      externalCompletionRequirements:
+      - key: EVT004_BattleCleared
+        provider: 0
+        isRequired: 1
+        allowInfiniteWait: 1
       timeoutSeconds: 0
     - label: "\uC804\uD22C \uC644\uB8CC \u2014 \uAE08\uBC1C \uB300\uD654 \uAC00\uB2A5"
       enterActions:
@@ -748,6 +753,11 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674824
+      externalCompletionRequirements:
+      - key: EVT006_BattleCleared
+        provider: 0
+        isRequired: 1
+        allowInfiniteWait: 1
       timeoutSeconds: 0
     - label: "\uC804\uD22C \uC644\uB8CC \u2014 \uD0C8\uCD9C\uBB38 \uC0DD\uC131"
       enterActions:

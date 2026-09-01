@@ -159,9 +159,9 @@ public class AttackEventTrigger : EventTriggerBase
     /// </summary>
     internal void ReceiveAttack(EventAttackContext attackContext)
     {
-        if (!IsAvailableInCurrentChunk() || attackContext == null || _filter == null ||
-            !_filter.Matches(attackContext)) return;
+        if (attackContext == null || _filter == null || !_filter.Matches(attackContext)) return;
 
+        // Chunk 제한은 EventTriggerBase에서 판정해야 LastResult/Evaluated에 거부 사유가 남는다.
         TryTrigger(new EventTriggerContext(
             this,
             attackContext.AttackerObject,

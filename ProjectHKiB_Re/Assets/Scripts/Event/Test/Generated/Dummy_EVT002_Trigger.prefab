@@ -122,6 +122,7 @@ MonoBehaviour:
   _targetNameMatch: 0
   _ignoreTargetNameCase: 0
   _areaCollider: {fileID: 6738910632136036640}
+  _legacyAreaCollider: {fileID: 0}
   _targetScope: 1
   _activation: 0
   _inputAction: {fileID: -2664373297183972651, guid: c50fdcfdee068de4e88e8ba3f400141b, type: 3}

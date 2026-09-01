@@ -3732,6 +3732,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   localManager: {fileID: 0}
   navigationManager: {fileID: 490475675}
+  _physicsManager: {fileID: 0}
   initialMap: {fileID: 11400000, guid: 0e206c1f89d359f46a996f13d7a8dd1c, type: 2}
 --- !u!114 &75784914
 MonoBehaviour:
@@ -68300,6 +68301,7 @@ MonoBehaviour:
   _stateMachine: {fileID: 0}
   TransitionConditions: 
   Timers: []
+  _stallWarningSeconds: 10
   eventFlags:
     _serializedList:
     - Key: {fileID: 11400000, guid: 015d48b9281ebbb4ab3a097627104cff, type: 2}

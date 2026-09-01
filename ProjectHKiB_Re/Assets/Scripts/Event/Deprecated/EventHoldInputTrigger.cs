@@ -9,6 +9,8 @@ using UnityEngine;
 [AddComponentMenu("ProjectHKiB/Event/Legacy/Event Hold Input Trigger")]
 public sealed class EventHoldInputTrigger : InteractionEventTrigger
 {
+    protected override bool SupportsLegacyAreaCollider => true;
+
     /// <summary>
     /// 예전 EventHoldInputTrigger의 의미를 홀드 입력으로 고정합니다.
     /// 누적 시간과 진행률은 기반 클래스가 관리합니다.

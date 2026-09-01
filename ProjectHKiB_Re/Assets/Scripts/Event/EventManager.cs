@@ -19,6 +19,12 @@ public class EventManager : StateController, IEventSaveProvider
 {
     public enum TargetSearchType { Player, FromMap, Manual }
 
+    [Header("Event Diagnostics")]
+    [SerializeField, Min(1f)] private float _stallWarningSeconds = 10f;
+    private StateSO _diagnosticState;
+    private float _diagnosticStateEnteredAt;
+    private float _nextStallWarningAt;
+
     // 스토리/월드 이벤트 플래그의 단일 진실 — 인스펙터에서 저작한 값도, 플레이 중 인스펙터에서
     // 직접 고친 값도, SetEventFlag로 들어온 값도 전부 여기 하나에 모인다. 판정·세이브 모두
     // 이 딕셔너리를 본다.
@@ -49,6 +55,7 @@ public class EventManager : StateController, IEventSaveProvider
             eventFlags[flag] = value;
 
         _pendingFlagsById.Remove(id);
+        EventDiagnostics.LogFlagSet(this, flag, value);
     }
 
 
@@ -229,8 +236,11 @@ public class EventManager : StateController, IEventSaveProvider
     {
         if (!CurrentState) return;
 
+        StateSO abortedState = CurrentState;
+        EventDiagnostics.LogEventAborted(this, abortedState);
         Debug.Log($"[EventManager] 진행 중이던 이벤트를 중단합니다 (State: '{CurrentState.name}').");
         EliminateStateMachine();
+        ResetStateDiagnostics(null);
     }
 
     /// <summary>
@@ -276,16 +286,37 @@ public class EventManager : StateController, IEventSaveProvider
     /// </param>
     public void StartEvent(EventSO eventSO, EventTargets manualTargets = null, bool interruptRunning = false)
     {
+        TryStartEvent(eventSO, manualTargets, interruptRunning, out _);
+    }
+
+    /// <summary>
+    /// EventSO를 실제로 시작했는지 반환한다. GameStateEvent와 트리거 진단 경로가
+    /// "호출했다"와 "시작됐다"를 구분할 수 있도록 기존 StartEvent의 결과형을 제공한다.
+    /// </summary>
+    public bool TryStartEvent(
+        EventSO eventSO,
+        EventTargets manualTargets,
+        bool interruptRunning,
+        out string rejectionDetail)
+    {
+        if (!eventSO)
+        {
+            rejectionDetail = "시작할 EventSO가 null입니다.";
+            Debug.LogError($"[EventManager] {rejectionDetail}");
+            return false;
+        }
+
         // 트리거가 겹쳐 있거나 두 번 발동하면 진행 중인 이벤트가 첫 단계부터 다시 시작된다 —
         // 연출이 처음부터 되감기니 "이벤트가 유난히 오래 걸린다"로 보인다. 막고 알린다.
         if (IsEventRunning && interruptRunning) AbortEvent();
 
         if (IsEventRunning)
         {
-            Debug.LogWarning($"[EventManager] '{eventSO.name}'을 시작하려 했지만 이미 이벤트가 진행 중입니다 " +
-                             $"(현재 State: '{CurrentState.name}'). 무시합니다 — 같은 트리거가 두 번 발동했거나 " +
+            rejectionDetail = $"'{eventSO.name}'을 시작하려 했지만 이미 이벤트가 진행 중입니다 " +
+                              $"(현재 State: '{CurrentState.name}').";
+            Debug.LogWarning($"[EventManager] {rejectionDetail} 무시합니다 — 같은 트리거가 두 번 발동했거나 " +
                              "트리거가 겹쳐 있는지 확인하세요.");
-            return;
+            return false;
         }
 
         EventStartedAtUnscaled = Time.unscaledTime;
@@ -298,6 +329,42 @@ public class EventManager : StateController, IEventSaveProvider
         if (TryGetInterface(out IEvent @event)) @event.CurrentTargets = currentTargets;
 
         Initialize(eventSO);
+        ResetStateDiagnostics(CurrentState);
+        EventDiagnostics.LogEventStarted(this, eventSO, CurrentState);
+        if (!IsEventRunning) EventDiagnostics.LogEventCompleted(this);
+        rejectionDetail = string.Empty;
+        return true;
+    }
+
+    public override void ChangeState(StateSO state)
+    {
+        StateSO previous = CurrentState;
+        base.ChangeState(state);
+        ResetStateDiagnostics(CurrentState);
+        EventDiagnostics.LogStateChanged(this, previous, CurrentState);
+        if (!IsEventRunning) EventDiagnostics.LogEventCompleted(this);
+    }
+
+    public override void UpdateState()
+    {
+        base.UpdateState();
+
+        if (CurrentState != _diagnosticState)
+            ResetStateDiagnostics(CurrentState);
+        if (!IsEventRunning || !CurrentState) return;
+
+        float now = Time.unscaledTime;
+        if (now < _nextStallWarningAt) return;
+
+        EventDiagnostics.LogEventStall(this, now - _diagnosticStateEnteredAt);
+        _nextStallWarningAt = now + Mathf.Max(1f, _stallWarningSeconds);
+    }
+
+    private void ResetStateDiagnostics(StateSO state)
+    {
+        _diagnosticState = state;
+        _diagnosticStateEnteredAt = Time.unscaledTime;
+        _nextStallWarningAt = _diagnosticStateEnteredAt + Mathf.Max(1f, _stallWarningSeconds);
     }
 
     public void FindTargets(EventSO eventSO, EventTargets manualTargets)

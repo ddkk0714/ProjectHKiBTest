@@ -36,27 +36,57 @@ public class GameStateEvent : GameEvent
     [SerializeField] private string[] _requiredClueIds;
 
     public bool CanTrigger()
+        => EvaluatePrerequisites().Succeeded;
+
+    private GameEventExecutionResult EvaluatePrerequisites()
     {
-        if (!MatchesWorld()) return false;
+        if (!_event)
+            return GameEventExecutionResult.Rejected(
+                GameEventRejectReason.MissingEventAsset,
+                "GameStateEvent에 시작할 EventSO가 연결되지 않았습니다.");
+
+        if (!GameManager.instance)
+            return GameEventExecutionResult.Rejected(
+                GameEventRejectReason.MissingGameManager,
+                "GameManager 인스턴스가 없습니다.");
+
+        if (!MatchesWorld())
+            return GameEventExecutionResult.Rejected(
+                GameEventRejectReason.WrongWorld,
+                $"현재 맵이 요구 세계 '{_worldRequirement}'와 일치하지 않습니다.");
+
+        EventManager eventManager = GameManager.instance.eventManager;
+        if (!eventManager)
+            return GameEventExecutionResult.Rejected(
+                GameEventRejectReason.MissingEventManager,
+                "GameManager에 EventManager가 연결되지 않았습니다.");
 
         if (_preconditions != null && _preconditions.Length > 0)
         {
-            EventManager eventManager = GameManager.instance.eventManager;
-            if (!eventManager) return false;
-
             for (int i = 0; i < _preconditions.Length; i++)
             {
                 EventFlagCondition condition = _preconditions[i];
                 if (condition == null || !condition.flag) continue;
 
-                if (!eventManager.HasEventFlag(condition.flag, condition.value)) return false;
+                if (eventManager.HasEventFlag(condition.flag, condition.value)) continue;
+
+                string currentValue = eventManager.TryGetEventFlag(condition.flag, out int value)
+                    ? value.ToString()
+                    : "미설정";
+                return GameEventExecutionResult.Rejected(
+                    GameEventRejectReason.FlagMismatch,
+                    $"플래그 '{condition.flag.name}' 값이 {currentValue}입니다(필요: {condition.value}).");
             }
         }
 
-        if (_requiredClueIds == null || _requiredClueIds.Length == 0) return true;
+        if (_requiredClueIds == null || _requiredClueIds.Length == 0)
+            return GameEventExecutionResult.Success();
 
         RouteModule route = RouteModule.Instance;
-        if (route == null || route.Progress == null) return false;
+        if (route == null || route.Progress == null)
+            return GameEventExecutionResult.Rejected(
+                GameEventRejectReason.MissingRouteProgress,
+                "필수 단서를 확인할 RouteModule.Progress가 없습니다.");
 
         foreach (string clueId in _requiredClueIds)
         {
@@ -70,10 +100,13 @@ public class GameStateEvent : GameEvent
                 break;
             }
 
-            if (!acquired) return false;
+            if (!acquired)
+                return GameEventExecutionResult.Rejected(
+                    GameEventRejectReason.MissingClue,
+                    $"필수 단서 '{clueId}'를 획득하지 않았습니다.");
         }
 
-        return true;
+        return GameEventExecutionResult.Success();
     }
 
     // 지금 열려 있는 맵이 이 이벤트가 요구하는 세계인지. 맵 정보를 아직 모르면(로드 중 등)
@@ -90,11 +123,24 @@ public class GameStateEvent : GameEvent
             : !mapManager.IsRealWorld;
     }
 
-    // start event by enabling controller update
+    public override GameEventExecutionResult TryTriggerEvent()
+    {
+        GameEventExecutionResult prerequisites = EvaluatePrerequisites();
+        if (!prerequisites.Succeeded) return prerequisites;
+
+        EventManager eventManager = GameManager.instance.eventManager;
+        if (!eventManager.TryStartEvent(_event, _manualTargets, _interruptRunningEvent, out string rejectionDetail))
+            return GameEventExecutionResult.Rejected(
+                GameEventRejectReason.EventAlreadyRunning,
+                rejectionDetail);
+
+        return GameEventExecutionResult.Success();
+    }
+
+    // 기존 직접 호출부는 유지하고, 실제 실행은 결과 API 한 곳으로 모은다.
     public override void TriggerEvent()
     {
-        if (!CanTrigger()) return;
-
-        GameManager.instance.eventManager.StartEvent(_event, _manualTargets, _interruptRunningEvent);
+        GameEventExecutionResult result = TryTriggerEvent();
+        EventDiagnostics.LogDirectGameEventRejection(this, result);
     }
 }

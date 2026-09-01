@@ -14,6 +14,8 @@ public sealed class EventTriggerContext
     public Collider2D TargetCollider { get; }
     public EventAttackContext Attack { get; }
     public bool IsAttack => Attack != null;
+    public bool IsGameEventSuppressed { get; private set; }
+    public string GameEventSuppressionReason { get; private set; }
 
     /// <summary>
     /// 트리거 실행 시점의 감지 정보를 보관합니다.
@@ -29,6 +31,62 @@ public sealed class EventTriggerContext
         Target = target;
         TargetCollider = targetCollider;
         Attack = attack;
+    }
+
+    /// <summary>
+    /// Triggered 구독자가 감지 신호 자체를 처리했을 때 뒤따르는 GameEvent 실행을 막는다.
+    /// 전투 완료 공격처럼 같은 트리거가 "이벤트 시작"과 "진행 중 완료"를 겸하는 경우에 사용한다.
+    /// </summary>
+    public void SuppressGameEvent(string reason)
+    {
+        IsGameEventSuppressed = true;
+        GameEventSuppressionReason = reason ?? string.Empty;
+    }
+}
+
+public enum EventTriggerRejectReason
+{
+    None,
+    ComponentInactive,
+    ChunkInactive,
+    TriggerOnceConsumed,
+    Cooldown,
+    MissingGameEvent,
+}
+
+public enum EventTriggerResultStatus
+{
+    Rejected,
+    SignalAccepted,
+    GameEventStarted,
+    GameEventRejected,
+    GameEventSuppressed,
+}
+
+/// <summary>
+/// 감지 신호 승인과 실제 GameEvent 실행 결과를 분리해 기록한다.
+/// </summary>
+public sealed class EventTriggerResult
+{
+    public EventTriggerResultStatus Status { get; }
+    public EventTriggerRejectReason TriggerRejectReason { get; }
+    public GameEventRejectReason GameEventRejectReason { get; }
+    public string Detail { get; }
+    public EventTriggerContext Context { get; }
+    public bool SignalAccepted => Status != EventTriggerResultStatus.Rejected;
+
+    public EventTriggerResult(
+        EventTriggerResultStatus status,
+        EventTriggerRejectReason triggerRejectReason,
+        GameEventRejectReason gameEventRejectReason,
+        string detail,
+        EventTriggerContext context)
+    {
+        Status = status;
+        TriggerRejectReason = triggerRejectReason;
+        GameEventRejectReason = gameEventRejectReason;
+        Detail = detail ?? string.Empty;
+        Context = context;
     }
 }
 
@@ -58,7 +116,9 @@ public abstract class EventTriggerBase : MonoBehaviour
     private bool _hasTriggered;
 
     public event Action<EventTriggerContext> Triggered;
+    public event Action<EventTriggerResult> Evaluated;
     public EventTriggerContext LastContext { get; private set; }
+    public EventTriggerResult LastResult { get; private set; }
     public GameEvent GameEvent => _gameEvent;
 
     /// <summary>
@@ -114,17 +174,70 @@ public abstract class EventTriggerBase : MonoBehaviour
     /// </summary>
     protected bool TryTrigger(EventTriggerContext context)
     {
-        if (!isActiveAndEnabled || !IsAvailableInCurrentChunk()) return false;
-        if (_triggerOnce && _hasTriggered) return false;
-        if (Time.time < _nextTriggerTime) return false;
+        if (!isActiveAndEnabled)
+            return Reject(EventTriggerRejectReason.ComponentInactive, "트리거 컴포넌트가 비활성 상태입니다.", context);
+        if (!IsAvailableInCurrentChunk())
+            return Reject(EventTriggerRejectReason.ChunkInactive, "소유 Chunk가 비활성 상태입니다.", context);
+        if (_triggerOnce && _hasTriggered)
+            return Reject(EventTriggerRejectReason.TriggerOnceConsumed, "Trigger Once가 이미 소진되었습니다.", context);
+        if (Time.time < _nextTriggerTime)
+            return Reject(EventTriggerRejectReason.Cooldown,
+                $"쿨다운이 {_nextTriggerTime - Time.time:0.###}초 남았습니다.", context);
 
         _hasTriggered = true;
         _nextTriggerTime = Time.time + _cooldown;
         LastContext = context ?? new EventTriggerContext(this);
 
         Triggered?.Invoke(LastContext);
-        if (_gameEvent) _gameEvent.TriggerEvent();
+
+        if (LastContext.IsGameEventSuppressed)
+        {
+            Publish(new EventTriggerResult(
+                EventTriggerResultStatus.GameEventSuppressed,
+                EventTriggerRejectReason.None,
+                GameEventRejectReason.None,
+                LastContext.GameEventSuppressionReason,
+                LastContext));
+            return true;
+        }
+
+        if (!_gameEvent)
+        {
+            Publish(new EventTriggerResult(
+                EventTriggerResultStatus.SignalAccepted,
+                EventTriggerRejectReason.MissingGameEvent,
+                GameEventRejectReason.None,
+                "감지 신호는 승인됐지만 실행할 GameEvent가 없습니다.",
+                LastContext));
+            return true;
+        }
+
+        GameEventExecutionResult execution = _gameEvent.TryTriggerEvent();
+        Publish(new EventTriggerResult(
+            execution.Succeeded ? EventTriggerResultStatus.GameEventStarted : EventTriggerResultStatus.GameEventRejected,
+            EventTriggerRejectReason.None,
+            execution.RejectReason,
+            execution.Detail,
+            LastContext));
         return true;
+    }
+
+    private bool Reject(EventTriggerRejectReason reason, string detail, EventTriggerContext context)
+    {
+        Publish(new EventTriggerResult(
+            EventTriggerResultStatus.Rejected,
+            reason,
+            GameEventRejectReason.None,
+            detail,
+            context));
+        return false;
+    }
+
+    private void Publish(EventTriggerResult result)
+    {
+        LastResult = result;
+        EventDiagnostics.LogTriggerResult(this, result);
+        Evaluated?.Invoke(result);
     }
 
     /// <summary>

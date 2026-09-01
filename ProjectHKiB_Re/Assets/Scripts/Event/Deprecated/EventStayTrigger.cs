@@ -9,6 +9,8 @@ using UnityEngine;
 [AddComponentMenu("ProjectHKiB/Event/Legacy/Event Stay Trigger")]
 public sealed class EventStayTrigger : AreaEventTrigger
 {
+    protected override bool SupportsLegacyAreaCollider => true;
+
     /// <summary>
     /// 예전 EventStayTrigger의 의미를 영역 진입 1회로 고정합니다.
     /// 대상이 나갔다 다시 들어오면 다시 발동할 수 있습니다.

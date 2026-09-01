@@ -9,6 +9,8 @@ using UnityEngine;
 [AddComponentMenu("ProjectHKiB/Event/Legacy/Event Confirm Direction Trigger")]
 public sealed class EventConfirmDirTrigger : InteractionEventTrigger
 {
+    protected override bool SupportsLegacyAreaCollider => true;
+
     /// <summary>
     /// 예전 방향 확인 트리거의 의미를 입력과 방향 조합으로 고정합니다.
     /// 요구 방향과 허용 내적은 기반 클래스 인스펙터에서 설정합니다.

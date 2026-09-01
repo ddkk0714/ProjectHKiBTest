@@ -9,6 +9,8 @@ using UnityEngine;
 [AddComponentMenu("ProjectHKiB/Event/Legacy/Event Input Trigger")]
 public sealed class EventInputTrigger : InteractionEventTrigger
 {
+    protected override bool SupportsLegacyAreaCollider => true;
+
     /// <summary>
     /// 예전 EventInputTrigger의 의미를 새로 누른 입력 한 번으로 고정합니다.
     /// 입력을 놓은 뒤 다시 눌러야 재발동할 수 있습니다.

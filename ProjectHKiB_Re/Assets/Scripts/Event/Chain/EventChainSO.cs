@@ -126,6 +126,31 @@ public class EventStepAction
     public static implicit operator EventStepAction(StateAction action) => new() { action = action };
 }
 
+/// <summary>
+/// 이벤트 체인 바깥의 시스템이 완료시켜야 하는 조건의 제공자 종류다.
+/// 현재는 공격 감지 브리지만 사용하며, 다른 외부 시스템을 연결할 때 항목을 추가한다.
+/// </summary>
+public enum ExternalCompletionProviderKind
+{
+    AttackTrigger,
+}
+
+[Serializable]
+public class ExternalCompletionRequirement
+{
+    [Tooltip("CustomBoolDecision이 기다리는 bool 이름입니다.")]
+    public string key = "";
+
+    [Tooltip("이 완료 신호를 제공해야 하는 외부 시스템 종류입니다.")]
+    public ExternalCompletionProviderKind provider = ExternalCompletionProviderKind.AttackTrigger;
+
+    [Tooltip("켜면 실제 Scene/Prefab 제공자가 없을 때 Player 빌드를 중단합니다.")]
+    public bool isRequired = true;
+
+    [Tooltip("타임아웃 없이 외부 신호를 기다리는 것을 명시적으로 허용합니다.")]
+    public bool allowInfiniteWait;
+}
+
 [Serializable]
 public class EventStepData
 {
@@ -136,6 +161,10 @@ public class EventStepData
 
     // 이 중 하나라도 참이면 다음 단계로 넘어간다(OR). timeoutSeconds와 함께 쓰면 "실제 조건 OR 타임아웃"이 된다.
     [SerializeReference, SubclassSelector] public StateDecision[] advanceWhenAny = Array.Empty<StateDecision>();
+
+    // advanceWhenAny 중 체인 외부 시스템이 true로 만들어야 하는 조건을 명시한다. 문자열 bool만
+    // 기다리면 제공 컴포넌트가 삭제돼도 체인이 알 수 없으므로, 빌드 Validator가 이 계약과 Scene을 대조한다.
+    public ExternalCompletionRequirement[] externalCompletionRequirements = Array.Empty<ExternalCompletionRequirement>();
 
     // 0이면 타임아웃 없음. 0보다 크면 advanceWhenAny가 한 번도 안 맞아도 이 시간 뒤 자동으로 다음 단계로
     // 넘어간다 — 대화 모듈처럼 씬에 없을 수도 있는 시스템을 기다리는 조건에 안전장치로 걸어둔다.
