@@ -118,6 +118,9 @@ public class RouteModule : MonoBehaviour, IEventSaveProvider
 
     // ─── 진행 상태 (방문 / 클리어 / 단서 / 이벤트) ────────────────
     private RouteProgressState _progress;
+    private const string ClueAcquiredAudioResourcePath = "ClueAcquiredAudio";
+    private AudioDataSO _clueAcquiredAudio;
+    private bool _warnedMissingClueAudio;
 
     // MapGraph가 JSON을 로드한 뒤(Awake) 첫 접근 시점에 생성된다.
     // MapGraph가 아직 없으면 생성하지 않는다 — 빈 그래프 기준의 잘못된 상태가
@@ -134,9 +137,35 @@ public class RouteModule : MonoBehaviour, IEventSaveProvider
                     return null;
                 }
                 _progress = new RouteProgressState(MapGraph.Instance);
+                _progress.OnClueAcquired += HandleClueAcquired;
             }
             return _progress;
         }
+    }
+
+    /// <summary>
+    /// 맵 방문, 이벤트 액션, 인터넷 열람 등 획득 경로와 무관하게 신규 단서에 한 번만 소리를 냅니다.
+    /// 세이브 복원은 OnClueAcquired를 발행하지 않으므로 로드 직후에는 재생되지 않습니다.
+    /// </summary>
+    private void HandleClueAcquired(ClueData clue)
+    {
+        if (_clueAcquiredAudio == null)
+            _clueAcquiredAudio = Resources.Load<AudioDataSO>(ClueAcquiredAudioResourcePath);
+
+        AudioManager audioManager = GameManager.instance != null ? GameManager.instance.audioManager : null;
+        if (_clueAcquiredAudio == null || audioManager == null)
+        {
+            if (!_warnedMissingClueAudio)
+            {
+                Debug.LogWarning(
+                    $"[RouteModule] 단서 획득 효과음을 재생할 수 없습니다. " +
+                    $"AudioData='{ClueAcquiredAudioResourcePath}', AudioManager={audioManager != null}");
+                _warnedMissingClueAudio = true;
+            }
+            return;
+        }
+
+        audioManager.PlayAudioOneShot(_clueAcquiredAudio, 1f, Vector3.zero);
     }
 
     // ─── 장착 장비 ───────────────────────────────────────────────
@@ -411,6 +440,8 @@ public class RouteModule : MonoBehaviour, IEventSaveProvider
 
     private void OnDestroy()
     {
+        if (_progress != null)
+            _progress.OnClueAcquired -= HandleClueAcquired;
         if (_instance == this) _instance = null;
     }
 }

@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.72438616
+  temporaryID: 0.046823267
   transitions:
   - name: "\uD0C0\uC784\uC544\uC6C3"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 7387912846122156090
+        rid: 5360412811521687979
       negate: 0
     trueState: {fileID: 11400000, guid: 2a6ecd150bd6ace4283b2dbe16edaaf1, type: 2}
     falseState: {fileID: 0}
@@ -35,12 +35,12 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 7387912846122156091
-  - rid: 7387912846122156092
-  - rid: 7387912846122156093
-  - rid: 7387912846122156094
-  - rid: 7387912846122156095
-  - rid: 7387912846122156096
+  - rid: 5360412811521687980
+  - rid: 5360412811521687981
+  - rid: 5360412811521687982
+  - rid: 5360412811521687983
+  - rid: 5360412811521687984
+  - rid: 5360412811521687985
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -53,48 +53,56 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 7387912846122156090
+    - rid: 5360412811521687979
       type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT002_S4_mark
         seconds: 1
-    - rid: 7387912846122156091
+    - rid: 5360412811521687980
       type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT002_S4_mark
-    - rid: 7387912846122156092
+    - rid: 5360412811521687981
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-002 S2 \uBC31\uBC1C \uBCF4\uC2A4\uD654"
         completeBoolName: 
-    - rid: 7387912846122156093
+    - rid: 5360412811521687982
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: NPC_B
         targetAction:
-          rid: 7387912846122156097
-    - rid: 7387912846122156094
+          rid: 5360412811521687986
+    - rid: 5360412811521687983
       type: {class: TargetEntitiesManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetIDs:
         - NPC_B
         targetAction:
-          rid: 7387912846122156098
-    - rid: 7387912846122156095
+          rid: 5360412811521687987
+    - rid: 5360412811521687984
       type: {class: CameraShakeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         strength: 2
         direction: {x: 1, y: 1, z: 1}
-    - rid: 7387912846122156096
+        audioCue:
+          _audioData: {fileID: 0}
+          _volume: 1
+          _delay: 0
+    - rid: 5360412811521687985
       type: {class: ScreenFlashAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         color: {r: 1, g: 1, b: 1, a: 1}
         duration: 0.3
-    - rid: 7387912846122156097
+        audioCue:
+          _audioData: {fileID: 11400000, guid: c119adcaebe88404a9be3d9a2982a53f, type: 2}
+          _volume: 1
+          _delay: 0
+    - rid: 5360412811521687986
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         animationName: 
-    - rid: 7387912846122156098
+    - rid: 5360412811521687987
       type: {class: ChangeStateMachineAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         stateMachine: {fileID: 11400000, guid: 3ed29771e87add64495182945db2b2dd, type: 2}

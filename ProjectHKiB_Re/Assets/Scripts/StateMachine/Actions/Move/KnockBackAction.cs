@@ -53,6 +53,10 @@ namespace StateMachine
         /// <summary>넉백 중 매 틱 곱해지는 감쇠. 1에 가까울수록 오래 미끄러진다.</summary>
         [Range(0f, 1f)] public float knockbackFriction = 0.95f;
 
+        [Header("효과음 (선택)")]
+        [Tooltip("넉백과 함께 재생할 SO 기반 원샷 효과음입니다. 비워 두면 무음입니다.")]
+        public EffectAudioCue audioCue = new();
+
         public override void Act(StateController stateController)
         {
             if (!stateController.TryGetInterface(out IPhysics physics))
@@ -62,6 +66,10 @@ namespace StateMachine
             }
 
             physics.KnockBack(ResolveDirection(stateController, physics), acceleration, accelDuration, knockbackFriction);
+
+            // 넉백이 실제로 걸린 뒤에만 울린다. TargetEntityManipulateAction 안에서 실행되므로
+            // 여기 stateController는 밀려나는 대상이다(AudioPlayer가 2D라 위치는 청감에 영향 없음).
+            audioCue?.Play(stateController);
         }
 
         private Vector3 ResolveDirection(StateController stateController, IPhysics physics)

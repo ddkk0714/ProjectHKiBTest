@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.96681523
+  temporaryID: 0.5881942
   transitions:
   - name: "\uC870\uAC74 0"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 7387912846122156162
+        rid: 5360412811521687966
       negate: 0
     trueState: {fileID: 11400000, guid: 6fc19cde61768fb4a97e00e6421a310c, type: 2}
     falseState: {fileID: 0}
@@ -35,8 +35,8 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 7387912846122156163
-  - rid: 7387912846122156164
+  - rid: 5360412811521687967
+  - rid: 5360412811521687968
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -49,17 +49,17 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 7387912846122156162
+    - rid: 5360412811521687966
       type: {class: MapLoadedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mapAddressableID: TestMap3
-    - rid: 7387912846122156163
+    - rid: 5360412811521687967
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "EVT-003 S3 \uC554\uC804 \uC0C1\uD0DC\uC5D0\uC11C \uAFC8\uC73C\uB85C
           \uC774\uB3D9"
         completeBoolName: 
-    - rid: 7387912846122156164
+    - rid: 5360412811521687968
       type: {class: ChangeMapAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mapData: {fileID: 11400000, guid: e04c945b3aa66a14390cc6cc006c369e, type: 2}

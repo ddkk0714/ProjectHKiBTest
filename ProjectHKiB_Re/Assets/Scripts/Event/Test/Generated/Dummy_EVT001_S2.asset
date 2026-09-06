@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.7381
+  temporaryID: 0.069640405
   transitions:
   - name: "\uC870\uAC74 0"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 7387912846122156038
+        rid: 5360412811521687843
       negate: 0
     trueState: {fileID: 11400000, guid: 33417e268270ff24786772fef92fd4a5, type: 2}
     falseState: {fileID: 0}
@@ -41,7 +41,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 7387912846122156039
+        rid: 5360412811521687844
       negate: 0
     trueState: {fileID: 11400000, guid: 33417e268270ff24786772fef92fd4a5, type: 2}
     falseState: {fileID: 0}
@@ -51,12 +51,12 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 7387912846122156040
-  - rid: 7387912846122156041
-  - rid: 7387912846122156042
-  - rid: 7387912846122156043
-  - rid: 7387912846122156044
-  - rid: 7387912846122156045
+  - rid: 5360412811521687845
+  - rid: 5360412811521687846
+  - rid: 5360412811521687847
+  - rid: 5360412811521687848
+  - rid: 5360412811521687849
+  - rid: 5360412811521687850
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -69,37 +69,37 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 7387912846122156038
+    - rid: 5360412811521687843
       type: {class: DialogueLineEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 7387912846122156039
+    - rid: 5360412811521687844
       type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT001_S2_mark
         seconds: 15
-    - rid: 7387912846122156040
+    - rid: 5360412811521687845
       type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT001_S2_mark
-    - rid: 7387912846122156041
+    - rid: 5360412811521687846
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 3
-    - rid: 7387912846122156042
+    - rid: 5360412811521687847
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetID: CLIPPED_HAIR
         targetAction:
-          rid: 7387912846122156046
-    - rid: 7387912846122156043
+          rid: 5360412811521687851
+    - rid: 5360412811521687848
       type: {class: AcquireClueAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         clueId: dummy-clue-wing
         openCodexImmediately: 0
-    - rid: 7387912846122156044
+    - rid: 5360412811521687849
       type: {class: DialogueStartAction, ns: StateMachine, asm: Assembly-CSharp}
       data: 
-    - rid: 7387912846122156045
+    - rid: 5360412811521687850
       type: {class: DialogueShowLineAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         line:
@@ -111,7 +111,7 @@ MonoBehaviour:
           BG: {fileID: 0}
           isChoice: 0
           choices: []
-    - rid: 7387912846122156046
+    - rid: 5360412811521687851
       type: {class: SetEntityActiveAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         active: 0

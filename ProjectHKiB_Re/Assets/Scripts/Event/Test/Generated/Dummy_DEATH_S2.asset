@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.20503142
+  temporaryID: 0.7650287
   transitions:
   - name: "\uC870\uAC74 0"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 7387912846122156249
+        rid: 5360412811521687835
       negate: 0
     trueState: {fileID: 11400000, guid: a4529ff462b20c948abecb14cb41f94a, type: 2}
     falseState: {fileID: 0}
@@ -41,7 +41,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 7387912846122156250
+        rid: 5360412811521687836
       negate: 0
     trueState: {fileID: 11400000, guid: a4529ff462b20c948abecb14cb41f94a, type: 2}
     falseState: {fileID: 0}
@@ -51,8 +51,8 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 7387912846122156251
-  - rid: 7387912846122156252
+  - rid: 5360412811521687837
+  - rid: 5360412811521687838
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -65,20 +65,20 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 7387912846122156249
+    - rid: 5360412811521687835
       type: {class: MapLoadedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mapAddressableID: TestMap2
-    - rid: 7387912846122156250
+    - rid: 5360412811521687836
       type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_DEATH_S2_mark
         seconds: 10
-    - rid: 7387912846122156251
+    - rid: 5360412811521687837
       type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_DEATH_S2_mark
-    - rid: 7387912846122156252
+    - rid: 5360412811521687838
       type: {class: ChangeMapAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mapData: {fileID: 11400000, guid: ae962f631543bce4fad467668f09d265, type: 2}

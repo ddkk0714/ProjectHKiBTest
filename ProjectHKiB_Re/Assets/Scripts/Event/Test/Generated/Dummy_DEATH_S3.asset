@@ -15,13 +15,13 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.4806307
+  temporaryID: 0.18150069
   transitions: []
   additionalTransitions: []
   EnterActions:
-  - rid: 7387912846122156253
-  - rid: 7387912846122156254
-  - rid: 7387912846122156255
+  - rid: 5360412811521687794
+  - rid: 5360412811521687795
+  - rid: 5360412811521687796
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -32,17 +32,17 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 7387912846122156253
+    - rid: 5360412811521687794
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         label: "\uC0AC\uB9DD - \uD604\uC2E4\uC758 \uBC29\uC5D0\uC11C \uAE68\uC5B4\uB0A8"
         completeBoolName: 
-    - rid: 7387912846122156254
+    - rid: 5360412811521687795
       type: {class: ScreenFadeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         targetColor: {r: 0, g: 0, b: 0, a: 0}
         duration: 0.8
-    - rid: 7387912846122156255
+    - rid: 5360412811521687796
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0

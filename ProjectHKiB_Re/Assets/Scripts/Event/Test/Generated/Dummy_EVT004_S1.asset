@@ -15,7 +15,7 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.8090744
+  temporaryID: 0.2919903
   transitions:
   - name: "\uB300\uAE30"
     activationInput: 10
@@ -25,7 +25,7 @@ MonoBehaviour:
     disableTime: 0
     decisions:
     - Decision:
-        rid: 7387912846122156179
+        rid: 5360412811521687872
       negate: 0
     trueState: {fileID: 11400000, guid: 37cc7a5a0526efc449741f22f970110a, type: 2}
     falseState: {fileID: 0}
@@ -35,8 +35,8 @@ MonoBehaviour:
     showFalseStatePort: 1
   additionalTransitions: []
   EnterActions:
-  - rid: 7387912846122156180
-  - rid: 7387912846122156181
+  - rid: 5360412811521687873
+  - rid: 5360412811521687874
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -49,16 +49,16 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 7387912846122156179
+    - rid: 5360412811521687872
       type: {class: UnscaledTimeElapsedDecision, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT004_S1_mark
         seconds: 1
-    - rid: 7387912846122156180
+    - rid: 5360412811521687873
       type: {class: MarkUnscaledTimeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         key: Dummy_EVT004_S1_mark
-    - rid: 7387912846122156181
+    - rid: 5360412811521687874
       type: {class: SetEventFlagAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         flag: {fileID: 11400000, guid: 205d589a1e3400ac38f938e2aab99802, type: 2}

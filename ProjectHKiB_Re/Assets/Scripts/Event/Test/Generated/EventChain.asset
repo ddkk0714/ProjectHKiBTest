@@ -81,6 +81,7 @@ MonoBehaviour:
           rid: 6174889742885454380
         waitAfter: 0
       advanceWhenAny: []
+      externalCompletionRequirements: []
       timeoutSeconds: 1.5
     - label: "\uC798\uB824 \uB098\uAC04 \uBA38\uB9AC\uCE74\uB77D \uC0DD\uC131"
       enterActions:
@@ -95,6 +96,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674719
+      externalCompletionRequirements: []
       timeoutSeconds: 0
     - label: "\uB2E8\uC11C \uD68D\uB4DD"
       enterActions:
@@ -115,6 +117,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674725
+      externalCompletionRequirements: []
       timeoutSeconds: 15
     - label: "\uB2E8\uC11C \uD68D\uB4DD \uB300\uC0AC \uC885\uB8CC"
       enterActions:
@@ -123,6 +126,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674727
+      externalCompletionRequirements: []
       timeoutSeconds: 15
     - label: "\uAE08\uBC1C \uD1F4\uC7A5"
       enterActions:
@@ -142,6 +146,7 @@ MonoBehaviour:
           rid: 6174889728934674732
         waitAfter: 0
       advanceWhenAny: []
+      externalCompletionRequirements: []
       timeoutSeconds: 0
   - eventId: Dummy_EVT002
     eventName: "\uBC31\uBC1C\uC758 \uBCF4\uC2A4\uD654"
@@ -211,6 +216,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674738
+      externalCompletionRequirements: []
       timeoutSeconds: 15
     - label: "\uB300\uC0AC 2"
       enterActions:
@@ -219,6 +225,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674740
+      externalCompletionRequirements: []
       timeoutSeconds: 15
     - label: "\uB300\uD654 \uC885\uB8CC"
       enterActions:
@@ -227,6 +234,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674742
+      externalCompletionRequirements: []
       timeoutSeconds: 15
     - label: "\uD074\uB85C\uC988\uC5C5"
       enterActions:
@@ -246,6 +254,7 @@ MonoBehaviour:
           rid: 6174889728934674747
         waitAfter: 0
       advanceWhenAny: []
+      externalCompletionRequirements: []
       timeoutSeconds: 2.4
     - label: "\uBCF4\uC2A4\uD654"
       enterActions:
@@ -265,6 +274,7 @@ MonoBehaviour:
           rid: 6174889728934674752
         waitAfter: 0
       advanceWhenAny: []
+      externalCompletionRequirements: []
       timeoutSeconds: 1
     - label: "\uB109\uBC31 \u2014 \uC2DC\uC791 + \uC720\uC9C0"
       enterActions:
@@ -294,6 +304,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674761
+      externalCompletionRequirements: []
       timeoutSeconds: 3
     - label: "\uB109\uBC31 \u2014 \uC885\uB8CC"
       enterActions:
@@ -304,6 +315,7 @@ MonoBehaviour:
           rid: 6174889728934674763
         waitAfter: 0.6
       advanceWhenAny: []
+      externalCompletionRequirements: []
       timeoutSeconds: 0
     - label: "\uC554\uC804"
       enterActions:
@@ -318,6 +330,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674767
+      externalCompletionRequirements: []
       timeoutSeconds: 0
     - label: "\uC554\uC804 \uC720\uC9C0"
       enterActions:
@@ -325,6 +338,7 @@ MonoBehaviour:
           rid: -2
         waitAfter: 0.8
       advanceWhenAny: []
+      externalCompletionRequirements: []
       timeoutSeconds: 0
     - label: "\uB9F5 \uC804\uD658"
       enterActions:
@@ -336,6 +350,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674770
+      externalCompletionRequirements: []
       timeoutSeconds: 0
     - label: "\uAE30\uC0C1 \uBC0F \uB2E8\uC11C \uD68D\uB4DD"
       enterActions:
@@ -362,6 +377,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674778
+      externalCompletionRequirements: []
       timeoutSeconds: 15
     - label: "\uB2E8\uC11C \uD68D\uB4DD \uB300\uC0AC \uC885\uB8CC"
       enterActions:
@@ -370,6 +386,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674780
+      externalCompletionRequirements: []
       timeoutSeconds: 15
     - label: "\uAE30\uC0C1 \uC644\uB8CC"
       enterActions:
@@ -377,6 +394,7 @@ MonoBehaviour:
           rid: 6174889728934674781
         waitAfter: 0
       advanceWhenAny: []
+      externalCompletionRequirements: []
       timeoutSeconds: 0
   - eventId: Dummy_EVT003
     eventName: "\uD574\uBABD"
@@ -447,6 +465,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674785
+      externalCompletionRequirements: []
       timeoutSeconds: 0
     - label: "\uADDC\uCE59 \uD574\uAE08 \uC548\uB0B4 \u2014 \uB178\uD2B8\uB97C \uB2EB\uC744
         \uB54C\uAE4C\uC9C0 \uB300\uAE30"
@@ -459,6 +478,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674788
+      externalCompletionRequirements: []
       timeoutSeconds: 0
     - label: "\uB178\uD2B8 \uB2EB\uD798 \u2014 \uC554\uC804"
       enterActions:
@@ -473,6 +493,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674792
+      externalCompletionRequirements: []
       timeoutSeconds: 0
     - label: "\uC554\uC804 \uC720\uC9C0"
       enterActions:
@@ -480,6 +501,7 @@ MonoBehaviour:
           rid: -2
         waitAfter: 1.6
       advanceWhenAny: []
+      externalCompletionRequirements: []
       timeoutSeconds: 0
     - label: "\uAFC8\uC73C\uB85C \uBCF5\uADC0"
       enterActions:
@@ -491,6 +513,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674795
+      externalCompletionRequirements: []
       timeoutSeconds: 0
     - label: "\uAFC8\uC5D0\uC11C \uAE30\uC0C1"
       enterActions:
@@ -504,6 +527,7 @@ MonoBehaviour:
           rid: 6174889728934674798
         waitAfter: 0
       advanceWhenAny: []
+      externalCompletionRequirements: []
       timeoutSeconds: 0
   - eventId: Dummy_EVT004
     eventName: "\uBD84\uB178\uD55C \uAE08\uBC1C\uACFC \uC804\uD22C"
@@ -607,6 +631,7 @@ MonoBehaviour:
           rid: 6174889742458684281
         waitAfter: 1
       advanceWhenAny: []
+      externalCompletionRequirements: []
       timeoutSeconds: 0
   - eventId: Dummy_EVT005
     eventName: "\uC9C4\uC815\uD55C \uAE08\uBC1C \uB300\uD654 / Lily \uAE30\uC5B4
@@ -658,6 +683,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674809
+      externalCompletionRequirements: []
       timeoutSeconds: 15
     - label: "\uC124\uB4DD"
       enterActions:
@@ -666,6 +692,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674811
+      externalCompletionRequirements: []
       timeoutSeconds: 15
     - label: "Lily \uAE30\uC5B4 \uC9C0\uAE09 \u2014 dood = 4"
       enterActions:
@@ -683,6 +710,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674816
+      externalCompletionRequirements: []
       timeoutSeconds: 15
     - label: "\uB300\uD654 \uC885\uB8CC"
       enterActions:
@@ -691,6 +719,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674818
+      externalCompletionRequirements: []
       timeoutSeconds: 15
     - label: "\uC870\uC791 \uBCF5\uADC0"
       enterActions:
@@ -701,6 +730,7 @@ MonoBehaviour:
           rid: 6174889728934674820
         waitAfter: 0
       advanceWhenAny: []
+      externalCompletionRequirements: []
       timeoutSeconds: 0
   - eventId: Dummy_EVT006
     eventName: "\uBC31\uBC1C\uACFC\uC758 \uC804\uD22C"
@@ -778,6 +808,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674830
+      externalCompletionRequirements: []
       timeoutSeconds: 0
     - label: "\uAC00\uC704 \uC0AC\uC6A9 \uB300\uAE30"
       enterActions:
@@ -789,6 +820,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674833
+      externalCompletionRequirements: []
       timeoutSeconds: 0
     - label: "\uD0C8\uCD9C\uBB38 \uAC00\uB974\uAE30"
       enterActions:
@@ -803,6 +835,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674837
+      externalCompletionRequirements: []
       timeoutSeconds: 2
     - label: "\uB370\uBAA8 \uC885\uB8CC"
       enterActions:
@@ -816,6 +849,7 @@ MonoBehaviour:
           rid: 6174889728934674840
         waitAfter: 0
       advanceWhenAny: []
+      externalCompletionRequirements: []
       timeoutSeconds: 0
   - eventId: Dummy_DEATH
     eventName: "\uC0AC\uB9DD \uBCF5\uADC0"
@@ -869,6 +903,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674846
+      externalCompletionRequirements: []
       timeoutSeconds: 3
     - label: "\uB418\uC0B4\uB9AC\uAE30 + \uC9C4\uD589\uB3C4 \uB418\uB3CC\uB9AC\uAE30"
       enterActions:
@@ -888,6 +923,7 @@ MonoBehaviour:
           rid: 6174889728934674851
         waitAfter: 0
       advanceWhenAny: []
+      externalCompletionRequirements: []
       timeoutSeconds: 0.3
     - label: "\uD604\uC2E4\uC758 \uBC29\uC73C\uB85C"
       enterActions:
@@ -896,6 +932,7 @@ MonoBehaviour:
         waitAfter: 0
       advanceWhenAny:
       - rid: 6174889728934674853
+      externalCompletionRequirements: []
       timeoutSeconds: 10
     - label: "\uAE30\uC0C1"
       enterActions:
@@ -909,6 +946,7 @@ MonoBehaviour:
           rid: 6174889728934674856
         waitAfter: 0
       advanceWhenAny: []
+      externalCompletionRequirements: []
       timeoutSeconds: 0.8
   references:
     version: 2
@@ -947,6 +985,10 @@ MonoBehaviour:
         shakeStrength: 0
         shakeDuration: 0
         shakeCount: 0
+        audioCue:
+          _audioData: {fileID: 11400000, guid: 06802ce680bc0024dbc53fe85789ec5a, type: 2}
+          _volume: 1
+          _delay: 0
         stop: 0
     - rid: 6174889728934674714
       type: {class: ScreenGlitchAction, ns: StateMachine, asm: Assembly-CSharp}
@@ -966,6 +1008,10 @@ MonoBehaviour:
       data:
         strength: 0
         direction: {x: 1, y: 1, z: 1}
+        audioCue:
+          _audioData: {fileID: 11400000, guid: bbcfaf2c150272246b61407d5a548aef, type: 2}
+          _volume: 1
+          _delay: 1.5
     - rid: 6174889728934674716
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
@@ -1146,6 +1192,10 @@ MonoBehaviour:
         shakeStrength: 0
         shakeDuration: 0
         shakeCount: 0
+        audioCue:
+          _audioData: {fileID: 11400000, guid: 06802ce680bc0024dbc53fe85789ec5a, type: 2}
+          _volume: 1
+          _delay: 0
         stop: 0
     - rid: 6174889728934674748
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
@@ -1170,11 +1220,19 @@ MonoBehaviour:
       data:
         strength: 2
         direction: {x: 1, y: 1, z: 1}
+        audioCue:
+          _audioData: {fileID: 0}
+          _volume: 1
+          _delay: 0
     - rid: 6174889728934674752
       type: {class: ScreenFlashAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         color: {r: 1, g: 1, b: 1, a: 1}
         duration: 0.3
+        audioCue:
+          _audioData: {fileID: 11400000, guid: c119adcaebe88404a9be3d9a2982a53f, type: 2}
+          _volume: 1
+          _delay: 0
     - rid: 6174889728934674753
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
@@ -1232,6 +1290,10 @@ MonoBehaviour:
         shakeStrength: 0
         shakeDuration: 0
         shakeCount: 0
+        audioCue:
+          _audioData: {fileID: 0}
+          _volume: 1
+          _delay: 0
         stop: 1
     - rid: 6174889728934674761
       type: {class: KnockbackEndedDecision, ns: StateMachine, asm: Assembly-CSharp}
@@ -1582,6 +1644,10 @@ MonoBehaviour:
       data:
         color: {r: 1, g: 1, b: 1, a: 1}
         duration: 0.35
+        audioCue:
+          _audioData: {fileID: 0}
+          _volume: 1
+          _delay: 0
     - rid: 6174889728934674828
       type: {class: DummyEventStepAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
@@ -1698,6 +1764,10 @@ MonoBehaviour:
         shakeStrength: 0
         shakeDuration: 0
         shakeCount: 0
+        audioCue:
+          _audioData: {fileID: 11400000, guid: fa328424feacf7c4d8c8fc8e2ddcf067, type: 2}
+          _volume: 1
+          _delay: 0
         stop: 0
     - rid: 6174889728934674845
       type: {class: ScreenFadeAction, ns: StateMachine, asm: Assembly-CSharp}
@@ -1733,6 +1803,10 @@ MonoBehaviour:
         shakeStrength: 0
         shakeDuration: 0
         shakeCount: 0
+        audioCue:
+          _audioData: {fileID: 0}
+          _volume: 1
+          _delay: 0
         stop: 1
     - rid: 6174889728934674851
       type: {class: ScreenGlitchAction, ns: StateMachine, asm: Assembly-CSharp}
@@ -1822,6 +1896,10 @@ MonoBehaviour:
         acceleration: 80
         accelDuration: 0.12
         knockbackFriction: 0.95
+        audioCue:
+          _audioData: {fileID: 11400000, guid: 7271a66a47d03a6488c20a82e30e0c9c, type: 2}
+          _volume: 1
+          _delay: 0
     - rid: 6174889728934674867
       type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
@@ -1855,6 +1933,10 @@ MonoBehaviour:
       data:
         color: {r: 1, g: 1, b: 1, a: 1}
         duration: 1
+        audioCue:
+          _audioData: {fileID: 0}
+          _volume: 1
+          _delay: 0
     - rid: 6174889742885454165
       type: {class: TargetEntityManipulateAction, ns: StateMachine, asm: Assembly-CSharp}
       data:

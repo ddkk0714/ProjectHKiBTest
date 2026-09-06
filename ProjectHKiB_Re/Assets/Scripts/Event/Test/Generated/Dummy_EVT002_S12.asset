@@ -15,11 +15,11 @@ MonoBehaviour:
   isPacked: 0
   isTemplate: 0
   exposedVariables: []
-  temporaryID: 0.20362309
+  temporaryID: 0.6820927
   transitions: []
   additionalTransitions: []
   EnterActions:
-  - rid: 7387912846122156085
+  - rid: 5360412811521687805
   UpdateActions: []
   ExitActions: []
   actionSequence: []
@@ -30,7 +30,7 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 7387912846122156085
+    - rid: 5360412811521687805
       type: {class: SetInputModeAction, ns: StateMachine, asm: Assembly-CSharp}
       data:
         mode: 0

@@ -20,15 +20,24 @@ namespace StateMachine
         [Min(0f)] public float shakeDuration;
         [Min(0)] public int shakeCount;
 
+        [Header("효과음 (선택)")]
+        [Tooltip("노이즈 연출과 같은 프레임에 재생할 SO 기반 원샷 효과음입니다. 비워 두면 무음입니다.")]
+        public EffectAudioCue audioCue = new();
+
         // 켜는 대신 끄는 용도로 쓸 때 체크. 위 값들은 무시된다.
         public bool stop;
 
         public override void Act(StateController stateController)
         {
-            Play();
+            Play(stateController);
         }
 
         public void Play()
+        {
+            Play(null);
+        }
+
+        private void Play(StateController stateController)
         {
             // stop은 다른 수치를 무시하고 현재 노이즈 요청만 취소한다.
             if (stop) ScreenEffectManager.Instance.StopNoise();
@@ -40,6 +49,9 @@ namespace StateMachine
                 shakeStrength,
                 shakeDuration,
                 shakeCount);
+
+            // 실제 이벤트의 Act와 테스트베드의 Play가 반드시 같은 경로에서 한 번만 재생한다.
+            audioCue?.Play(stateController);
         }
     }
 }
