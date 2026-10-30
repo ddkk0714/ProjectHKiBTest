@@ -8,9 +8,29 @@ Shader "Hidden/FlashlightOcclusion"
         CGINCLUDE
         #include "UnityCG.cginc"
         sampler2D _MainTex, _OcclusionMap, _VisibilityMask, _BlurredMask, _WallMap;
-        float4 _OcclusionMap_TexelSize, _Bounds, _BlurAxis, _WallMapRect;
-        float _Rotation, _Softness, _SpreadDistance, _ShadowStrength, _Inset, _PixelsPerUnit;
+        float4 _OcclusionMap_TexelSize, _Bounds, _BlurAxis, _WallMapRect, _WallMap_TexelSize;
+        float _Rotation, _Softness, _SpreadDistance, _ShadowStrength, _Inset, _PixelsPerUnit, _WallFaceFade;
         float4 _Origin;
+        float2 BeamToWorld(float2 p)
+        {
+            float s = sin(_Rotation), c = cos(_Rotation);
+            return float2(c*p.x - s*p.y, s*p.x + c*p.y) + _Origin.xy;
+        }
+        float2 WorldToBeam(float2 w)
+        {
+            float s = sin(_Rotation), c = cos(_Rotation);
+            float2 d = w - _Origin.xy;
+            return float2(c*d.x + s*d.y, -s*d.x + c*d.y);
+        }
+        float2 WorldToUV(float2 w)
+        {
+            return (WorldToBeam(w) - _Bounds.xy) / _Bounds.zw;
+        }
+        // Wall map texel (FlashlightWallMapJob): 0 = floor, 1-254 = wall face (cells down to its base), 255 = other wall art.
+        float WallCode(float2 w)
+        {
+            return round(tex2Dlod(_WallMap, float4((w - _WallMapRect.xy) / _WallMapRect.zw, 0, 0)).r * 255);
+        }
         // Beam-local point -> center of its world pixel. Keeps shadow edges on the sprite pixel grid
         // while the beam texture moves and rotates with the light.
         float2 SnapToWorldPixel(float2 p)
@@ -46,10 +66,9 @@ Shader "Hidden/FlashlightOcclusion"
         float4 MaskSample(float2 p, float aa)
         {
             float r = length(p);
-            // Shadows fall on the floor only: wall pixels (DarknessManager.UpdateWallMap) are never covered.
-            float s = sin(_Rotation), c = cos(_Rotation);
-            float2 w = float2(c*p.x - s*p.y, s*p.x + c*p.y) + _Origin.xy;
-            float onFloor = tex2Dlod(_WallMap, float4((w - _WallMapRect.xy) / _WallMapRect.zw, 0, 0)).r < 0.5 ? 1 : 0;
+            // Plate shadows fall on the floor only: wall pixels (DarknessManager.UpdateWallMap) are never covered here.
+            // Wall faces are shaded in Compose.
+            float onFloor = WallCode(BeamToWorld(p)) < 0.5 ? 1 : 0;
             float start = onFloor > 0 ? ShadowStart(p) : 1000;
             float behind = r - start + _Inset;
             // Each sample covers half a pixel.
@@ -97,11 +116,10 @@ Shader "Hidden/FlashlightOcclusion"
             }
             return sum / total;
         }
-        float4 Compose(v2f_img i) : SV_Target
+        float SurfaceLit(float2 uv)
         {
-            float alpha = tex2D(_MainTex,i.uv).a;
-            float4 hard = tex2D(_VisibilityMask,i.uv);
-            float4 soft = tex2D(_BlurredMask,i.uv);
+            float4 hard = tex2Dlod(_VisibilityMask,float4(uv,0,0));
+            float4 soft = tex2Dlod(_BlurredMask,float4(uv,0,0));
             // Blur over floor pixels only.
             float floorWeight = max(1-soft.b, 0.001);
             float softLit = saturate(soft.r / floorWeight);
@@ -113,7 +131,52 @@ Shader "Hidden/FlashlightOcclusion"
             float contact = lerp(neighborContact, centerContact, centerCovered);
             float lit = lerp(hard.a, softLit, saturate(contact));
             // Walls are never blurred.
-            lit = lerp(lit, hard.a, hard.b);
+            return lerp(lit, hard.a, hard.b);
+        }
+        // A wall face is a vertical face standing on its base line and facing down (-y).
+        // It is fully lit while the light is in front of its base line, fades out as the light moves past it,
+        // and takes the shadow of the floor right in front of it.
+        // Brightness ignores the light's sideways offset: an angle term collapses into a thin bright column
+        // when the light stands right at the wall, because every pixel of a column shares one value.
+        float WallFaceLit(float2 w, float run)
+        {
+            float cell = _WallMapRect.z * _WallMap_TexelSize.x;
+            float row = floor((w.y - _WallMapRect.y) / cell);
+            float2 base = float2(w.x, _WallMapRect.y + (row - run + 1) * cell);
+            float inFront = base.y - _Origin.y;
+            float lit = saturate(1 + inFront / max(_WallFaceFade, 0.01));
+            // In front: other walls shade it through the floor right in front of it.
+            [branch] if (inFront > 0)
+            {
+                float2 front = WorldToUV(base - float2(0, 0.5 * cell));
+                if (all(front >= 0) && all(front <= 1)) lit *= SurfaceLit(front);
+            }
+            // Behind: that floor lies in this wall's own shadow, so look at the first plate on the way instead.
+            // A plate on another base line is another wall in between.
+            else if (lit > 0)
+            {
+                float2 p = WorldToBeam(w);
+                float r = length(p);
+                float start = ShadowStart(p);
+                if (start < r)
+                {
+                    float2 q = BeamToWorld(p * ((start + 0.5 * cell) / max(r, 0.0001)));
+                    float code = WallCode(q);
+                    float qBase = _WallMapRect.y + (floor((q.y - _WallMapRect.y) / cell) - code + 1) * cell;
+                    if (code > 0.5 && code < 254.5 && abs(qBase - base.y) > 0.5 * cell) lit = 0;
+                }
+            }
+            return lit;
+        }
+        float4 Compose(v2f_img i) : SV_Target
+        {
+            float alpha = tex2D(_MainTex,i.uv).a;
+            float lit = SurfaceLit(i.uv);
+            float2 p = _Bounds.xy + i.uv * _Bounds.zw;
+            if (_PixelsPerUnit > 0) p = SnapToWorldPixel(p);
+            float2 w = BeamToWorld(p);
+            float code = WallCode(w);
+            [branch] if (code > 0.5 && code < 254.5) lit = WallFaceLit(w, code);
             return float4(1,1,1,alpha*lerp(1,lit,_ShadowStrength));
         }
         ENDCG

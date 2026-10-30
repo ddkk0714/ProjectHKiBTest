@@ -20,7 +20,7 @@ internal sealed class WallVisualGrid
     public int Width, Height;
     // 칸마다 가장 가까운 바닥면 칸까지의 체비셰프 칸 거리(255에서 자름). 빈 공간을 건너뛰는 데 쓴다.
     public byte[] Clear;
-    // 1 = 벽 그림(렌더러) 또는 바닥면. 셰이더 그림자는 여기에 지지 않는다(그림자는 바닥에만).
+    // 1 = 벽 그림(렌더러) 또는 바닥면. 그림자 판 그림자는 여기에 지지 않는다(벽 앞면 음영은 셰이더가 따로 한다).
     public byte[] Visual;
     public int Version;
 
