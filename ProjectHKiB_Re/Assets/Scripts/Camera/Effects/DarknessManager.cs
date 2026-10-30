@@ -77,6 +77,8 @@ public class DarknessSettings
     [Min(0f)] public float flashlightShadowInset = 0f;
     [Tooltip("그림자 판정을 월드 픽셀 격자(스프라이트 PPU)에 맞춰 이동 중 경계가 미끄러지지 않게 한다. 0이면 끈다.")]
     [Min(0f)] public float flashlightShadowPixelsPerUnit = 16f;
+    [Tooltip("벽 앞면이 광원을 등질 때 얼마나 천천히 어두워지는지. 0이면 광원이 벽 밑선과 나란해질 때 꺼지고, 높을수록 밑선을 넘어서도 은은하게 남는다.")]
+    [Range(0f, 1f)] public float flashlightWallFaceWrap = 0.3f;
 
     [Header("부드러움")]
     [Tooltip("손전등이 플레이어를 따라가는 빠르기(1/초). 물리 틱 사이를 메워 그림자가 뚝뚝 끊기지 않게 한다. 0이면 보간 안 함.")]
@@ -154,6 +156,7 @@ public class DarknessManager : MonoBehaviour
     private static readonly int PixelsPerUnitId = Shader.PropertyToID("_PixelsPerUnit");
     private static readonly int WallMapId = Shader.PropertyToID("_WallMap");
     private static readonly int WallMapRectId = Shader.PropertyToID("_WallMapRect");
+    private static readonly int WallFaceWrapId = Shader.PropertyToID("_WallFaceWrap");
     private readonly List<SpriteRenderer> _playerSprites = new();
     private readonly List<SpriteRenderer> _shadowProxies = new();
     private GameObject _shadowProxyRoot;
@@ -262,6 +265,7 @@ public class DarknessManager : MonoBehaviour
             _current.flashlightShadowSoftness = Mathf.Lerp(from.flashlightShadowSoftness, to.flashlightShadowSoftness, t);
             _current.flashlightShadowSpreadDistance = Mathf.Lerp(from.flashlightShadowSpreadDistance, to.flashlightShadowSpreadDistance, t);
             _current.flashlightShadowInset = Mathf.Lerp(from.flashlightShadowInset, to.flashlightShadowInset, t);
+            _current.flashlightWallFaceWrap = Mathf.Lerp(from.flashlightWallFaceWrap, to.flashlightWallFaceWrap, t);
             _current.flashlightOffset = Mathf.Lerp(from.flashlightOffset, to.flashlightOffset, t);
             _current.flicker = Mathf.Lerp(from.flicker, to.flicker, t);
             yield return null;
@@ -518,6 +522,7 @@ public class DarknessManager : MonoBehaviour
             ParamsA = new Vector4(_current.flashlightShadowSoftness, _current.flashlightShadowIntensity,
                                   _current.flashlightShadowInset, _current.flashlightShadowSpreadDistance),
             PixelsPerUnit = _current.flashlightShadowPixelsPerUnit,
+            WallFaceWrap = _current.flashlightWallFaceWrap,
             Walls = _occluderStateHash,
         };
         if (_beamOccluded && key.Same(_lastOcclusionKey)) return;
@@ -538,6 +543,7 @@ public class DarknessManager : MonoBehaviour
         _occlusionMaterial.SetFloat(PixelsPerUnitId, _current.flashlightShadowPixelsPerUnit);
         _occlusionMaterial.SetTexture(WallMapId, _wallMap);
         _occlusionMaterial.SetVector(WallMapRectId, _wallMapRect);
+        _occlusionMaterial.SetFloat(WallFaceWrapId, _current.flashlightWallFaceWrap);
         var descriptor = _beamTarget.descriptor;
         descriptor.depthBufferBits = 0;
         var mask = RenderTexture.GetTemporary(descriptor);
@@ -610,11 +616,12 @@ public class DarknessManager : MonoBehaviour
         public Vector2 Origin;
         public float Rotation;
         public Vector4 Bounds, ParamsA;
-        public float PixelsPerUnit;
+        public float PixelsPerUnit, WallFaceWrap;
         public int Walls;
 
         public bool Same(OcclusionKey o) => Origin == o.Origin && Rotation == o.Rotation && Bounds == o.Bounds &&
-                                             ParamsA == o.ParamsA && PixelsPerUnit == o.PixelsPerUnit && Walls == o.Walls;
+                                             ParamsA == o.ParamsA && PixelsPerUnit == o.PixelsPerUnit &&
+                                             WallFaceWrap == o.WallFaceWrap && Walls == o.Walls;
     }
 
     private readonly List<WallVisualGrid> _gridOccluders = new();
@@ -646,8 +653,8 @@ public class DarknessManager : MonoBehaviour
     }
 
     // ─── 벽 지도 ────────────────────────────────────────────────
-    // 광원 주변 벽 칸을 월드 픽셀(격자 칸) 하나당 텍셀 하나로 옮긴다(255 = 벽 그림, 0 = 바닥).
-    // 셰이더는 벽 그림에는 그림자를 드리우지 않는다 — 그림자는 바닥에만 진다(벽끼리, 회전 벽 포함).
+    // 광원 주변 벽 칸을 월드 픽셀(격자 칸) 하나당 텍셀 하나로 옮긴다(값은 FlashlightWallMapJob.Pixels 참고).
+    // 셰이더는 벽 그림에 그림자 판 그림자를 드리우지 않는다. 벽 앞면만 광원을 향한 정도와 바로 앞 바닥의 그림자로 어두워진다.
 
     private Texture2D _wallMap;
     private NativeArray<byte> _wallPixels;
@@ -673,10 +680,10 @@ public class DarknessManager : MonoBehaviour
         }
 
         int x0 = Mathf.FloorToInt((origin.x - radius) / cell), y0 = Mathf.FloorToInt((origin.y - radius) / cell);
-        // RunOcclusionJob이 _jobGrids/_jobVisual을 이미 채워 두었다.
+        // RunOcclusionJob이 _jobGrids/_jobClear/_jobVisual을 이미 채워 두었다.
         new FlashlightWallMapJob
         {
-            Grids = _jobGrids, Visual = _jobVisual, GridCount = _gridOccluders.Count,
+            Grids = _jobGrids, Clear = _jobClear, Visual = _jobVisual, GridCount = _gridOccluders.Count,
             X0 = x0, Y0 = y0, Side = side, Pixels = _wallPixels,
         }.Schedule(side, 16).Complete();
         _wallMap.SetPixelData(_wallPixels, 0);

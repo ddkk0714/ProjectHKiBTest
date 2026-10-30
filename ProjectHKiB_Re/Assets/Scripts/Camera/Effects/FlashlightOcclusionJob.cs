@@ -151,32 +151,36 @@ internal struct FlashlightOcclusionJob : IJobParallelFor
 }
 
 /// <summary>
-/// 광원 주변 벽 지도(DarknessManager.UpdateWallMap)를 한 줄씩 병렬로 채운다. 칸 좌표는 격자 칸 단위 정수 —
+/// 광원 주변 벽 지도(DarknessManager.UpdateWallMap)를 한 열씩 아래에서 위로 병렬로 채운다. 칸 좌표는 격자 칸 단위 정수 —
 /// 모든 격자의 MinX/MinY가 칸 경계에 맞춰져 있다.
 /// </summary>
 [BurstCompile]
 internal struct FlashlightWallMapJob : IJobParallelFor
 {
     [ReadOnly] public NativeArray<FlashlightOcclusionJob.Grid> Grids;
-    [ReadOnly] public NativeArray<byte> Visual;
+    [ReadOnly] public NativeArray<byte> Clear, Visual;
     public int GridCount, X0, Y0, Side;
-    [NativeDisableParallelForRestriction, WriteOnly] public NativeArray<byte> Pixels; // 255 = 벽 그림
+    // 0 = 바닥, 1~254 = 벽 앞면(그림자 판 안)이고 값은 그 열의 벽 밑선까지 칸 수(맨 아래 칸이 1), 255 = 판 밖 벽 그림(top 등).
+    [NativeDisableParallelForRestriction, WriteOnly] public NativeArray<byte> Pixels;
 
-    public void Execute(int row)
+    public void Execute(int col)
     {
-        int y = Y0 + row;
-        for (int col = 0; col < Side; col++)
+        int x = X0 + col, run = 0;
+        for (int row = 0; row < Side; row++)
         {
-            int x = X0 + col;
-            byte value = 0;
-            for (int g = 0; g < GridCount && value == 0; g++)
+            int y = Y0 + row;
+            bool face = false, visual = false;
+            for (int g = 0; g < GridCount && !face; g++)
             {
                 FlashlightOcclusionJob.Grid grid = Grids[g];
                 int gx = x - (int)math.round(grid.MinX / grid.Cell), gy = y - (int)math.round(grid.MinY / grid.Cell);
-                if (gx >= 0 && gy >= 0 && gx < grid.Width && gy < grid.Height &&
-                    Visual[grid.Offset + gy * grid.Width + gx] != 0) value = 255;
+                if (gx < 0 || gy < 0 || gx >= grid.Width || gy >= grid.Height) continue;
+                int i = grid.Offset + gy * grid.Width + gx;
+                face = Clear[i] == 0;
+                visual |= Visual[i] != 0;
             }
-            Pixels[row * Side + col] = value;
+            run = face ? math.min(run + 1, 254) : 0;
+            Pixels[row * Side + col] = face ? (byte)run : visual ? (byte)255 : (byte)0;
         }
     }
 }
