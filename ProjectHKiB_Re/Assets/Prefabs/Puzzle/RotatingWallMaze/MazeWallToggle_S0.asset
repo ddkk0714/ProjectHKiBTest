@@ -19,6 +19,7 @@ MonoBehaviour:
   transitions: []
   additionalTransitions: []
   EnterActions:
+  - rid: 3000991763022479364
   - rid: 3000991763022479360
   UpdateActions: []
   ExitActions: []
@@ -39,3 +40,15 @@ MonoBehaviour:
     - rid: 3000991763022479361
       type: {class: ToggleChildrenActiveAction, ns: StateMachine, asm: Assembly-CSharp}
       data: 
+    - rid: 3000991763022479364
+      type: {class: PlayLoopAudioAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        channel: 0
+        audioID: 
+        sequence:
+        - BGM_TheDepths_Stage1
+        - BGM_TheDepths_Stage2
+        - BGM_TheDepths_Stage3
+        - BGM_TheDepths_Stage4
+        volume: 1
+        fadeSec: 2

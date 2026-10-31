@@ -17,7 +17,10 @@ public class MapDataSO : ScriptableObject
     // MapLocalManager.Initialize()가 아직 설정된 적 없는 것만 채운다(EventManager.EnsureEventFlag).
     // 진행도 플래그(dood 등)의 시작값을 여기 넣어두지 않으면 `== 0` 조건이 성립하지 않는다.
     public SerializedDictionary<EventFlagSO, int> initialEventFlags;
+    // BGM·환경음: AudioManager.loopDatas에 등록한 AudioDataSO의 에셋 이름. 비우면 이 맵에선 꺼진다.
+    // 에셋 참조가 아니라 이름인 이유: 맵 씬 번들에 음원이 복제되지 않게 하려고.
     public string bgmID;
+    public string ambienceID;
     public SerializedDictionary<string, List<EntityInitializeInfo>> allEntityInitInfos;
     public SerializedDictionary<string, List<AnimationInitializeInfo>> allAnimInitInfos;
 }

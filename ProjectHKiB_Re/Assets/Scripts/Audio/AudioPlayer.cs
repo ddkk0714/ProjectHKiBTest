@@ -29,6 +29,7 @@ public class AudioPlayer : MonoBehaviour
     public void InitializeWhenReused(AudioDataSO audioData)
     {
         _audioData = audioData;
+        _audioSource.outputAudioMixerGroup = audioData.type ? audioData.type.mixerGroup : null;
         IsFading = false;
         _audioSource.volume = 0;
     }

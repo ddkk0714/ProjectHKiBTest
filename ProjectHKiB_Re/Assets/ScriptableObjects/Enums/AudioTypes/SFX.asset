@@ -16,3 +16,4 @@ MonoBehaviour:
   initOutTime: 2
   playOneShot: 1
   loop: 0
+  mixerGroup: {fileID: 24300014, guid: 0a786695c57d5e44787ba4b528a20f09, type: 2}

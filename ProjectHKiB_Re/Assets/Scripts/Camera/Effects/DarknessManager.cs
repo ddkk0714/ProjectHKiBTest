@@ -115,6 +115,10 @@ public class DarknessManager : MonoBehaviour
     private Coroutine _transition;
     private UnityEngine.Object _owner;
 
+    [Header("손전등 켜고 끄는 소리")]
+    [SerializeField] private EffectAudioCue _flashlightOnAudio = new();
+    [SerializeField] private EffectAudioCue _flashlightOffAudio = new();
+
     private Light2D _globalLight;
     private float _globalBaseIntensity = 1f;
     private Color _globalBaseColor = Color.white;
@@ -214,6 +218,8 @@ public class DarknessManager : MonoBehaviour
 
     public void SetFlashlight(bool on)
     {
+        // 키와 SetFlashlightAction이 모두 여기를 지난다. 이미 그 상태면 울리지 않는다.
+        if (_target.flashlight != on) (on ? _flashlightOnAudio : _flashlightOffAudio).Play();
         _target.flashlight = on;
         if (_transition == null) _current.flashlight = on;
     }

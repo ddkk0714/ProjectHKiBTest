@@ -2550,7 +2550,18 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1beb8b104e2d47448b8793039a8ca457, type: 2}
   allTypes:
   - {fileID: 11400000, guid: 362fe4bd6b8cd9f40bd0892a953bd260, type: 2}
+  - {fileID: 11400000, guid: 964370f8299f458c8bd14ed778532bb8, type: 2}
+  - {fileID: 11400000, guid: 87da40de173b43948214cb189eb9a78b, type: 2}
   audioMixer: {fileID: 24100000, guid: 0a786695c57d5e44787ba4b528a20f09, type: 2}
+  loopDatas:
+  - {fileID: 11400000, guid: 902be9bf79da42a49cc1f6dfc1a2a0d6, type: 2}
+  - {fileID: 11400000, guid: 9e50cf58a0894ea796ff353a282a94df, type: 2}
+  - {fileID: 11400000, guid: ede656c0ed934d3d90e4659c1d5e3069, type: 2}
+  - {fileID: 11400000, guid: bd033a0731224f7c98bb2e5c6ebc003a, type: 2}
+  - {fileID: 11400000, guid: abd94746fc8d451194c652edeac1b9a2, type: 2}
+  bgmGroup: {fileID: 24300010, guid: 0a786695c57d5e44787ba4b528a20f09, type: 2}
+  ambienceGroup: {fileID: 24300012, guid: 0a786695c57d5e44787ba4b528a20f09, type: 2}
+  mapLoopFadeSec: 1
 --- !u!4 &943787373
 Transform:
   m_ObjectHideFlags: 0
@@ -6265,7 +6276,7 @@ MonoBehaviour:
   <MaxWalkSpeed>k__BackingField: 5
   <SprintCoeff>k__BackingField: 2
   <FrictionWalkInfluence>k__BackingField: 1
-  <DefaultFootstepAudio>k__BackingField: {fileID: 11400000, guid: d78d695b40ad7c64b8cb95741be6bae5, type: 2}
+  <DefaultFootstepAudio>k__BackingField: {fileID: 11400000, guid: 3ac8994e7cc847c68d98e0c435427dbd, type: 2}
   <GroundFriction>k__BackingField: 0.6
   <AirFriction>k__BackingField: 0.99
   <BounceCoeff>k__BackingField: 0.3
@@ -6430,6 +6441,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38e3f54b62b251a4d941a4d8d2f199a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _flashlightOnAudio:
+    _audioData: {fileID: 11400000, guid: 3a181843d5224acaa20e1fde440b3309, type: 2}
+    _volume: 1
+    _delay: 0
+  _flashlightOffAudio:
+    _audioData: {fileID: 11400000, guid: a6ff5805e85f4c2dab48155d7730151a, type: 2}
+    _volume: 1
+    _delay: 0
 --- !u!1 &1992153300
 GameObject:
   m_ObjectHideFlags: 0
