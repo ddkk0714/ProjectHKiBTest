@@ -308,7 +308,9 @@ public class MapManager : MonoBehaviour
         for (int i = SceneManager.sceneCount - 1; i >= 0; i--)
         {
             Scene scene = SceneManager.GetSceneAt(i);
-            if (!scene.isLoaded || scene == active || scene == keep ||
+            // gameObject.scene(System)도 남긴다 — 에디터에서 맵 씬을 먼저 열면 활성 씬이 System이 아니라서
+            // System까지 "안 쓰는 씬"으로 언로드돼 Player(AudioListener)가 사라졌다.
+            if (!scene.isLoaded || scene == active || scene == keep || scene == gameObject.scene ||
                 scene == pendingAddressablesUnload || scene == pendingAdoptedUnload) continue;
 
             Debug.LogWarning($"[MapManager] 쓰이지 않는 씬 '{scene.name}'을 언로드합니다 — " +
