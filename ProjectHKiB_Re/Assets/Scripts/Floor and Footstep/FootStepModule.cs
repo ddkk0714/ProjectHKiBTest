@@ -38,10 +38,23 @@ public class FootStepModule : InterfaceModule, IFootstep
         footstepAudioList = new();
     }
 
+    private PhysicsModule _physics;
+
     public void PlayFootstepAudio(EnumManager.AnimDir animDir)
     {
-        if (DefaultFootstepAudio != null)
-            GameManager.instance.audioManager.PlayAudioOneShot(DefaultFootstepAudio, footstepAudioVolume, transform.position);
+        // 지금 밟고 있는 바닥(물리 Ground)에 FloorInfoProvider가 있으면 그 바닥 소리로, 없으면 기본 발소리로 낸다.
+        AudioDataSO stepAudio = DefaultFootstepAudio;
+        float stepVolume = footstepAudioVolume;
+        if (_physics == null) TryGetComponent(out _physics);
+        if (_physics != null && _physics.Ground != null
+            && _physics.Ground.TryGetComponent(out FloorInfoProvider floor) && floor.floorInfo != null)
+        {
+            stepAudio = floor.floorInfo.floorAudioData;
+            stepVolume *= floor.floorInfo.volume;
+        }
+
+        if (stepAudio != null)
+            GameManager.instance.audioManager.PlayAudioOneShot(stepAudio, stepVolume, transform.position);
         if (footstepAudioList != null && footstepAudioList.Count > 0)
         {
             for (int i = 0; i < footstepAudioList.Count; i++)

@@ -27,8 +27,8 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: ea287be6697f4e74c94f429bd7c7106c
-    m_Address: puzzle1_copy
+  - m_GUID: 086704335be44ca39f7105bb7312b1fa
+    m_Address: Story
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

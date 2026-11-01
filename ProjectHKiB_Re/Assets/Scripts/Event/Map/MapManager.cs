@@ -31,6 +31,9 @@ public class MapManager : MonoBehaviour
 
     public event Action<MapDataSO> OnMapLoaded;
 
+    [Tooltip("맵 로드가 끝나면 화면을 검정에서 걷어내는 시간(초). 전환을 일으킨 쪽(타이틀·출구 이벤트 등)이 먼저 검게 덮는다.")]
+    [SerializeField, Min(0f)] private float loadFadeInSec = 0.5f;
+
     public MapDataSO initialMap;
     [NaughtyAttributes.Button] public void LoadMap() => LoadMap(initialMap);
 
@@ -222,6 +225,9 @@ public class MapManager : MonoBehaviour
 
         Debug.Log("loaded: " + CurrentMapData.name + " (" + CurrentMapData.mapAddressableID + ")");
 
+        // OnMapLoaded보다 먼저 건다 — 구독자(이벤트 등)가 화면을 다시 덮고 싶으면 뒤에서 덮어쓸 수 있게.
+        ScreenEffectManager.Instance.FadeFromBlack(loadFadeInSec);
+
         OnMapLoaded?.Invoke(CurrentMapData);
 
         TryAdvanceMapLoadedTransition();
@@ -302,7 +308,9 @@ public class MapManager : MonoBehaviour
         for (int i = SceneManager.sceneCount - 1; i >= 0; i--)
         {
             Scene scene = SceneManager.GetSceneAt(i);
-            if (!scene.isLoaded || scene == active || scene == keep ||
+            // gameObject.scene(System)도 남긴다 — 에디터에서 맵 씬을 먼저 열면 활성 씬이 System이 아니라서
+            // System까지 "안 쓰는 씬"으로 언로드돼 Player(AudioListener)가 사라졌다.
+            if (!scene.isLoaded || scene == active || scene == keep || scene == gameObject.scene ||
                 scene == pendingAddressablesUnload || scene == pendingAdoptedUnload) continue;
 
             Debug.LogWarning($"[MapManager] 쓰이지 않는 씬 '{scene.name}'을 언로드합니다 — " +

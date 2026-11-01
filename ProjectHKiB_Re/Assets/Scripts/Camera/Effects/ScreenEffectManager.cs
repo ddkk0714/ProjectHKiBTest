@@ -527,6 +527,10 @@ public class ScreenEffectManager : MonoBehaviour
 
         _glitchCanvas.renderMode = RenderMode.ScreenSpaceCamera;
         _glitchCanvas.worldCamera = target;
+        // 모드를 바꾼 뒤 정렬 레이어를 다시 건다. 생성 때(Overlay) 지정한 Blur가 풀려 Default로 그려지면
+        // 화면 복사(Top)보다 먼저 그려져 엉뚱한 텍스처를 읽고, 그 뒤에 그려지는 플레이어 등은 일그러지지 않는다.
+        _glitchCanvas.sortingLayerName = GlitchSortingLayer;
+        _glitchCanvas.sortingOrder = GlitchSortingOrder;
         // 직교 카메라라 거리가 변해도 화면을 덮는 크기는 그대로다. 다만 클립 범위 안에 있어야
         // 그려지는데, 이 프로젝트의 2D 카메라는 near clip이 **음수**(-5000)라 "near + 0.01"로 잡으면
         // 카메라 5000유닛 뒤에 놓인다. 그래서 범위 안쪽의 적당한 값으로 잡는다.

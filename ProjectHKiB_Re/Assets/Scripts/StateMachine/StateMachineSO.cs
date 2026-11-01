@@ -36,8 +36,15 @@ public class StateMachineSO : ScriptableObject
         StateMachineGraph synchronizedGraph = StateMachineGraphSynchronizer.Synchronize(this);
         if (synchronizedGraph == null) return;
 
-        UnityEditor.EditorWindow.GetWindow<GraphProcessor.BaseGraphWindow>().InitializeGraph(synchronizedGraph); // StateMachineGraphWindow -> BaseGraphWindow
-        //Debug.LogError("임시로 비활성화됨!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        // StateMachineGraphWindow는 Editor 어셈블리에 있어 이 런타임 스크립트에서 이름으로 못 쓴다.
+        // 추상 클래스 BaseGraphWindow를 직접 열면 "Can not create instance of abstract class"가 나므로 타입을 찾아 연다.
+        foreach (System.Type windowType in UnityEditor.TypeCache.GetTypesDerivedFrom<GraphProcessor.BaseGraphWindow>())
+        {
+            if (windowType.Name != "StateMachineGraphWindow") continue;
+            ((GraphProcessor.BaseGraphWindow)UnityEditor.EditorWindow.GetWindow(windowType)).InitializeGraph(synchronizedGraph);
+            return;
+        }
+        Debug.LogError("[StateMachineSO] StateMachineGraphWindow를 찾지 못해 그래프 창을 열 수 없습니다.");
     }
 #endif
 

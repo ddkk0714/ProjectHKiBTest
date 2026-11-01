@@ -49,8 +49,18 @@ public class SaveModule : InterfaceModule, IInitializable
     private Dictionary<string, ItemDataSO> itemCache;
 
     // ====== PATH ======
-    private string GetPath(int slot)
+    private static string GetPath(int slot)
         => Path.Combine(Application.persistentDataPath, $"save_slot_{slot}.json");
+
+    // 타이틀 화면이 SaveModule 인스턴스(System 씬 안에 있음) 없이 Continue 활성 여부를 정할 때 쓴다.
+    public static bool HasSave(int slot) => File.Exists(GetPath(slot));
+
+    // 불러오기 전에 세이브 내용만 들여다본다. 타이틀의 Continue가 첫 맵을 저장된 맵으로 바꿔
+    // 스토리 맵(첫 맵)을 건너뛰는 데 쓴다.
+    public static SaveSlotData PeekSave(int slot)
+        => HasSave(slot) ? JsonUtility.FromJson<SaveSlotData>(File.ReadAllText(GetPath(slot))) : null;
+
+    public MapDataRegistrySO MapDataRegistry => mapDataRegistry;
 
     // ====== REGISTER ======
     public override void Register(IInterfaceRegistable interfaceRegistable)

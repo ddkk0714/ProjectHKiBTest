@@ -16,7 +16,7 @@ MonoBehaviour:
   isRealWorld: 0
   initialEventFlags:
     _serializedList: []
-  bgmID: 
+  bgmID: BGM_TheDepths
   allEntityInitInfos:
     _serializedList: []
   allAnimInitInfos:
