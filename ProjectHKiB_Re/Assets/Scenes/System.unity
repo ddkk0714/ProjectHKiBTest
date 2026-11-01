@@ -309,7 +309,8 @@ MonoBehaviour:
   localManager: {fileID: 0}
   navigationManager: {fileID: 0}
   _physicsManager: {fileID: 0}
-  initialMap: {fileID: 11400000, guid: 8ec334b70a8c48642ac8d85b828faa8c, type: 2}
+  loadFadeInSec: 0.5
+  initialMap: {fileID: 11400000, guid: 1fd37960a80d4ac3aaf79f8fa080a9d6, type: 2}
 --- !u!114 &75784914
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -590,7 +591,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 327803487}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -27, y: -53, z: 0}
+  m_LocalPosition: {x: 9, y: -60, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2559,6 +2560,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ede656c0ed934d3d90e4659c1d5e3069, type: 2}
   - {fileID: 11400000, guid: bd033a0731224f7c98bb2e5c6ebc003a, type: 2}
   - {fileID: 11400000, guid: abd94746fc8d451194c652edeac1b9a2, type: 2}
+  - {fileID: 11400000, guid: 8a0c162c37d746dbaa239d0d72411976, type: 2}
   bgmGroup: {fileID: 24300010, guid: 0a786695c57d5e44787ba4b528a20f09, type: 2}
   ambienceGroup: {fileID: 24300012, guid: 0a786695c57d5e44787ba4b528a20f09, type: 2}
   mapLoopFadeSec: 1
@@ -5265,10 +5267,10 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.15039578
-    y: 0
-    width: 0.6989153
-    height: 1
+    x: 0
+    y: 0.36771104
+    width: 0.46385545
+    height: 0.62826365
   near clip plane: -5000
   far clip plane: 5000
   field of view: 40
@@ -5297,7 +5299,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1718942438}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -27, y: -52.9999, z: -10}
+  m_LocalPosition: {x: 9, y: -59.9999, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

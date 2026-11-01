@@ -31,6 +31,9 @@ public class MapManager : MonoBehaviour
 
     public event Action<MapDataSO> OnMapLoaded;
 
+    [Tooltip("맵 로드가 끝나면 화면을 검정에서 걷어내는 시간(초). 전환을 일으킨 쪽(타이틀·출구 이벤트 등)이 먼저 검게 덮는다.")]
+    [SerializeField, Min(0f)] private float loadFadeInSec = 0.5f;
+
     public MapDataSO initialMap;
     [NaughtyAttributes.Button] public void LoadMap() => LoadMap(initialMap);
 
@@ -221,6 +224,9 @@ public class MapManager : MonoBehaviour
         if (navigationManager != null) navigationManager.RebuildWorld();
 
         Debug.Log("loaded: " + CurrentMapData.name + " (" + CurrentMapData.mapAddressableID + ")");
+
+        // OnMapLoaded보다 먼저 건다 — 구독자(이벤트 등)가 화면을 다시 덮고 싶으면 뒤에서 덮어쓸 수 있게.
+        ScreenEffectManager.Instance.FadeFromBlack(loadFadeInSec);
 
         OnMapLoaded?.Invoke(CurrentMapData);
 
