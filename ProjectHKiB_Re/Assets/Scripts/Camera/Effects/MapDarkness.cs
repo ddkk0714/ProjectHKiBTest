@@ -23,7 +23,10 @@ public class MapDarkness : MonoBehaviour
     // 맵 언로드도 OnDisable을 거친다. 다음 맵이 어두운 맵이면 그 맵의 MapDarkness가 OnEnable에서 바로 다시 건다.
     private void OnEnable()
     {
-        DarknessManager.Instance.Apply(_settings, _fadeIn, this);
+        // 플레이어가 F로 켜 둔 손전등을 암전이 끄지 않게 한다(밝을 때 켜 두면 어두워지는 순간 바로 보인다).
+        DarknessSettings settings = _settings.Clone();
+        settings.flashlight = _settings.flashlight || DarknessManager.Instance.FlashlightOn;
+        DarknessManager.Instance.Apply(settings, _fadeIn, this);
 #if UNITY_EDITOR
         _lastInspectorFlashlight = _settings.flashlight;
 #endif
