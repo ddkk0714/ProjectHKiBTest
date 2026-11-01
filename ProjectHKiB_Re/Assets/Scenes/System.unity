@@ -1407,7 +1407,7 @@ MonoBehaviour:
   m_Intensity: 0.55
   m_LightVolumeIntensity: 1
   m_LightVolumeIntensityEnabled: 0
-  m_ApplyToSortingLayers: 0000000081db3cb0c7b5fbf48bc1b754351178926d0a5214b95c3ec40d40db50596835511320dfa4
+  m_ApplyToSortingLayers: 0000000081db3cb0c7b5fbf48bc1b754351178926d0a5214b95c3ec40d40db50596835511320dfa467e97764
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -5267,10 +5267,10 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
-    y: 0.36771104
-    width: 0.46385545
-    height: 0.62826365
+    x: 0.13043478
+    y: 0
+    width: 0.73971015
+    height: 1
   near clip plane: -5000
   far clip plane: 5000
   field of view: 40
