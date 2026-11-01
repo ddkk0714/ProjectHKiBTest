@@ -187,14 +187,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 16
-  m_fontSizeBase: 16
+  m_fontSize: 13
+  m_fontSizeBase: 13
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -425,34 +425,47 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   text: {fileID: 318500916}
   lines:
-  - "(\uD398\uC774\uB4DC \uC778)\n\uC2E4\uD5D8 \uAE30\uB85D: T14-001_1109\n\uC2E4\uD5D8
+  - "(\uD398\uC774\uB4DC \uC778)\n\uC2E4\uD5D8 \uAE30\uB85D: [[T14-001_1109]]\n\uC2E4\uD5D8
     \uBAA9\uC801: '\uB378\uD0C0'\uC758 \uC815\uC11C \uC548\uC815\uD654 \uBC0F \uAE30\uB2A5\uD68C\uBCF5,
-    T01 \uAE30\uB85D \uC81C\uAC70"
-  - "\uC9C4\uCC99 \uBCF4\uACE0:\n\uD45C\uBC31...\n0...100%"
-  - "\uC0AC\uC545\uD55C \uB9C8\uC655 \uC0DD\uC131...\uC644\uB8CC\n\uB378\uD0C0\uC5D0\uAC8C
-    '\uC6A9\uC0AC' \uC0AC\uBA85 \uBD80\uC5EC...\uC644\uB8CC"
-  - "\uB378\uD0C0 \uC0C1\uC138 \uC18D\uC131 \uBD80\uC5EC...\n-\uBC29\uB791 \uAE30\uC0AC\n-\uB9C8\uC655\uC758
-    \uC0AC\uCC9C\uC655 \uC911 '\uAD34\uB825\uC758 \uAE30\uC0AC',   '\uCC3D\uACF5\uC758
-    \uAE30\uC0AC' \uCC98\uCE58\n-\uBA85\uC608 \uD6C8\uC7A5 \uBCF4\uC720\n...\uC644\uB8CC\u2026"
-  - "(\uD398\uC774\uB4DC \uC778)\n\uC2E4\uD5D8 \uAE30\uB85D: T14-287_1109\n\uC9C4\uCC99
-    \uBCF4\uACE0:\n\uB9C8\uC744 A38D101 \uC0DD\uC131..."
-  - "! \uBAAC\uC2A4\uD130E201 \uC0DD\uC131\uC624\uB958!\n! \uBAAC\uC2A4\uD130E202
-    \uC0DD\uC131\uC624\uB958!\n! \uBAAC\uC2A4\uD130E203 \uC0DD\uC131\uC624\uB958!"
-  - "! \uC790\uC560\uB85C\uC6B4 \uC131\uB140 \uC0DD\uC131...\uC2E4\uD328\n\uB3D9\uB8CC
-    \uC601\uC785 '\uC790\uC560\uB85C\uC6B4 \uC131\uB140' \uBD88\uAC00\n\uC6B0\uD68C\uB85C\uB97C
-    \uCC3E\uB294 \uC911..."
-  - "\uB9C8\uC655\uC131 F66R490 \uC0DD\uC131...\uC644\uB8CC\n\uC790\uC560\uB85C\uC6B4
-    \uC131\uB140 \uC0DD\uC131...\uC644\uB8CC"
-  - "\uB378\uD0C0\uC5D0\uAC8C \uBAA9\uD45C \uBD80\uC5EC...\n-\uB9C8\uC655\uC131\uC5D0
-    \uC7A0\uC785\n-\uC131\uB140\uB97C \uAD6C\uD558\uAE30\n-\uB9C8\uC655\uC744 \uD1A0\uBC8C\n...\uC644\uB8CC\u2026"
-  - "(\uD398\uC774\uB4DC \uC778)\n\uC2E4\uD5D8 \uAE30\uB85D: T1-143_1109\n\uC9C4\uCC99
-    \uBCF4\uACE0:"
-  - "- \uB378\uD0C0\uC758 \uC870\uC791...\n\u2190, \u2191, \u2192, \u2193 ...\n-
-    \uBE60\uB974\uAC8C \uB2EC\uB9AC\uAE30...\nShift ...\n- \uC190\uC804\uB4F1 \uCF1C\uACE0
-    \uB044\uAE30...\nF ..."
+    T01 \uAE30\uB85D\n\n\uC9C4\uCC99 \uBCF4\uACE0:\n\uD45C\uBC31...{0-100}% \uC81C\uAC70\n\n\uC0AC\uC545\uD55C
+    \uB9C8\uC655 \uC0DD\uC131...\uC644\uB8CC\n\uB378\uD0C0\uC5D0\uAC8C '\uC6A9\uC0AC'
+    \uC0AC\uBA85 \uBD80\uC5EC...\uC644\uB8CC"
+  - "(\uD398\uC774\uB4DC \uC778)\n\uC2E4\uD5D8 \uAE30\uB85D: [[T14-287_1109]]\n\uC9C4\uCC99
+    \uBCF4\uACE0:\n\uB9C8\uC744 [[A38D101]] \uC0DD\uC131... {1s}\n\n!![[! \uBAAC\uC2A4\uD130E201
+    \uC0DD\uC131\uC624\uB958!]]\n![[ \uBAAC\uC2A4\uD130E202 \uC0DD\uC131\uC624\uB958!]]\n![[
+    \uBAAC\uC2A4\uD130E203 \uC0DD\uC131\uC624\uB958!]]"
+  - "!! [[\uC790\uC560\uB85C\uC6B4 \uC131\uB140 \uC0DD\uC131...\uC2E4\uD328]]\n!
+    [[\uB3D9\uB8CC \uC601\uC785 '\uC790\uC560\uB85C\uC6B4 \uC131\uB140' \uBD88\uAC00]]\n\uC6B0\uD68C\uB85C\uB97C
+    \uCC3E\uB294 \uC911...{noise} {1s}\n\n\uB9C8\uC655\uC131 [[F66R490]] \uC0DD\uC131...\uC644\uB8CC\n\uC790\uC560\uB85C\uC6B4
+    \uC131\uB140 \uC0DD\uC131...\uC644\uB8CC\n\uB378\uD0C0\uC5D0\uAC8C \uBAA9\uD45C
+    \uBD80\uC5EC...\n-\uB9C8\uC655\uC131\uC5D0 \uC7A0\uC785\n-\uC131\uB140\uB97C
+    \uAD6C\uD558\uAE30\n-\uB9C8\uC655\uC744 \uD1A0\uBC8C\n...\uC644\uB8CC\u2026"
+  - "(\uD398\uC774\uB4DC \uC778)\n\uC2E4\uD5D8 \uAE30\uB85D: [[T1-143_1109]]\n\uC9C4\uCC99
+    \uBCF4\uACE0:\n\n- \uB378\uD0C0\uC758 \uC870\uC791...\n\u2190, \u2191, \u2192,
+    \u2193 ...\n- \uBE60\uB974\uAC8C \uB2EC\uB9AC\uAE30...\nShift ...\n- \uC190\uC804\uB4F1
+    \uCF1C\uACE0 \uB044\uAE30...\nF ..."
   nextMap: {fileID: 11400000, guid: 7d69083be1ace6841ae4c8e641677441, type: 2}
   fadeSec: 0.5
   typingSource: {fileID: 1998588355}
+  typingSoundSpeed: 1.5
+  counterSec: 1.5
+  noiseSec: 1
+  errorColor: {r: 1, g: 0.33, b: 0.33, a: 1}
+  glitchAudio:
+    _audioData: {fileID: 11400000, guid: 22eee24eb1a7453e94d6e143880717c9, type: 2}
+    _volume: 0.608
+    _delay: 0.1
+  glitchIntensity: 1
+  glitchBlockShift: 0.5
+  glitchRgbSplit: 0.025
+  glitchBlockDensity: 12
+  glitchBlockCoverage: 1
+  glitchSplitAngle: 0
+  glitchScanline: 0.8
+  glitchJitter: 0.08
+  glitchNoiseIntensity: 1
+  glitchNoiseSec: 0.2
+  charSec: 0.05
 --- !u!114 &1998588352
 MonoBehaviour:
   m_ObjectHideFlags: 0
