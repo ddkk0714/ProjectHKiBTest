@@ -227249,3 +227249,60 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!1001 &1273199338976286942
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4195565519432966508, guid: 6cfb55a04f9f7544ea5ca77a9177b02c, type: 3}
+      propertyPath: m_RootOrder
+      value: 34
+      objectReference: {fileID: 0}
+    - target: {fileID: 4195565519432966508, guid: 6cfb55a04f9f7544ea5ca77a9177b02c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4195565519432966508, guid: 6cfb55a04f9f7544ea5ca77a9177b02c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4195565519432966508, guid: 6cfb55a04f9f7544ea5ca77a9177b02c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4195565519432966508, guid: 6cfb55a04f9f7544ea5ca77a9177b02c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4195565519432966508, guid: 6cfb55a04f9f7544ea5ca77a9177b02c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4195565519432966508, guid: 6cfb55a04f9f7544ea5ca77a9177b02c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4195565519432966508, guid: 6cfb55a04f9f7544ea5ca77a9177b02c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4195565519432966508, guid: 6cfb55a04f9f7544ea5ca77a9177b02c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4195565519432966508, guid: 6cfb55a04f9f7544ea5ca77a9177b02c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4195565519432966508, guid: 6cfb55a04f9f7544ea5ca77a9177b02c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7035125624972995058, guid: 6cfb55a04f9f7544ea5ca77a9177b02c, type: 3}
+      propertyPath: m_Name
+      value: Puzzle1_ChaserEncounter
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6cfb55a04f9f7544ea5ca77a9177b02c, type: 3}

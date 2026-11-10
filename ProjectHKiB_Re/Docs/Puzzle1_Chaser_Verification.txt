@@ -1,0 +1,13 @@
+passed=True
+start=(9.00, -55.00, 0.00)
+end=(9.00, -58.00, 0.00)
+travel=13
+nodes=6528
+status=Arrived
+states=Chaser_Chase,Chaser_Pause,Chaser_Burst,Chaser_Recover
+sprint=True
+pauseStopped=True
+retargeted=True
+chaseSpeed=3
+burstSpeed=4.8
+errors=

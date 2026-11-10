@@ -1,0 +1,166 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1056118524798137069
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1163960449391067701}
+  - component: {fileID: 5789525041486908581}
+  m_Layer: 0
+  m_Name: Chaser_Navigation
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1163960449391067701
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1056118524798137069}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4195565519432966508}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5789525041486908581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1056118524798137069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4c493517a9a6fd4dbd91800d5fc443f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  world:
+    bottomLeft: {x: -45, y: -62}
+    topRight: {x: 58, y: 3}
+    cellSize: 1
+    minZ: -10
+    maxZ: 10
+    floorLayer:
+      serializedVersion: 2
+      m_Bits: 128
+    wallLayer:
+      serializedVersion: 2
+      m_Bits: 8
+    sampleBufferSize: 32
+    duplicateHeightTolerance: 0.05
+    allowDiagonal: 1
+    preventDiagonalCornerCutting: 1
+  maxPathsPerFrame: 2
+  buildOnAwake: 1
+  drawNodes: 0
+  drawConnections: 0
+  gizmoProfile: {fileID: 0}
+--- !u!1 &7035125624972995058
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4195565519432966508}
+  m_Layer: 0
+  m_Name: Puzzle1_ChaserEncounter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4195565519432966508
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7035125624972995058}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1163960449391067701}
+  - {fileID: 8011946386509093778}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &3349774082766949802
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 4195565519432966508}
+    m_Modifications:
+    - target: {fileID: 1623833651342782551, guid: cf315420d1ea532489f5ceb194300e89, type: 3}
+      propertyPath: navigationManager
+      value: 
+      objectReference: {fileID: 5789525041486908581}
+    - target: {fileID: 4705398553541547576, guid: cf315420d1ea532489f5ceb194300e89, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4705398553541547576, guid: cf315420d1ea532489f5ceb194300e89, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 4705398553541547576, guid: cf315420d1ea532489f5ceb194300e89, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -55
+      objectReference: {fileID: 0}
+    - target: {fileID: 4705398553541547576, guid: cf315420d1ea532489f5ceb194300e89, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4705398553541547576, guid: cf315420d1ea532489f5ceb194300e89, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4705398553541547576, guid: cf315420d1ea532489f5ceb194300e89, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4705398553541547576, guid: cf315420d1ea532489f5ceb194300e89, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4705398553541547576, guid: cf315420d1ea532489f5ceb194300e89, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4705398553541547576, guid: cf315420d1ea532489f5ceb194300e89, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4705398553541547576, guid: cf315420d1ea532489f5ceb194300e89, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4705398553541547576, guid: cf315420d1ea532489f5ceb194300e89, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4705398553541547578, guid: cf315420d1ea532489f5ceb194300e89, type: 3}
+      propertyPath: m_Name
+      value: Puzzle1_Chaser
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: cf315420d1ea532489f5ceb194300e89, type: 3}
+--- !u!4 &8011946386509093778 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4705398553541547576, guid: cf315420d1ea532489f5ceb194300e89, type: 3}
+  m_PrefabInstance: {fileID: 3349774082766949802}
+  m_PrefabAsset: {fileID: 0}

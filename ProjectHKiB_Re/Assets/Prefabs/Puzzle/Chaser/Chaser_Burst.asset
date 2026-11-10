@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ffa63ce1c9f844b99882f818407756, type: 3}
+  m_Name: Chaser_Burst
+  m_EditorClassIdentifier: 
+  isPacked: 0
+  isTemplate: 0
+  exposedVariables: []
+  temporaryID: 0.6476379
+  transitions:
+  - name: Player unavailable
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 0
+    disableTime: 0
+    decisions:
+    - Decision:
+        rid: 2065813257679273997
+      negate: 1
+    trueState: {fileID: 11400000, guid: 4bf847bbe66303a448df1e900f978c53, type: 2}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  - name: Burst duration
+    activationInput: 10
+    trigger: {fileID: 0}
+    type: 0
+    availableTime: 2
+    disableTime: 0
+    decisions: []
+    trueState: {fileID: 11400000, guid: 773221f622771b2469e0c0ce1cf007be, type: 2}
+    falseState: {fileID: 0}
+    Action:
+      rid: -2
+    showTrueStatePort: 1
+    showFalseStatePort: 0
+  additionalTransitions: []
+  EnterActions:
+  - rid: 2065813257679273998
+  - rid: 2065813257679273999
+  - rid: 2065813257679274000
+  UpdateActions:
+  - rid: 2065813257679274001
+  ExitActions:
+  - rid: 2065813257679274002
+  actionSequence: []
+  loopActionSequence: 0
+  useTimer: 0
+  timerID: 0
+  time: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 2065813257679273997
+      type: {class: DetectAndTargetDecision, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        radius: 300
+        targetManager: {fileID: 11400000, guid: b3f38c5a6e0762d4ba6cc8d3042b3e9d, type: 2}
+    - rid: 2065813257679273998
+      type: {class: ApplySprintAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        apply: 1
+    - rid: 2065813257679273999
+      type: {class: SetNavigationBehaviourAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        behaviour: {fileID: 11400000, guid: 0abe4742d28bc574ba0b75aff0dec11f, type: 2}
+        useCurrentTarget: 1
+        explicitTarget: {fileID: 0}
+    - rid: 2065813257679274000
+      type: {class: PlayAnimationAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        animationName: Walk
+    - rid: 2065813257679274001
+      type: {class: SetDirFromLastSetDirAction, ns: StateMachine, asm: Assembly-CSharp}
+      data:
+        negative: 0
+    - rid: 2065813257679274002
+      type: {class: StopNavigationAction, ns: StateMachine, asm: Assembly-CSharp}
+      data: 

@@ -1,0 +1,244 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-1945829380851517901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d5bce95d28994049b5bb57841a729ee, type: 3}
+  m_Name: Puzzle1_Chaser_FSMEditor
+  m_EditorClassIdentifier: 
+  serializedNodes: []
+  nodes:
+  - rid: 2065813257645981718
+  - rid: 2065813257645981719
+  - rid: 2065813257645981720
+  - rid: 2065813257645981721
+  - rid: 2065813257645981722
+  - rid: 2065813257645981723
+  edges:
+  - GUID: 217849d0-e6c1-4ac4-ac53-601458be0809
+    owner: {fileID: -1945829380851517901}
+    inputNodeGUID: 01d3fb67-7b08-4151-b4a3-17064ae8a1a2
+    outputNodeGUID: 442983d5-546e-4092-b3bb-668a6d80b02a
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: 34dddd13-3091-49ce-9927-16fc767427c2
+    owner: {fileID: -1945829380851517901}
+    inputNodeGUID: c4ff5377-7abe-4e80-a44f-fcecc0aca904
+    outputNodeGUID: 01d3fb67-7b08-4151-b4a3-17064ae8a1a2
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 1afdea17-724b-4076-bea5-82a3db05f201
+    owner: {fileID: -1945829380851517901}
+    inputNodeGUID: 01d3fb67-7b08-4151-b4a3-17064ae8a1a2
+    outputNodeGUID: c4ff5377-7abe-4e80-a44f-fcecc0aca904
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: d7caaf54-b6fd-47ac-add0-8f8065cf2c28
+    owner: {fileID: -1945829380851517901}
+    inputNodeGUID: 5808af95-5e92-42d1-a59b-17acc24f538b
+    outputNodeGUID: c4ff5377-7abe-4e80-a44f-fcecc0aca904
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 25506173-c67b-46d1-9eaf-9e95994a5482
+    owner: {fileID: -1945829380851517901}
+    inputNodeGUID: 3ee73445-05bf-40d7-b4ac-9bde88b62c7d
+    outputNodeGUID: 5808af95-5e92-42d1-a59b-17acc24f538b
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 41d5ed5b-5057-4f44-87d1-beeebf79bd82
+    owner: {fileID: -1945829380851517901}
+    inputNodeGUID: 01d3fb67-7b08-4151-b4a3-17064ae8a1a2
+    outputNodeGUID: 3ee73445-05bf-40d7-b4ac-9bde88b62c7d
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  - GUID: 270fde54-48cc-4feb-8443-0e50527127fb
+    owner: {fileID: -1945829380851517901}
+    inputNodeGUID: f960fe5f-427e-438c-ae8e-781dc637015e
+    outputNodeGUID: 3ee73445-05bf-40d7-b4ac-9bde88b62c7d
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_1_True
+  - GUID: 0b7e96f6-ee0b-47f2-b7bc-f382c1ce7c06
+    owner: {fileID: -1945829380851517901}
+    inputNodeGUID: c4ff5377-7abe-4e80-a44f-fcecc0aca904
+    outputNodeGUID: f960fe5f-427e-438c-ae8e-781dc637015e
+    inputFieldName: inputState
+    outputFieldName: outputTransitions
+    inputPortIdentifier: 
+    outputPortIdentifier: T_0_True
+  groups: []
+  stackNodes: []
+  pinnedElements: []
+  exposedParameters: []
+  serializedParameterList: []
+  stickyNotes: []
+  nodeInspectorReference: {fileID: 0}
+  position: {x: 0, y: 0, z: 0}
+  scale: {x: 1, y: 1, z: 1}
+  targetStateMachine: {fileID: 11400000}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2065813257645981718
+      type: {class: InitialStateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: 
+        GUID: 442983d5-546e-4092-b3bb-668a6d80b02a
+        computeOrder: 0
+        position:
+          serializedVersion: 2
+          x: -560
+          y: 0
+          width: 100
+          height: 100
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        outputTransitions: {fileID: 0}
+    - rid: 2065813257645981719
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Chaser_Acquire
+        GUID: 01d3fb67-7b08-4151-b4a3-17064ae8a1a2
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 11400000, guid: 4bf847bbe66303a448df1e900f978c53, type: 2}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 2065813257645981720
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Chaser_Chase
+        GUID: c4ff5377-7abe-4e80-a44f-fcecc0aca904
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 0
+          y: 320
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 11400000, guid: 252489e6a5d96224c8c9e38d8913e50c, type: 2}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 2065813257645981721
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Chaser_Pause
+        GUID: 5808af95-5e92-42d1-a59b-17acc24f538b
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 0
+          y: 640
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 11400000, guid: 9b8749c4d4b1f5a43a4093e7d46882f1, type: 2}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 2065813257645981722
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Chaser_Burst
+        GUID: 3ee73445-05bf-40d7-b4ac-9bde88b62c7d
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 0
+          y: 960
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 11400000, guid: 50428d47ba0fa9046ae648e739205785, type: 2}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+    - rid: 2065813257645981723
+      type: {class: StateNode, ns: , asm: Assembly-CSharp}
+      data:
+        nodeCustomName: Chaser_Recover
+        GUID: f960fe5f-427e-438c-ae8e-781dc637015e
+        computeOrder: -2
+        position:
+          serializedVersion: 2
+          x: 0
+          y: 1280
+          width: 400
+          height: 200
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        stateSO: {fileID: 11400000, guid: 773221f622771b2469e0c0ce1cf007be, type: 2}
+        inputState: {fileID: 0}
+        inputStateV: {fileID: 0}
+        outputTransitions: {fileID: 0}
+        outputTransitionsV: {fileID: 0}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97cc48d9291f2784caac4164ff25b2ab, type: 3}
+  m_Name: Puzzle1_Chaser_FSM
+  m_EditorClassIdentifier: 
+  customVariables:
+    boolVariables:
+      _serializedList: []
+    intVariables:
+      _serializedList: []
+    floatVariables:
+      _serializedList: []
+  initialState: {fileID: 11400000, guid: 4bf847bbe66303a448df1e900f978c53, type: 2}
+  graph: {fileID: -1945829380851517901}
+  allStates:
+  - {fileID: 11400000, guid: 4bf847bbe66303a448df1e900f978c53, type: 2}
+  - {fileID: 11400000, guid: 252489e6a5d96224c8c9e38d8913e50c, type: 2}
+  - {fileID: 11400000, guid: 9b8749c4d4b1f5a43a4093e7d46882f1, type: 2}
+  - {fileID: 11400000, guid: 50428d47ba0fa9046ae648e739205785, type: 2}
+  - {fileID: 11400000, guid: 773221f622771b2469e0c0ce1cf007be, type: 2}
+  _commandPairs: []
